@@ -1,0 +1,61 @@
+name: Deploy VitePress Site to GitHub Pages
+
+on:
+  push:
+    branches: [master]
+
+  workflow_dispatch: # Permite ejecutar este flujo manualmente desde la pestaña de Actions
+
+permissions:
+  contents: read # Permisos de lectura de contenido para el token
+  pages: write   # Permisos de escritura en GitHub Pages
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false # Evita cancelar los despliegues en progreso
+
+jobs:
+  # Job de construcción
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Permite obtener todo el historial para construir correctamente
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 'lts/*' # Última versión LTS de Node.js
+          cache: 'npm' # Puedes cambiarlo a pnpm / yarn si usas uno de esos gestores de paquetes
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+
+      - name: Install dependencies
+        run: npm ci # o pnpm install / yarn install / bun install según prefieras
+
+      - name: Build with VitePress
+        run: |
+          npm run docs:build # o pnpm docs:build / yarn docs:build / bun run docs:build
+          touch docs/.vitepress/dist/.nojekyll # Evita que GitHub Pages procese el contenido como un sitio Jekyll
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: docs/.vitepress/dist
+
+  # Job de despliegue
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    needs: build
+    runs-on: ubuntu-latest
+    name: Deploy
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
