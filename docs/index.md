@@ -6,6 +6,9 @@ hero:
   name: "Flaskavel Framework"
   text: "Your Laboratory for Elegant Web Development"
   tagline: My great project tagline
+  image:
+    src: logo.svg
+    alt: VitePress
   actions:
     - theme: brand
       text: Markdown Examples
