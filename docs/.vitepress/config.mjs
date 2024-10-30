@@ -4,11 +4,27 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "Flaskavel Framework",
   description: "Your Laboratory for Elegant Web Development",
+  lang: 'en-US',
+  lastUpdated: true,
+  base: '/',
   themeConfig: {
+    footer: {
+        message: 'Released under the MIT License.',
+        copyright: 'Copyright © 2024 Raul Mauricio Uñate'
+    },
+
+    logo: 'img/favicon.png',
+
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Examples', link: '/markdown-examples' }
+      { text: 'Examples', link: '/markdown-examples' },
+      {
+        text: 'Versions',
+        items: [
+          { text: 'v1.x', link: '/v1.x/' }
+        ]
+      }
     ],
 
     sidebar: [
@@ -24,5 +40,18 @@ export default defineConfig({
     socialLinks: [
       { icon: 'github', link: 'https://github.com/vuejs/vitepress' }
     ]
-  }
+  },
+  head: [
+    ['link', {
+            rel: 'stylesheet',
+            href: '/css/style.css'
+        }
+    ],
+    ['link', {
+        rel: 'icon',
+        href: 'img/favicon.png',
+        type: 'image/png'
+    }
+  ],
+  ],
 })
