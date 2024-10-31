@@ -1,28 +1,27 @@
 ---
-# https://vitepress.dev/reference/default-theme-home-page
 layout: home
 
 hero:
   name: "Flaskavel Framework"
-  text: "Your Laboratory for Elegant Web Development"
-  tagline: The elegant opinionated framework of Python.
+  text: "Python isn't just powerful; it’s thrilling."
+  tagline: "Elevate your craft to a science—take your web skills to new heights."
   image:
     src: logo.svg
-    alt: VitePress
+    alt: Flaskavel
   actions:
     - theme: brand
-      text: Get Started
+      text: "🚀 Get Started"
       link: /markdown-examples
     - theme: alt
-      text: View on GitHub
-      link: /api-examples
+      text: "🌐 View on GitHub"
+      link: https://github.com/flaskavel
 
 features:
-  - title: Feature A
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature B
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature C
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+  - title: "🎯 Purpose-Driven"
+    details: "We've adopted best practices from proven solutions, enhancing developer experience with a strong, value-driven framework."
+  - title: "✨ Effortless to Use"
+    details: "Familiar with other structured technologies? Then Flaskavel will feel incredibly intuitive and easy to adopt."
+  - title: "⚙️ Native Python Support"
+    details: "Python offers seamless, efficient solutions, where other tech stacks require cumbersome workarounds—get more with less effort."
 ---
 

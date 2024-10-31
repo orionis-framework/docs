@@ -1,17 +1,19 @@
 :root {
-    --vp-home-hero-name-color: #ed450c;
-    --vp-button-brand-border: #fcdd00;
-    --vp-button-brand-bg: #f0dc50;
-    --vp-button-brand-text: black;
-    --vp-button-brand-hover-bg: #ed450c;
-    --vp-c-brand-1: #ed450c;
+    --vp-home-hero-name-color: #ff1d44;
+    --vp-button-brand-border: #56a292;
+    --vp-button-brand-bg: #1c8080;
+    --vp-button-brand-hover-bg: #ff1d44;
+    --vp-c-brand-1: #ff1d44;
 }
 
-.tagline{
-    font-size: 22px !important;
+.VPHero.has-image .name {
+    color: #ff1d44;
 }
 
-[data-v-72cc4481] .image-src {
-    max-width: 400px;
-    max-height: 400px;
+@media (min-width: 640px) {
+    .VPImage.image-src {
+        max-width: 450px !important;
+        max-height: 450px !important;
+        margin-left: 50px !important;
+    }
 }
