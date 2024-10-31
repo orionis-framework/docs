@@ -1,28 +1,26 @@
 import { defineConfig } from 'vitepress'
 
-// https://vitepress.dev/reference/site-config
 export default defineConfig({
   title: "Flaskavel Framework",
-  description: "Your Laboratory for Elegant Web Development",
+  description: "Python isn't just powerful; it’s thrilling.",
   lang: 'en-US',
   lastUpdated: true,
   base: '/',
   themeConfig: {
     footer: {
-        message: 'Released under the MIT License.',
-        copyright: 'Copyright © 2024 Raul Mauricio Uñate'
+      message: 'This project is proudly released under the MIT License.',
+      copyright: '© 2024 Raul Mauricio Uñate and the Flaskavel Team. All rights reserved.'
     },
-
+    editLink: {
+      pattern: 'https://github.com/flaskavel/docs/tree/main/docs/:path'
+    },
     logo: 'img/favicon.png',
-
-    // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Examples', link: '/markdown-examples' },
       {
         text: 'Versions',
         items: [
-          { text: 'v1.x', link: '/v1.x/' }
+          { text: 'v1.x', link: '/v1.x/getting-started/install' }
         ]
       }
     ],
@@ -38,8 +36,11 @@ export default defineConfig({
     ],
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/vuejs/vitepress' }
-    ]
+      { icon: 'github', link: 'https://github.com/flaskavel' }
+    ],
+    search: {
+      provider: 'local'
+    }
   },
   head: [
     ['link', {
@@ -51,7 +52,47 @@ export default defineConfig({
         rel: 'icon',
         href: 'img/favicon.png',
         type: 'image/png'
-    }
-  ],
+      }
+    ],
+    ['meta', {
+        property: 'og:image',
+        content: 'og/og_image.jpg'
+      }
+    ],
+    ['meta', {
+        property: 'og:image:secure_url',
+        content: 'og/og_image.jpg'
+      }
+    ],
+    ['meta', {
+          property: 'og:image:width',
+          content: '600'
+      }
+    ],
+    ['meta', {
+          property: 'og:image:height',
+          content: '400'
+      }
+    ],
+    ['meta', {
+          property: 'og:title',
+          content: 'Flaskavel Framework'
+      }
+    ],
+    ['meta', {
+          property: 'og:description',
+          content: "Python isn't just powerful; it’s thrilling.!"
+      }
+    ],
+    ['meta', {
+          property: 'og:url',
+          content: 'https://github.com/flaskavel'
+      }
+    ],
+    ['meta', {
+          property: 'og:type',
+          content: 'website'
+      }
+    ]
   ],
 })

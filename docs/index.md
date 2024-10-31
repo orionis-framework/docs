@@ -11,7 +11,7 @@ hero:
   actions:
     - theme: brand
       text: "🚀 Get Started"
-      link: /markdown-examples
+      link: /1.x/prologue
     - theme: alt
       text: "🌐 View on GitHub"
       link: https://github.com/flaskavel
