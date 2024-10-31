@@ -12,7 +12,7 @@ export default defineConfig({
       copyright: '© 2024 Raul Mauricio Uñate and the Flaskavel Team. All rights reserved.'
     },
     editLink: {
-      pattern: 'https://github.com/flaskavel/docs/tree/main/docs/:path'
+      pattern: 'https://github.com/flaskavel/docs/tree/master/docs/:path'
     },
     logo: 'img/favicon.png',
     nav: [
