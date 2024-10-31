@@ -20,17 +20,17 @@ export default defineConfig({
       {
         text: 'Versions',
         items: [
-          { text: 'v1.x', link: '/v1.x/getting-started/install' }
+          { text: 'v1.x', link: '/1.x/getting-started/install' }
         ]
       }
     ],
 
     sidebar: [
+      { text: 'Prologue', link: '/1.x/prologue' },
       {
-        text: 'Examples',
+        text: 'Getting Started',
         items: [
-          { text: 'Markdown Examples', link: '/markdown-examples' },
-          { text: 'Runtime API Examples', link: '/api-examples' }
+          { text: 'Install', link: '/1.x/getting-started/install' },
         ]
       }
     ],
