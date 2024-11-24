@@ -1,4 +1,4 @@
-name: Deploy VitePress Site to GitHub Pages
+name: Deploy Flaskavel Docs
 
 on:
   push:

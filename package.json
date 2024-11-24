@@ -1,4 +1,9 @@
 {
+  "name": "flaskavel-docs",
+  "version": "1.0.0",
+  "description": "Documentation for Flaskavel framework using VitePress",
+  "author": "Raúl Mauricio Uñate Castro <raulmauriciounate@gmail.com>",
+  "license": "MIT",
   "devDependencies": {
     "vitepress": "^1.4.1"
   },
@@ -6,5 +11,15 @@
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs"
+  },
+  "keywords": [
+    "flaskavel",
+    "flask",
+    "laravel",
+    "python"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/flaskavel/docs"
   }
 }
