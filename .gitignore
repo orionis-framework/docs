@@ -1,12 +1,23 @@
+# Node.js dependencies folder. Typically excluded to avoid versioning installed packages.
 node_modules
+
+# VitePress cache directory. Excluded to prevent unnecessary files from being versioned.
 docs/.vitepress/cache
+
+# VitePress build output directory. Ignored as these are generated files after building the site.
 docs/.vitepress/dist
+
+# VitePress temporary files for development. Excluded to avoid committing intermediate states.
 docs/.vitepress/.temp
+
+# JetBrains Fleet IDE configurations. Excluded to prevent committing IDE-specific settings.
 .fleet
+
+# JetBrains IntelliJ-based IDE configurations (e.g., IntelliJ IDEA, PyCharm). These are user-specific and should not be versioned.
 .idea
+
+# Visual Studio Code configurations. Ignored as they are environment-specific and user-specific.
 .vscode
+
+# macOS metadata files. Excluded to avoid clutter in the repository with system-generated files.
 **/.DS_Store
-/vendor/
-/.fleet
-/.idea
-/.vscode
