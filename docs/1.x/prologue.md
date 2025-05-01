@@ -9,7 +9,7 @@ outline: false
 ## Welcome to Orionis: A New Era of Development
 
 <div style="display: flex; justify-content: center; margin-bottom: 20px;">
-  <img src="/img/min_logo_2.png" alt="Orionis Framework Logo" style="max-width: 200px;"/>
+  <img src="/img/min_logo_2.png" alt="Orionis Framework"/>
 </div>
 
 Orionis is not just a framework—it's a revolution. Born from the ambition to empower a team of exceptional developers, Orionis bridges the gap between the familiar and the future.
