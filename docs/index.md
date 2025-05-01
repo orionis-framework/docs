@@ -6,7 +6,7 @@ hero:
   text: "Python isn't just powerful; it’s thrilling."
   tagline: "Elevate your craft to a science—take your web skills to new heights."
   image:
-    src: public/img/logo.png
+    src: /img/logo.png
     alt: Orionis
   actions:
     - theme: brand

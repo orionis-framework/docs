@@ -1,11 +1,11 @@
 import { defineConfig } from 'vitepress'
-import { app } from '../../config/app'
-import { docs } from '../../config/docs'
-import { footer } from '../../config/footer'
-import { nav } from '../../config/nav'
-import { menu } from '../../config/menu'
-import { links } from '../../config/links'
-import { header } from '../../config/header'
+import { app } from './app'
+import { header } from './header'
+import { footer } from './footer'
+import { links } from './links'
+import { docs } from './docs'
+import { menu } from './menu'
+import { nav } from './nav'
 
 export default defineConfig({
   title: app.name,
