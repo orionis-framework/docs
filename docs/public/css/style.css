@@ -1,13 +1,16 @@
 :root {
-    --vp-home-hero-name-color: #ff1d44;
+    --vp-home-hero-name-color: #1b5480;
     --vp-button-brand-border: #56a292;
-    --vp-button-brand-bg: #1c8080;
-    --vp-button-brand-hover-bg: #ff1d44;
-    --vp-c-brand-1: #ff1d44;
+    --vp-button-brand-bg: #1b5480;
+    --vp-button-brand-hover-bg: #ebebef;
+    --vp-button-brand-hover-text: #1b5480;
+    --vp-c-brand-1: #1b5480;
+    --vp-button-alt-hover-bg: #1b5480;
+    --vp-button-alt-hover-text: #ffffff;
 }
 
 .VPHero.has-image .name {
-    color: #ff1d44;
+    color: #1b5480;
 }
 
 @media (min-width: 640px) {

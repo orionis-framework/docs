@@ -1,4 +1,4 @@
-name: Deploy Flaskavel Docs
+name: Deploy Orionis Docs
 
 on:
   push:

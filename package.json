@@ -1,11 +1,11 @@
 {
-  "name": "flaskavel-docs",
+  "name": "orionis-framework",
   "version": "1.0.0",
-  "description": "Documentation for Flaskavel framework using VitePress",
+  "description": "Documentation for Orionis framework using VitePress",
   "author": "Raúl Mauricio Uñate Castro <raulmauriciounate@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "vitepress": "^1.4.1"
+    "vitepress": "^1.0.0"
   },
   "scripts": {
     "docs:dev": "vitepress dev docs",
@@ -13,13 +13,13 @@
     "docs:preview": "vitepress preview docs"
   },
   "keywords": [
-    "flaskavel",
-    "flask",
+    "orionis",
+    "framework",
     "laravel",
     "python"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/flaskavel/docs"
+    "url": "https://github.com/orionis-framework/docs"
   }
 }
