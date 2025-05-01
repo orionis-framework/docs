@@ -11,7 +11,7 @@ export const app = {
     lang: 'en-US',
 
     // Base Path
-    base: 'https://orionis-framework.com/',
+    base: '/',
 
     // Author Information
     author: {
