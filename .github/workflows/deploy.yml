@@ -43,8 +43,9 @@ jobs:
           touch docs/.vitepress/dist/.nojekyll # Evita que GitHub Pages procese el contenido como un sitio Jekyll
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
+          name: vitepress-dist
           path: docs/.vitepress/dist
 
   # Job de despliegue
