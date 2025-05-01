@@ -42,11 +42,11 @@ jobs:
           npm run docs:build # Cambia npm por pnpm/yarn/bun si usas otro gestor de paquetes
           touch docs/.vitepress/dist/.nojekyll # Evita que GitHub Pages procese el contenido como un sitio Jekyll
 
-      - name: Upload artifact
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: vitepress-dist
-          path: docs/.vitepress/dist
+          name: my-artifact
+          path: ./build
 
   # Job de despliegue
   deploy:
