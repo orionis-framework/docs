@@ -1,7 +1,7 @@
 {
   "name": "orionis-framework",
   "version": "1.0.0",
-  "description": "Documentation for Orionis framework using VitePress",
+  "description": "Documentation for Orionis Framework",
   "author": "Raúl Mauricio Uñate Castro <raulmauriciounate@gmail.com>",
   "license": "MIT",
   "devDependencies": {
