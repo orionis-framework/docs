@@ -2,7 +2,7 @@ import { defineConfig } from 'vitepress'
 
 export default defineConfig({
   title: 'Orionis Framework',
-  description: 'Experience the power and excitement of Python.',
+  description: 'Unleash the power and excitement of Python with the Orionis Framework.',
   lang: 'en-US',
   lastUpdated: true,
   base: '/',
@@ -105,8 +105,8 @@ export default defineConfig({
       }
     ],
     footer: {
-      message: 'All rights reserved. Built with passion and dedication. This project is proudly released under the MIT License.',
-      copyright: `© 2023 - ${new Date().getFullYear()} | Orionis Framework Team.`,
+      message: 'Built with passion and dedication. Released under the MIT License.',
+      copyright: `© 2023 - ${new Date().getFullYear()} | Raúl Mauricio Uñate and the Orionis Framework Team.`,
     },
     editLink: {
       pattern: 'https://github.com/orionis-framework/docs/edit/master/docs/:path'
@@ -119,14 +119,14 @@ export default defineConfig({
     }
   },
   head: [
-    ['link', { rel: 'stylesheet', href: '/css/style.css' }],
-    ['link', { rel: 'icon', href: '/favicon.ico' }],
-    ['meta', { property: 'og:image', content: 'og/image.png' }],
-    ['meta', { property: 'og:image:secure_url', content: 'og/image.png' }],
+    ['link', { rel: 'stylesheet', href: '/css/style.css', type: 'text/css' }],
+    ['link', { rel: 'icon', href: '/favicon.ico', type: 'image/x-icon' }],
+    ['meta', { property: 'og:image', content: '/og/image.png' }],
+    ['meta', { property: 'og:image:secure_url', content: '/og/image.png' }],
     ['meta', { property: 'og:image:width', content: '600' }],
     ['meta', { property: 'og:image:height', content: '400' }],
     ['meta', { property: 'og:title', content: 'Orionis Framework' }],
-    ['meta', { property: 'og:description', content: 'Experience the power and excitement of Python.' }],
+    ['meta', { property: 'og:description', content: 'Unleash the power and excitement of Python with the Orionis Framework.' }],
     ['meta', { property: 'og:url', content: 'https://orionis-framework.com/' }],
     ['meta', { property: 'og:type', content: 'website' }]
   ]

@@ -3,7 +3,7 @@ layout: home
 
 hero:
   name: "Orionis Framework"
-  text: "Unleash the full potential of Python—where power meets elegance."
+  text: "Unlock Python's power with elegance."
   tagline: "Transform your web development journey into a masterpiece of innovation."
   image:
     src: /img/logo.png
