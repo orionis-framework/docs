@@ -3,52 +3,50 @@ name: Deploy Orionis Docs
 on:
   push:
     branches:
-      - master # Asegúrate de que "master" sea efectivamente tu rama principal
-  workflow_dispatch: # Permite ejecutar este flujo manualmente desde la pestaña de Actions
+      - master # Asegúrate de que "master" es tu rama principal
+  workflow_dispatch: # Permite ejecución manual desde Actions
 
 permissions:
-  contents: read # Permisos de lectura de contenido para el token
-  pages: write   # Permisos de escritura en GitHub Pages
+  contents: read
+  pages: write
   id-token: write
 
 concurrency:
   group: pages
-  cancel-in-progress: false # Evita cancelar los despliegues en progreso
+  cancel-in-progress: false
 
 jobs:
-  # Job de construcción
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0 # Permite obtener todo el historial para construir correctamente
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 'lts/*' # Última versión LTS de Node.js
+          node-version: 'lts/*'
           cache: 'npm'
 
       - name: Setup Pages
         uses: actions/configure-pages@v3
 
       - name: Install dependencies
-        run: npm ci # Cambia npm por pnpm/yarn/bun si usas otro gestor de paquetes
+        run: npm ci
 
       - name: Build with VitePress
         run: |
-          npm run docs:build # Cambia npm por pnpm/yarn/bun si usas otro gestor de paquetes
-          touch docs/.vitepress/dist/.nojekyll # Evita que GitHub Pages procese el contenido como un sitio Jekyll
+          npm run docs:build
+          touch docs/.vitepress/dist/.nojekyll
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: my-artifact
-          path: ./build
+          path: docs/.vitepress/dist
 
-  # Job de despliegue
   deploy:
     environment:
       name: github-pages
