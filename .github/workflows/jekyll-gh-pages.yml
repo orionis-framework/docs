@@ -1,5 +1,5 @@
 # Workflow for building and deploying a VitePress site to GitHub Pages
-name: Deploy VitePress to GitHub Pages
+name: Deploy Orionis Framework Docs
 
 on:
   # Runs on pushes targeting the default branch
@@ -31,7 +31,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18 # Specify the Node.js version compatible with VitePress
+            node-version: '>=22.0.0'
 
       - name: Install dependencies
         run: npm install
@@ -47,7 +47,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./docs/.vitepress/dist # Path to the built VitePress site
+          path: ./docs/.vitepress/dist
 
   # Deployment job
   deploy:

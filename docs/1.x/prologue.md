@@ -5,16 +5,28 @@ toc: false
 outline: false
 
 ---
-## What is Orionis?
 
-<div style="display: flex; justify-content: center;">
-  <img src="/img/min_logo_2.png" alt="Orionis Framework"/>
+## Welcome to Orionis: A New Era of Development
+
+<div style="display: flex; justify-content: center; margin-bottom: 20px;">
+  <img src="/img/min_logo_2.png" alt="Orionis Framework Logo" style="max-width: 200px;"/>
 </div>
 
-Orionis is born from a vision: to facilitate the leap of an exceptionally talented team of developers to a new technological horizon without losing their ability to make an impact. This team was skilled in PHP and mastered a framework that allowed them to create with precision and agility. However, as we looked ahead, we realized that the challenges we aimed to tackle, such as RPA, AI, Blockchain, Data Analytics, OCR, and Computer Vision, required something more: we needed the versatility and power of Python.
+Orionis is not just a framework—it's a revolution. Born from the ambition to empower a team of exceptional developers, Orionis bridges the gap between the familiar and the future.
 
-When the team faced the task of building a new architecture in Python, we understood that the transition was not just about language but also about mindset. Python, with its different approach to structure and application lifecycle, raised questions for which we needed a specific solution: How do we organize classes in a natural way? How do we manage the lifecycle of a Request? And what about Middleware, so essential in robust applications? Each element that they had mastered in the PHP ecosystem now posed a learning curve.
+Imagine a team of PHP experts, masters of precision and agility, standing at the edge of a new technological frontier. The challenges ahead—RPA, AI, Blockchain, Data Analytics, OCR, and Computer Vision—demanded more than just skill; they required a new toolset. Enter Python: versatile, powerful, and ready to tackle the future.
 
-Then the key question emerged: “What if we build something in Python that feels like home?” Thus, Orionis was born. We based this new framework on the methodology the team already mastered, capturing the essence of their workflow in a Python environment. We began developing the initial functionalities, tailored to their strengths and habits, and soon we provided them with a version to test. The result was surprising: they not only adapted quickly but also began to understand the why and how of each step. Instead of simply "using" a tool, they became active participants in a solution that not only facilitated their transition but also empowered them on their journey into Python.
+But transitioning to Python wasn’t just about learning a new language—it was about embracing a new mindset. Questions arose:
+- How do we structure classes naturally?
+- How do we manage the lifecycle of a Request?
+- What about Middleware, the backbone of robust applications?
 
-Orionis is more than just a framework; it is a community that transforms the transition from a simple technological leap into a complete evolution of skills, elevating web craftsmanship to a scientific level within the powerful ecosystem of Python.
+The answers lay in creating something extraordinary: a framework that felt like home.
+
+**Orionis was born.**
+
+Built on the methodology this team already mastered, Orionis captures the essence of their workflow and reimagines it in Python. The result? A seamless transition that not only accelerates adaptation but also transforms developers into active creators of their own solutions.
+
+With Orionis, the leap to Python becomes more than a technological shift—it’s a journey of empowerment. It’s a community where craftsmanship meets science, elevating development to new heights within Python’s powerful ecosystem.
+
+Welcome to Orionis. Your evolution starts here.

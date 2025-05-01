@@ -4,9 +4,9 @@
     --vp-button-brand-bg: #1b5480;
     --vp-button-brand-hover-bg: #ebebef;
     --vp-button-brand-hover-text: #1b5480;
-    --vp-c-brand-1: #1b5480;
     --vp-button-alt-hover-bg: #1b5480;
     --vp-button-alt-hover-text: #ffffff;
+    --vp-c-brand-1: #1b5480;
 }
 
 .VPHero.has-image .name {

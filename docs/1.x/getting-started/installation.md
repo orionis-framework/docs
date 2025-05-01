@@ -6,69 +6,46 @@ outline: deep
 
 # Installation
 
+Welcome to the installation guide for **Orionis Framework**! Follow these steps to set up your environment and start building amazing projects.
+
 ## Requirements
 
-To install and use Flaskavel, make sure you have the following prerequisites:
+Before you begin, ensure your system meets the following prerequisites:
 
-- `git`
-- `python >= 3.12`
-- `pip` (usually installed alongside Python)
+- **Git**: Version control system.
+- **Python**: Version `3.12` or higher.
+- **Pip**: Python package manager (usually bundled with Python).
 
-## Global Installation of Flaskavel
+## Global Installation of Orionis
 
-To install Flaskavel globally on your machine or server, run the following command:
+Install Orionis Framework globally on your machine with the following command:
 
 ```sh
-pip install flaskavel
+pip install orionis
 ```
 
-If you already have it installed and want to update to the latest version, use:
+To update to the latest version, simply run:
 
 ```sh
-pip install --upgrade flaskavel
+pip install --upgrade orionis
 ```
 
 ## Creating a New Project
 
-To create a new Flaskavel project, open a terminal in the directory where you want to generate the project and run:
+Generate a new Orionis Framework project effortlessly. Open a terminal in your desired directory and execute:
 
 ```sh
-flaskavel new example-app
+orionis new example-app
 ```
 
-This will produce an output similar to the following:
+In just moments, your project will be ready to dive into Orionis Framework development.
 
-```
-┌─┐┬  ┌─┐┌─┐┬┌─┌─┐┬  ┬┌─┐┬
-├┤ │  ├─┤└─┐├┴┐├─┤└┐┌┘├┤ │
-└  ┴─┘┴ ┴└─┘┴ ┴┴ ┴ └┘ └─┘┴─┘
-Python isn't just powerful; it’s thrilling.
--------------------------------------------
-Flaskavel Team © 2024 - 202X
-Version: X.X.X
-Docs: https://flaskavel.com/
+## Starting the Project
 
-Thank you for using Flaskavel.
- INFO  2024-01-06 06:00:03 [Init Project] - Cloning the repository into 'example-app'... (Getting Latest Version)
- INFO  2024-01-06 06:00:03 [Init Project] - Repository successfully cloned into 'example-app'.
- INFO  2024-01-06 06:00:03 [Init Project] - Entering directory 'example-app'.
- INFO  2024-01-06 06:00:03 [Init Project] - Creating virtual environment...
- INFO  2024-01-06 06:00:06 [Init Project] - Virtual environment successfully created.
- INFO  2024-01-06 06:00:06 [Init Project] - Installing dependencies from 'requirements.txt'...
- INFO  2024-01-06 06:00:11 [Init Project] - Dependencies successfully installed.
- INFO  2024-01-06 06:00:12 [Init Project] - Project 'example-app' successfully created at 'D:\workspace\flaskavel\example-app'.
-Welcome aboard, the journey starts now. Let your imagination soar!
-```
-
-In just a few seconds, your project will be ready for you to start experiencing Flaskavel development.
-
-## Start the Project
-
-Now, simply navigate to the project directory and start the server.
+Navigate to your project directory and launch the development server:
 
 ```sh
 cd ./example-app
-python -B reactor serve
 ```
 
-✨🚀 Unleash Your Creativity! 🚀✨
+✨🚀 **Unleash Your Creativity with Orionis Framework!** 🚀✨
