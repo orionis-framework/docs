@@ -102,6 +102,19 @@ export default defineConfig({
           { text: 'Collaboration Guide', link: '/1.x/community/collaboration-guide' },
           { text: 'Next Steps', link: '/1.x/community/next-steps' },
         ]
+      },
+      {
+        text: 'Testing',
+        collapsed: true,
+        collapsible: true,
+        items: [
+          { text: 'Getting Started', link: '/1.x/testing/getting-started' },
+          { text: 'Mandatory Syntax', link: '/1.x/testing/required-syntax' },
+          { text: 'Custom Suite', link: '/1.x/testing/custom-suite' },
+          { text: 'Methods', link: '/1.x/testing/methods' },
+          { text: 'Printing Output', link: '/1.x/testing/printing-output' },
+          { text: 'Types', link: '/1.x/testing/types' },
+        ]
       }
     ],
     footer: {
