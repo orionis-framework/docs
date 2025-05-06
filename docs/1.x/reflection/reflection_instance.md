@@ -29,7 +29,8 @@ class FakeClass(BaseFakeClass):
 
     def __init__(self) -> None:
         self.public_attr = 42
-        self._private_attr = "secret"
+        self._protected_attr = "protected"
+        self.__private_attr = "private"
         self.dynamic_attr = None
 
     def instanceMethod(self, x: int, y: int) -> int:
@@ -142,8 +143,79 @@ print(attributes)
 # Output:
 # {
 #     "public_attr": 42,
-#     "_private_attr": "secret",
+#     "_protected_attr": "protected",
+#     "__private_attr": "private",
 #     "dynamic_attr": None
+# }
+```
+
+### `getPublicAttributes` Method
+
+The `getPublicAttributes` method returns a dictionary containing all public attributes of an instance. This is useful for identifying attributes that are intended for external access and manipulation.
+
+```python
+from orionis.luminate.support.inspection.reflection import Reflection
+from folder.module import FakeClass
+
+# Create a Reflection instance for the target object
+reflex = Reflection.instance(FakeClass())
+
+# Retrieve the instance public attributes
+attributes = reflex.getPublicAttributes()
+
+# Print the retrieved attributes
+print(attributes)
+
+# Output:
+# {
+#     "public_attr": 42,
+#     "dynamic_attr": None
+# }
+```
+
+### `getPrivateAttributes` Method
+
+The `getPrivateAttributes` method returns a dictionary containing all private attributes of an instance. This is useful for identifying attributes that are intended for internal use only and should not be accessed directly from outside the class.
+
+```python
+from orionis.luminate.support.inspection.reflection import Reflection
+from folder.module import FakeClass
+
+# Create a Reflection instance for the target object
+reflex = Reflection.instance(FakeClass())
+
+# Retrieve the instance private attributes
+attributes = reflex.getPrivateAttributes()
+
+# Print the retrieved attributes
+print(attributes)
+
+# Output:
+# {
+#     "__private_attr": "private",
+# }
+```
+
+### `getProtectedAttributes` Method
+
+The `getProtectedAttributes` method returns a dictionary containing all protected attributes of an instance. This is useful for identifying attributes that are intended for internal use within the class or by subclasses.
+
+```python
+from orionis.luminate.support.inspection.reflection import Reflection
+from folder.module import FakeClass
+
+# Create a Reflection instance for the target object
+reflex = Reflection.instance(FakeClass())
+
+# Retrieve the instance protected attributes
+attributes = reflex.getProtectedAttributes()
+
+# Print the retrieved attributes
+print(attributes)
+
+# Output:
+# {
+#     "_protected_attr": "protected",
 # }
 ```
 
