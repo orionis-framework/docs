@@ -94,16 +94,6 @@ export default defineConfig({
         ]
       },
       {
-        text: 'Community',
-        collapsed: true,
-        collapsible: true,
-        items: [
-          { text: 'Discord', link: '/1.x/community/discord' },
-          { text: 'Collaboration Guide', link: '/1.x/community/collaboration-guide' },
-          { text: 'Next Steps', link: '/1.x/community/next-steps' },
-        ]
-      },
-      {
         text: 'Testing',
         collapsed: true,
         collapsible: true,
@@ -114,6 +104,25 @@ export default defineConfig({
           { text: 'Methods', link: '/1.x/testing/methods' },
           { text: 'Printing Output', link: '/1.x/testing/printing-output' },
           { text: 'Types', link: '/1.x/testing/types' },
+        ]
+      },
+      {
+        text: 'Reflection',
+        collapsed: true,
+        collapsible: true,
+        items: [
+          { text: 'What is it?', link: '/1.x/reflection/reflection' },
+          { text: 'Reflecting an Instance', link: '/1.x/reflection/reflection_instance' },
+        ]
+      },
+      {
+        text: 'Community',
+        collapsed: true,
+        collapsible: true,
+        items: [
+          { text: 'Discord', link: '/1.x/community/discord' },
+          { text: 'Collaboration Guide', link: '/1.x/community/collaboration-guide' },
+          { text: 'Next Steps', link: '/1.x/community/next-steps' },
         ]
       }
     ],
