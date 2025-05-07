@@ -9,7 +9,10 @@ outline: false
 ## Welcome to Orionis: A New Era of Development
 
 <div style="display: flex; justify-content: center; margin-bottom: 20px;">
-  <img src="/img/logo.svg" alt="Orionis Framework" style="width: 300px; height: auto; margin-top: 30px; margin-bottom: 30px;"/>
+  <img src="https://raw.githubusercontent.com/orionis-framework/framework/1.x/orionis/static/svg/logo.svg" alt="Orionis Framework" style="width: 300px; height: auto; margin-top: 30px; margin-bottom: 0px;"/>
+</div>
+<div style="display: flex; justify-content: center; margin-bottom: 20px;">
+  <img src="https://raw.githubusercontent.com/orionis-framework/framework/1.x/orionis/static/svg/text.svg" alt="Orionis Framework" style="width: 400px; height: auto; margin-top: 0px; margin-bottom: 30px;"/>
 </div>
 
 Orionis is not just a framework—it's a revolution. Born from the ambition to empower a team of exceptional developers, Orionis bridges the gap between the familiar and the future.

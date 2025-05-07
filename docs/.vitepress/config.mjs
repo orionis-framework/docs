@@ -7,7 +7,7 @@ export default defineConfig({
   lastUpdated: true,
   base: '/',
   themeConfig: {
-    logo: 'img/logo.svg',
+    logo: 'https://raw.githubusercontent.com/orionis-framework/framework/1.x/orionis/static/svg/logo.svg',
     nav: [
       {
         text: 'Home',
@@ -142,7 +142,7 @@ export default defineConfig({
   },
   head: [
     ['link', { rel: 'stylesheet', href: '/css/style.css', type: 'text/css' }],
-    ['link', { rel: 'icon', href: '/img/logo.svg', type: 'image/svg+xml' }],
+    ['link', { rel: 'icon', href: 'https://raw.githubusercontent.com/orionis-framework/framework/1.x/orionis/static/svg/logo.svg', type: 'image/svg+xml' }],
     ['meta', { property: 'og:image', content: '/og/image.png' }],
     ['meta', { property: 'og:image:secure_url', content: '/og/image.png' }],
     ['meta', { property: 'og:image:width', content: '600' }],
