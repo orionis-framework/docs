@@ -6,7 +6,7 @@ hero:
   text: "Unlock Python's power with elegance."
   tagline: "Transform your web development journey into a masterpiece of innovation."
   image:
-    src: /img/logo.png
+    src: /img/logo.svg
     alt: "Orionis Framework Logo"
   actions:
     - theme: brand

@@ -121,6 +121,41 @@ module_name = reflex.getModuleName()
 print(module_name)  # Output: "folder.module"
 ```
 
+### `getAllAttributes` Method
+This method returns a dataclass containing all the attributes of the instance, including public, protected, and private ones. It is particularly useful for inspecting an object's state or building advanced tools such as serializers or debuggers.
+
+```python
+from orionis.luminate.support.inspection.reflection import Reflection
+from folder.module import FakeClass
+
+# Create a Reflection instance for the target object
+reflex = Reflection.instance(FakeClass())
+
+# Retrieve ClassAttributes
+attrs = reflex.getAllAttributes()
+print(attrs)
+
+# Output:
+# ClassAttributes(
+#     public={
+#         'public_attr': 42,
+#         'dynamic_attr': None
+#     },
+#     private={
+#         '__private_attr': 'private'
+#     },
+#     protected={
+#         '_protected_attr': 'protected'
+#     },
+#     all={
+#         'public_attr': 42,
+#         'dynamic_attr': None,
+#         '__private_attr': 'private',
+#         '_protected_attr': 'protected'
+#     }
+# )
+```
+
 ### `getAttributes` Method
 
 The `getAttributes` method returns a dictionary containing all attributes of an instance, including both public and private ones. This is particularly useful for dynamically inspecting an object’s state or for building advanced tools such as serializers or debuggers.
