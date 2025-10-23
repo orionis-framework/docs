@@ -13,6 +13,11 @@
     color: #1b5480;
 }
 
+.VPHero.has-image .text{
+    font-size: 2rem;
+    line-height: 1.2;
+}
+
 @media (min-width: 640px) {
     .VPImage.image-src {
         max-width: 450px !important;
