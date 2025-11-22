@@ -1,5 +1,6 @@
-/* Import Urbanist font from Google Fonts */
+/* Import fonts from Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap');
 
 /* Set Urbanist as the main font */
 :root {
@@ -28,11 +29,38 @@ h6 {
 }
 
 /* Styles for code elements keeping monospace font */
-code,
 pre,
 kbd,
 samp {
-    font-family: 'Fira Code', 'Monaco', 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+    font-family: 'Fira Code', 'Monaco', 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace !important;
+}
+
+code,
+code *,
+.code,
+[class*="code"],
+tt {
+    font-family: 'Fira Code', 'Monaco', 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace !important;
+}
+
+/* Additional selectors for framework-specific code elements */
+.astro-code,
+.shiki,
+.highlight,
+.language-*,
+[data-language],
+.token,
+.hljs {
+    font-family: 'Fira Code', 'Monaco', 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace !important;
+}
+
+/* Override any inherited font-family from parent elements */
+* code,
+* pre,
+* kbd,
+* samp,
+* tt {
+    font-family: 'Fira Code', 'Monaco', 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace !important;
 }
 
 /* Documentation title/name styles */
@@ -116,4 +144,30 @@ nav[aria-labelledby] a[aria-current="page"]:hover {
 
 .right-sidebar li:has(a[href="#_top"]) {
   display: none !important;
+}
+
+/* Contributors page enhancements */
+.contributors-showcase {
+  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --accent-gradient: linear-gradient(135deg, #ffd700, #ffed4a);
+  --shadow-primary: 0 10px 30px rgba(102, 126, 234, 0.3);
+  --shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.15);
+  --border-radius-xl: 20px;
+}
+
+/* Smooth scrolling for better UX */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Enhanced focus states for accessibility */
+.contributor-card:focus-within {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+.contributor-name a:focus {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+  border-radius: 4px;
 }

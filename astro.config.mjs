@@ -43,6 +43,7 @@ export default defineConfig({
 			sidebar: [
 				{
 					label: '📚 Introduction',
+					collapsed: false,
 					translations: {
 						es: '📚 Introducción',
 					},
@@ -65,7 +66,7 @@ export default defineConfig({
 				},
 				{
 					label: '🛠️ Installation',
-					collapsed: true,
+					collapsed: false,
 					translations: {
 						es: '🛠️ Instalación'
 					},
@@ -82,6 +83,29 @@ export default defineConfig({
 							slug: 'installation/steps',
 							translations: {
 								es: 'Pasos de Instalación',
+							},
+						},
+					],
+				},
+				{
+					label: '🤝 Contribute',
+					collapsed: false,
+					translations: {
+						es: '🤝 Contribuir'
+					},
+					items: [
+						{
+							label: 'Contribution Guide',
+							slug: 'contribute/guide',
+							translations: {
+								es: 'Guía de Contribución',
+							},
+						},
+						{
+							label: 'Contributors',
+							slug: 'contribute/contributors',
+							translations: {
+								es: 'Contribuidores',
 							},
 						},
 					],

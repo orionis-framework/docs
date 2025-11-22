@@ -1,0 +1,345 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { ContributorsAPI, type ContributorData } from '../../../utils/contributors';
+
+// Get data using our API utility
+const contributors = await ContributorsAPI.fetchContributors();
+---
+
+<StarlightPage
+  frontmatter={{
+    title: "Contributors",
+    description: "Discover the amazing contributors who make Orionis Framework possible"
+  }}
+>
+  <div class="contributors-container">
+    <p class="intro">
+      Our thanks to the {contributors.length} people who have contributed {contributors.reduce((sum, c) => sum + c.totalContributions, 0)} commits to the development of Orionis Framework.
+    </p>
+
+    <div class="contributors-list">
+      {contributors.map((contributor) => (
+        <div class="contributor-item">
+          <a href={contributor.html_url} target="_blank" rel="noopener noreferrer" class="contributor-link">
+            <img
+              src={contributor.avatar_url}
+              alt={`${contributor.login}`}
+              class="avatar"
+              loading="lazy"
+            />
+            <div class="contributor-info">
+              <strong class="username">{contributor.login}</strong>
+              <div class="stats">
+                <span class="total">{contributor.totalContributions}</span>
+                <div class="breakdown">
+                  {contributor.frameworkContributions > 0 && (
+                    <span class="repo">Framework: {contributor.frameworkContributions}</span>
+                  )}
+                  {contributor.skeletonContributions > 0 && (
+                    <span class="repo">Skeleton: {contributor.skeletonContributions}</span>
+                  )}
+                </div>
+              </div>
+            </div>
+            {contributor.rank <= 3 && (
+              <span class="rank">{ContributorsAPI.getRankBadge(contributor.rank)}</span>
+            )}
+          </a>
+        </div>
+      ))}
+    </div>
+
+    {contributors.length === 0 && (
+      <div class="loading">
+        <p>Loading contributors...</p>
+      </div>
+    )}
+
+    <div class="contribute-note">
+      <div class="contribute-header">
+        <span class="contribute-icon">🚀</span>
+        <h3>Want to appear here?</h3>
+      </div>
+      <p class="contribute-description">
+        Join our developer community and contribute to the growth of the framework.
+      </p>
+      <div class="contribute-actions">
+        <a href="https://github.com/orionis-framework/framework" class="contribute-btn primary" target="_blank" rel="noopener noreferrer">
+          <span class="btn-icon">⚡</span>
+          <span>Framework Core</span>
+        </a>
+        <a href="https://github.com/orionis-framework/skeleton" class="contribute-btn secondary" target="_blank" rel="noopener noreferrer">
+          <span class="btn-icon">🏗️</span>
+          <span>Skeleton Template</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    /* Hide right sidebar for a cleaner contributors page */
+    :global(.right-sidebar-container) {
+      display: none !important;
+    }
+
+    :global(.main-frame) {
+      grid-template-columns: var(--sl-sidebar-width) 1fr !important;
+    }
+
+    .contributors-container {
+      max-width: none;
+      width: 100%;
+      margin: 0;
+      padding: 2rem;
+    }
+
+    .intro {
+      text-align: center;
+      font-size: 1.1rem;
+      color: #134675;
+      margin-bottom: 2rem;
+      font-weight: 500;
+    }
+
+    .contributors-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .contributor-item {
+      position: relative;
+    }
+
+    .contributor-link {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s ease;
+      background: white;
+    }
+
+    .contributor-link:hover {
+      border-color: #4CC9F0;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(76, 201, 240, 0.2);
+    }
+
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      border: 2px solid #4CC9F0;
+    }
+
+    .contributor-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .username {
+      display: block;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #134675;
+      margin-bottom: 0.25rem;
+    }
+
+    .stats {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+    }
+
+    .total {
+      font-weight: 600;
+      color: #4CC9F0;
+    }
+
+    .breakdown {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .repo {
+      color: #666;
+      font-size: 0.8rem;
+    }
+
+    .rank {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      width: 24px;
+      height: 24px;
+      background: #F4C430;
+      border: 2px solid #134675;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      color: #134675;
+      font-weight: 700;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: var(--sl-color-gray-3);
+    }
+
+    .contribute-note {
+      text-align: center;
+      padding: 2rem;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      border-radius: 12px;
+      border: 2px solid #4CC9F0;
+      margin-top: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .contribute-note::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #134675, #4CC9F0, #F4C430);
+    }
+
+    .contribute-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .contribute-icon {
+      font-size: 1.5rem;
+    }
+
+    .contribute-header h3 {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #134675;
+    }
+
+    .contribute-description {
+      margin: 0 0 1.5rem 0;
+      color: #134675;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      opacity: 0.8;
+    }
+
+    .contribute-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .contribute-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+      border: 2px solid transparent;
+      min-width: 140px;
+      justify-content: center;
+    }
+
+    .contribute-btn.primary {
+      background: #134675;
+      color: white;
+    }
+
+    .contribute-btn.primary:hover {
+      background: #4CC9F0;
+      color: #134675;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(76, 201, 240, 0.3);
+    }
+
+    .contribute-btn.secondary {
+      background: transparent;
+      color: #134675;
+      border-color: #134675;
+    }
+
+    .contribute-btn.secondary:hover {
+      background: #F4C430;
+      color: #134675;
+      border-color: #F4C430;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(244, 196, 48, 0.3);
+    }
+
+    .btn-icon {
+      font-size: 1rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .contributors-list {
+        grid-template-columns: 1fr;
+      }
+
+      .stats {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+      }
+
+      .breakdown {
+        gap: 0.25rem;
+      }
+    }
+
+    /* Animation on load */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .contributor-item {
+      animation: fadeInUp 0.3s ease forwards;
+    }
+
+    .contributor-item:nth-child(n) {
+      animation-delay: calc(var(--i, 0) * 50ms);
+    }
+  </style>
+
+  <script>
+    // Add animation delays
+    document.querySelectorAll('.contributor-item').forEach((item, index) => {
+      (item as HTMLElement).style.setProperty('--i', index.toString());
+    });
+  </script>
+</StarlightPage>
