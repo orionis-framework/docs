@@ -1,0 +1,119 @@
+/* Import Urbanist font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&display=swap');
+
+/* Set Urbanist as the main font */
+:root {
+    --font-family: 'Urbanist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+/* Apply to all elements */
+* {
+    font-family: var(--font-family);
+}
+
+/* Specific styles for text elements */
+body {
+    font-family: var(--font-family);
+    font-weight: 400;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-family);
+    font-weight: 600;
+}
+
+/* Styles for code elements keeping monospace font */
+code,
+pre,
+kbd,
+samp {
+    font-family: 'Fira Code', 'Monaco', 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+}
+
+/* Documentation title/name styles */
+.site-title,
+.navbar-brand,
+.header-title,
+[data-page-title],
+.starlight-banner h1,
+.site-header h1,
+.main-header h1 {
+    color: #134675 !important;
+    font-weight: 700;
+}
+
+/* Icon styles */
+.icon,
+.nav-icon,
+.menu-icon,
+svg,
+[class*="icon"],
+i {
+    fill: #134675 !important;
+    color: #134675 !important;
+    transition: all 0.3s ease;
+}
+
+.icon:hover,
+.nav-icon:hover,
+.menu-icon:hover,
+svg:hover,
+[class*="icon"]:hover,
+i:hover,
+a:hover .icon,
+a:hover .nav-icon,
+a:hover .menu-icon,
+a:hover svg,
+a:hover [class*="icon"],
+a:hover i {
+    fill: #4CC9F0 !important;
+    color: #4CC9F0 !important;
+    transform: scale(1.05);
+}
+
+/* Sidebar styles for Starlight */
+/* Active/current page item */
+.sidebar nav a[aria-current="page"],
+.sidebar nav a.active,
+.sidebar-content a[aria-current="page"],
+.sidebar-content a.active,
+[data-starlight-sidebar] a[aria-current="page"],
+[data-starlight-sidebar] a.active,
+.sidebar a[data-current-parent],
+nav[aria-labelledby] a[aria-current="page"] {
+    background-color: #134675 !important;
+    font-weight: 600;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+/* Make sure active state takes precedence over hover */
+.sidebar nav a[aria-current="page"]:hover,
+.sidebar nav a.active:hover,
+.sidebar-content a[aria-current="page"]:hover,
+.sidebar-content a.active:hover,
+[data-starlight-sidebar] a[aria-current="page"]:hover,
+[data-starlight-sidebar] a.active:hover,
+nav[aria-labelledby] a[aria-current="page"]:hover {
+    background-color: #F4C430 !important;
+    color: #000000 !important;
+}
+
+/* Hide the first content panel */
+.content-panel:first-of-type {
+    display: none;
+}
+
+/* Hide "Back to Top" links in the right sidebar */
+.right-sidebar a[href="#_top"] {
+  display: none !important;
+}
+
+.right-sidebar li:has(a[href="#_top"]) {
+  display: none !important;
+}
