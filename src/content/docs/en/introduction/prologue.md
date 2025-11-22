@@ -1,8 +1,18 @@
 ---
 title: 'Prologue'
+description: 'Discover Orionis Framework: the revolution in full-stack development that combines PHP and Python to create limitless applications with RPA, AI and Blockchain.'
 tableOfContents: false
 editUrl: true
 lastUpdated: true
+head:
+  - tag: meta
+    attrs:
+      name: keywords
+      content: "Orionis Framework, full-stack development, PHP, Python, RPA, artificial intelligence, blockchain, revolutionary framework"
+  - tag: meta
+    attrs:
+      property: og:type
+      content: article
 ---
 
 # Welcome to Orionis

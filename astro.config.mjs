@@ -1,20 +1,25 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
+	site: 'https://docs.orionis-framework.com',
 	redirects: {
 		'/': '/en/introduction/prologue',
 		'/en/': '/en/introduction/prologue',
 		'/es/': '/es/introduction/prologue',
 	},
 	integrations: [
+		sitemap(),
 		starlight({
 			title: 'Orionis Framework',
+			description: 'Framework revolucionario para desarrollo full-stack con PHP y Python. Construye sin límites con RPA, IA, Blockchain y más.',
 			logo: {
 				src: './public/favicon.svg',
 			},
+			favicon: '/favicon.svg',
 			defaultLocale: 'en',
 			editLink: {
 				baseUrl: 'https://github.com/orionis-framework/docs/edit/master/',

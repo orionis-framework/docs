@@ -1,0 +1,20 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://docs.orionis-framework.com/sitemap-index.xml
+Sitemap: https://docs.orionis-framework.com/sitemap-0.xml
+
+# Política para motores de búsqueda
+Crawl-delay: 1
+
+# Bloquear directorios no necesarios (si los tienes)
+Disallow: /api/
+Disallow: /_astro/
+Disallow: /admin/
+
+# Permitir acceso a recursos estáticos importantes
+Allow: /js/
+Allow: /css/
+Allow: /images/
+Allow: /favicon.svg

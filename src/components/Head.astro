@@ -1,10 +1,101 @@
 ---
 // src/components/Head.astro
 import StarlightHead from '@astrojs/starlight/components/Head.astro';
+import type { Props as StarlightProps } from '@astrojs/starlight/props';
+
+export interface HeadProps extends StarlightProps {}
+
+const { entry, lang } = Astro.props;
+const isSpanish = lang === 'es';
+
+// Metadatos específicos para SEO
+const siteTitle = 'Orionis Framework';
+const siteDescription = isSpanish
+  ? 'Framework revolucionario para desarrollo full-stack con PHP y Python. Construye sin límites con RPA, IA, Blockchain y más.'
+  : 'Revolutionary full-stack development framework with PHP and Python. Build without limits with RPA, AI, Blockchain and more.';
+
+const pageTitle = entry?.data.title ? `${entry.data.title} - ${siteTitle}` : siteTitle;
+const pageDescription = entry?.data.description || siteDescription;
+
+// URLs para Open Graph
+const siteUrl = 'https://docs.orionis-framework.com';
+const currentUrl = new URL(Astro.url.pathname, siteUrl).toString();
+const ogImage = `${siteUrl}/seo/seo.png`;
+
+// Palabras clave
+const keywords = isSpanish
+  ? 'Orionis, Framework, PHP, Python, RPA, Inteligencia Artificial, Blockchain, Desarrollo Web, Full Stack'
+  : 'Orionis, Framework, PHP, Python, RPA, Artificial Intelligence, Blockchain, Web Development, Full Stack';
 ---
 
 <!-- Include the default Starlight Head component first -->
 <StarlightHead {...Astro.props} />
+
+<!-- SEO Meta Tags -->
+<meta name="description" content={pageDescription} />
+<meta name="keywords" content={keywords} />
+<meta name="author" content="Raul Mauricio Uñate Castro" />
+<meta name="robots" content="index, follow" />
+<meta name="language" content={lang} />
+
+<!-- Open Graph Meta Tags -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content={siteTitle} />
+<meta property="og:title" content={pageTitle} />
+<meta property="og:description" content={pageDescription} />
+<meta property="og:url" content={currentUrl} />
+<meta property="og:image" content={ogImage} />
+<meta property="og:image:alt" content={`${siteTitle} - ${pageDescription}`} />
+<meta property="og:locale" content={lang === 'es' ? 'es_ES' : 'en_US'} />
+
+<!-- Twitter Card Meta Tags -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={pageTitle} />
+<meta name="twitter:description" content={pageDescription} />
+<meta name="twitter:image" content={ogImage} />
+<meta name="twitter:image:alt" content={`${siteTitle} - ${pageDescription}`} />
+
+<!-- Canonical URL -->
+<link rel="canonical" href={currentUrl} />
+
+<!-- Alternate language URLs -->
+{lang === 'es' && (
+  <link rel="alternate" hreflang="en" href={currentUrl.replace('/es/', '/en/')} />
+)}
+{lang === 'en' && (
+  <link rel="alternate" hreflang="es" href={currentUrl.replace('/en/', '/es/')} />
+)}
+<link rel="alternate" hreflang="x-default" href={currentUrl.replace(`/${lang}/`, '/en/')} />
+
+<!-- Preconnect to external domains -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+<!-- JSON-LD Structured Data -->
+<script type="application/ld+json" set:html={JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": pageTitle,
+  "description": pageDescription,
+  "url": currentUrl,
+  "author": {
+    "@type": "Organization",
+    "name": "Orionis Framework Team",
+    "url": siteUrl
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": siteTitle,
+    "url": siteUrl,
+    "logo": {
+      "@type": "ImageObject",
+      "url": `${siteUrl}/favicon.svg`
+    }
+  },
+  "inLanguage": lang,
+  "datePublished": entry?.data.lastUpdated || new Date().toISOString(),
+  "dateModified": entry?.data.lastUpdated || new Date().toISOString()
+})} />
 
 <!-- Add our custom global script -->
 <script is:inline src="/js/global.js"></script>
