@@ -11,7 +11,10 @@ export default defineConfig({
 	},
 	integrations: [
 		starlight({
-			title: 'Orionis Framework Docs',
+			title: 'Orionis Framework',
+			logo: {
+				src: './public/favicon.svg',
+			},
 			defaultLocale: 'en',
 			editLink: {
 				baseUrl: 'https://github.com/orionis-framework/docs/edit/master/',
@@ -21,6 +24,7 @@ export default defineConfig({
 			],
 			components: {
 				Search: '@astrojs/starlight/components/Search.astro',
+				Head: './src/components/Head.astro',
 			},
 			locales: {
 				en: {

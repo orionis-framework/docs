@@ -1,0 +1,10 @@
+---
+// src/components/Head.astro
+import StarlightHead from '@astrojs/starlight/components/Head.astro';
+---
+
+<!-- Include the default Starlight Head component first -->
+<StarlightHead {...Astro.props} />
+
+<!-- Add our custom global script -->
+<script is:inline src="/js/global.js"></script>
