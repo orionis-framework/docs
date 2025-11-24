@@ -815,7 +815,6 @@ my_project/                    # root
 ├── routes/                    # routes
 ├── storage/                   # storage
 ├── tests/                     # tests
-└── main.py
 ```
 
 #### Configuration recommendations
