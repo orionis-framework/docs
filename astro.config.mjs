@@ -94,7 +94,7 @@ export default defineConfig({
 							label: 'Project Structure',
 							slug: 'getting-started/project-structure',
 							translations: {
-								es: 'Estructura-del-proyecto',
+								es: 'Estructura Del Proyecto',
 							},
 						},
 						{
