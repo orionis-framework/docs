@@ -70,24 +70,126 @@ export default defineConfig({
 					],
 				},
 				{
-					label: '🛠️ Installation',
+					label: '🚩 Getting Started',
 					collapsed: false,
 					translations: {
-						es: '🛠️ Instalación'
+						es: '🚩 Primeros Pasos'
 					},
 					items: [
 						{
-							label: 'Prerequisites',
-							slug: 'installation/prerequisites',
+							label: 'Installation',
+							slug: 'getting-started/installation',
 							translations: {
-								es: 'Prerrequisitos',
+								es: 'Instalación',
 							},
 						},
 						{
-							label: 'Installation Steps',
-							slug: 'installation/steps',
+							label: 'Configuration',
+							slug: 'getting-started/configuration',
 							translations: {
-								es: 'Pasos de Instalación',
+								es: 'Configuración',
+							},
+						},
+						{
+							label: 'Project Structure',
+							slug: 'getting-started/project-structure',
+							translations: {
+								es: 'Estructura-del-proyecto',
+							},
+						},
+						{
+							label: 'Deployment',
+							slug: 'getting-started/deployment',
+							translations: {
+								es: 'Despliegue',
+							},
+						},
+					],
+				},
+				{
+					label: '🏛️ Architecture Concepts',
+					collapsed: false,
+					translations: {
+						es: '🏛️ Conceptos de Arquitectura'
+					},
+					items: [
+						{
+							label: 'Request Lifecycle',
+							slug: 'architecture/request-lifecycle',
+							translations: {
+								es: 'Ciclo de vida de la petición',
+							},
+						},
+						{
+							label: 'Service Container',
+							slug: 'architecture/service-container',
+							translations: {
+								es: 'Contenedor de servicios',
+							},
+						},
+						{
+							label: 'Service Providers',
+							slug: 'architecture/service-providers',
+							translations: {
+								es: 'Proveedores de servicios',
+							},
+						},
+						{
+							label: 'Facades',
+							slug: 'architecture/facades',
+							translations: {
+								es: 'Facades',
+							},
+						},
+					],
+				},
+				{
+					label: '💻 Console & Commands',
+					collapsed: false,
+					translations: {
+						es: '💻 Consola y Comandos'
+					},
+					items: [
+						{
+							label: 'Native Commands',
+							slug: 'console/native-commands',
+							translations: {
+								es: 'Comandos Nativos',
+							},
+						},
+						{
+							label: 'Custom Commands',
+							slug: 'console/custom-commands',
+							translations: {
+								es: 'Comandos Personalizados',
+							},
+						},
+						{
+							label: 'Command Routing',
+							slug: 'console/command-routing',
+							translations: {
+								es: 'Rutas de Comandos',
+							},
+						},
+						{
+							label: 'Task Scheduler',
+							slug: 'console/task-scheduler',
+							translations: {
+								es: 'Programador de Tareas',
+							},
+						},
+						{
+							label: 'Events & Listeners',
+							slug: 'console/events-listeners',
+							translations: {
+								es: 'Eventos y Listeners',
+							},
+						},
+						{
+							label: 'Exceptions & Error Handling',
+							slug: 'console/exceptions-error-handling',
+							translations: {
+								es: 'Excepciones y Manejo de Errores',
 							},
 						},
 					],
@@ -103,14 +205,14 @@ export default defineConfig({
 							label: 'Contribution Guide',
 							slug: 'contribute/guide',
 							translations: {
-								es: 'Guía de Contribución',
+								es: 'Guía de contribución',
 							},
 						},
 						{
 							label: 'Contributors',
 							slug: 'contribute/contributors',
 							translations: {
-								es: 'Contribuidores',
+								es: 'Colaboradores',
 							},
 						},
 					],
