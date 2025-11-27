@@ -51,24 +51,55 @@ Orionis follows its own code style conventions, aligned with modern web framewor
 
 Example:
 
+If you are defining a class or method, make sure to include **type annotations and documentation in NumPyDoc format.**
+
+Class names should use *PascalCase*, and method names should use *camelCase*.
+
 ```python
-def example_function(param1: int, param2: str) -> bool:
+class ExampleClass:
+
+    def exampleMethod(self, param1: int, param2: str) -> bool:
+        """
+        This is a sample function demonstrating
+        type annotations and documentation in NumPyDoc format.
+
+        Parameters
+        ----------
+        param1 : int
+            Description of the first parameter.
+        param2 : str
+            Description of the second parameter.
+
+        Returns
+        -------
+        bool
+            Description of the return value.
+        """
+        return True
+
+```
+
+If you are defining a function, follow the same format, but use *snake_case* for the function name.
+
+```python
+def example_function(param1: float, param2: list) -> dict:
     """
-    This is an example function demonstrating type annotations and NumPyDoc-style documentation.
+    This is a sample function demonstrating type annotations
+    and documentation in NumPyDoc format.
 
     Parameters
     ----------
-    param1 : int
+    param1 : float
         Description of the first parameter.
-    param2 : str
+    param2 : list
         Description of the second parameter.
 
     Returns
     -------
-    bool
+    dict
         Description of the return value.
     """
-    return True
+    return {}
 ```
 
 ### Style Rule Exceptions

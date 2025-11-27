@@ -51,24 +51,55 @@ Orionis sigue convenciones propias de estilo de código, alineadas con framework
 
 Ejemplo:
 
+Si estás definiendo una clase o método, asegúrate de incluir **anotaciones de tipos y documentación formato NumPyDoc.**
+
+Nombre de la clase debe usar *PascalCase* y el nombre del método debe usar *camelCase*.
+
 ```python
-def ejemplo_funcion(param1: int, param2: str) -> bool:
+class NombreDeLaClase:
+
+    def nombreDelMethodo(self, param1: int, param2: str) -> bool:
+        """
+        Esta es una función de ejemplo que demuestra
+        las anotaciones de tipos y la documentación en formato NumPyDoc.
+
+        Parameters
+        ----------
+        param1 : int
+            Descripción del primer parámetro.
+        param2 : str
+            Descripción del segundo parámetro.
+
+        Returns
+        -------
+        bool
+            Descripción del valor de retorno.
+        """
+        return True
+
+```
+
+Si estás definiendo una función, sigue el mismo formato, pero el nombre debe usar *snake_case*.
+
+```python
+def nombre_de_la_funcion(param1: float, param2: list) -> dict:
     """
-    Esta es una función de ejemplo que demuestra las anotaciones de tipos y la documentación en formato NumPyDoc.
+    Esta es una función de ejemplo que demuestra las anotaciones
+    de tipos y la documentación en formato NumPyDoc.
 
     Parameters
     ----------
-    param1 : int
+    param1 : float
         Descripción del primer parámetro.
-    param2 : str
+    param2 : list
         Descripción del segundo parámetro.
 
     Returns
     -------
-    bool
+    dict
         Descripción del valor de retorno.
     """
-    return True
+    return {}
 ```
 
 ### Excepciones de reglas de estilo
