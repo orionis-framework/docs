@@ -406,9 +406,19 @@ Sí, es posible registrar un servicio mediante una función o cualquier objeto *
 Utiliza esta opción solo cuando realmente necesites controlar manualmente la creación del servicio.
 
 #### Firma del método
+```python
+(method) def callable(
+    fn: (...) -> Any,
+    *,
+    alias: str
+) -> bool | None
+```
 
+#### Parámetros
+- **`fn`**: La función o *callable* que crea y retorna la instancia del servicio.
+- **`alias`**: Un nombre alternativo obligatorio para registrar el servicio.
 
-Ejemplo de uso mejorado
+#### Ejemplo de uso mejorado
 
 Supongamos que tienes una función que reporta errores enviando un correo. Puedes registrar esta función como servicio *callable* en el contenedor:
 
@@ -565,9 +575,11 @@ Solo requieres pasar los demás parámetros necesarios al método, y el contened
 
 ### Resolver manualmente un servicio
 
-Si necesitas resolver un servicio registrado manualmente, puedes hacerlo utilizando el método `make` disponible en la fachada de la instancia de la aplicación. Este método te permite obtener una instancia del servicio registrado en el contenedor.
+Si necesitas resolver un servicio registrado manualmente, puedes hacerlo utilizando el método `make` disponible en la instancia o en la fachada `orionis.support.facades.application.Application` de la instancia de la aplicación. Este método te permite obtener una instancia del servicio registrado en el contenedor.
 
 Para poder resolverlo puedes usar el contrato (interfaz) o el alias con el que fue registrado.
+
+#### Resolviendo Con La Fachada Application
 
 Ejemplo de uso:
 
@@ -582,20 +594,51 @@ email_service: IEmailService = Application.make(IEmailService)
 email_service_alias: IEmailService = Application.make("EmailServiceProvider")
 ```
 
+#### Resolviendo Con La Instancia De La Aplicación
+
+Ejemplo de uso:
+
+```python
+from bootstrap.app import app
+from module import IEmailService
+
+# Resolver el servicio usando el contrato (interfaz)
+email_service: IEmailService = app.make(IEmailService)
+
+# Resolver el servicio usando el alias
+email_service_alias: IEmailService = app.make("EmailServiceProvider")
+```
+
+
 Aca estamos tipando la variable `email_service` como `IEmailService` para indicar que esperamos una instancia que implemente esa interfaz. El contenedor de servicios se encargará de proporcionarnos la implementación correcta registrada previamente.
 
 ### Resolver un servicio *callable*
 
 Puedes resolver un servicio registrado como *callable* utilizando el método `make` de la misma manera que con otros servicios. El contenedor de servicios ejecutará el *callable* y proporcionará las dependencias necesarias automáticamente.
 
+#### Resolviendo Con La Fachada Application
+
 Ejemplo de uso:
 
 ```python
 from orionis.support.facades.application import Application
-from module import IEmailService
 
 # Resolver siempre usando el alias
 email_service_alias = Application.make(
+    "report_error",
+    error_message="Error al conectar a la base de datos"
+)
+```
+
+#### Resolviendo Con La Instancia De La Aplicación
+
+Ejemplo de uso:
+
+```python
+from bootstrap.app import app
+
+# Resolver siempre usando el alias
+email_service_alias = app.make(
     "report_error",
     error_message="Error al conectar a la base de datos"
 )

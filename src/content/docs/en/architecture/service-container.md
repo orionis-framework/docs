@@ -404,8 +404,20 @@ Yes, it is possible to register a service using a function or any *callable* obj
 Use this option only when you really need to manually control the creation of the service.
 
 #### Method signature
+```python
+(method) def callable(
+    fn: (...) -> Any,
+    *,
+    alias: str
+) -> bool | None
+```
 
-Improved usage example
+#### Parameters
+- **`fn`**: The function or *callable* that creates and returns the service instance.
+- **`alias`**: A mandatory alternative name to register the service.
+
+
+#### Example
 
 Suppose you have a function that reports errors by sending an email. You can register this function as a *callable* service in the container:
 
@@ -559,13 +571,15 @@ In this example, the `sendWelcomeEmail` method receives an instance of `IEmailSe
 
 You only need to pass the other required parameters to the method, and the container will manage the dependencies for you.
 
-### Manually resolving a service
+### Manually resolve a service
 
-If you need to manually resolve a registered service, you can do so using the `make` method available on the application facade instance. This method allows you to obtain an instance of the service registered in the container.
+If you need to manually resolve a registered service, you can do so using the `make` method available on the instance or on the facade `orionis.support.facades.application.Application` of the application instance. This method allows you to obtain an instance of the service registered in the container.
 
 You can resolve it using either the contract (interface) or the alias with which it was registered.
 
-Example usage:
+#### Resolving With The Application Facade
+
+Usage example:
 
 ```python
 from orionis.support.facades.application import Application
@@ -578,20 +592,50 @@ email_service: IEmailService = Application.make(IEmailService)
 email_service_alias: IEmailService = Application.make("EmailServiceProvider")
 ```
 
-Here, we are typing the variable `email_service` as `IEmailService` to indicate that we expect an instance implementing that interface. The service container will provide the correct implementation registered previously.
+#### Resolving With The Application Instance
 
-### Resolving a *callable* service
+Usage example:
 
-You can resolve a service registered as a *callable* using the `make` method just like with other services. The service container will execute the *callable* and automatically provide the necessary dependencies.
+```python
+from bootstrap.app import app
+from module import IEmailService
 
-Example usage:
+# Resolve the service using the contract (interface)
+email_service: IEmailService = app.make(IEmailService)
+
+# Resolve the service using the alias
+email_service_alias: IEmailService = app.make("EmailServiceProvider")
+```
+
+Here, we are typing the variable `email_service` as `IEmailService` to indicate that we expect an instance implementing that interface. The service container will provide the correct implementation previously registered.
+
+### Resolve a *callable* service
+
+You can resolve a service registered as a *callable* using the `make` method in the same way as with other services. The service container will execute the *callable* and automatically provide the necessary dependencies.
+
+#### Resolving With The Application Facade
+
+Usage example:
 
 ```python
 from orionis.support.facades.application import Application
-from module import IEmailService
 
 # Always resolve using the alias
 email_service_alias = Application.make(
+    "report_error",
+    error_message="Error connecting to the database"
+)
+```
+
+#### Resolving With The Application Instance
+
+Usage example:
+
+```python
+from bootstrap.app import app
+
+# Always resolve using the alias
+email_service_alias = app.make(
     "report_error",
     error_message="Error connecting to the database"
 )
