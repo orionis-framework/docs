@@ -151,6 +151,13 @@ export default defineConfig({
 					},
 					items: [
 						{
+							label: 'Reactor CLI',
+							slug: 'console/reactor',
+							translations: {
+								es: 'Reactor CLI',
+							},
+						},
+						{
 							label: 'Native Commands',
 							slug: 'console/native-commands',
 							translations: {
