@@ -1,5 +1,9 @@
 ---
 title: Rutas de Comandos
+tableOfContents: true
+editUrl: true
+lastUpdated: true
+template: doc
 ---
 
 ## Rutas de Comandos
@@ -65,7 +69,7 @@ Después del registro, puedes encadenar configuración:
 
 Esta variante se usa cuando quieres exponer un método concreto de una clase.
 
-### Ejemplo de registro
+**Ejemplo de registro**
 
 ```python
 from app.services.welcome_service import WelcomeService
@@ -80,7 +84,7 @@ Reactor.command("app:test", [WelcomeService, "greetUser"])\
     ])
 ```
 
-### Qué está ocurriendo
+**¿Qué está ocurriendo?**
 
 - Se crea una firma de comando llamada `app:test`.
 - Esa firma apunta al método `greetUser` de la clase `WelcomeService`.
@@ -88,7 +92,7 @@ Reactor.command("app:test", [WelcomeService, "greetUser"])\
 - Se habilita timestamp en la salida del comando.
 - Se define el argumento `--name` como obligatorio.
 
-### Firma esperada del método destino
+**Firma esperada del método destino**
 
 ```python
 class WelcomeService:
@@ -97,7 +101,7 @@ class WelcomeService:
         ...
 ```
 
-### Ejecución desde terminal
+**Ejecución desde terminal**
 
 ```bash
 python -B reactor app:test --name="Orionis"
@@ -107,7 +111,7 @@ python -B reactor app:test --name="Orionis"
 
 Esta variante se usa cuando tu clase define `__call__` como punto de entrada.
 
-### Ejemplo de registro
+**Ejemplo de registro**
 
 ```python
 from app.services.welcome_service import WelcomeService
@@ -122,7 +126,7 @@ Reactor.command("app:test", WelcomeService)\
     ])
 ```
 
-### Clase destino esperada
+**Clase destino esperada**
 
 ```python
 class WelcomeService:
@@ -131,12 +135,12 @@ class WelcomeService:
         ...
 ```
 
-### Comportamiento
+**Comportamiento**
 
 - Si envías `--name`, ese valor se inyecta en `__call__`.
 - Si no lo envías, se usa el valor por defecto (`"User"`).
 
-### Ejecución desde terminal
+**Ejecución desde terminal**
 
 Con parámetro:
 
@@ -198,20 +202,20 @@ python -B reactor user:sync --source="crm" --dry-run
 
 ## Errores frecuentes y cómo evitarlos
 
-### La firma no aparece en `reactor list`
+**La firma no aparece en `reactor list`**
 
 - Verifica que la ruta esté registrada en `routes\console.py`.
 - Revisa que no existan errores de importación en el archivo de rutas.
 - Confirma que estás ejecutando el proyecto en el entorno de Python correcto.
 - Ejecuta `python -B reactor optimize:clear` para limpiar bytecode obsoleto.
 
-### El método no recibe argumentos
+**El método no recibe argumentos**
 
 - Verifica que el nombre del argumento coincida con el parámetro esperado.
 - Comprueba tipos (`type_`) y obligatoriedad (`required`) al declarar `Argument`.
 - Asegura que el valor se esté enviando correctamente en la CLI.
 
-### Error al resolver la clase destino
+**Error al resolver la clase destino**
 
 - Confirma que la clase sea importable desde `routes\console.py`.
 - Revisa dependencias o inicialización requerida por la clase.
@@ -224,7 +228,7 @@ python -B reactor user:sync --source="crm" --dry-run
 - Evita registrar comandos con firmas ambiguas o demasiado genéricas.
 - Documenta en el equipo qué firmas son internas y cuáles son de uso habitual.
 
-## Cierre
+## Notas
 
 Las rutas de comandos en Orionis Framework permiten exponer lógica de aplicación
 de forma rápida, mantenible y sin código boilerplate innecesario. Elegir entre

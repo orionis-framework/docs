@@ -1,5 +1,9 @@
 ---
 title: Comandos Nativos
+tableOfContents: true
+editUrl: true
+lastUpdated: true
+template: doc
 ---
 
 ## Comandos Nativos de Orionis Framework
@@ -59,17 +63,17 @@ En producción, evalúa tu estrategia de despliegue:
 
 ## Comando `list`
 
-### Propósito
+**Propósito**
 
 Muestra todos los comandos disponibles, tanto nativos como personalizados.
 
-### Uso
+**Uso**
 
 ```bash
 python -B reactor list
 ```
 
-### Cuándo usarlo
+**Cuándo usarlo**
 
 - Al iniciar en un proyecto existente.
 - Después de crear comandos personalizados.
@@ -77,17 +81,17 @@ python -B reactor list
 
 ## Comando `about`
 
-### Propósito
+**Propósito**
 
 Entrega información de la versión de Orionis Framework y datos del entorno de ejecución.
 
-### Uso
+**Uso**
 
 ```bash
 python -B reactor about
 ```
 
-### Cuándo usarlo
+**Cuándo usarlo**
 
 - Para validar la versión instalada.
 - Para reportar información al equipo durante soporte técnico.
@@ -95,39 +99,39 @@ python -B reactor about
 
 ## Comando `optimize:clear`
 
-### Propósito
+**Propósito**
 
 Elimina archivos de bytecode y artefactos de optimización generados durante el bootstrapping de la aplicación.
 
-### Uso
+**Uso**
 
 ```bash
 python -B reactor optimize:clear
 ```
 
-### Cuándo usarlo
+**Cuándo usarlo**
 
 - Después de cambios relevantes de configuración.
 - Al detectar comportamientos inconsistentes tras refactors.
 - En procesos de build o despliegue para garantizar un arranque limpio.
 
-### Nota operativa
+**Nota operativa**
 
 En entornos de producción no suele ser necesario ejecutarlo en cada inicio. Lo recomendable es incorporarlo en el pipeline cuando buscas un despliegue reproducible y limpio.
 
 ## Comando `schedule:list`
 
-### Propósito
+**Propósito**
 
 Muestra una vista detallada de todas las tareas programadas registradas en el proyecto.
 
-### Uso
+**Uso**
 
 ```bash
 python -B reactor schedule:list
 ```
 
-### Información que muestra
+**Información que muestra**
 
 - `Signature`: Nombre de la tarea.
 - `Arguments`: Argumentos configurados.
@@ -139,7 +143,7 @@ python -B reactor schedule:list
 - `Start Date - End Date`: Rango de fechas de ejecución.
 - `Details`: Frecuencia o intervalo de ejecución.
 
-### Cuándo usarlo
+**Cuándo usarlo**
 
 - Antes de pasar a producción.
 - Durante auditorías operativas.
@@ -147,24 +151,24 @@ python -B reactor schedule:list
 
 ## Comando `schedule:work`
 
-### Propósito
+**Propósito**
 
 Inicia el proceso que mantiene activo el scheduler y ejecuta tareas en segundo plano según su programación.
 
-### Uso
+**Uso**
 
 ```bash
 python -B reactor schedule:work
 ```
 
-### Comportamiento esperado
+**Comportamiento esperado**
 
 - Lee las tareas definidas en `app\console\scheduler.py`.
 - Evalúa tiempos de ejecución y dispara tareas cuando corresponde.
 - Publica eventos asociados para que los listeners respondan.
 - Mantiene un proceso persistente para tareas recurrentes.
 
-### Recomendaciones por entorno
+**Recomendaciones por entorno**
 
 En desarrollo:
 - Ejecuta este comando en una terminal separada.
@@ -180,7 +184,7 @@ En Unix:
 En Windows:
 - Puedes usar el Programador de tareas o un servicio dedicado.
 
-### Ejecución directa sin scheduler
+**Ejecución directa sin scheduler**
 
 Si no necesitas scheduler y solo quieres ejecutar un comando concreto en intervalos, puedes apoyarte en herramientas del sistema:
 - Linux: `cron`.
@@ -214,49 +218,49 @@ python -B reactor <signature>
 
 ## Comando `make:command`
 
-### Propósito
+**Propósito**
 
 Genera la estructura base de un comando personalizado para extender la consola de tu proyecto.
 
-### Uso
+**Uso**
 
 ```bash
 python -B reactor make:command <name_of_command> [--options]
 ```
 
-### Opciones comunes
+**Opciones comunes**
 
 - `--signature`: Firma con la que invocarás el comando.
 - `--description`: Descripción visible en `reactor list`.
 
-### Ejemplo
+**Ejemplo**
 
 ```bash
 python -B reactor make:command clean_cache --signature="cache:clean" --description="Limpia cache de aplicacion"
 ```
 
-### Buena práctica
+**Buena práctica**
 
 Usa firmas consistentes con formato `modulo:accion` para facilitar descubrimiento y mantenimiento.
 
 ## Comando `make:task:listener`
 
-### Propósito
+**Propósito**
 
 Genera un listener para reaccionar a eventos del ciclo de vida de tareas programadas.
 
-### Uso
+**Uso**
 
 ```bash
 python -B reactor make:task:listener <name_of_listener>
 ```
 
-### Ubicación y relación con scheduler
+**Ubicación y relación con scheduler**
 
 - Los listeners se ubican en `app\console\listeners`.
 - Se conectan a tareas definidas en `app\console\scheduler.py`, dentro del método `tasks`.
 
-### Eventos de tarea habituales
+**Eventos de tarea habituales**
 
 - `onTaskAdded`: Se agrega una tarea al scheduler.
 - `onTaskRemoved`: Se elimina una tarea.
@@ -266,7 +270,7 @@ python -B reactor make:task:listener <name_of_listener>
 - `onTaskSubmitted`: La tarea se envía para ejecución.
 - `onTaskMaxInstances`: Se alcanza el máximo de instancias permitidas.
 
-### Cuándo conviene usar listeners
+**Cuándo conviene usar listeners**
 
 - Para registrar auditoría operacional.
 - Para emitir notificaciones tras ejecuciones críticas.
@@ -274,29 +278,29 @@ python -B reactor make:task:listener <name_of_listener>
 
 ## Comando `serve`
 
-### Propósito
+**Propósito**
 
 Inicia el servidor de desarrollo para ejecutar la aplicación localmente.
 
-### Uso básico
+**Uso** básico
 
 ```bash
 python -B reactor serve
 ```
 
-### Opciones
+**Opciones**
 
 - `--interface`: Define la interfaz de servidor.
 - `--port`: Establece el puerto de escucha.
 - `--log`: Activa logs detallados del servidor.
 
-### Valores frecuentes
+**Valores frecuentes**
 
 - `--interface="rsgi"`: interfaz predeterminada.
 - `--interface="asgi"`: útil para servidores ASGI compatibles.
 - `--port="8000"`: puerto por defecto.
 
-### Ejemplos
+**Ejemplos**
 
 ```bash
 python -B reactor serve --interface="rsgi" --port="8000" --log
@@ -306,23 +310,23 @@ python -B reactor serve --interface="rsgi" --port="8000" --log
 python -B reactor serve --interface="asgi" --port="8080" --log
 ```
 
-### Recomendación
+**Recomendación**
 
 Activa `--log` cuando estés depurando problemas de arranque, puertos ocupados o comportamiento del servidor web.
 
 ## Comando `test`
 
-### Propósito
+**Propósito**
 
 Ejecuta pruebas del proyecto para validar el comportamiento de la aplicación.
 
-### Uso
+**Uso**
 
 ```bash
 python -B test
 ```
 
-### Opciones disponibles
+**Opciones disponibles**
 
 - `--verbosity, -v`: Nivel de detalle en salida.
 - `--fail-fast, -f`: Detiene ejecución al primer fallo (`1`) o continúa (`0`).
@@ -330,7 +334,7 @@ python -B test
 - `--file-pattern`: Patrón de archivos de prueba.
 - `--method-pattern`: Patrón de métodos de prueba.
 
-### Valores por defecto
+**Valores por defecto**
 
 - Verbosidad: `2`.
 - Fail fast: `0`.
@@ -338,7 +342,7 @@ python -B test
 - Patrón de archivos: `test_*.py`.
 - Patrón de métodos: `test*`.
 
-### Ejemplos útiles
+**Ejemplos útiles**
 
 Ejecutar todas las pruebas con salida detallada:
 
@@ -384,26 +388,26 @@ Para una rutina de desarrollo más estable, puedes seguir este orden:
 
 ## Solución de problemas frecuentes
 
-### Un comando no aparece en `list`
+**Un comando no aparece en `list`**
 
 - Verifica que el comando esté correctamente registrado.
 - Revisa errores de importación en módulos de consola.
 - Confirma que estás usando el entorno de Python correcto.
 - Ejecuta `python -B reactor optimize:clear` para limpiar bytecode obsoleto.
 
-### Una tarea programada no se ejecuta
+**Una tarea programada no se ejecuta**
 
 - Confirma que `schedule:work` esté activo.
 - Revisa restricciones como `start_date`, `end_date` o `max_instances`.
 - Valida logs de listeners para identificar fallos.
 - Valida el log general de Orionis Framework para errores relacionados.
 
-### Las pruebas no detectan casos esperados
+**Las pruebas no detectan casos esperados**
 
 - Revisa `--start-dir` y `--file-pattern`.
 - Verifica que los métodos cumplan el patrón `test*`.
 - Ajusta la verbosidad con `-v` para mayor detalle de diagnóstico.
 
-## Cierre
+## Nota
 
 Los comandos nativos de Orionis Framework son una capa operativa clave para desarrollar con mayor velocidad y control. Dominar estos comandos te permitirá automatizar tareas, mejorar la observabilidad del sistema y mantener una operación más predecible en desarrollo y producción.

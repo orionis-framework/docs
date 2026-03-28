@@ -1,0 +1,24 @@
+{
+    "folder-color.pathColors": [
+        {
+            "folderPath": "documentation\\src\\content\\docs\\es\\console\\reactor.md\\",
+            "color": "foldercolorizer.color_00cccc"
+        },
+        {
+            "folderPath": "documentation\\src\\content\\docs\\es\\console\\native-commands.md\\",
+            "color": "foldercolorizer.color_00cccc"
+        },
+        {
+            "folderPath": "documentation\\src\\content\\docs\\es\\console\\custom-commands.md\\",
+            "color": "foldercolorizer.color_00cccc"
+        },
+        {
+            "folderPath": "documentation\\src\\content\\docs\\es\\console\\command-routing.md\\",
+            "color": "foldercolorizer.color_00cccc"
+        },
+        {
+            "folderPath": "documentation\\src\\content\\docs\\es\\console\\task-scheduler.md\\",
+            "color": "foldercolorizer.color_00cccc"
+        }
+    ]
+}

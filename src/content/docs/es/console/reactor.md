@@ -1,5 +1,9 @@
 ---
 title: Interprete Linea de Comandos Reactor
+tableOfContents: true
+editUrl: true
+lastUpdated: true
+template: doc
 ---
 
 ## Intérprete de Línea de Comandos **Reactor**

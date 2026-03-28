@@ -45,6 +45,10 @@ export default defineConfig({
 				{ icon: 'github', label: 'GitHub', href: 'https://github.com/orionis-framework' },
 				{ icon: 'discord', label: 'Discord', href: '#' }
 			],
+			tableOfContents: {
+				minHeadingLevel: 2,
+				maxHeadingLevel: 4,
+			},
 			sidebar: [
 				{
 					label: '📚 Introduction',

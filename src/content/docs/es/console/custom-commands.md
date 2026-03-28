@@ -1,5 +1,9 @@
 ---
 title: Comandos Personalizados
+tableOfContents: true
+editUrl: true
+lastUpdated: true
+template: doc
 ---
 
 ## Comandos Personalizados en Orionis Framework
@@ -38,19 +42,19 @@ El comando nativo `make:command` genera la estructura base de un nuevo comando,
 incluyendo la clase, sus propiedades principales y el método `handle` listo para
 implementar la lógica.
 
-### Sintaxis
+**Sintaxis**
 
 ```bash
 python -B reactor make:command <name> [--signature="..."] [--description="..."]
 ```
 
-### Parámetros aceptados
+**Parámetros aceptados**
 
 - `name`: Nombre del archivo y clase a generar, en formato `snake_case`.
 - `--signature`: Firma con la que se invocará el comando desde la terminal.
 - `--description`: Texto descriptivo que aparecerá al ejecutar `reactor list`.
 
-### Ejemplo de uso
+**Ejemplo de uso**
 
 ```bash
 python -B reactor make:command clean_cache --signature="cache:clean" --description="Limpia cache de aplicacion"
@@ -59,7 +63,7 @@ python -B reactor make:command clean_cache --signature="cache:clean" --descripti
 Este comando genera el archivo `app/console/commands/clean_cache_command.py`, listo
 para que implementes la lógica específica.
 
-### Convención de nomenclatura
+**Convención de nomenclatura**
 
 | Elemento | Formato esperado | Ejemplo |
 |----------|-----------------|---------|
@@ -94,7 +98,7 @@ class CleanCacheCommand(BaseCommand):
         ...
 ```
 
-### Propiedades principales
+**Propiedades principales**
 
 - `signature`: Cadena de texto que define cómo se invocará el comando. Debe ser
   única en el proyecto.
@@ -110,7 +114,7 @@ Los argumentos del comando se declaran como instancias de `Argument` dentro de l
 propiedad `arguments`. Cada definición establece el nombre o flags del argumento,
 su tipo, obligatoriedad, valor por defecto y texto de ayuda.
 
-### Ejemplo con múltiples argumentos
+**Ejemplo con múltiples argumentos**
 
 ```python
 from typing import ClassVar
@@ -156,9 +160,9 @@ class ServeCommand(BaseCommand):
         self.info(f"Servidor iniciando en {interface}:{port} (log={log})")
 ```
 
-## Referencia de la clase `Argument`
+## Referencia de la entidad `Argument`
 
-### Firma del constructor
+**Firma del constructor**
 
 ```python
 class Argument(
@@ -179,7 +183,7 @@ class Argument(
 )
 ```
 
-### Parámetros de configuración
+**Parámetros de configuración**
 
 | Parámetro | Tipo | Descripción |
 |-----------|------|-------------|
@@ -201,7 +205,7 @@ class Argument(
 
 Dentro del método `handle` puedes leer los valores recibidos con los siguientes métodos:
 
-### Obtener un argumento individual
+**Obtener un argumento individual**
 
 ```python
 # Retorna el valor del argumento o None si no se proporcionó
@@ -211,14 +215,14 @@ valor = self.getArgument('name')
 valor = self.getArgument('key', default='valor_por_defecto')
 ```
 
-### Obtener todos los argumentos
+**Obtener todos los argumentos**
 
 ```python
 # Retorna un diccionario con todos los argumentos y sus valores
 todos = self.getArguments()
 ```
 
-### Ejemplo de uso combinado
+**Ejemplo de uso combinado**
 
 ```python
 async def handle(self) -> None:
@@ -238,7 +242,7 @@ cuando el caso de uso lo requiera.
 Dentro de `handle` puedes orquestar operaciones de negocio como consultas a base
 de datos, invocación de servicios, generación de archivos o envío de notificaciones.
 
-### Inyección de dependencias
+**Inyección de dependencias**
 
 Orionis Framework soporta inyección de dependencias directamente en el método
 `handle`. Basta con declarar el tipo del servicio como parámetro y el contenedor
@@ -252,7 +256,7 @@ async def handle(self, cache: CacheService) -> None:
     self.success("Cache limpiada correctamente.")
 ```
 
-### Uso del constructor
+**Uso del constructor**
 
 También puedes inicializar dependencias o estado en el constructor de la clase,
 lo que resulta familiar si vienes de otros frameworks:
@@ -268,7 +272,7 @@ def __init__(self, cache: CacheService):
 La recomendación general es mantener `handle` como coordinador del caso de uso y
 delegar la lógica compleja a servicios especializados.
 
-## API de consola disponible en los comandos
+## API de salidas de consola
 
 `BaseCommand` hereda de la clase `Console`, que concentra las utilidades de salida,
 entrada interactiva, depuración y renderizado en terminal. Esta API no se limita a
@@ -320,7 +324,7 @@ async def handle(self) -> None:
     self.success("Perfil validado correctamente.")
 ```
 
-### Ejemplo de uso básico
+**Ejemplo de uso básico**
 
 ```python
 async def handle(self) -> None:
@@ -339,7 +343,7 @@ async def handle(self) -> None:
 Estos métodos imprimen únicamente el texto coloreado. No incluyen etiqueta ni
 timestamp. Son adecuados para complementar la salida principal del comando.
 
-### Variantes disponibles
+**Variantes disponibles**
 
 | Método | Color | Variante |
 |--------|-------|----------|
@@ -358,7 +362,7 @@ timestamp. Son adecuados para complementar la salida principal del comando.
 No existe un método `textFail(...)`. Si necesitas expresar un fallo con semántica
 propia del framework, debes usar `fail(...)` o `error(...)` según la intención.
 
-### Ejemplo de texto auxiliar
+**Ejemplo de texto auxiliar**
 
 ```python
 async def handle(self) -> None:
@@ -380,14 +384,14 @@ Estos métodos ayudan a estructurar visualmente la salida en terminal.
 | `self.writeLine(message)` | Imprime un mensaje simple con salto de línea. |
 | `self.write(*values, sep, end, file, flush)` | Funciona como `print(...)` y permite más control sobre la salida. |
 
-### Cuándo usar `line`, `newLine`, `write` y `writeLine`
+**Cuándo usar `line`, `newLine`, `write` y `writeLine`**
 
 - Usa `line()` cuando solo quieras separar bloques visualmente con una línea en blanco.
 - Usa `newLine(count)` cuando necesites más de un salto de línea consecutivo.
 - Usa `writeLine(...)` para imprimir una línea simple sin color ni formato especial.
 - Usa `write(...)` cuando necesites controlar `sep`, `end`, `flush` o el stream de salida.
 
-### Ejemplo de espaciado
+**Ejemplo de espaciado***
 
 ```python
 async def handle(self) -> None:
@@ -398,7 +402,94 @@ async def handle(self) -> None:
     self.writeLine("Resultado: OK")
 ```
 
-### Interacción con el usuario
+### Renderizado de tablas
+
+El método `table(...)` imprime una tabla con bordes Unicode, encabezados en negrita
+y ancho de columnas calculado dinámicamente a partir del contenido.
+
+```python
+self.table(
+    headers=["ID", "Nombre", "Estado"],
+    rows=[
+        [1, "Tarea Alpha", "Activa"],
+        [2, "Tarea Beta", "Pendiente"],
+        [3, "Tarea Gamma", "Completada"],
+    ],
+)
+```
+
+Lanza `ValueError` si `headers` o `rows` están vacíos. Es especialmente útil para
+mostrar listados, resultados de consultas, comparaciones o salidas administrativas.
+
+### Barra de progreso
+
+La propiedad `progressBar` devuelve una nueva instancia de `ProgressBar` cada vez
+que se accede a ella.
+
+```python
+bar = self.progressBar
+bar.start(total=100)
+for _ in range(100):
+    # proceso
+    bar.advance()
+bar.finish()
+```
+
+Esto resulta útil en operaciones largas como importaciones, migraciones, sincronías
+o procesamiento por lotes.
+
+### Impresión de excepciones
+
+El método `exception(...)` usa `rich.traceback.Traceback` para renderizar la traza
+de una excepción con formato enriquecido.
+
+```python
+try:
+    operacion_riesgosa()
+except Exception as exc:
+    self.exception(exc)
+    raise
+```
+
+Lanza `TypeError` si el argumento recibido no es una instancia de `Exception`.
+Es útil cuando necesitas mostrar una traza legible sin depender del formato por
+defecto del intérprete.
+
+### Salida con código de estado
+
+Estos métodos terminan explícitamente el proceso:
+
+| Método | Código de salida | Comportamiento |
+|--------|------------------|----------------|
+| `self.exitSuccess(message=None)` | `0` | Imprime un mensaje de éxito opcional y finaliza correctamente. |
+| `self.exitError(message=None)` | `1` | Imprime un mensaje de error opcional y finaliza con error. |
+
+Son útiles cuando necesitas cerrar el comando de manera explícita sin continuar
+con el resto del flujo.
+
+```python
+async def handle(self) -> None:
+    if not self.confirm("¿Deseas continuar con la operación?"):
+        self.exitError("Operación cancelada por el usuario.")
+
+    self.exitSuccess("Proceso completado correctamente.")
+```
+
+**Código de salida**
+
+El framework determina el resultado final del comando según el flujo de ejecución:
+
+- Si `handle` termina sin excepciones, el proceso finaliza con código `0`.
+- Si `handle` lanza una excepción no controlada, el proceso finaliza con un código
+  distinto de `0`.
+- Si llamas a `exitSuccess(...)`, el proceso finaliza con código `0`.
+- Si llamas a `exitError(...)`, el proceso finaliza con código `1`.
+
+No es necesario retornar un valor desde `handle`. El resultado del comando queda
+determinado por excepciones no controladas o por llamadas explícitas a los métodos
+de salida del proceso.
+
+## API de consola interacción con el usuario
 
 Estos métodos permiten solicitar datos desde la terminal. Todos muestran el prompt
 con el color informativo del framework.
@@ -463,121 +554,6 @@ prefijo mediante `startswith(...)`. Si encuentra una coincidencia, retorna la
 primera opción que cumple la condición. Si no encuentra ninguna, retorna `default`
 o, en su defecto, el texto ingresado por el usuario.
 
-### Renderizado de tablas
-
-El método `table(...)` imprime una tabla con bordes Unicode, encabezados en negrita
-y ancho de columnas calculado dinámicamente a partir del contenido.
-
-```python
-self.table(
-    headers=["ID", "Nombre", "Estado"],
-    rows=[
-        [1, "Tarea Alpha", "Activa"],
-        [2, "Tarea Beta", "Pendiente"],
-        [3, "Tarea Gamma", "Completada"],
-    ],
-)
-```
-
-Lanza `ValueError` si `headers` o `rows` están vacíos. Es especialmente útil para
-mostrar listados, resultados de consultas, comparaciones o salidas administrativas.
-
-### Barra de progreso
-
-La propiedad `progressBar` devuelve una nueva instancia de `ProgressBar` cada vez
-que se accede a ella.
-
-```python
-bar = self.progressBar
-bar.start(total=100)
-for _ in range(100):
-    # proceso
-    bar.advance()
-bar.finish()
-```
-
-Esto resulta útil en operaciones largas como importaciones, migraciones, sincronías
-o procesamiento por lotes.
-
-### Inspección de variables (`dump`)
-
-El método `dump(...)` está orientado a depuración. Permite inspeccionar variables
-con diferentes niveles de detalle mediante `VarDumper`.
-
-```python
-self.dump(mi_variable, show_types=True, expand_all=True)
-```
-
-### Parámetros disponibles
-
-| Parámetro | Tipo | Descripción |
-|-----------|------|-------------|
-| `*args` | `Any` | Valores a inspeccionar. |
-| `show_types` | `bool` | Muestra el tipo de cada valor. |
-| `show_index` | `bool` | Muestra índices en colecciones. |
-| `expand_all` | `bool` | Expande estructuras anidadas. |
-| `max_depth` | `int \| None` | Limita la profundidad máxima. |
-| `module_path` | `str \| None` | Añade referencia del módulo origen. |
-| `line_number` | `int \| None` | Añade referencia de línea. |
-| `force_exit` | `bool` | Fuerza salida del proceso tras imprimir el dump. |
-| `redirect_output` | `bool` | Redirige la salida a otro destino configurado. |
-| `insert_line` | `bool` | Inserta una línea adicional al final. |
-
-Usa `dump(...)` durante desarrollo o depuración. Para salida orientada al usuario
-final del comando, suele ser preferible `info(...)`, `table(...)` o mensajes de
-texto más controlados.
-
-### Impresión de excepciones
-
-El método `exception(...)` usa `rich.traceback.Traceback` para renderizar la traza
-de una excepción con formato enriquecido.
-
-```python
-try:
-    operacion_riesgosa()
-except Exception as exc:
-    self.exception(exc)
-    raise
-```
-
-Lanza `TypeError` si el argumento recibido no es una instancia de `Exception`.
-Es útil cuando necesitas mostrar una traza legible sin depender del formato por
-defecto del intérprete.
-
-### Salida con código de estado
-
-Estos métodos terminan explícitamente el proceso:
-
-| Método | Código de salida | Comportamiento |
-|--------|------------------|----------------|
-| `self.exitSuccess(message=None)` | `0` | Imprime un mensaje de éxito opcional y finaliza correctamente. |
-| `self.exitError(message=None)` | `1` | Imprime un mensaje de error opcional y finaliza con error. |
-
-Son útiles cuando necesitas cerrar el comando de manera explícita sin continuar
-con el resto del flujo.
-
-```python
-async def handle(self) -> None:
-    if not self.confirm("¿Deseas continuar con la operación?"):
-        self.exitError("Operación cancelada por el usuario.")
-
-    self.exitSuccess("Proceso completado correctamente.")
-```
-
-## Código de salida
-
-El framework determina el resultado final del comando según el flujo de ejecución:
-
-- Si `handle` termina sin excepciones, el proceso finaliza con código `0`.
-- Si `handle` lanza una excepción no controlada, el proceso finaliza con un código
-  distinto de `0`.
-- Si llamas a `exitSuccess(...)`, el proceso finaliza con código `0`.
-- Si llamas a `exitError(...)`, el proceso finaliza con código `1`.
-
-No es necesario retornar un valor desde `handle`. El resultado del comando queda
-determinado por excepciones no controladas o por llamadas explícitas a los métodos
-de salida del proceso.
-
 ## Buenas prácticas
 
 - **Firmas descriptivas y únicas**: Usa el patrón `modulo:accion` para evitar
@@ -597,19 +573,19 @@ de salida del proceso.
 
 ## Solución de problemas frecuentes
 
-### El comando no aparece en `reactor list`
+**El comando no aparece en `reactor list`**
 
 - Verifica que el archivo esté ubicado en `app/console/commands/`.
 - Confirma que la clase hereda de `BaseCommand`.
 - Revisa que no existan errores de importación en el módulo.
 
-### El argumento siempre llega como `None`
+**El argumento siempre llega como `None`**
 
 - Verifica que el `dest` en `Argument` coincida exactamente con la clave que
   usas en `getArgument`.
 - Asegúrate de que el argumento se está pasando correctamente en la terminal.
 
-### La inyección de dependencias no resuelve el servicio
+**La inyección de dependencias no resuelve el servicio**
 
 - Confirma que el servicio esté registrado en el contenedor de la aplicación.
 - Verifica el tipo declarado en el parámetro de `handle`; debe coincidir con
