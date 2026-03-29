@@ -79,6 +79,7 @@ clasificación de comandos a medida que el proyecto crece.
 La plantilla generada a partir del ejemplo anterior es equivalente a:
 
 ```python
+from typing import ClassVar
 from orionis.console.args.argument import Argument
 from orionis.console.base.command import BaseCommand
 
@@ -91,7 +92,7 @@ class CleanCacheCommand(BaseCommand):
     description: str = "Limpia cache de aplicacion"
 
     # Argumentos y opciones que el comando acepta
-    arguments: list[Argument] = []
+    arguments: ClassVar[list[Argument]] = []
 
     async def handle(self) -> None:
         # TODO: Implementar lógica del comando
@@ -287,11 +288,21 @@ como `YYYY-MM-DD HH:MM:SS`.
 
 | Método | Etiqueta impresa | Estilo | Uso recomendado |
 |--------|------------------|--------|-----------------|
-| `self.success(message, *, timestamp=True)` | `SUCCESS` | Fondo verde y texto blanco | Confirmar que una operación terminó correctamente. |
-| `self.info(message, *, timestamp=True)` | `INFO` | Fondo azul y texto blanco | Informar progreso, contexto o pasos intermedios. |
-| `self.warning(message, *, timestamp=True)` | `WARNING` | Fondo amarillo y texto blanco | Advertir sobre una situación anómala que no bloquea el flujo. |
-| `self.fail(message, *, timestamp=True)` | `FAIL` | Fondo rojo y texto blanco | Indicar un resultado fallido o no satisfactorio dentro de un flujo aún controlado. |
-| `self.error(message, *, timestamp=True)` | `ERROR` | Fondo rojo y texto blanco | Reportar un error real que normalmente precede a una excepción o a una salida fallida. |
+| <span style="white-space:nowrap">`self.success`</span> | `SUCCESS` | Fondo verde y texto blanco | Confirmar que una operación terminó correctamente. |
+| <span style="white-space:nowrap">`self.info`</span> | `INFO` | Fondo azul y texto blanco | Informar progreso, contexto o pasos intermedios. |
+| <span style="white-space:nowrap">`self.warning`</span> | `WARNING` | Fondo amarillo y texto blanco | Advertir sobre una situación anómala que no bloquea el flujo. |
+| <span style="white-space:nowrap">`self.fail`</span> | `FAIL` | Fondo rojo y texto blanco | Indicar un resultado fallido o no satisfactorio dentro de un flujo aún controlado. |
+| <span style="white-space:nowrap">`self.error`</span> | `ERROR` | Fondo rojo y texto blanco | Reportar un error real que normalmente precede a una excepción o a una salida fallida. |
+
+**Ejemplo de uso**
+
+```python
+self.success("Operación completada.", timestamp=True)
+self.info("Procesando datos...")
+self.warning("El valor X no es óptimo, pero se usará el predeterminado.")
+self.fail("La operación no produjo el resultado esperado, pero se continuará.")
+self.error("No se pudo completar la operación debido a un error.")
+```
 
 El parámetro `timestamp` controla si se imprime la fecha y hora antes del mensaje.
 Úsalo en `False` cuando quieras una salida más limpia o cuando el tiempo no aporte

@@ -190,10 +190,10 @@ export default defineConfig({
 							},
 						},
 						{
-							label: 'Events & Listeners',
-							slug: 'console/events-listeners',
+							label: 'Facade',
+							slug: 'console/facade',
 							translations: {
-								es: 'Eventos y Listeners',
+								es: 'Fachada',
 							},
 						},
 						{
