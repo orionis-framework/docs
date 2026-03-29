@@ -27,6 +27,10 @@
         {
             "folderPath": "documentation\\src\\content\\docs\\es\\console\\",
             "color": "foldercolorizer.color_00cccc"
+        },
+        {
+            "folderPath": "documentation\\src\\content\\docs\\es\\architecture\\request-lifecycle.md\\",
+            "color": "foldercolorizer.color_00cccc"
         }
     ]
 }
