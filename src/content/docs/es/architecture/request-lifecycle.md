@@ -28,8 +28,6 @@ divergen en la forma en que se resuelve y ejecuta la solicitud. Las secciones
 siguientes describen cada etapa con detalle, explicando su responsabilidad dentro
 del framework y las implicaciones que tiene para el desarrollador.
 
----
-
 ## Ciclo de vida de una petición CLI
 
 ### Visión general del flujo
@@ -221,8 +219,6 @@ Este código de salida es relevante para integraciones con sistemas de CI/CD,
 scripts de automatización o cualquier proceso externo que evalúe el resultado
 de la ejecución del comando.
 
----
-
 ## Ciclo de vida de una petición HTTP
 
 ### Visión general del flujo
@@ -388,8 +384,6 @@ Antes de ser enviada, la respuesta vuelve a recorrer el pipeline de middleware
 en sentido inverso, permitiendo que cada capa aplique transformaciones finales
 sobre la salida.
 
----
-
 ## Puntos clave para el desarrollador
 
 Entender el ciclo de vida completo permite aprovechar con precisión los puntos
@@ -407,3 +401,69 @@ de extensión que ofrece el framework:
   negocio específica de cada operación, delegando responsabilidades a servicios
   y repositorios especializados.
 
+## Estado persistente de la aplicación
+
+<div class="advantage-banner">
+  <div class="advantage-banner-header">
+    <span class="advantage-banner-icon">⚡</span>
+    <div>
+      <p class="advantage-banner-title">Arquitectura de proceso persistente</p>
+      <p class="advantage-banner-subtitle">Una ventaja arquitectónica clave frente a frameworks tradicionales WSGI</p>
+    </div>
+  </div>
+  <div class="advantage-banner-body">
+    <p class="advantage-banner-lead">
+      A diferencia de los frameworks tradicionales basados en WSGI, donde el estado de la
+      aplicación se destruye y reconstruye por completo en cada solicitud,
+      <strong>Orionis Framework adopta un modelo de proceso persistente</strong> compatible con
+      ASGI y RSGI. El contenedor IoC, los servicios registrados, las conexiones a base de
+      datos y cualquier recurso inicializado durante el bootstrap permanecen vivos durante
+      toda la vida del proceso, compartidos eficientemente entre solicitudes.
+    </p>
+    <div class="advantage-grid">
+      <div class="advantage-card">
+        <span class="advantage-card-icon">🚀</span>
+        <span class="advantage-card-title">Arranque único</span>
+        <span class="advantage-card-desc">El bootstrap y el registro de servicios se ejecutan una sola vez. Cada solicitud llega a un sistema completamente listo.</span>
+      </div>
+      <div class="advantage-card">
+        <span class="advantage-card-icon">🔗</span>
+        <span class="advantage-card-title">Conexiones reutilizadas</span>
+        <span class="advantage-card-desc">Los pools de conexiones a base de datos y clientes HTTP se mantienen abiertos y disponibles entre peticiones.</span>
+      </div>
+      <div class="advantage-card">
+        <span class="advantage-card-icon">🧠</span>
+        <span class="advantage-card-title">Singletons reales</span>
+        <span class="advantage-card-desc">Las dependencias registradas como singleton conservan su estado e identidad durante toda la vida del proceso.</span>
+      </div>
+      <div class="advantage-card">
+        <span class="advantage-card-icon">⚡</span>
+        <span class="advantage-card-title">Menor latencia</span>
+        <span class="advantage-card-desc">Al eliminar la sobrecarga de inicialización por solicitud, la latencia de respuesta se reduce de forma significativa.</span>
+      </div>
+    </div>
+    <div class="advantage-context-grid">
+      <div class="advantage-context-item">
+        <span class="advantage-context-icon">🖥️</span>
+        <div class="advantage-context-content">
+          <span class="advantage-context-title">Contexto HTTP</span>
+          <span class="advantage-context-desc">El proceso del servidor permanece activo indefinidamente. Cada solicitud entrante reutiliza el mismo estado del contenedor IoC sin reinicialización.</span>
+        </div>
+      </div>
+      <div class="advantage-context-item">
+        <span class="advantage-context-icon">📦</span>
+        <div class="advantage-context-content">
+          <span class="advantage-context-title">Contexto CLI</span>
+          <span class="advantage-context-desc">El ciclo de vida se inicia y finaliza con el comando. Los comandos compuestos invocados vía <code>Reactor.call</code> comparten el mismo contenedor y estado de la solicitud original.</span>
+        </div>
+      </div>
+      <div class="advantage-context-item">
+        <span class="advantage-context-icon">🕒</span>
+        <div class="advantage-context-content">
+          <span class="advantage-context-title">Contexto Scheduler</span>
+          <span class="advantage-context-desc">Al emplear <code>schedule:work</code>, el worker permanece activo entre ejecuciones de tareas programadas, reutilizando conexiones y servicios sin reiniciar el proceso.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

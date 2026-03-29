@@ -31,6 +31,10 @@
         {
             "folderPath": "documentation\\src\\content\\docs\\es\\architecture\\request-lifecycle.md\\",
             "color": "foldercolorizer.color_00cccc"
+        },
+        {
+            "folderPath": "documentation\\src\\content\\docs\\es\\architecture\\service-container.md\\",
+            "color": "foldercolorizer.color_00cccc"
         }
     ]
 }
