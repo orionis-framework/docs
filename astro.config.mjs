@@ -242,6 +242,13 @@ export default defineConfig({
 								es: '📄 Cifrador'
 							},
 						},
+						{
+							label: '📄 Inspirational',
+							slug: 'helpers/inspirational',
+							translations: {
+								es: '📄 Inspiración'
+							},
+						},
 					],
 				},
 				{
@@ -277,6 +284,13 @@ export default defineConfig({
 							slug: 'reflection/instances',
 							translations: {
 								es: '📄 Instancias'
+							},
+						},
+						{
+							label: '📄 Modules',
+							slug: 'reflection/modules',
+							translations: {
+								es: '📄 Módulos'
 							},
 						},
 					],
