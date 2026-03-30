@@ -259,6 +259,13 @@ export default defineConfig({
 					},
 					items: [
 						{
+							label: '📄 Overview',
+							slug: 'reflection/overview',
+							translations: {
+								es: '📄 Descripción General'
+							},
+						},
+						{
 							label: '📄 Abstract Classes',
 							slug: 'reflection/abstract',
 							translations: {
