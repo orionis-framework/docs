@@ -1,893 +1,459 @@
 ---
 title: Service Container
+tableOfContents: true
+editUrl: true
+lastUpdated: true
+template: doc
 ---
 
-# Service Container
+## Introduction
 
-The **Service Container** in `Orionis Framework` is a robust solution for dependency management in your applications. Its flexible architecture allows you to register and resolve services efficiently, promoting collaboration between components without unnecessary coupling.
+The **Service Container** is the core of Orionis Framework's architecture. It implements an **Inversion of Control** (IoC) system that centralizes the registration, resolution, and lifecycle management of all application dependencies.
 
-## Advantages of using the service container
+Instead of manually instantiating classes or explicitly propagating dependencies through each layer, the container automatically resolves them from type annotations declared in constructors and methods. This decouples components from one another and facilitates maintenance, extensibility, and testing.
 
-- **Automatic dependency injection:** The container creates and manages instances for you, eliminating the need to handle dependencies manually.
-- **Modular and scalable design:** Facilitates the development of clean and maintainable applications, where each component is independent and reusable.
-- **Advanced lifecycle management:** Allows you to register services as *singleton*, *scoped*, or *transient*, adapting the lifecycle according to your application's requirements.
-- **Intelligent dependency resolution:** Automatically analyzes and resolves the dependencies needed for each service.
+The container is a **thread-safe singleton**: a single shared instance exists throughout the entire process lifetime, regardless of whether the context is an HTTP request, a CLI command, or a scheduled task. The implementation uses a **double-checked locking** pattern with `threading.RLock` to ensure safety in concurrent environments.
 
-The service container in `Orionis Framework` is inspired by solutions from well-known frameworks such as Laravel (PHP), Symfony (PHP), Spring (Java), and .NET Core (C#), offering an optimized experience tailored for the Orionis ecosystem.
+---
 
-## What is a service container?
+## Core Concepts
 
-A **service container** is a central component in software architecture that manages the creation, configuration, and lifecycle of objects and their dependencies. It acts as a centralized registry where services (classes or components) and their relationships can be defined, allowing dependencies to be injected automatically when requested.
+### Inversion of Control (IoC)
 
-### Main features
+Inversion of Control is the principle by which the responsibility for building and wiring objects is transferred from business code to a centralized component: the container. The developer declares *what* is needed; the container decides *how* to create it and *when* to deliver it.
 
-- **Inversion of Control (IoC):** The container takes control of object creation instead of objects creating themselves.
-- **Dependency Injection (DI):** Objects receive their dependencies from the outside rather than creating them internally.
-- **Automatic lifecycle management:** The container decides when to create, maintain, and destroy service instances.
-- **Decoupling:** Reduces dependency between classes, making maintenance and testing easier.
+### Dependency Injection (DI)
 
-## What lifecycles does the service container support?
+Dependency Injection is the concrete mechanism the container uses to satisfy each class's requirements. When a class declares typed parameters in its constructor or a method, the container inspects those types via reflection, locates the registered bindings, and delivers the correct instances without developer intervention.
 
-The service container in `Orionis Framework` supports three lifecycles for registered services, adapting to different application needs:
+The container supports injection in both positional and keyword-only arguments, and can transparently invoke both synchronous functions and `async def` coroutines.
 
-### Singleton
-A single instance of the service is created and shared throughout the application. This instance remains in memory for the entire duration of the application's execution.
+### Contract and Implementation
 
-**When to use:**
-- Configuration services
-- Logging services
-- Stateless services
+The recommended pattern in Orionis Framework is to register services by binding a **contract** (interface or abstract class) to an **implementation** (concrete class). This separation provides three direct advantages:
 
-### Scoped
-A new instance of the service is created for each specific scope or context. By default, this means one instance per HTTP request in web applications.
+- It allows swapping implementations without modifying the consuming code.
+- It simplifies the creation of test doubles (*mocks*) for unit testing.
+- It naturally applies the Dependency Inversion Principle (DIP).
 
-**When to use:**
-- Services that maintain state during a request
-- Authentication services
-- User context services
-
-### Transient
-Each time the service is requested, a new instance is created. This is the lightest lifecycle in terms of memory management.
-
-**When to use:**
-- Lightweight, stateless services
-- Calculation or processing services
-- Services that do not require persistence
-
-## What is required to register a service?
-
-To register a service in the `Orionis Framework` service container, two mandatory components are required:
-
-- **Contract (Interface):** Specifies the functionality the service must implement, but does not define how it is implemented. It defines "what" the service should do.
-- **Implementation (Class):** Provides the concrete logic that fulfills the contract defined by the interface. It defines "how" the work is done.
-
-### Benefits of this separation:
-- **Flexibility:** Allows changing the implementation without affecting the code that uses the service
-- **Testability:** Makes it easier to create mocks and stubs for unit testing
-- **Maintainability:** Code becomes easier to maintain and extend
-
-Below is a basic and clear example of how to define and register a service in the `Orionis Framework` service container.
-
-### Service Definition
-
-**Contract (Interface)**
 ```python
+# Contract (app/contracts/email.py)
 from abc import ABC, abstractmethod
 
 class IEmailService(ABC):
 
     @abstractmethod
-    def configure(self, subject: str, body: str, to: str) -> None:
-        """Configures the email parameters."""
-        pass
+    def configure(self, subject: str, body: str, to: str) -> None: ...
 
     @abstractmethod
-    def send(self) -> bool:
-        """Sends the email and returns True if successful."""
-        pass
-```
+    def send(self) -> bool: ...
 
-**Implementation (Class)**
-```python
-from module import IEmailService
+
+# Implementation (app/services/email.py)
+from app.contracts.email import IEmailService
 
 class EmailService(IEmailService):
 
     def configure(self, subject: str, body: str, to: str) -> None:
-        """Configures the email parameters."""
         self._subject = subject
-        self._body = body
-        self._to = to
+        self._body    = body
+        self._to      = to
 
     def send(self) -> bool:
-        """Sends the email and returns True if successful."""
-        # Here would go the actual sending logic using SMTP
+        # actual SMTP sending logic
         return True
 ```
 
-**Important**: For the service registration to be successful, the implementation class must comply with the contract defined by the interface. This ensures that all expected functionalities are present and correctly implemented. If the contract is not fully met, the service container will throw an exception indicating the breach.
+> If the implementation does not fully satisfy the contract (i.e., `concrete` is not a subclass of `abstract`), the container will raise a `TypeError` during registration, before the application processes any request.
 
-## How to register a service in the container?
+---
+
+## Lifecycles
+
+The container offers three lifecycles, defined in the `Lifetime` enum (`orionis.container.enums.lifetimes`). Choosing the correct lifecycle is one of the most important design decisions when registering a service.
+
+```python
+from orionis.container.enums.lifetimes import Lifetime
+
+# Lifetime.SINGLETON — one instance for the entire process
+# Lifetime.SCOPED    — one instance per active scope
+# Lifetime.TRANSIENT — a new instance per resolution
+```
 
 ### Singleton
 
-To register a service with a *singleton* lifecycle, use the `singleton` method available on the application instance. With this lifecycle, a single instance of the service will be created and reused throughout the application.
+A single instance is created the first time the service is resolved and stored in an internal container cache. It is reused throughout the entire process lifetime: across HTTP requests, CLI commands, and scheduled tasks.
 
-#### Method signature
-
-The signature of the `singleton` method is as follows:
-```python
-(method) def singleton(
-    abstract: (...) -> Any,
-    concrete: (...) -> Any,
-    *,
-    alias: str = None,
-    enforce_decoupling: bool = False
-) -> bool | None
-```
-
-#### Parameters
-
-- **`abstract`**: The interface or abstract class that defines the service contract.
-- **`concrete`**: The concrete class that implements the service.
-- **`alias`** (optional): An alternative name to register the service. Must be a string.
-- **`enforce_decoupling`** (optional): If set to `True`, the container will verify that the concrete class fulfills the contract defined by the interface, but without requiring direct implementation in the class, promoting greater decoupling. **Rarely used in practice**, however, `Orionis` is flexible enough to allow it.
-
-#### Usage example
-
-```python
-# bootstrap/app.py
-from orionis.foundation.application import Application, IApplication
-
-# Create the application instance
-app: IApplication = Application()
-
-# Register the service as singleton
-app.singleton(IEmailService, EmailService)
-
-# Start the application
-app.create()
-```
-
-#### Registration with alias
-
-If you want to use an alias to register the service:
-
-```python
-# bootstrap/app.py
-from orionis.foundation.application import Application, IApplication
-
-app: IApplication = Application()
-
-# Register with alias (use named parameter)
-app.singleton(IEmailService, EmailService, alias="EmailServiceProvider")
-
-app.create()
-```
-
-> **Important:** The `alias` parameter must be passed as a named argument. Passing it as the third positional parameter will result in a type error.
+**When to use:** configuration services, database clients, logging services, in-memory caches, or any resource whose initialization is expensive and whose state can be safely shared.
 
 ### Scoped
 
-To register a service with a *scoped* lifecycle, use the `scoped` method available on the application instance. With this lifecycle, a new instance of the service will be created for each specific scope or context (by default, each HTTP or Console request).
+A new instance is created at the beginning of each **active scope** and reused within that scope. In an HTTP context, the framework opens a scope per request; in CLI, per command execution. When the scope ends, scoped instances are automatically discarded.
 
-#### Method signature
+If a scoped service is resolved without an active scope, the container raises `RuntimeError` with the message `"No active scope for scoped service. Use 'beginScope()' to create a scope."`.
 
-The signature of the `scoped` method is as follows:
-```python
-(method) def scoped(
-    abstract: (...) -> Any,
-    concrete: (...) -> Any,
-    *,
-    alias: str = None,
-    enforce_decoupling: bool = False
-) -> bool | None
-```
-#### Parameters
-
-The parameters are identical to those of the `singleton` method:
-
-- **`abstract`**: The interface or abstract class that defines the service contract.
-- **`concrete`**: The concrete class that implements the service.
-- **`alias`** (optional): An alternative name to register the service.
-- **`enforce_decoupling`** (optional): If set to `True`, the container will verify that the concrete class fulfills the contract defined by the interface, but without requiring direct implementation in the class, promoting greater decoupling. **Rarely used in practice**, however, `Orionis` is flexible enough to allow it.
-
-#### Usage example
-
-```python
-# bootstrap/app.py
-from orionis.foundation.application import Application, IApplication
-
-app: IApplication = Application()
-
-# Register the service as scoped
-app.scoped(IEmailService, EmailService)
-
-app.create()
-```
-
-#### Registration with alias
-
-```python
-# bootstrap/app.py
-from orionis.foundation.application import Application, IApplication
-
-app: IApplication = Application()
-
-# Register with alias
-app.scoped(IEmailService, EmailService, alias="EmailServiceProvider")
-
-app.create()
-```
+**When to use:** services that need to maintain state bound to a single request, such as the current user's authentication context, a transactional Unit of Work, or a per-request stateful repository.
 
 ### Transient
 
-To register a service with a *transient* lifecycle, use the `transient` method available on the application instance. With this lifecycle, a new instance of the service will be created every time it is requested.
+Each time the service is requested, the container creates a new independent instance. No reference is stored or shared between resolutions.
 
-#### Method signature
+**When to use:** lightweight stateless objects, calculation or transformation helpers, builders, or any component that should not be shared across calls.
 
-The signature of the `transient` method is as follows:
+---
+
+## Service Registration
+
+Service registration can be performed directly on the application instance in `bootstrap/app.py`, or within a `ServiceProvider` to keep code organized by module (recommended).
+
+### Common Signature
+
+The `singleton`, `scoped`, and `transient` methods share the same signature:
 
 ```python
-(method) def transient(
-    abstract: (...) -> Any,
-    concrete: (...) -> Any,
+def method(
+    abstract: type | None,
+    concrete: type,
     *,
-    alias: str = None,
-    enforce_decoupling: bool = False
-) -> bool | None
+    alias: str | None = None,
+    override: bool = False,
+) -> bool
 ```
 
-#### Parameters
+| Parameter  | Type           | Description |
+|------------|----------------|-------------|
+| `abstract` | `type \| None` | Contract that identifies the service. If `None`, `concrete` itself is used as the registration key. |
+| `concrete` | `type`         | Concrete class that implements the contract. Must be a class (`inspect.isclass`). |
+| `alias`    | `str \| None`  | Alternative string name for resolving the service. Must be passed as a keyword-only argument. |
+| `override` | `bool`         | If `True`, allows overwriting an existing binding. Defaults to `False`. |
 
-The parameters are identical to the previous methods:
+All methods return `True` if the binding was registered successfully. If any constraint is violated, they raise the corresponding exception:
 
-- **`abstract`**: The interface or abstract class that defines the service contract.
-- **`concrete`**: The concrete class that implements the service.
-- **`alias`** (optional): An alternative name to register the service.
-- **`enforce_decoupling`** (optional): If set to `True`, the container will verify that the concrete class fulfills the contract defined by the interface, but without requiring direct implementation in the class, promoting greater decoupling. **Rarely used in practice**, however, `Orionis` is flexible enough to allow it.
+- `TypeError` — if `concrete` is not a class, or does not implement `abstract`.
+- `ValueError` — if the alias is empty, or if the contract/alias is already registered and `override` is `False`.
 
-#### Usage example
+### `singleton`
+
+Registers a service with the Singleton lifecycle.
 
 ```python
-# bootstrap/app.py
-from orionis.foundation.application import Application, IApplication
+app.singleton(IEmailService, EmailService)
 
-app: IApplication = Application()
-
-# Register the service as transient
-app.transient(IEmailService, EmailService)
-
-app.create()
+# With string alias
+app.singleton(IEmailService, EmailService, alias="mailer")
 ```
 
-#### Registration with alias
+### `scoped`
+
+Registers a service with the Scoped lifecycle.
 
 ```python
-# bootstrap/app.py
-from orionis.foundation.application import Application, IApplication
+app.scoped(IAuthContext, AuthContext)
 
-app: IApplication = Application()
-
-# Register with alias
-app.transient(IEmailService, EmailService, alias="EmailServiceProvider")
-
-app.create()
+# With alias
+app.scoped(IAuthContext, AuthContext, alias="auth")
 ```
 
-## Other features of the service container
+### `transient`
 
-Although the main methods for registering services are `singleton`, `scoped`, and `transient`, the `Orionis Framework` service container offers additional functionalities to enhance dependency management:
-
-### Instances
-
-You can register a specific instance of a service using the `instance` method. This is useful when you already have a created instance and want the container to use it.
-
-#### Method signature
-
-The signature of the `instance` method is as follows:
+Registers a service with the Transient lifecycle.
 
 ```python
-(method) def instance(
-    abstract: (...) -> Any,
-    instance: Any,
+app.transient(IReportBuilder, PdfReportBuilder)
+
+# With alias
+app.transient(IReportBuilder, PdfReportBuilder, alias="report.pdf")
+```
+
+### `instance`
+
+Registers an already-constructed object as an effective singleton. Unlike `singleton`, the container does not build the class: it simply stores and returns the provided reference. Useful when you need to pre-initialize a service with specific parameters before the application fully starts up.
+
+```python
+mailer = EmailService()
+
+app.instance(IEmailService, mailer)
+app.instance(IEmailService, mailer, alias="mailer")
+```
+
+The `instance` method signature receives an object instead of a concrete type:
+
+```python
+def instance(
+    abstract: type | None,
+    instance: object,
     *,
-    alias: str = None,
-    enforce_decoupling: bool = False
-) -> bool | None
+    alias: str | None = None,
+    override: bool = False,
+) -> bool
 ```
 
-#### Parameters
+If `abstract` is `None`, the container uses `type(instance)` as the registration key. If the value passed is a class instead of an instance, a `TypeError` is raised (`"instance() expects an initialized object, not a class."`).
 
-The parameters are identical to the previous methods:
+#### Behavior Within a Scope
 
-- **`abstract`**: The interface or abstract class that defines the service contract.
-- **`instance`**: The specific instance of the service you want to register, already initialized.
-- **`alias`** (optional): An alternative name to register the service.
-- **`enforce_decoupling`** (optional): If set to `True`, the container will verify that the concrete class fulfills the contract defined by the interface, but without requiring direct implementation in the class, promoting greater decoupling. **Rarely used in practice**, however, `Orionis` is flexible enough to allow it.
+When `instance` is called within an active scope, the instance is registered in the local scope and **not** globally. In this context:
 
-#### Is this a Singleton?
+- The instance is bound to the scope's lifecycle and is discarded when the scope closes.
+- The `alias` parameter is **not allowed** and raises `ValueError` (`"Alias registration is only allowed globally."`) if provided.
+- The `override` validation applies against the local scope, not against global bindings.
 
-Registering a specific instance with the `instance` method can be considered similar to a singleton in the sense that the same instance is reused every time the service is requested. However, the key difference is that with `instance`, you provide the already created instance, while with `singleton`, the container is responsible for creating and managing the instance.
+---
 
-#### Usage example
+## Binding Verification
+
+### `bound`
+
+Checks whether a contract or alias is registered in the container or in the current active scope.
 
 ```python
-# bootstrap/app.py
-from orionis.foundation.application import Application, IApplication
+# Check by contract type
+is_registered: bool = app.bound(IEmailService)
 
-app: IApplication = Application()
-
-# Register a specific instance
-app.instance(IEmailService, EmailService())
-
-app.create()
+# Check by string alias
+is_registered: bool = app.bound("mailer")
 ```
 
-#### Registration with alias
+The method evaluates the following sources in order:
+
+1. If `key` is a string, it resolves the alias to the corresponding abstract type. If the alias does not exist, it returns `False`.
+2. Searches in the **active scope** (if one exists).
+3. Searches in **global bindings** and in the **singleton cache**.
+
+Returns `True` if the service is found in any of these sources. Returns `False` otherwise.
+
+---
+
+## Service Resolution
+
+The container exposes several resolution mechanisms suited to different scenarios. The preferred approach is always **automatic injection via constructor**; explicit methods are intended for infrastructure code or specific situations.
+
+### Constructor Injection
+
+The primary and recommended mechanism. When the container builds a class, it inspects its `__init__` via reflection (`ReflectionConcrete`) and injects each typed parameter that matches a registered binding. Parameters without a type, without a registered binding, and without a default value cause a `TypeError`.
 
 ```python
-# bootstrap/app.py
-from orionis.foundation.application import Application, IApplication
-
-app: IApplication = Application()
-
-# Register an instance with alias
-app.instance(IEmailService, EmailService(), alias="EmailServiceProvider")
-
-app.create()
-```
-
-### Scoped Instance
-
-You can register a specific instance of a service with a *scoped* lifecycle using the `scopedInstance` method. This is useful when you want a particular instance to be used within a specific scope.
-As you can see, this is different from `instance`, since `instance` is a global instance reused throughout the application, while `scopedInstance` is an instance reused only within a specific scope.
-
-```python
-(method) def scopedInstance(
-    abstract: (...) -> Any,
-    instance: Any,
-    *,
-    alias: str = None,
-    enforce_decoupling: bool = False
-) -> bool | None
-```
-
-#### Parameters
-
-The parameters are identical to the previous methods:
-
-- **`abstract`**: The interface or abstract class that defines the service contract.
-- **`instance`**: The specific instance of the service you want to register, already initialized.
-- **`alias`** (optional): An alternative name to register the service.
-- **`enforce_decoupling`** (optional): If set to `True`, the container will verify that the concrete class fulfills the contract defined by the interface, but without requiring direct implementation in the class, promoting greater decoupling. **Rarely used in practice**, however, `Orionis` is flexible enough to allow it.
-
-#### Usage example
-
-```python
-# bootstrap/app.py
-from orionis.foundation.application import Application, IApplication
-
-app: IApplication = Application()
-
-# Register a specific instance as scoped
-app.scopedInstance(IEmailService, EmailService())
-
-app.create()
-```
-#### Registration with alias
-
-```python
-# bootstrap/app.py
-from orionis.foundation.application import Application, IApplication
-
-app: IApplication = Application()
-
-# Register a scoped instance with alias
-app.scopedInstance(IEmailService, EmailService(), alias="EmailServiceProvider")
-
-# Start the application
-app.create()
-```
-
-### Callable
-
-Can you register a service using a function?
-Yes, it is possible to register a service using a function or any *callable* object. This is useful when you need to customize the creation of the service, for example, by applying dynamic configurations or additional logic before instantiating it.
-
-> **Recommendation:** Although *callables* offer flexibility, it is recommended to register services using classes to maintain a clear and coherent architecture. The use of functions as services should be reserved for very specific cases.
-
-**Important limitations:**
-- The container will automatically inject the dependencies required by the *callable*.
-- It cannot be used with *singleton* or *scoped* lifecycles due to the dynamic nature of *callables*.
-
-Use this option only when you really need to manually control the creation of the service.
-
-#### Method signature
-```python
-(method) def callable(
-    fn: (...) -> Any,
-    *,
-    alias: str
-) -> bool | None
-```
-
-#### Parameters
-- **`fn`**: The function or *callable* that creates and returns the service instance.
-- **`alias`**: A mandatory alternative name to register the service.
-
-
-#### Example
-
-Suppose you have a function that reports errors by sending an email. You can register this function as a *callable* service in the container:
-
-```python
-# app/helpers.py
-def report_error(email_service: IEmailService, logger: ILoggerService, error_message: str) -> bool:
-    email_service.configure(
-        subject='Application Error',
-        body=error_message,
-        to='raulmauriciounate@gmail.com'
-    )
-    return email_service.send()
-```
-
-Then, register the function in the container using the `callable` method:
-
-```python
-# bootstrap/app.py
-from orionis.foundation.application import Application, IApplication
-from app.helpers import report_error
-
-app: IApplication = Application()
-
-# Register the function as a callable service with alias
-app.callable(report_error, alias="report_error")
-
-# Start the application
-app.create()
-```
-
-This way, you can inject and reuse the `report_error` function anywhere in your application, taking advantage of the container's automatic dependency resolution.
-
-## Best practices
-
-To make the most of the `Orionis Framework` service container, consider the following best practices when defining and registering your services:
-
-### 1. Interface naming
-Use the "I" prefix for interfaces, followed by the service name:
-```python
-class IEmailService(ABC): pass
-class IUserService(ABC): pass
-class ILoggerService(ABC): pass
-```
-
-### 2. Use of `Service Providers`
-Register related services in dedicated service providers to keep your code organized and modular.
-See the [Service Providers](../service-providers) section for more details.
-
-### 3. Choosing the correct lifecycle
-- **Singleton**: For services that are expensive to create or maintain global state
-- **Scoped**: For services that need to maintain state during an operation
-- **Transient**: For lightweight, stateless services
-
-### 4. Avoid circular dependencies
-Make sure your services do not depend on each other in a circular way, as this can cause issues during resolution.
-
-## How to resolve a registered service
-
-Once a service has been registered in the service container, you can resolve and inject it anywhere in your application using the container's automatic dependency injection functionality.
-
-### In a class constructor
-
-**The most common way** to resolve and inject a registered service is through a class constructor. The service container will automatically analyze the required dependencies and provide the corresponding instances when a class instance is created.
-
-This makes it very simple and clean to use services in your controllers, services, or other application components.
-
-```python
-# app/http/controllers/user_controller.py
-class UserController(Controller):
+class UserController(BaseController):
 
     def __init__(
         self,
-        email_service: IEmailService,
-        logger: ILoggerService
+        email: IEmailService,
+        logger: ILoggerService,
     ) -> None:
-        """
-        email_service (IEmailService): Service for sending emails.
-        logger (ILoggerService): Service for logging events and errors.
-        """
-        self._email_service = email_service
+        self._email  = email
         self._logger = logger
 
-    def sendWelcomeEmail(
-        self,
-        user_email: str
-    ) -> bool:
-        """
-        Sends a welcome email to the specified user.
-        Configures the email with default subject and body, and sends it to the provided email.
-        Returns True if the sending was successful, False otherwise.
-        """
-
-        # Configure the already injected email service
-        self._email_service.configure(
-            subject='Welcome to Orionis Framework',
-            body='Thank you for registering!',
-            to=user_email
-        )
-
-        # Send the email and log the result
-        result = self._email_service.send()
-
-        # Log the result using the injected logging service
-        if result:
-            self._logger.log(f'Welcome email sent to {user_email}')
-        else:
-            self._logger.log(f'Failed to send welcome email to {user_email}')
-
-        # Return the sending result
+    async def register(self, user_email: str) -> bool:
+        self._email.configure("Welcome", "Thanks for signing up.", user_email)
+        result = self._email.send()
+        self._logger.info(f"Registration completed for {user_email}")
         return result
 ```
-#### What happens here?
 
-Well, the `Orionis Framework` dependency container automatically resolves the `IEmailService` and `ILoggerService` dependencies when an instance of `UserController` is created. There is no need to manually instantiate these services; the container injects them automatically, making dependency management easier and promoting a clean, decoupled design.
+The container resolves `IEmailService` and `ILoggerService` automatically when building `UserController`. Built-in types (`str`, `int`, etc.) and types from the `typing` module are **not** auto-resolved: they must have a default value or be provided explicitly.
 
-Simply create an instance of `UserController` and the container will handle the rest.
+### Method Parameter Injection
 
-### In Class Methods
-
-You can inject dependencies directly into your class methods using the `Orionis Framework` service container. This is especially useful for functions or methods that require specific services without needing to store them as class attributes.
-
-Here is an example of how to do this:
+Dependencies can also be declared in method parameters. The container injects them when the method is invoked through `call` or `invoke`. Parameters that do not correspond to registered services must be passed explicitly by the caller.
 
 ```python
-# app/http/controllers/user_controller.py
-class UserController(Controller):
+class ReportController(BaseController):
 
-    def sendWelcomeEmail(
+    async def generate(
         self,
-        email_service: IEmailService,
-        user_email: str
-    ) -> bool:
-        """
-        Sends a welcome email to the specified user.
-        Configures the email with default subject and body, and sends it to the provided email.
-        Returns True if the sending was successful, False otherwise.
-        """
-
-        # Configure the already injected email service
-        email_service.configure(
-            subject='Welcome to Orionis Framework',
-            body='Thank you for registering!',
-            to=user_email
-        )
-
-        # Send the email and return the result
-        return email_service.send()
+        builder: IReportBuilder,   # resolved by the container
+        period: str,               # passed explicitly
+    ) -> bytes:
+        return await builder.build(period)
 ```
 
-In this example, the `sendWelcomeEmail` method receives an instance of `IEmailService` as a parameter. The service container automatically injects the correct implementation when the method is called, allowing you to use the service without needing to store it as a class attribute.
+### `make`
 
-You only need to pass the other required parameters to the method, and the container will manage the dependencies for you.
-
-### Manually resolve a service
-
-If you need to manually resolve a registered service, you can do so using the `make` method available on the instance or on the facade `orionis.support.facades.application.Application` of the application instance. This method allows you to obtain an instance of the service registered in the container.
-
-You can resolve it using either the contract (interface) or the alias with which it was registered.
-
-#### Resolving With The Application Facade
-
-Usage example:
-
-```python
-from orionis.support.facades.application import Application
-from module import IEmailService
-
-# Resolve the service using the contract (interface)
-email_service: IEmailService = Application.make(IEmailService)
-
-# Resolve the service using the alias
-email_service_alias: IEmailService = Application.make("EmailServiceProvider")
-```
-
-#### Resolving With The Application Instance
-
-Usage example:
-
-```python
-from bootstrap.app import app
-from module import IEmailService
-
-# Resolve the service using the contract (interface)
-email_service: IEmailService = app.make(IEmailService)
-
-# Resolve the service using the alias
-email_service_alias: IEmailService = app.make("EmailServiceProvider")
-```
-
-Here, we are typing the variable `email_service` as `IEmailService` to indicate that we expect an instance implementing that interface. The service container will provide the correct implementation previously registered.
-
-### Resolve a *callable* service
-
-You can resolve a service registered as a *callable* using the `make` method in the same way as with other services. The service container will execute the *callable* and automatically provide the necessary dependencies.
-
-#### Resolving With The Application Facade
-
-Usage example:
+Resolves and returns the instance of a service from a contract type or a string alias. It is an asynchronous method (`async`) because it may trigger the loading of deferred providers.
 
 ```python
 from orionis.support.facades.application import Application
 
-# Always resolve using the alias
-email_service_alias = Application.make(
-    "report_error",
-    error_message="Error connecting to the database"
-)
+# By contract type
+email: IEmailService = await Application.make(IEmailService)
+
+# By string alias
+email: IEmailService = await Application.make("mailer")
 ```
 
-#### Resolving With The Application Instance
-
-Usage example:
+It can also be called directly on the application instance:
 
 ```python
 from bootstrap.app import app
 
-# Always resolve using the alias
-email_service_alias = app.make(
-    "report_error",
-    error_message="Error connecting to the database"
-)
+email: IEmailService = await app.make(IEmailService)
 ```
 
-In this example, we are resolving the *callable* registered with the alias `"report_error"` and passing an error message as an additional argument. The container will automatically inject the dependencies required by the `report_error` function and execute the function with the provided parameters.
+**Internal resolution order:**
 
-<aside aria-label="Important" class="starlight-aside starlight-aside--note">
-<p class="starlight-aside__title" aria-hidden="true">
-<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="starlight-aside__icon">
-<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 15c-.55 0-1-.45-1-1v-4c0-.55.45-1 1-1s1 .45 1 1v4c0 .55-.45 1-1 1zm0-8c-.83 0-1.5-.67-1.5-1.5S11.17 6 12 6s1.5.67 1.5 1.5S12.83 9 12 9z"/>
-</svg>
-Alert!
-</p>
-<div class="starlight-aside__content">
-<p>When directly resolving a <strong>callable</strong>, make sure to pass additional parameters that are not container dependencies <strong>using their name</strong> in the <code>make</code> method, as shown in the example. Do not pass them as positional arguments, as this may cause unexpected errors.</p>
-</div>
-</aside>
+1. If the service is not registered, attempts to load an associated deferred provider.
+2. If after step 1 the service is still not registered:
+   - If `key` is a **class type**, it is built automatically with dependency injection (equivalent to `build`).
+   - If `key` is a **string alias**, raises `ValueError` (`"Service '{key}' is not registered."`).
+3. If the service exists in the **active scope**, returns the scope instance.
+4. If the service exists in the **singleton cache**, returns the cached instance.
+5. Otherwise, resolves the binding according to its lifecycle.
 
-## Validate service registration
+### `build`
 
-If you need to check whether a service has been registered in the service container, you can use the `bound` method available on the application instance. This method allows you to verify if a specific service is registered, either by its contract (interface) or by its alias.
-
-#### Method signature
-```python
-(method) def bound(
-    abstract_or_alias: Any
-) -> bool
-```
-
-#### Parameters
-- **`abstract_or_alias`**: The interface, abstract class, or alias of the service you want to check.
-
-#### Example usage
+Builds an instance of any class with automatic dependency injection, without requiring the class to be registered in the container. Before instantiating, it attempts to load deferred providers associated with the type.
 
 ```python
-# Check if the service is registered using the contract (interface)
-is_registered = app.bound(IEmailService)
-
-# Check if the service is registered using the alias
-is_registered_alias = app.bound("EmailServiceProvider")
+controller: UserController = await app.build(UserController)
 ```
 
-## Get a registered service
+`build` always creates a new instance. If the class is registered as a singleton or scoped, that binding is ignored: `build` directly constructs the concrete class. If the argument is not a class, it raises `TypeError` (`"build() expects a class type to instantiate."`).
 
-If you need to obtain detailed information about a service registered in the container, you can use the `getBinding` method available on the application instance. This method returns an instance of `orionis.container.entities.binding.Binding` that allows you to access the complete definition of the service, including its lifecycle, implementation, and other configurations.
+### `invoke`
+
+Executes a function (not an instance method or a class) injecting its typed parameters automatically. Parameters without a binding must be provided as positional or keyword arguments. Supports both synchronous functions and `async def` coroutines.
 
 ```python
-# Get the service using the contract (interface)
-service = app.getBinding(IEmailService)
+async def notify(logger: ILoggerService, message: str) -> None:
+    logger.info(message)
 
-# Get the service using the alias
-service = app.getBinding("EmailServiceProvider")
-
-# Access the details of the registered service
-print(service)
-
-# Example of expected output
-# Binding(
-#     contract=...,
-#     concrete=...,
-#     instance=...,
-#     function=...,
-#     lifetime=...,
-#     enforce_decoupling=...,
-#     alias=...
-# )
+await app.invoke(notify, message="Process completed.")
 ```
 
-## Remove a registered service
+If a class or type is passed as the argument, the method raises `TypeError` (`"invoke() expects a non-class callable as the first argument."`).
 
-If you need to remove a service registered in the service container, you can use the `drop` method available on the application instance. This method allows you to delete a specific service, either by its contract (interface) or by its alias.
+### `call`
 
-<aside aria-label="Important" class="starlight-aside starlight-aside--note">
-<p class="starlight-aside__title" aria-hidden="true">
-<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="starlight-aside__icon">
-<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 15c-.55 0-1-.45-1-1v-4c0-.55.45-1 1-1s1 .45 1 1v4c0 .55-.45 1-1 1zm0-8c-.83 0-1.5-.67-1.5-1.5S11.17 6 12 6s1.5.67 1.5 1.5S12.83 9 12 9z"/>
-</svg>
-Attention!
-</p>
-<div class="starlight-aside__content">
-<p>Use this method with caution. Removing native framework services or services that are dependencies of other components can cause serious errors in the application. Make sure you fully understand the implications before removing any registered service.</p>
-</div>
-</aside>
-
-#### Method signature
-```python
-(method) def drop(
-    self,
-    abstract: Callable[..., Any] = None,
-    alias: str = None
-) -> bool
-```
-
-#### Parameters
-- **`abstract`** (optional): The interface or abstract class of the service you want to remove.
-- **`alias`** (optional): The alias of the service you want to remove.
-
-#### Example usage
+Invokes a method on an existing instance with automatic dependency injection for its parameters. The first argument is the instance; the second is the method name as a string.
 
 ```python
-# Remove the service using the contract (interface)
-app.drop(abstract=IEmailService)
+controller = UserController.__new__(UserController)
 
-# Remove the service using the alias
-app.drop(alias="EmailServiceProvider")
+await app.call(controller, "register", user_email="user@domain.com")
 ```
 
-## Manually create a scope
+| Exception         | Condition |
+|-------------------|-----------|
+| `AttributeError`  | The method does not exist on the instance. |
+| `TypeError`        | The attribute exists but is not callable. |
 
-In advanced scenarios, you may need to manually create a new scope. This is useful when you want to explicitly manage the lifecycle of services, especially in contexts where it is not handled automatically, such as background tasks or custom processes.
+---
 
-Although `Orionis Framework` automatically manages scopes in HTTP and console requests, you can manually create a new scope using the `createContext` method available on the application instance.
+## Scopes
 
-#### Example usage
+Scopes are the mechanism that allows Scoped services to maintain state within a bounded context — typically an HTTP request or a CLI command execution — without sharing it with other concurrent contexts.
+
+### Internal Architecture
+
+The container manages scopes through two classes:
+
+- **`ScopeManager`** (`orionis.container.context.manager`): an asynchronous context manager that maintains a dictionary of instances per scope. Supports storage of coroutines and `asyncio.Task`, resolving them automatically via `await` on first read.
+- **`ScopedContext`** (`orionis.container.context.scope`): stores the active scope using `contextvars.ContextVar`, which ensures isolation between concurrent requests without explicit locks.
+
+### Automatic Management
+
+Under normal conditions, the framework manages scopes transparently:
+
+- **HTTP:** one scope per incoming request, opened before dispatch and closed after the response.
+- **CLI:** one scope per command execution.
+
+### Manual Management with `beginScope`
+
+In advanced scenarios — background tasks, custom workers, integration tests — you can manage scopes manually:
 
 ```python
-# Manually create a new scope
-with app.createContext():
+async with app.beginScope():
+    # An active scope exists within this block.
+    # Scoped services receive an instance shared within the scope.
+    auth: IAuthContext = await app.make(IAuthContext)
 
-    # Within this block, a new scope is created
-    email_service: IEmailService = app.make(IEmailService)
+    # When exiting the block, the scope is closed and
+    # scoped instances are automatically discarded.
 ```
 
-All services registered with a *scoped* lifecycle within the `with` block will share the same instance during the context's duration. When exiting the block, the scope will be closed and the *scoped* instances will be released.
+`beginScope()` returns a `ScopeManager` usable as an asynchronous context manager (`async with`). Upon exiting the block, the scope invokes `clear()` on its instances and restores the `ContextVar` to its previous state via a token.
 
-Make sure you understand scope management well to avoid memory issues or references to instances that are no longer valid outside the created context.
-
-## Resolve dependencies of a Binding
-
-If you need to resolve the dependencies of a service registered in the container, you can use the `resolveDependencies` method available on the application instance. This way, the container will automatically analyze and resolve all the dependencies required for the specified service.
-
-#### Method signature
-```python
-(method) def resolve(
-        self,
-        binding: Binding,
-        *args,
-        **kwargs
-) -> Any
-```
-
-#### Parameters
-- **`binding`**: The `Binding` instance representing the service registered in the container.
-- **`*args`**: Additional positional arguments that may be required to resolve dependencies.
-- **`**kwargs`**: Additional named arguments that may be required to resolve dependencies.
-
-#### Example usage
+### Active Scope Inspection
 
 ```python
-# Get the binding of the service
-binding = app.getBinding(IEmailService)
-
-# Resolve the dependencies of the service
-email_service: IEmailService = app.resolve(binding)
+current_scope = app.getCurrentScope()
+# Returns the active ScopeManager, or None if no scope is open.
 ```
 
-## Call a method with dependency injection
+---
 
-If you need to call a specific method of a class and want the service container to automatically inject the required dependencies for that method, you can use the `call` method available on the application instance. This is especially useful when you want to execute a method without manually instantiating the class or managing its dependencies.
+## Circular Dependency Detection
 
-#### Method signature
-```python
-(method) def call(
-    self,
-    instance: Any,
-    method_name: str,
-    *args,
-    **kwargs
-) -> Any
+The container detects circular dependencies at resolution time. It maintains an internal set (`__resolution_cache`) with the keys of the types currently being resolved in the chain. If during the construction of a service the same type is detected as already being resolved, the container raises `CircularDependencyException`:
+
+```
+orionis.container.exceptions.CircularDependencyException:
+Circular dependency detected while resolving argument 'app.services.foo.FooService'.
 ```
 
-#### Parameters
-- **`instance`**: The instance of the class containing the method you want to call.
-- **`method_name`**: The name of the method you want to execute.
-- **`*args`**: Additional positional arguments that may be required for the method.
-- **`**kwargs`**: Additional named arguments that may be required for the method.
+Detection uses the full module path (`module.ClassName`) as the tracking key, and the service is removed from the set upon completion of its resolution (in a `finally` block), regardless of whether the construction was successful.
 
-#### Example usage
+Circular dependencies are a clear indicator of a design problem. Common solutions include:
 
-```python
-# Create an instance of the class
-user_controller = UserController()
+- Splitting responsibility into less coupled services.
+- Introducing a level of indirection through a mediator service or an event.
+- Converting one of the dependencies into a method parameter instead of a constructor dependency.
 
-# Call the method with dependency injection
-result = app.call(user_controller, "sendWelcomeEmail", user_email="webmaster@domain.co")
-```
+---
 
-#### Asynchronous Variant
+## Service Providers
 
-If the method you want to call is asynchronous, you can use the `callAsync` method available on the application instance. This allows you to execute asynchronous methods with automatic dependency injection. Its signature and usage are similar to the `call` method, but it is designed to work with asynchronous functions; however, even if the method is asynchronous, the `call` method will also work correctly.
-
-## Execute From Outside the Container
-
-### Resolve functions (*Callable*)
-
-In situations where you need to execute a function or method from outside the service container but still want to take advantage of automatic dependency injection, you can use the `invoke` method available on the application instance. This is useful for executing standalone functions that require services managed by the container.
-
-#### Method signature
-```python
-(method) def invoke(
-    self,
-    fn: Callable,
-    *args,
-    **kwargs
-) -> Any
-```
-
-#### Parameters
-- **`fn`**: The function or method you want to execute.
-- **`*args`**: Additional positional arguments that may be required for the function.
-- **`**kwargs`**: Additional named arguments that may be required for the function.
-#### Example usage
+A `ServiceProvider` is the recommended organizational unit for grouping related registrations. The base `ServiceProvider` class exposes `self.app` (the container instance) and requires implementing two methods differentiated by their execution phase:
 
 ```python
-# Example function to execute
-def log_error(logger: ILoggerService, message: str) -> None:
-    logger.error(message)
+from orionis.foundation.providers.service_provider import ServiceProvider
 
-# Execute the function with dependency injection
-result = app.invoke(
-    log_error,
-    message="Critical system error"
-)
+class MailServiceProvider(ServiceProvider):
+
+    def register(self) -> None:
+        self.app.singleton(IEmailService, EmailService)
+        self.app.singleton(IMailQueue, RedisMailQueue)
+
+    async def boot(self) -> None:
+        # Asynchronous initialization logic that requires
+        # all services to already be registered.
+        mailer: IEmailService = await self.app.make(IEmailService)
+        await mailer.verify_connection()
 ```
 
-#### Asynchronous Variant
+| Method     | Sync/Async  | Purpose |
+|------------|-------------|---------|
+| <span style="white-space: nowrap;">`register`</span> | Synchronous | Register bindings in the container. During this phase, other services should not be resolved because the provider processing order is not guaranteed. |
+| <span style="white-space: nowrap;">`boot`</span>     | Asynchronous | Execute initialization logic. During this phase, all providers have completed `register` and services are available for resolution. |
 
-If the function you want to execute is asynchronous, you can use the `invokeAsync` method available on the application instance. This allows you to execute asynchronous functions with automatic dependency injection. Although the `invoke` method will also work correctly with asynchronous functions, `invokeAsync` is optimized for this purpose.
+### Deferred Providers
 
-### Resolving Classes
+Deferred providers (`DeferrableProvider`) delay their registration until one of their services is requested for the first time. The container stores metadata for deferred providers (module and class) in an internal dictionary (`_deferred_providers`), and when `make` or `build` requires an unregistered service, the container:
 
-If you need to create an instance of a class from outside the service container, but want the container to handle automatic dependency injection, you can use the `build` method available on the application instance. This is useful for instantiating classes that require services managed by the container.
+1. Checks if a deferred provider associated with the requested type exists.
+2. Dynamically imports the provider's module via `importlib.import_module`.
+3. Builds the provider instance with `build`.
+4. Executes the provider's `register()` and `boot()`.
+5. Marks the provider as resolved in an internal cache to avoid duplicate processing.
 
-#### Method signature
-```python
-(method) def build(
-    self,
-    type_: Callable[..., Any],
-    *args,
-    **kwargs
-) -> Any
-```
+This mechanism reduces application startup time in environments with many services that are not used in every context.
 
-#### Parameters
-- **`type_`**: The class you want to instantiate.
-- **`*args`**: Additional positional arguments that may be required for the class constructor.
-- **`**kwargs`**: Additional named arguments that may be required for the class constructor.
+Refer to the [Service Providers](/en/architecture/service-providers) documentation for the complete lifecycle and `DeferrableProvider` implementation.
 
-#### Usage example
+---
 
-```python
-# Create an instance of UserController with dependency injection
-user_controller: UserController = app.build(UserController)
-```
+## Best Practices
+
+**Name contracts with the `I` prefix:** `IEmailService`, `IUserRepository`. This improves readability, distinguishes contracts from implementations, and facilitates static type analysis.
+
+**Declare dependencies by contract, not by implementation:** constructors and methods should receive interfaces, never concrete classes. This is what makes the design truly decoupled and substitutable.
+
+**Register in service providers:** group related bindings in a dedicated `ServiceProvider` rather than concentrating them in `bootstrap/app.py`. One provider per module or functional domain is a good organizational guideline.
+
+**Choose the correct lifecycle:** misuse of lifecycles is a common source of hard-to-track bugs. As a general rule: `singleton` for expensive resources or global state; `scoped` for per-request state; `transient` for stateless objects.
+
+**Do not resolve services in `register`:** during the registration phase, the provider processing order is not guaranteed. Attempting to resolve a service in `register` may cause an exception.
+
+**Reserve `make` for specific cases:** automatic injection via constructor is always preferable to manual resolution. Use `make` only when strictly necessary: dynamic factories, infrastructure code, or conditional resolution at runtime.
+
+**Avoid circular dependencies by design:** if two services need each other, it is a signal that responsibility should be redistributed. The container will detect and raise the corresponding exception, but the correct solution is to redesign, not work around the error.

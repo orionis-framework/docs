@@ -1,0 +1,370 @@
+---
+title: Project Structure
+tableOfContents: true
+editUrl: true
+lastUpdated: true
+template: doc
+---
+
+import { FileTree } from '@astrojs/starlight/components';
+
+# Directory Structure
+
+The default structure of an `Orionis` application is designed to provide a solid starting point for both minimalist and enterprise-grade projects. You are free to organize your application however you prefer — Orionis imposes no restrictions on where classes are located, as long as the application is properly configured during the bootstrapping process.
+
+## Root Directory
+
+The root directory of your project contains the directories and files that make up the base application structure. Below is the layout you will find in a fresh Orionis installation:
+
+<FileTree>
+- app/ Main application code
+  - console/ Commands and task scheduling
+    - commands/ Custom commands
+    - listeners/ Console event listeners
+    - scheduler.py Scheduler configuration
+  - contracts/ Interfaces and application contracts
+  - exceptions/ Custom exception handler
+    - handler.py
+  - facades/ Application facades
+  - http/ HTTP layer
+    - controllers/ Request controllers
+  - models/ ORM models
+  - notifications/ Notification system
+  - jobs/ Queued jobs
+  - providers/ Service providers
+    - app_service_provider.py
+  - services/ Business logic
+- bootstrap/ Application startup
+  - app.py
+- config/ Configuration files
+  - app.py
+  - auth.py
+  - cache.py
+  - cors.py
+  - database.py
+  - filesystems.py
+  - logging.py
+  - mail.py
+  - queue.py
+  - session.py
+  - testing.py
+- database/ Migrations and seeders
+- resources/ Views, translations, and assets
+- routes/ Route definitions
+  - api.py
+  - web.py
+  - console.py
+- storage/ Generated storage
+  - app/
+    - public/ Publicly accessible files
+    - private/ Private files
+  - framework/
+    - bootstrap/ Compiled configuration cache
+    - cache/
+      - data/ File-based cache
+  - logs/ Application logs
+- tests/ Automated test suite
+- .venv/ Python virtual environment
+- .env Environment variables (not versioned)
+- .env.example Environment variables template
+- .gitignore Files ignored by Git
+- pyproject.toml Project metadata and dependencies
+- **reactor** Framework CLI
+- README.md Project documentation
+</FileTree>
+
+## App Directory
+
+The `app` directory contains the core code of your application. Nearly every class you write will reside here, organized into subdirectories that clearly separate responsibilities.
+
+### Console
+
+Contains custom command-line commands, console event listeners, and the task scheduler configuration. These components are executed through the `reactor` CLI.
+
+```
+console/
+├── commands/           # Custom commands
+├── listeners/          # Console event listeners
+└── scheduler.py        # Task scheduler configuration
+```
+
+### Contracts
+
+Contains the interfaces and contracts that define agreements between your application's components. This enables dependency inversion and simplifies testing with mocks.
+
+### Exceptions
+
+Houses your application's exception handler (`handler.py`). Here you can customize how uncaught exceptions are reported and rendered throughout the entire application.
+
+### Facades
+
+Contains your application's facades, which provide a convenient static interface for accessing services registered in the container.
+
+### Http
+
+Contains your application's HTTP layer: controllers that handle incoming requests, middleware that filters requests, and request validation classes.
+
+- **Controllers**: Receive HTTP requests, delegate logic to services, and return responses.
+- **Middleware**: Filters that execute before or after requests (authentication, CORS, rate limiting).
+- **Requests**: Validation classes that encapsulate input rules.
+
+### Models
+
+Contains ORM model classes. Each model represents a table in your database and provides an expressive interface for interacting with data.
+
+### Notifications
+
+Contains transactional notification classes that your application sends through various channels (email, SMS, push notifications).
+
+### Jobs
+
+Contains your application's queued jobs. Jobs can be executed asynchronously or synchronously within the request lifecycle.
+
+### Providers
+
+Contains your application's service providers. Providers bootstrap the application by binding services in the dependency injection container and executing initialization tasks.
+
+A service provider implements two fundamental methods:
+
+```python
+from orionis.container.providers.service_provider import ServiceProvider
+
+class AppServiceProvider(ServiceProvider):
+
+    def register(self) -> None:
+        # Register services in the container
+        ...
+
+    async def boot(self) -> None:
+        # Execute initialization tasks after registration
+        ...
+```
+
+### Services
+
+Contains classes that encapsulate complex business logic. This directory helps keep controllers thin and code reusable across different entry points (HTTP, CLI).
+
+:::note[Key Note]
+The `console` and `http` directories serve as entry interfaces to your application's core. The HTTP protocol and CLI are communication mechanisms — they do not contain business logic. Logic remains centralized in `services`, `models`, and other internal components.
+:::
+
+## Bootstrap Directory
+
+The `bootstrap` directory contains the `app.py` file, responsible for creating and initializing the application instance. This file configures routes, the task scheduler, the exception handler, service providers, and executes the framework startup.
+
+```python
+from pathlib import Path
+from app.console.scheduler import Scheduler
+from app.exceptions.handler import ExceptionHandler
+from app.providers.app_service_provider import AppServiceProvider
+from orionis.foundation.application import Application
+
+app = Application(
+    base_path=Path(__file__).parent.parent,
+    compiled=True,
+    compiled_path="storage/framework/bootstrap",
+    compiled_invalidation_paths=[
+        "app", "bootstrap", "config",
+        "resources", "routes", ".env"
+    ],
+)
+
+app.withRouting(
+    console="routes/console.py",
+    web="routes/web.py",
+    api="routes/api.py",
+    health="/up",
+)
+
+app.withScheduler(Scheduler)
+app.withExceptionHandler(ExceptionHandler)
+
+app.withProviders(
+    AppServiceProvider,
+)
+
+app.create()
+```
+
+The `compiled=True` parameter enables configuration caching in `storage/framework/bootstrap`. The paths listed in `compiled_invalidation_paths` are monitored to automatically invalidate the cache when changes are detected. This improves performance in production without sacrificing the development experience.
+
+## Config Directory
+
+The `config` directory contains all of your application's configuration files. Each file is a frozen dataclass (`frozen=True`) that defines its default values and supports loading environment variables via `Env.get()`.
+
+| File | Description |
+|---|---|
+| `app.py` | Name, environment, debug, host, port, workers, timezone, locale, encryption |
+| `auth.py` | Authentication system configuration |
+| `cache.py` | Cache drivers (default: file-based) |
+| `cors.py` | Allowed origins, methods, headers, credentials, max age |
+| `database.py` | Database connections (SQLite, PostgreSQL, MySQL, Oracle) |
+| `filesystems.py` | Storage disks: local, public, and AWS S3 |
+| `logging.py` | Logging channels: stack, hourly, daily, weekly, monthly, chunked |
+| `mail.py` | Mail transports: SMTP and file |
+| `queue.py` | Broker and job queue configuration |
+| `session.py` | Session cookie, duration, SameSite, HTTPS |
+| `testing.py` | Verbosity, fail fast, test directory, file patterns |
+
+:::tip[Recommendation]
+Review each configuration file to familiarize yourself with all available options. The previous section of the documentation covers the Orionis configuration system in depth.
+:::
+
+## Database Directory
+
+The `database` directory is intended to contain database migrations, seeders, and model factories for your application.
+
+## Resources Directory
+
+The `resources` directory stores views, email templates, localization files (translations), and uncompiled assets such as CSS, JavaScript, and images.
+
+## Routes Directory
+
+The `routes` directory contains your application's route definitions. By default, Orionis includes three route files: `web.py`, `api.py`, and `console.py`.
+
+### web.py
+
+Defines routes for your web application's HTTP requests. Supports a fluent API with prefixes, route grouping, and typed parameters:
+
+```python
+from app.http.controllers.home_controller import HomeController
+from orionis.support.facades.router import Route
+
+Route.prefix("/home").group(
+    Route.get("/{slug:str}/{id:int}", [HomeController, 'index'])
+)
+```
+
+### api.py
+
+Contains routes for your REST API. These routes are designed to be stateless and generally return JSON responses:
+
+```python
+from app.http.controllers.home_controller import HomeController
+from orionis.support.facades.router import Route
+
+Route.get("/api-route", [HomeController, "index"])
+```
+
+### console.py
+
+Registers console commands that are executed through the `reactor` CLI. Uses the `Reactor` facade with a fluent API to define commands with descriptions, arguments, and options:
+
+```python
+from app.services.welcome_service import WelcomeService
+from orionis.console.args.argument import Argument
+from orionis.support.facades.reactor import Reactor
+
+Reactor.command("app:test", [WelcomeService, "greetUser"])\
+       .timestamp()\
+       .description("Command Test Defined as Route")\
+       .arguments([
+            Argument(
+                name_or_flags=["--name", "-n"],
+                type_=str,
+                required=False
+            )
+       ])
+```
+
+## Storage Directory
+
+The `storage` directory contains files generated by your application and the framework. It is organized into subdirectories with specific purposes:
+
+### app/
+
+Stores files generated by your application, divided into two categories:
+
+- **`public/`**: Publicly accessible files through the web server (uploaded images, downloadable documents, generated assets). Served by default from the `/static` URL.
+- **`private/`**: Files that should not be publicly accessible (confidential documents, temporary processing files, backups).
+
+### framework/
+
+Contains files automatically generated by the framework:
+
+- **`bootstrap/`**: Compiled configuration cache. Generated when `compiled=True` is set on the `Application` instance, speeding up application startup.
+- **`cache/data/`**: File-based cache system storage (`FILE` driver).
+
+### logs/
+
+Contains your application's log files. Depending on the logging configuration, you may have logs organized by different rotation strategies: `stack`, `hourly`, `daily`, `weekly`, `monthly`, or `chunked`.
+
+:::caution[Important]
+The `storage` directory and all its subdirectories must have write permissions for the web server. In production environments, ensure that only `storage/app/public` is publicly accessible. All other subdirectories should remain private to protect sensitive files.
+:::
+
+## Tests Directory
+
+The `tests` directory contains your automated test suite. Orionis includes its own testing microframework with configuration built into `config/testing.py`.
+
+To run the tests, use the `reactor` CLI:
+
+```bash
+python -B reactor test
+```
+
+The testing configuration allows you to adjust output verbosity, enable fail-fast mode, specify the test directory, and define file and method patterns.
+
+## Virtual Environment
+
+The `.venv` directory contains the Python virtual environment for your application. It provides dependency isolation, ensuring each project has its own package versions without conflicts with the global system.
+
+:::caution[Important]
+Make sure to include the `.venv` directory in your `.gitignore` file. The virtual environment should be recreated in each deployment environment and should never be shared between developers or servers.
+:::
+
+## Root Files
+
+### Environment Files
+
+**`.env`** — Contains environment variables specific to your local installation (database credentials, API keys, environment settings). This file **must not be versioned**.
+
+**`.env.example`** — Example template of the `.env` file that should be versioned. It shows which environment variables the application requires without exposing actual values.
+
+### Project Files
+
+**`pyproject.toml`** — Defines project metadata, Python dependencies, and development tool configuration. Orionis uses `pyproject.toml` as the standard for dependency management.
+
+**`reactor`** — Framework CLI entry point. Executes commands through the application's CLI kernel in an asynchronous environment:
+
+```python
+import sys
+from bootstrap.app import app
+from orionis.services.asynchrony.engine_cli import ReactorLoop
+
+if __name__ == "__main__":
+    sys.exit(
+        ReactorLoop.run(
+            app.handleCommand(sys.argv)
+        )
+    )
+```
+
+**`.gitignore`** — Specifies files and directories that Git should ignore (`.venv/`, `.env`, `__pycache__/`, `storage/logs/`).
+
+**`README.md`** — Main project documentation with installation and usage instructions.
+
+## App Directory Organization
+
+The `app` directory follows an architecture based on separation of responsibilities:
+
+| Layer | Directory | Responsibility |
+|---|---|---|
+| **HTTP Entry** | `http/` | Controllers, middleware, request validation |
+| **CLI Entry** | `console/` | Console commands, task scheduler |
+| **Business Logic** | `services/` | Domain operations and business rules |
+| **Persistence** | `models/` | ORM models and data access |
+| **Infrastructure** | `providers/` | Service registration and configuration |
+| **Contracts** | `contracts/` | Interfaces and abstractions |
+| **Facades** | `facades/` | Static access to container services |
+
+Orionis implements the following design patterns:
+
+- **MVC (Model-View-Controller)**: Organization of presentation and domain logic.
+- **Service Layer**: Encapsulation of complex business logic outside of controllers.
+- **Provider Pattern**: Service registration and configuration in the dependency injection container.
+- **Facade Pattern**: Simplified access to container services through static interfaces.
+
+:::tip[Automatic Code Generation]
+Many classes in the `app` directory can be automatically generated with the `reactor` CLI. Run `python -B reactor help` to see the available commands.
+:::

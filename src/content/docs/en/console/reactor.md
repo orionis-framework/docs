@@ -1,152 +1,156 @@
 ---
-title: Interprete Linea de Comandos Reactor
+title: Reactor Command Line Interface
+tableOfContents: true
+editUrl: true
+lastUpdated: true
+template: doc
 ---
 
-## Intérprete de Línea de Comandos **Reactor**
+## Reactor Command Line Interface
 
-Orionis Framework incluye un intérprete de línea de comandos llamado **Reactor CLI**, diseñado para facilitar la interacción con el framework desde la terminal. Esta herramienta permite ejecutar comandos integrados y personalizados para automatizar tareas comunes de desarrollo, administración y mantenimiento de aplicaciones.
+Orionis Framework includes a command line interface called **Reactor CLI**, designed to streamline interaction with the framework from the terminal. This tool allows you to run built-in and custom commands to automate common development, administration, and application maintenance tasks.
 
-En esta sección aprenderás:
+In this section you will learn:
 
-- Qué es **Reactor CLI**
-- Cómo utilizarlo
-- Cómo funciona internamente
-- Cómo gestiona la ejecución asíncrona según el sistema operativo
+- What **Reactor CLI** is
+- How to use it
+- How it works internally
+- How it manages asynchronous execution across operating systems
 
-## ¿Qué es Reactor CLI?
+## What is Reactor CLI?
 
-**Reactor CLI** es la interfaz oficial de línea de comandos de **Orionis Framework**.
+**Reactor CLI** is the official command line interface for **Orionis Framework**.
 
-Proporciona un conjunto de comandos que permiten realizar tareas habituales durante el desarrollo de una aplicación, tales como:
+It provides a set of commands that allow you to perform common tasks during application development, such as:
 
-- iniciar el servidor de desarrollo
-- generar componentes o estructuras de proyecto
-- ejecutar pruebas
-- ejecutar tareas programadas
-- administrar servicios del framework
+- Starting the development server
+- Generating components or project structures
+- Running tests
+- Executing scheduled tasks
+- Managing framework services
 
-Además, **Reactor CLI es completamente extensible**, lo que permite a los desarrolladores crear comandos personalizados adaptados a las necesidades específicas de cada proyecto.
+Additionally, **Reactor CLI is fully extensible**, allowing developers to create custom commands tailored to the specific needs of each project.
 
-Esto convierte a Reactor CLI en una herramienta central para la automatización del flujo de trabajo dentro de Orionis.
+This makes Reactor CLI a central tool for workflow automation within Orionis.
 
-## Uso de Reactor CLI
+## Using Reactor CLI
 
-Utilizar **Reactor CLI** es muy sencillo. Desde la terminal puedes ejecutar comandos usando la siguiente sintaxis:
+Using **Reactor CLI** is straightforward. From the terminal, you can run commands using the following syntax:
 
 ```bash
-python reactor [comando] [argumentos] [--opciones]
+python reactor [command] [arguments] [--options]
 ````
 
-Por ejemplo, para iniciar el servidor de desarrollo puedes ejecutar:
+For example, to start the development server you can run:
 
 ```bash
 python reactor serve
 ```
 
-Una vez iniciado el servidor, podrás acceder a tu aplicación desde:
+Once the server is running, you can access your application at:
 
 ```
 http://localhost:8000
 ```
 
-## Uso de la bandera `-B` de Python
+## Using the Python `-B` Flag
 
-En algunos casos es recomendable ejecutar el CLI utilizando la bandera `-B` de Python:
+In some cases it is recommended to run the CLI using the Python `-B` flag:
 
 ```bash
 python -B reactor serve
 ```
 
-La opción `-B` indica a Python que **no genere archivos de bytecode (`.pyc`)**.
+The `-B` option tells Python **not to generate bytecode files (`.pyc`)**.
 
-Esto puede ser útil en entornos de desarrollo cuando:
+This can be useful in development environments when:
 
-* se realizan cambios frecuentes en el código
-* se desea mantener el repositorio limpio
-* se quiere evitar la generación de carpetas `__pycache__`
+* You are making frequent code changes
+* You want to keep the repository clean
+* You want to avoid generating `__pycache__` folders
 
-El comportamiento del comando será exactamente el mismo, pero sin generar archivos de compilación.
+The command behavior will be exactly the same, but without generating compiled files.
 
-## Punto de entrada de Reactor CLI
+## Reactor CLI Entry Point
 
-En todos los proyectos creados con **Orionis Framework** existe un archivo llamado:
+In every project created with **Orionis Framework** there is a file called:
 
 ```
 reactor
 ```
 
-Este archivo se encuentra en la raíz del proyecto y actúa como **punto de entrada del CLI**.
+This file is located at the project root and acts as the **CLI entry point**.
 
-Su responsabilidad principal es:
+Its main responsibility is to:
 
-1. Inicializar el entorno del framework
-2. Descubrir los comandos disponibles
-3. Interpretar argumentos y opciones
-4. Ejecutar el comando solicitado
+1. Initialize the framework environment
+2. Discover available commands
+3. Parse arguments and options
+4. Execute the requested command
 
-Cuando ejecutas un comando como:
+When you run a command like:
 
 ```bash
 python reactor serve
 ```
 
-Reactor CLI realiza internamente el siguiente proceso:
+Reactor CLI internally performs the following process:
 
-1. Carga el entorno del framework
-2. Descubre los comandos registrados
-3. Analiza los argumentos y opciones proporcionados
-4. Resuelve el comando solicitado
-5. Ejecuta la lógica del comando
+1. Loads the framework environment
+2. Discovers registered commands
+3. Parses the provided arguments and options
+4. Resolves the requested command
+5. Executes the command logic
 
-Este mecanismo permite que los comandos se integren de forma consistente dentro del ecosistema de Orionis.
+This mechanism ensures that commands integrate consistently within the Orionis ecosystem.
 
-## Ejecución asíncrona y gestión del Event Loop
+## Asynchronous Execution and Event Loop Management
 
-Reactor CLI está diseñado para aprovechar el modelo **asíncrono** de Python basado en `asyncio`.
+Reactor CLI is designed to leverage Python's **asynchronous** model based on `asyncio`.
 
-Para garantizar el mejor rendimiento posible en cada plataforma, Orionis incluye un manejador interno de **event loops** que selecciona automáticamente la implementación más adecuada dependiendo del sistema operativo.
+To ensure the best possible performance on each platform, Orionis includes an internal **event loop** manager that automatically selects the most suitable implementation depending on the operating system.
 
-Esto permite que las operaciones asíncronas se ejecuten utilizando el motor de eventos más eficiente disponible.
+This allows asynchronous operations to run using the most efficient event engine available.
 
-## Estrategia de Event Loop por sistema operativo
+## Event Loop Strategy by Operating System
 
-| Sistema     | Loop utilizado             | Factory                     |
+| System      | Loop Used                  | Factory                     |
 | ----------- | -------------------------- | --------------------------- |
-| **Linux**   | `uvloop` si está instalado | `uvloop.new_event_loop`     |
-|             | Loop estándar de asyncio   | `asyncio.new_event_loop`    |
-| **macOS**   | `uvloop` si está instalado | `uvloop.new_event_loop`     |
-|             | Loop estándar de asyncio   | `asyncio.new_event_loop`    |
+| **Linux**   | `uvloop` if installed      | `uvloop.new_event_loop`     |
+|             | Standard asyncio loop      | `asyncio.new_event_loop`    |
+| **macOS**   | `uvloop` if installed      | `uvloop.new_event_loop`     |
+|             | Standard asyncio loop      | `asyncio.new_event_loop`    |
 | **Windows** | `ProactorEventLoop`        | `asyncio.ProactorEventLoop` |
 
-## Uso automático de uvloop
+## Automatic uvloop Usage
 
-Cuando está disponible, Reactor CLI utiliza automáticamente **uvloop**.
+When available, Reactor CLI automatically uses **uvloop**.
 
-`uvloop` es una implementación alternativa del event loop de Python diseñada para alto rendimiento. Está basada en **libuv**, la misma biblioteca que utiliza el runtime de Node.js para manejar operaciones de I/O asíncronas.
+`uvloop` is an alternative implementation of Python's event loop designed for high performance. It is built on top of **libuv**, the same library used by the Node.js runtime to handle asynchronous I/O operations.
 
-Gracias a esta implementación, `uvloop` puede ofrecer mejoras significativas de rendimiento frente al loop estándar de `asyncio`.
+Thanks to this implementation, `uvloop` can offer significant performance improvements over the standard `asyncio` loop.
 
-## Beneficios de uvloop
+## Benefits of uvloop
 
-En diversos benchmarks, `uvloop` ha demostrado:
+In various benchmarks, `uvloop` has demonstrated:
 
-* menor latencia
-* mayor throughput
-* mejor manejo de miles de conexiones concurrentes
+* Lower latency
+* Higher throughput
+* Better handling of thousands of concurrent connections
 
-Dependiendo del tipo de aplicación, puede llegar a ser **entre 2x y 4x más rápido** que el loop predeterminado de `asyncio`.
+Depending on the type of application, it can be **between 2x and 4x faster** than the default `asyncio` loop.
 
-Por esta razón, Orionis lo utiliza automáticamente cuando está disponible, sin requerir configuración adicional por parte del desarrollador.
+For this reason, Orionis uses it automatically when available, without requiring any additional configuration from the developer.
 
-Si `uvloop` no está instalado, Reactor CLI utiliza el loop estándar de `asyncio` sin afectar la compatibilidad del sistema.
+If `uvloop` is not installed, Reactor CLI falls back to the standard `asyncio` loop without affecting system compatibility.
 
-## Resumen
+## Summary
 
-Reactor CLI es una herramienta fundamental dentro del ecosistema de Orionis que permite:
+Reactor CLI is a fundamental tool within the Orionis ecosystem that allows you to:
 
-* interactuar con el framework desde la terminal
-* automatizar tareas comunes de desarrollo
-* ejecutar comandos integrados o personalizados
-* aprovechar el modelo asíncrono de Python de forma eficiente
+* Interact with the framework from the terminal
+* Automate common development tasks
+* Run built-in or custom commands
+* Efficiently leverage Python's asynchronous model
 
-Gracias a su sistema de detección automática de event loops, Reactor CLI garantiza un comportamiento consistente y optimizado en diferentes plataformas.
+Thanks to its automatic event loop detection system, Reactor CLI ensures consistent and optimized behavior across different platforms.
