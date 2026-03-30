@@ -249,6 +249,13 @@ export default defineConfig({
 								es: '📄 Inspiración'
 							},
 						},
+						{
+							label: '📄 Environment',
+							slug: 'helpers/environment',
+							translations: {
+								es: '📄 Entorno'
+							},
+						},
 					],
 				},
 				{
