@@ -1,0 +1,301 @@
+---
+title: Facades
+tableOfContents: true
+editUrl: true
+lastUpdated: true
+template: doc
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+## Introducción
+
+Las **Facades** proporcionan una interfaz estática expresiva para acceder a los servicios registrados en el [contenedor de servicios](/es/architecture/service-container/) de Orionis Framework. En lugar de inyectar o resolver manualmente una dependencia, una facade permite invocar métodos directamente sobre la clase, como si fueran llamadas estáticas:
+
+```python
+from orionis.support.facades.logger import Log
+
+Log.info("Solicitud procesada correctamente")
+```
+
+Detrás de esta sintaxis concisa, la facade delega la llamada al servicio real que fue resuelto e inicializado previamente por el contenedor. El resultado es un código más legible y compacto sin sacrificar la flexibilidad de la inyección de dependencias.
+
+### ¿Cuándo usar facades?
+
+Las facades son ideales cuando se busca una API limpia y directa para servicios de uso frecuente: logging, encriptación, enrutamiento, ejecución de comandos, entre otros. Sin embargo, no reemplazan la inyección de dependencias en constructores. En clases con lógica de negocio compleja o en código que requiere alta testabilidad, la inyección explícita sigue siendo la opción recomendada.
+
+> Las facades y la inyección de dependencias no son mutuamente excluyentes. Ambas acceden al mismo contenedor y resuelven las mismas instancias.
+
+---
+
+## Cómo funcionan las facades
+
+La arquitectura de facades en Orionis se sustenta en tres componentes que trabajan en conjunto:
+
+1. **`FacadeMeta`** — una metaclase que intercepta el acceso a atributos sobre la clase facade.
+2. **`Facade`** — la clase base que gestiona la inicialización y el cacheo del servicio subyacente.
+3. **Facades concretas** — clases que extienden `Facade` y declaran a qué servicio del contenedor representan.
+
+### La metaclase `FacadeMeta`
+
+`FacadeMeta` es el mecanismo central que permite la sintaxis estática de las facades. Cuando se accede a un atributo o método en una clase facade (por ejemplo, `Log.info(...)`), Python no encuentra ese atributo directamente en la clase. En ese momento, la metaclase intercepta la llamada a través de `__getattr__` y ejecuta el siguiente flujo:
+
+1. Obtiene la instancia del servicio previamente cacheado.
+2. Verifica que el servicio posea el atributo solicitado. Si no existe, lanza `AttributeError` con un mensaje descriptivo que incluye el nombre de la facade y el atributo faltante.
+3. Retorna el atributo del servicio, completando la delegación de forma transparente.
+
+Esto significa que cada llamada como `Log.info("mensaje")` se traduce internamente en `logger_instance.info("mensaje")`, donde `logger_instance` es el objeto `Logger` resuelto por el contenedor.
+
+### La clase base `Facade`
+
+La clase `Facade` utiliza `FacadeMeta` como metaclase y expone la lógica de inicialización y resolución del servicio. Internamente, cada subclase concreta mantiene su propia referencia cacheada al servicio y a la aplicación. Esto garantiza que la resolución del servicio ocurra una sola vez y que las llamadas posteriores utilicen la instancia almacenada sin volver a consultar el contenedor.
+
+---
+
+## Métodos de la clase `Facade`
+
+### `getFacadeAccessor`
+
+Este método **debe ser sobrescrito** por cada facade concreta. Retorna el alias o identificador (`str`) con el que el servicio fue registrado en el contenedor. Si una subclase no lo implementa, se lanzará `NotImplementedError` al intentar inicializar la facade.
+
+### `init`
+
+Método asíncrono que inicializa la facade resolviendo el servicio desde el contenedor. Debe invocarse una vez antes de utilizar la facade, típicamente dentro del método `boot()` de un [proveedor de servicios](/es/architecture/service-providers/).
+
+```python
+await MyFacade.init()
+```
+
+Al ejecutarse, `init()` realiza las siguientes operaciones:
+
+1. Obtiene la instancia singleton de `Application` si aún no está disponible.
+2. Verifica que la aplicación haya completado su proceso de arranque. Si no lo ha hecho, lanza `RuntimeError`.
+3. Resuelve el servicio a través del contenedor usando el accessor declarado en `getFacadeAccessor()`.
+4. Almacena la instancia resuelta en caché para uso posterior.
+5. Si la resolución falla por cualquier motivo, envuelve el error en un `RuntimeError` descriptivo que incluye el nombre de la facade.
+
+:::caution[Inicialización obligatoria]
+Una facade **no puede usarse** hasta que `init()` haya sido ejecutado con `await`. Cualquier intento de acceder a un método o atributo antes de la inicialización lanzará `RuntimeError`. El lugar recomendado para realizar esta llamada es siempre el método `boot()` del proveedor de servicios asociado, ya que en ese punto todos los servicios han sido registrados en el contenedor y la aplicación está completamente arrancada.
+:::
+
+### `resolve`
+
+Retorna la instancia del servicio ya inicializado. Es un método sincrónico útil cuando se necesita acceder directamente al objeto subyacente después de que `init()` ha sido ejecutado.
+
+```python
+service = MyFacade.resolve()
+```
+
+Si la facade no ha sido inicializada, `resolve()` lanzará `RuntimeError`.
+
+---
+
+## Facades incluidas en el framework
+
+Orionis Framework incluye un conjunto de facades predefinidas que cubren los servicios fundamentales:
+
+| Facade | Importación | Servicio |
+|---|---|---|
+| `Application` | `orionis.support.facades.application` | Instancia de la aplicación |
+| `Crypt` | `orionis.support.facades.encrypter` | Encriptación y descifrado |
+| `Log` | `orionis.support.facades.logger` | Sistema de logging |
+| `Reactor` | `orionis.support.facades.reactor` | Consola CLI Reactor |
+| `Route` | `orionis.support.facades.router` | Enrutamiento HTTP |
+| `Test` | `orionis.support.facades.testing` | Motor de pruebas |
+
+Entre otras...
+En cada nueva versión se pueden agregar más facades para cubrir nuevos servicios o funcionalidades del framework.
+
+Cada una de estas facades es inicializada automáticamente por su proveedor de servicios correspondiente durante el arranque de la aplicación. No es necesario llamar a `init()` manualmente para las facades del framework.
+
+---
+
+## Crear una facade personalizada
+
+Crear una facade propia requiere tres pasos: definir el contrato del servicio, implementarlo, y crear la clase facade que lo expone.
+
+### Paso 1 — Definir el contrato
+
+El contrato establece la interfaz pública del servicio. Es una clase abstracta que declara los métodos que la implementación debe proporcionar:
+
+```python
+# app/contracts/welcome.py
+from abc import ABC, abstractmethod
+
+class IWelcomeService(ABC):
+
+    @abstractmethod
+    def greeting(self) -> str: ...
+
+    @abstractmethod
+    def farewell(self, name: str) -> str: ...
+```
+
+### Paso 2 — Implementar el servicio
+
+La implementación concreta satisface el contrato:
+
+```python
+# app/services/welcome.py
+from app.contracts.welcome import IWelcomeService
+
+class WelcomeService(IWelcomeService):
+
+    def greeting(self) -> str:
+        return "¡Bienvenido a Orionis Framework!"
+
+    def farewell(self, name: str) -> str:
+        return f"Hasta pronto, {name}."
+```
+
+### Paso 3 — Crear la facade
+
+La facade extiende `Facade` y define `getFacadeAccessor` retornando el alias con el que el servicio será registrado en el contenedor:
+
+```python
+# app/facades/welcome.py
+from orionis.container.facades.facade import Facade
+
+class Welcome(Facade):
+
+    @classmethod
+    def getFacadeAccessor(cls) -> str:
+        return "welcome_service"
+```
+
+### Paso 4 — Registrar y arrancar en un proveedor
+
+En el [proveedor de servicios](/es/architecture/service-providers/) correspondiente, se registra el binding en `register()` y se inicializa la facade en `boot()`:
+
+```python
+# app/providers/welcome_provider.py
+from orionis.container.providers.service_provider import ServiceProvider
+from app.contracts.welcome import IWelcomeService
+from app.services.welcome import WelcomeService
+from app.facades.welcome import Welcome as WelcomeFacade
+
+class WelcomeProvider(ServiceProvider):
+
+    def register(self) -> None:
+        self.app.singleton(
+            IWelcomeService,
+            WelcomeService,
+            alias="welcome_service"
+        )
+
+    async def boot(self) -> None:
+        await WelcomeFacade.init()
+```
+
+El alias proporcionado en `singleton()` debe coincidir exactamente con el valor retornado por `getFacadeAccessor()`.
+
+### Uso
+
+Una vez registrado el proveedor, la facade está lista para usarse en cualquier parte de la aplicación:
+
+```python
+from app.facades.welcome import Welcome
+
+Welcome.greeting()       # "¡Bienvenido a Orionis Framework!"
+Welcome.farewell("Ana")  # "Hasta pronto, Ana."
+```
+
+---
+
+## Estructura de directorios recomendada
+
+Las facades personalizadas deben ubicarse en el directorio `app/facades/`. Cada facade se compone de dos archivos: el módulo Python (`.py`) con la clase que extiende `Facade`, y un archivo stub (`.pyi`) que habilita el autocompletado en el editor. Ambos archivos deben compartir el mismo nombre y residir en la misma carpeta:
+
+```
+app/
+└── facades/
+    ├── welcome.py       # Clase facade
+    └── welcome.pyi      # Stub para autocompletado
+```
+
+Si la aplicación crece y se requieren múltiples facades, el directorio las agrupa de forma natural:
+
+```
+app/
+└── facades/
+    ├── welcome.py
+    ├── welcome.pyi
+    ├── payment.py
+    ├── payment.pyi
+    ├── notification.py
+    └── notification.pyi
+```
+
+---
+
+## Autocompletado con stubs `.pyi`
+
+Al usar facades, los editores de código no pueden inferir automáticamente los métodos disponibles, ya que la delegación ocurre en tiempo de ejecución a través de `__getattr__`. Para habilitar el autocompletado y la verificación de tipos estática, Orionis utiliza archivos **stub** (`.pyi`) que declaran la interfaz combinada de la facade.
+
+El stub hereda del contrato del servicio y de `IFacade`, lo que indica a herramientas como Pyright/Pylance y MyPy que la facade expone tanto los métodos del servicio subyacente como el método `init()`. Esto permite autocompletado completo y detección de errores de tipo sin afectar el comportamiento en tiempo de ejecución.
+
+Para cada facade personalizada, se debe crear un archivo `.pyi` junto al módulo `.py` siguiendo este patrón:
+
+```python
+# app/facades/welcome.pyi
+from orionis.container.contracts.facade import IFacade
+from app.contracts.welcome import IWelcomeService
+
+class Welcome(IWelcomeService, IFacade):
+    ...
+```
+
+:::note
+El archivo `.pyi` no contiene lógica: solo declara la herencia combinada para que el editor conozca la interfaz completa de la facade.
+:::
+
+---
+
+## Ciclo de vida de una facade
+
+El ciclo de vida de una facade se compone de tres fases secuenciales que ocurren durante el arranque y la ejecución de la aplicación:
+
+<Steps>
+
+1. **Registro del servicio**
+
+   Durante la fase de registro, el [proveedor de servicios](/es/architecture/service-providers/) vincula el contrato (interfaz) a su implementación concreta en el contenedor, asignando un alias que identificará al servicio.
+
+   ```python
+   def register(self) -> None:
+       self.app.singleton(IService, Service, alias="my_alias")
+   ```
+
+2. **Arranque de la facade**
+
+   En la fase de arranque, el proveedor invoca `init()` sobre la facade. Este método resuelve el servicio desde el contenedor a través del alias declarado en `getFacadeAccessor()` y almacena la instancia en caché para su uso posterior.
+
+   ```python
+   async def boot(self) -> None:
+       await MyFacade.init()
+   ```
+
+3. **Delegación transparente**
+
+   Una vez inicializada, cada acceso a un atributo o método de la facade es interceptado por la metaclase, que lo delega directamente a la instancia cacheada del servicio. El consumidor utiliza la facade sin conocer los detalles de resolución.
+
+   ```python
+   MyFacade.someMethod(args)  # se delega al servicio real
+   ```
+
+</Steps>
+
+---
+
+## Facade vs. inyección de dependencias
+
+Ambos mecanismos acceden al mismo contenedor y resuelven las mismas instancias. La elección entre uno y otro depende del contexto:
+
+| Aspecto | Facade | Inyección de dependencias |
+|---|---|---|
+| **Sintaxis** | Estática: `Log.info(...)` | Vía constructor o parámetro tipado |
+| **Descubrimiento** | Requiere stub `.pyi` para autocompletado | El IDE infiere tipos automáticamente |
+| **Testabilidad** | El servicio puede reemplazarse en el contenedor | Dobles inyectados directamente |
+| **Caso de uso ideal** | Rutas, comandos, configuración rápida | Clases de servicio, lógica de negocio |
+
+En la práctica, las facades se usan con frecuencia en las capas externas de la aplicación (rutas, comandos CLI, tareas programadas), mientras que la inyección de dependencias prevalece en la lógica interna de servicios y dominios.

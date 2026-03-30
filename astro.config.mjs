@@ -114,35 +114,35 @@ export default defineConfig({
 					label: '🏛️ Architecture Concepts',
 					collapsed: false,
 					translations: {
-						es: '🏛️ Conceptos de Arquitectura'
+						es: '🏛️ Arquitectura'
 					},
 					items: [
 						{
 							label: 'Request Lifecycle',
 							slug: 'architecture/request-lifecycle',
 							translations: {
-								es: 'Ciclo de vida de la petición',
+								es: '▪️ Ciclo de vida de la petición',
 							},
 						},
 						{
 							label: 'Service Container',
 							slug: 'architecture/service-container',
 							translations: {
-								es: 'Contenedor de servicios',
+								es: '▪️ Contenedor de servicios',
 							},
 						},
 						{
 							label: 'Service Providers',
 							slug: 'architecture/service-providers',
 							translations: {
-								es: 'Proveedores de servicios',
+								es: '▪️ Proveedores de servicios',
 							},
 						},
 						{
 							label: 'Facades',
 							slug: 'architecture/facades',
 							translations: {
-								es: 'Facades',
+								es: '▪️ Facades',
 							},
 						},
 					],
@@ -158,49 +158,49 @@ export default defineConfig({
 							label: 'Reactor CLI',
 							slug: 'console/reactor',
 							translations: {
-								es: 'Reactor CLI',
+								es: '▪️ Reactor CLI',
 							},
 						},
 						{
 							label: 'Native Commands',
 							slug: 'console/native-commands',
 							translations: {
-								es: 'Comandos Nativos',
+								es: '▪️ Comandos Nativos',
 							},
 						},
 						{
 							label: 'Custom Commands',
 							slug: 'console/custom-commands',
 							translations: {
-								es: 'Comandos Personalizados',
+								es: '▪️ Comandos Personalizados',
 							},
 						},
 						{
 							label: 'Command Routing',
 							slug: 'console/command-routing',
 							translations: {
-								es: 'Rutas de Comandos',
+								es: '▪️ Rutas de Comandos',
 							},
 						},
 						{
 							label: 'Task Scheduler',
 							slug: 'console/task-scheduler',
 							translations: {
-								es: 'Programador de Tareas',
+								es: '▪️ Programador de Tareas',
 							},
 						},
 						{
 							label: 'Facade',
 							slug: 'console/facade',
 							translations: {
-								es: 'Fachada',
+								es: '▪️ Fachada',
 							},
 						},
 						{
 							label: 'Exceptions & Error Handling',
 							slug: 'console/exceptions-error-handling',
 							translations: {
-								es: 'Excepciones y Manejo de Errores',
+								es: '▪️ Excepciones y Manejo de Errores',
 							},
 						},
 					],

@@ -57,6 +57,7 @@ En producción, evalúa tu estrategia de despliegue:
 - `schedule:list`: Lista tareas programadas y su configuración.
 - `schedule:work`: Ejecuta y mantiene activo el scheduler.
 - `make:command`: Genera un comando personalizado.
+- `make:provider`: Genera un proveedor de servicios.
 - `make:task:listener`: Genera un listener para eventos de tareas.
 - `serve`: Inicia servidor de desarrollo.
 - `test`: Ejecuta pruebas del proyecto.
@@ -242,6 +243,59 @@ python -B reactor make:command clean_cache --signature="cache:clean" --descripti
 **Buena práctica**
 
 Usa firmas consistentes con formato `modulo:accion` para facilitar descubrimiento y mantenimiento.
+
+## Comando `make:provider`
+
+**Propósito**
+
+Genera la estructura base de un proveedor de servicios (service provider) para registrar bindings, configuraciones o lógica de arranque en el contenedor de servicios de tu aplicación.
+
+**Uso**
+
+```bash
+python -B reactor make:provider <name> [--deferred]
+```
+
+**Argumentos y opciones**
+
+- `name` (obligatorio): Nombre del archivo y la clase del proveedor. Debe seguir el formato `snake_case` (solo letras minúsculas, números y guiones bajos, comenzando con una letra).
+- `--deferred` (opcional): Si se indica, el proveedor será diferido y solo se cargará cuando sea necesario, optimizando el rendimiento de arranque.
+
+**Ejemplos**
+
+Crear un proveedor estándar (eager):
+
+```bash
+python -B reactor make:provider cache
+```
+
+Crear un proveedor diferido:
+
+```bash
+python -B reactor make:provider billing --deferred
+```
+
+Crear un proveedor con nombre compuesto:
+
+```bash
+python -B reactor make:provider payment_gateway --deferred
+```
+
+**Comportamiento esperado**
+
+- Valida que el argumento `name` cumpla el formato `snake_case`.
+- Genera el nombre de clase capitalizando cada segmento separado por guiones bajos y agregando el sufijo `Provider` si no lo tiene (por ejemplo, `payment_gateway` → `PaymentGatewayProvider`).
+- Crea el archivo en el directorio `app/providers/` con el sufijo `_provider.py` si no lo incluye (por ejemplo, `cache` → `cache_provider.py`).
+- Si el archivo ya existe, informa el error sin sobrescribirlo.
+
+**Proveedores eager vs. diferidos**
+
+- **Eager** (por defecto): El proveedor se carga y registra durante el arranque de la aplicación. Ideal para servicios que necesitan estar disponibles desde el inicio.
+- **Diferido** (`--deferred`): El proveedor se carga solo cuando el contenedor resuelve alguno de los bindings que proporciona. Útil para servicios pesados o poco frecuentes, ya que reduce el tiempo de arranque.
+
+**Buena práctica**
+
+Nombra tus proveedores de forma descriptiva y alineada con el módulo o funcionalidad que registran. Usa el flag `--deferred` para proveedores que encapsulan integraciones externas o servicios de uso esporádico.
 
 ## Comando `make:task:listener`
 
