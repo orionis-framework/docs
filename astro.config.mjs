@@ -112,7 +112,7 @@ export default defineConfig({
 				},
 				{
 					label: '🏛️ Architecture',
-					collapsed: false,
+					collapsed: true,
 					translations: {
 						es: '🏛️ Arquitectura'
 					},
@@ -149,7 +149,7 @@ export default defineConfig({
 				},
 				{
 					label: '💻 Console & Commands',
-					collapsed: false,
+					collapsed: true,
 					translations: {
 						es: '💻 Consola y Comandos'
 					},
@@ -201,6 +201,38 @@ export default defineConfig({
 							slug: 'console/exceptions-error-handling',
 							translations: {
 								es: '📄 Excepciones y Manejo de Errores',
+							},
+						},
+					],
+				},
+				{
+					label: '🌐 HTTP & Requests',
+					collapsed: true,
+					translations: {
+						es: '🌐 HTTP y Peticiones'
+					},
+					items: [
+						{
+							label: '📄 Overview',
+							slug: 'http/overview',
+							translations: {
+								es: '📄 Descripción General',
+							},
+						},
+					],
+				},
+				{
+					label: '🧩 Helpers & Utilities',
+					collapsed: true,
+					translations: {
+						es: '🧩 Utilidades y Ayudantes'
+					},
+					items: [
+						{
+							label: '📄 Metadata',
+							slug: 'helpers/metadata',
+							translations: {
+								es: '📄 Metadatos'
 							},
 						},
 					],
