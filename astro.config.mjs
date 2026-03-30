@@ -235,6 +235,13 @@ export default defineConfig({
 								es: '📄 Metadatos'
 							},
 						},
+						{
+							label: '📄 Encrypter',
+							slug: 'helpers/encrypter',
+							translations: {
+								es: '📄 Cifrador'
+							},
+						},
 					],
 				},
 				{
