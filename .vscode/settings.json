@@ -63,6 +63,10 @@
         {
             "folderPath": "documentation\\src\\content\\docs\\es\\contribute\\",
             "color": "foldercolorizer.color_00cccc"
+        },
+        {
+            "folderPath": "documentation\\src\\content\\docs\\en\\introduction\\",
+            "color": "foldercolorizer.color_00cccc"
         }
     ]
 }

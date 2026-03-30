@@ -58,17 +58,17 @@ export default defineConfig({
 					},
 					items: [
 						{
-							label: 'Prologue',
+							label: '🧾 Prologue',
 							slug: 'introduction/prologue',
 							translations: {
-								es: '▪️ Prólogo',
+								es: '🧾 Prólogo',
 							},
 						},
 						{
-							label: 'Versions',
+							label: '🧾 Versions',
 							slug: 'introduction/versions',
 							translations: {
-								es: '▪️ Versiones',
+								es: '🧾 Versiones',
 							},
 						},
 					],
@@ -81,17 +81,17 @@ export default defineConfig({
 					},
 					items: [
 						{
-							label: 'Installation',
+							label: '📝 Installation',
 							slug: 'getting-started/installation',
 							translations: {
-								es: 'Instalación',
+								es: '📝 Instalación',
 							},
 						},
 						{
-							label: 'Configuration',
+							label: '🧾 Configuration',
 							slug: 'getting-started/configuration',
 							translations: {
-								es: '▪️ Configuración',
+								es: '🧾 Configuración',
 							},
 						},
 						{
@@ -102,10 +102,10 @@ export default defineConfig({
 							},
 						},
 						{
-							label: 'Deployment',
+							label: '📝 Deployment',
 							slug: 'getting-started/deployment',
 							translations: {
-								es: 'Despliegue',
+								es: '📝 Despliegue',
 							},
 						},
 					],
