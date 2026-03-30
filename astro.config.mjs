@@ -293,6 +293,20 @@ export default defineConfig({
 								es: '📄 Módulos'
 							},
 						},
+						{
+							label: '📄 Dependencies',
+							slug: 'reflection/dependencies',
+							translations: {
+								es: '📄 Dependencias'
+							},
+						},
+						{
+							label: '📄 Inspection',
+							slug: 'reflection/inspect',
+							translations: {
+								es: '📄 Inspección'
+							},
+						},
 					],
 				},
 				{
