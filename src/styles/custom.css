@@ -694,12 +694,12 @@ html {
 
 .http-flow-branch-tag.asgi {
     background: rgba(76, 201, 240, 0.15);
-    color: #4CC9F0;
+    color: #0e7fa5;
 }
 
 .http-flow-branch-tag.rsgi {
     background: rgba(255, 215, 0, 0.15);
-    color: #ffd700;
+    color: #b8960b;
 }
 
 .http-flow-branch-info {
