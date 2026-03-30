@@ -265,6 +265,13 @@ export default defineConfig({
 								es: '📄 Invocables'
 							},
 						},
+						{
+							label: '📄 Concrete Classes',
+							slug: 'reflection/concretes',
+							translations: {
+								es: '📄 Clases Concretas'
+							},
+						},
 					],
 				},
 				{
