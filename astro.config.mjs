@@ -252,17 +252,17 @@ export default defineConfig({
 					},
 					items: [
 						{
-							label: '📄 Abstract Class',
+							label: '📄 Abstract Classes',
 							slug: 'reflection/abstract',
 							translations: {
 								es: '📄 Clases Asbtractas'
 							},
 						},
 						{
-							label: '📄 Encrypter',
-							slug: 'helpers/encrypter',
+							label: '📄 Callables',
+							slug: 'reflection/callables',
 							translations: {
-								es: '📄 Cifrador'
+								es: '📄 Invocables'
 							},
 						},
 					],
