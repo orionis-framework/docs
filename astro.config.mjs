@@ -75,7 +75,7 @@ export default defineConfig({
 				},
 				{
 					label: '🚩 Getting Started',
-					collapsed: false,
+					collapsed: true,
 					translations: {
 						es: '🚩 Primeros Pasos'
 					},
@@ -269,7 +269,7 @@ export default defineConfig({
 				},
 				{
 					label: '🤝 Contribute',
-					collapsed: false,
+					collapsed: true,
 					translations: {
 						es: '🤝 Contribuir'
 					},
