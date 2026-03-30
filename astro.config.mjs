@@ -245,6 +245,29 @@ export default defineConfig({
 					],
 				},
 				{
+					label: '🧠 Reflection',
+					collapsed: true,
+					translations: {
+						es: '🧠 Reflexión'
+					},
+					items: [
+						{
+							label: '📄 Abstract Class',
+							slug: 'reflection/abstract',
+							translations: {
+								es: '📄 Clases Asbtractas'
+							},
+						},
+						{
+							label: '📄 Encrypter',
+							slug: 'helpers/encrypter',
+							translations: {
+								es: '📄 Cifrador'
+							},
+						},
+					],
+				},
+				{
 					label: '🤝 Contribute',
 					collapsed: false,
 					translations: {
