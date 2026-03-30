@@ -272,6 +272,13 @@ export default defineConfig({
 								es: '📄 Clases Concretas'
 							},
 						},
+						{
+							label: '📄 Instances',
+							slug: 'reflection/instances',
+							translations: {
+								es: '📄 Instancias'
+							},
+						},
 					],
 				},
 				{
