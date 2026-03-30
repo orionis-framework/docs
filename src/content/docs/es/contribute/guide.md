@@ -1,120 +1,201 @@
 ---
-title: Guía de Contribución Mejorada
+title: Guía de Contribución
+tableOfContents: true
+editUrl: true
+lastUpdated: true
+template: doc
 ---
 
 # Guía de Contribución
 
-Bienvenido/a a la guía oficial para contribuir a Orionis Framework. Aquí encontrarás las mejores prácticas y requisitos para colaborar de manera efectiva, garantizando calidad, seguridad y coherencia en el desarrollo.
+Bienvenido/a a la guía oficial para contribuir a **Orionis Framework**. Aquí encontrarás las mejores prácticas, requisitos y flujos de trabajo para colaborar de manera efectiva, garantizando calidad, seguridad y coherencia en cada aporte.
 
-## Reporte de Errores
+---
 
-Para una colaboración eficiente, **envía siempre tus correcciones mediante pull requests (PR)** en vez de reportar errores por correo o foros. Los PR serán revisados únicamente cuando estén marcados como "listos para revisión" (no en estado de "borrador") y todas las pruebas asociadas estén aprobadas. Todo ajuste debe incluir pruebas que validen su funcionamiento.
+## Repositorios oficiales
 
-Los PR inactivos en estado de "borrador" podrán ser cerrados tras algunos días, según lo determinen los mantenedores.
+El código fuente de Orionis Framework se gestiona en GitHub. Cada componente del ecosistema cuenta con su propio repositorio:
 
-Al reportar un error, incluye un **título claro, descripción detallada, información relevante y un ejemplo de código reproducible**. Esto facilita la colaboración y la resolución rápida del problema.
+| Repositorio | Descripción |
+|---|---|
+| [Orionis Framework](https://github.com/orionis-framework/framework) | Núcleo del framework |
+| [Orionis Skeleton](https://github.com/orionis-framework/skeleton) | Plantilla base para nuevos proyectos |
 
-Si detectas advertencias incorrectas en el IDE, SonarQube, Ruff u otras herramientas al usar Orionis Framework, **no crees un issue en GitHub**. En su lugar, envía un PR para corregir el inconveniente.
+---
 
-El código fuente de Orionis Framework se gestiona en GitHub, con repositorios específicos para cada proyecto basado en Laravel:
+## Flujo de contribución
 
-- [Orionis Skeleton](https://github.com/orionis-framework/skeleton)
-- [Orionis Framework](https://github.com/orionis-framework/framework)
+A continuación se describe el proceso general para aportar al proyecto:
 
-## Discusión sobre el Desarrollo del Framework
+1. **Haz un fork** del repositorio en el que deseas contribuir.
+2. **Crea una rama** desde la rama base apropiada (consulta la sección [Estrategia de ramas](#estrategia-de-ramas)).
+3. **Implementa los cambios** siguiendo las convenciones de estilo y calidad del proyecto.
+4. **Incluye pruebas** que validen el comportamiento nuevo o modificado.
+5. **Ejecuta el análisis estático** con Ruff y SonarQube antes de abrir tu PR.
+6. **Abre un Pull Request** y márcalo como *Ready for review* cuando esté listo.
+7. **Responde al feedback** de los revisores y realiza los ajustes necesarios.
+
+:::tip[Consejo]
+Los PR serán revisados únicamente cuando estén marcados como **"Ready for review"** y todas las pruebas asociadas estén aprobadas. Los PR inactivos en estado de "borrador" podrán ser cerrados tras algunos días, según lo determinen los mantenedores.
+:::
+
+---
+
+## Reporte de errores
+
+Para una colaboración eficiente, **envía siempre tus correcciones mediante Pull Requests** en vez de reportar errores por correo o foros. Todo ajuste debe incluir pruebas que validen su funcionamiento.
+
+Al reportar un error, incluye:
+
+- Un **título claro y conciso** que describa el problema.
+- Una **descripción detallada** con el comportamiento esperado vs. el obtenido.
+- **Pasos para reproducir** el error de forma consistente.
+- **Información del entorno**: versión de Python, sistema operativo y versión de Orionis.
+- Un **ejemplo de código reproducible** mínimo.
+
+:::caution[Advertencias erróneas en herramientas]
+Si detectas advertencias incorrectas en tu IDE, SonarQube, Ruff u otras herramientas al usar Orionis Framework, **no crees un issue en GitHub**. En su lugar, envía un PR para corregir el inconveniente directamente.
+:::
+
+---
+
+## Discusión sobre el desarrollo
 
 ¿Tienes ideas para nuevas características o mejoras? Compártelas en el [tablero de discusiones de GitHub](https://github.com/orgs/orionis-framework/discussions). Se recomienda estar dispuesto a colaborar en la implementación, ya sea aportando código o ayudando en el desarrollo.
 
-No todas las propuestas serán aceptadas; los mantenedores revisarán cada sugerencia considerando la visión y los objetivos del proyecto. Las propuestas deben aportar valor real al framework y priorizar soluciones que beneficien a la comunidad.
+No todas las propuestas serán aceptadas; los mantenedores evaluarán cada sugerencia considerando la visión, los objetivos y la hoja de ruta del proyecto. Las propuestas deben aportar valor real y priorizar soluciones que beneficien a la comunidad.
 
-## ¿A qué rama debo enviar mi contribución?
+---
 
-- **Correcciones de errores:** Envía tus correcciones a la rama de la versión estable más reciente (por ejemplo, `1.x`). No envíes correcciones a `master` salvo que el error afecte exclusivamente a funcionalidades de la próxima versión principal.
-- **Mejoras menores y compatibles:** Envía también a la rama estable más reciente.
-- **Nuevas características o cambios incompatibles:** Envía a la rama `master`, que representa el desarrollo de la próxima versión principal.
+## Estrategia de ramas
 
-## Archivos Compilados
+Elige la rama destino de tu PR según el tipo de cambio:
 
-No incluyas archivos compilados en tus PR. Estos se generan automáticamente a partir del código fuente y **serán rechazados** si se detectan en los PR. Esto garantiza la integridad y seguridad del proyecto.
+| Tipo de cambio | Rama destino | Ejemplo |
+|---|---|---|
+| Corrección de errores | Última versión estable | `1.x` |
+| Mejoras menores y compatibles | Última versión estable | `1.x` |
+| Nuevas características o cambios incompatibles | `master` | — |
 
-## Vulnerabilidades de Seguridad
+:::note[Nota]
+No envíes correcciones a `master` salvo que el error afecte exclusivamente a funcionalidades de la próxima versión principal.
+:::
 
-Si descubres una vulnerabilidad de seguridad, **envía un correo electrónico a Raul M Uñate** a <a href="mailto:raulmauriciounate@gmail.com">raulmauriciounate@gmail.com</a>. Todas las vulnerabilidades serán atendidas con prioridad.
+---
 
-## Estilo de Código y Análisis Estático
+## Pruebas
 
-Orionis sigue convenciones propias de estilo de código, alineadas con frameworks web modernos. **Todo el código debe pasar el análisis estático con [Ruff](https://github.com/astral-sh/ruff)** y no debe generar advertencias ni errores.
+Toda contribución **debe incluir pruebas** que validen los cambios realizados. Se espera que:
 
-- Toda función, clase o método agregado o modificado debe incluir documentación en formato NumPyDoc.
-- Toda función, clase o método debe incluir anotaciones de tipos (type hints) para parámetros y valores de retorno.
-- El código debe ser legible, coherente y seguir las convenciones establecidas en el proyecto.
+- Los **bug fixes** incluyan al menos un test que reproduzca el error corregido.
+- Las **nuevas funcionalidades** incluyan tests unitarios y, cuando corresponda, tests de integración.
+- Las pruebas sigan las convenciones existentes del proyecto en cuanto a estructura y nomenclatura.
 
-Ejemplo:
+Antes de abrir tu PR, verifica que **todas las pruebas pasen correctamente** ejecutando la suite completa del proyecto.
 
-Si estás definiendo una clase o método, asegúrate de incluir **anotaciones de tipos y documentación formato NumPyDoc.**
+---
 
-Nombre de la clase debe usar *PascalCase* y el nombre del método debe usar *camelCase*.
+## Archivos compilados
+
+:::danger[Importante]
+No incluyas archivos compilados ni artefactos generados en tus PR. Estos se producen automáticamente a partir del código fuente y **serán rechazados** si se detectan. Esto garantiza la integridad y trazabilidad del proyecto.
+:::
+
+---
+
+## Vulnerabilidades de seguridad
+
+Si descubres una vulnerabilidad de seguridad, **no la publiques como un issue público**. En su lugar, envía un correo electrónico a **Raul M. Uñate** a <a href="mailto:raulmauriciounate@gmail.com">raulmauriciounate@gmail.com</a>. Todas las vulnerabilidades serán atendidas con prioridad y de forma confidencial.
+
+---
+
+## Estilo de código
+
+Orionis sigue convenciones propias de estilo, alineadas con frameworks web modernos. Estos son los requisitos obligatorios para todo código:
+
+- **Documentación**: Toda función, clase o método debe incluir docstrings en formato **NumPyDoc**.
+- **Anotaciones de tipos**: Todos los parámetros y valores de retorno deben estar tipados con *type hints*.
+- **Legibilidad**: El código debe ser claro, coherente y seguir las convenciones del proyecto.
+
+### Convención de nomenclatura
+
+| Elemento | Convención | Ejemplo |
+|---|---|---|
+| Clases | *PascalCase* | `EmailService` |
+| Métodos | *camelCase* | `sendEmail` |
+| Funciones | *snake_case* | `validate_input` |
+| Constantes | *UPPER_SNAKE_CASE* | `MAX_RETRIES` |
+
+### Ejemplo: clase con método
 
 ```python
-class NombreDeLaClase:
+class EmailService:
 
-    def nombreDelMethodo(self, param1: int, param2: str) -> bool:
+    def sendNotification(self, recipient: str, subject: str) -> bool:
         """
-        Esta es una función de ejemplo que demuestra
-        las anotaciones de tipos y la documentación en formato NumPyDoc.
+        Envía una notificación por correo electrónico.
 
         Parameters
         ----------
-        param1 : int
-            Descripción del primer parámetro.
-        param2 : str
-            Descripción del segundo parámetro.
+        recipient : str
+            Dirección de correo del destinatario.
+        subject : str
+            Asunto del correo electrónico.
 
         Returns
         -------
         bool
-            Descripción del valor de retorno.
+            True si el envío fue exitoso, False en caso contrario.
         """
         return True
-
 ```
 
-Si estás definiendo una función, sigue el mismo formato, pero el nombre debe usar *snake_case*.
+### Ejemplo: función independiente
 
 ```python
-def nombre_de_la_funcion(param1: float, param2: list) -> dict:
+def parse_config_file(file_path: str, encoding: str = "utf-8") -> dict:
     """
-    Esta es una función de ejemplo que demuestra las anotaciones
-    de tipos y la documentación en formato NumPyDoc.
+    Lee y parsea un archivo de configuración.
 
     Parameters
     ----------
-    param1 : float
-        Descripción del primer parámetro.
-    param2 : list
-        Descripción del segundo parámetro.
+    file_path : str
+        Ruta absoluta al archivo de configuración.
+    encoding : str, optional
+        Codificación del archivo. Por defecto es 'utf-8'.
 
     Returns
     -------
     dict
-        Descripción del valor de retorno.
+        Diccionario con los pares clave-valor de la configuración.
     """
     return {}
 ```
 
-### Excepciones de reglas de estilo
+---
 
-El framework está inspirado en la convención de nomenclatura de **frameworks web modernos**. Es necesario ajustar SonarQube/SonarLint para evitar falsos positivos durante el análisis estático.
+## Análisis estático
 
-## Análisis Estático con SonarQube y Ruff
+Orionis Framework utiliza dos herramientas complementarias para asegurar la calidad del código:
 
-Orionis Framework utiliza **SonarQube** como herramienta principal para el análisis estático de código y calidad. Además, **Ruff** es la herramienta oficial para linting y formato en Orionis Framework. Todo el código debe pasar ambos análisis antes de enviar un PR.
+| Herramienta | Propósito |
+|---|---|
+| [Ruff](https://github.com/astral-sh/ruff) | Linting y formateo de código |
+| [SonarQube](https://www.sonarqube.org/) | Análisis estático de calidad y seguridad |
 
-Configura tu entorno para ejecutar `ruff check .` y corrige cualquier advertencia o error antes de enviar tu contribución.
+**Todo el código debe pasar ambos análisis** sin advertencias ni errores antes de enviar un PR.
 
-### Configuración recomendada para VSCode
+### Ruff
 
-Si usas **Visual Studio Code**, puedes aplicar la siguiente configuración en tu archivo `settings.json` para SonarLint. En otros IDE, consulta la documentación correspondiente para adaptar las reglas, ya que la configuración puede variar.
+Configura tu entorno para ejecutar Ruff y corrige cualquier advertencia antes de enviar tu contribución:
+
+```bash
+ruff check .
+```
+
+### Configuración de SonarLint para VSCode
+
+Si usas **Visual Studio Code**, aplica la siguiente configuración en tu archivo `settings.json`:
 
 ```json
 "sonarlint.rules": {
@@ -137,31 +218,35 @@ Si usas **Visual Studio Code**, puedes aplicar la siguiente configuración en tu
 "sonarlint.automaticAnalysis": true
 ```
 
-> **Nota:** Esta configuración es específica para VSCode. Si usas otro IDE, deberás adaptar las reglas según la documentación de SonarQube/SonarLint para ese entorno.
+:::note[Nota]
+Esta configuración es específica para VSCode. Si usas otro IDE, adapta las reglas según la documentación de SonarQube/SonarLint para tu entorno.
+:::
 
-### Explicación de las reglas
+### Referencia de reglas personalizadas
 
-- **`python:S100`**: Permite nombres de métodos con guiones bajos iniciales o estructura camelCase, alineados con el estilo del framework.
-- **`python:S2638`**: Se desactiva por incompatibilidad con la sintaxis de inyección de dependencias.
-- **`python:S1542`**: Refuerza la consistencia en la nomenclatura de métodos.
+| Regla | Estado | Descripción |
+|---|---|---|
+| `python:S100` | Activa (personalizada) | Permite nombres de métodos en *camelCase* y con guiones bajos iniciales, alineados con el estilo del framework. |
+| `python:S1542` | Activa (personalizada) | Refuerza la consistencia en la nomenclatura de funciones y métodos. |
+| `python:S2638` | Desactivada | Incompatible con la sintaxis de inyección de dependencias utilizada en Orionis. |
 
-## Manejo de Complejidad Cognitiva (`python:S3776`)
+### Complejidad cognitiva (`python:S3776`)
 
-Algunos métodos pueden superar el límite de complejidad cognitiva por defecto de **15**.
+Algunos métodos pueden superar el límite de complejidad cognitiva por defecto de **15**. En esos casos:
 
-### Recomendación
-
-- **No desactivar la regla globalmente**.
-- Usa `# NOSONAR` con moderación y solo cuando la complejidad sea justificada.
+- **No desactives la regla globalmente.**
+- Usa `# NOSONAR` con moderación y solo cuando la complejidad sea justificada y revisada.
 
 ```python
 def metodo_complejo(...):  # NOSONAR
-    # Lógica compleja que requiere excepción
+    # Lógica compleja que requiere excepción documentada
     ...
 ```
 
-> **Nota:** Considera aumentar el umbral solo si es estrictamente necesario y justificado por la naturaleza del problema.
+:::caution[Precaución]
+Considera aumentar el umbral de complejidad solo si es estrictamente necesario y justificado por la naturaleza del problema. Documenta la razón en un comentario o en la descripción del PR.
+:::
 
 ---
 
-¡Gracias por contribuir a Orionis Framework! Tu colaboración ayuda a mejorar la calidad y experiencia de desarrollo para toda la comunidad.
+¡Gracias por contribuir a Orionis Framework! Tu colaboración ayuda a mejorar la calidad y la experiencia de desarrollo para toda la comunidad.

@@ -1,0 +1,182 @@
+---
+title: 'Versiones'
+tableOfContents: true
+editUrl: true
+lastUpdated: true
+template: doc
+---
+
+import { Card, CardGrid, Steps, Badge } from '@astrojs/starlight/components';
+
+## Liberación OpenSource
+
+Orionis Framework está en un proceso de **liberación gradual OpenSource**. El framework ha sido desarrollado, probado y está siendo utilizado como base tecnológica de diversos sistemas empresariales en producción.
+
+:::tip[Un framework nacido en producción]
+Orionis no es un proyecto experimental. Nació en entornos reales y ha sido validado en sistemas empresariales antes de su publicación abierta. La liberación gradual garantiza que cada componente cumple los estándares de calidad que el ecosistema merece.
+:::
+
+### Estado del Proceso
+
+<Steps>
+
+1. **Framework Core** <Badge text="Completado" variant="success" />
+
+   Funcionalidades principales probadas y estables. El núcleo del framework está listo para producción.
+
+2. **Documentación** <Badge text="En progreso" variant="caution" />
+
+   En proceso de desarrollo y mejora continua. Cada módulo se documenta con ejemplos prácticos y guías detalladas.
+
+3. **Componentes** <Badge text="En progreso" variant="caution" />
+
+   Liberación gradual de módulos y funcionalidades. Los componentes se publican a medida que superan las pruebas de calidad.
+
+4. **Testing Público** <Badge text="Pendiente" variant="note" />
+
+   Preparación para pruebas de la comunidad. Próximamente abriremos canales para feedback y contribuciones.
+
+</Steps>
+
+:::note[Agradecimiento a la comunidad]
+Este proceso de liberación requiere tiempo y dedicación para asegurar la calidad, organización y documentación adecuada de cada componente. Agradecemos la paciencia y el apoyo de la comunidad mientras completamos este proceso.
+:::
+
+---
+
+## Versiones Disponibles
+
+### Versión Actual en PyPI
+
+La versión más reciente disponible públicamente:
+
+<div class="version-info">
+    <div class="version-badge">
+        <span class="version-label">Versión Actual:</span>
+        <span id="current-version" class="version-number">Cargando...</span>
+    </div>
+    <div class="version-status">
+        <span id="version-status">OpenSource - Liberación Gradual</span>
+    </div>
+</div>
+
+---
+
+### Hoja de Ruta
+
+<CardGrid>
+  <Card title="Versión Actual" icon="rocket">
+    <Badge text="En desarrollo" variant="caution" /> <span id="dynamic-version" />
+
+    Versión actual en liberación pública gradual. Incluye el core del framework, sistema de routing, middleware, inyección de dependencias y CLI Reactor.
+  </Card>
+
+  <Card title="v1.0.0 — Estable" icon="star">
+    <Badge text="Junio 2026" variant="note" />
+
+    Primera versión estable completa. Marcará la madurez oficial del framework con API pública garantizada, documentación completa y soporte a largo plazo.
+  </Card>
+</CardGrid>
+
+:::caution[Sobre versiones futuras]
+A partir de la **v1.0.0**, las siguientes versiones se planificarán según la evolución natural del framework, las necesidades de la comunidad y los avances tecnológicos del ecosistema Python. No se fuerzan fechas artificiales: cada release llegará cuando esté lista y probada.
+:::
+
+### Política de Versionado
+
+Orionis sigue el estándar **Semantic Versioning (SemVer)**:
+
+<CardGrid>
+  <Card title="Major (X.0.0)" icon="warning">
+    Cambios incompatibles con versiones anteriores. Se proporcionarán guías de migración detalladas y un período de transición adecuado.
+  </Card>
+
+  <Card title="Minor (0.X.0)" icon="add-document">
+    Nuevas funcionalidades compatibles hacia atrás. Módulos y mejoras que amplían las capacidades sin romper código existente.
+  </Card>
+
+  <Card title="Patch (0.0.X)" icon="approve-check">
+    Correcciones de errores y mejoras de rendimiento. Actualizaciones seguras que se pueden aplicar sin riesgo.
+  </Card>
+</CardGrid>
+
+<style>
+{`
+.version-info {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.version-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+.version-label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+.version-number {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+.version-status {
+    font-size: 0.85rem;
+    opacity: 0.8;
+}
+.loading {
+    animation: pulse 2s infinite;
+}
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+`}
+</style>
+
+<script>
+{`
+document.addEventListener('DOMContentLoaded', function() {
+    async function fetchVersionInfo() {
+        const currentVersionEl = document.getElementById('current-version');
+        const dynamicVersionEl = document.getElementById('dynamic-version');
+        const statusEl = document.getElementById('version-status');
+        try {
+            currentVersionEl.textContent = 'Cargando...';
+            currentVersionEl.classList.add('loading');
+            const response = await fetch('https://pypi.org/pypi/orionis/json');
+            if (!response.ok) {
+                throw new Error('HTTP ' + response.status + ': ' + response.statusText);
+            }
+            const data = await response.json();
+            const version = data.info.version;
+            const uploadTime = new Date(data.urls[0]?.upload_time || Date.now());
+            currentVersionEl.textContent = 'v' + version;
+            currentVersionEl.classList.remove('loading');
+            dynamicVersionEl.textContent = 'v' + version;
+            const timeSinceUpload = Math.floor((Date.now() - uploadTime.getTime()) / (1000 * 60 * 60 * 24));
+            statusEl.textContent = 'OpenSource - Liberación Gradual (actualizada hace ' + timeSinceUpload + ' días)';
+        } catch (error) {
+            currentVersionEl.textContent = 'No disponible';
+            currentVersionEl.classList.remove('loading');
+            dynamicVersionEl.textContent = '';
+            statusEl.textContent = 'Error al cargar información de versión';
+            setTimeout(function() {
+                fetchVersionInfo();
+            }, 5000);
+        }
+    }
+    fetchVersionInfo();
+    setInterval(fetchVersionInfo, 300000);
+});
+`}
+</script>

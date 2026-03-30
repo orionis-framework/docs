@@ -1,0 +1,370 @@
+---
+title: Estructura del proyecto
+tableOfContents: true
+editUrl: true
+lastUpdated: true
+template: doc
+---
+
+import { FileTree } from '@astrojs/starlight/components';
+
+# Estructura de Directorios
+
+La estructura predeterminada de una aplicación `Orionis` está diseñada para ofrecer un punto de partida sólido tanto para proyectos minimalistas como empresariales. Eres libre de organizar tu aplicación como prefieras — Orionis no impone restricciones sobre la ubicación de las clases, siempre que la aplicación se configure correctamente durante el proceso de bootstrapping.
+
+## Directorio Raíz
+
+El directorio raíz de tu proyecto contiene los directorios y archivos que conforman la estructura base de la aplicación. A continuación se presenta la distribución que encontrarás en una instalación nueva de Orionis:
+
+<FileTree>
+- app/ Código principal de la aplicación
+  - console/ Comandos y programación de tareas
+    - commands/ Comandos personalizados
+    - listeners/ Listeners de eventos de consola
+    - scheduler.py Configuración del planificador
+  - contracts/ Interfaces y contratos de la aplicación
+  - exceptions/ Manejador de excepciones personalizado
+    - handler.py
+  - facades/ Facades de la aplicación
+  - http/ Capa HTTP
+    - controllers/ Controladores de solicitudes
+  - models/ Modelos ORM
+  - notifications/ Sistema de notificaciones
+  - jobs/ Trabajos en cola
+  - providers/ Proveedores de servicios
+    - app_service_provider.py
+  - services/ Lógica de negocio
+- bootstrap/ Arranque de la aplicación
+  - app.py
+- config/ Archivos de configuración
+  - app.py
+  - auth.py
+  - cache.py
+  - cors.py
+  - database.py
+  - filesystems.py
+  - logging.py
+  - mail.py
+  - queue.py
+  - session.py
+  - testing.py
+- database/ Migraciones y seeders
+- resources/ Vistas, traducciones y assets
+- routes/ Definiciones de rutas
+  - api.py
+  - web.py
+  - console.py
+- storage/ Almacenamiento generado
+  - app/
+    - public/ Archivos accesibles públicamente
+    - private/ Archivos privados
+  - framework/
+    - bootstrap/ Cache de configuración compilada
+    - cache/
+      - data/ Cache basado en archivos
+  - logs/ Logs de la aplicación
+- tests/ Suite de pruebas automatizadas
+- .venv/ Entorno virtual de Python
+- .env Variables de entorno (no versionado)
+- .env.example Plantilla de variables de entorno
+- .gitignore Archivos ignorados por Git
+- pyproject.toml Metadatos y dependencias del proyecto
+- **reactor** CLI del framework
+- README.md Documentación del proyecto
+</FileTree>
+
+## Directorio App
+
+El directorio `app` contiene el código principal de tu aplicación. Casi todas las clases que escribas residirán aquí, organizadas en subdirectorios que separan responsabilidades de forma clara.
+
+### Console
+
+Contiene los comandos de línea de comandos personalizados, los listeners de eventos de consola y la configuración del planificador de tareas. Estos componentes se ejecutan a través del CLI `reactor`.
+
+```
+console/
+├── commands/           # Comandos personalizados
+├── listeners/          # Listeners de eventos de consola
+└── scheduler.py        # Configuración del planificador de tareas
+```
+
+### Contracts
+
+Contiene las interfaces y contratos que definen los acuerdos entre los componentes de tu aplicación. Esto permite la inversión de dependencias y facilita el testing con mocks.
+
+### Exceptions
+
+Alberga el manejador de excepciones de tu aplicación (`handler.py`). Aquí puedes personalizar cómo se reportan y se renderizan las excepciones no capturadas a lo largo de toda la aplicación.
+
+### Facades
+
+Contiene las facades de tu aplicación, que proporcionan una interfaz estática conveniente para acceder a servicios registrados en el contenedor.
+
+### Http
+
+Contiene la capa HTTP de tu aplicación: controladores que manejan las solicitudes entrantes, middleware que filtra las solicitudes, y clases de validación de requests.
+
+- **Controllers**: Reciben las solicitudes HTTP, delegan la lógica a servicios y devuelven respuestas.
+- **Middleware**: Filtros que se ejecutan antes o después de las solicitudes (autenticación, CORS, rate limiting).
+- **Requests**: Clases de validación que encapsulan las reglas de entrada.
+
+### Models
+
+Contiene las clases de modelo ORM. Cada modelo representa una tabla en tu base de datos y proporciona una interfaz expresiva para interactuar con los datos.
+
+### Notifications
+
+Contiene las clases de notificaciones transaccionales que tu aplicación envía a través de distintos canales (correo electrónico, SMS, notificaciones push).
+
+### Jobs
+
+Contiene los trabajos en cola de tu aplicación. Los jobs pueden ejecutarse de forma asíncrona o síncrona dentro del ciclo de vida de la solicitud.
+
+### Providers
+
+Contiene los proveedores de servicios de tu aplicación. Los proveedores arrancan la aplicación vinculando servicios en el contenedor de inyección de dependencias y ejecutando tareas de inicialización.
+
+Un proveedor de servicios implementa dos métodos fundamentales:
+
+```python
+from orionis.container.providers.service_provider import ServiceProvider
+
+class AppServiceProvider(ServiceProvider):
+
+    def register(self) -> None:
+        # Registra servicios en el contenedor
+        ...
+
+    async def boot(self) -> None:
+        # Ejecuta tareas de inicialización después del registro
+        ...
+```
+
+### Services
+
+Contiene clases que encapsulan la lógica de negocio compleja. Este directorio permite mantener los controladores delgados y el código reutilizable entre distintos puntos de entrada (HTTP, CLI).
+
+:::note[Nota clave]
+Los directorios `console` y `http` funcionan como interfaces de entrada hacia el núcleo de tu aplicación. El protocolo HTTP y la CLI son mecanismos de comunicación, no contienen lógica de negocio. La lógica permanece centralizada en `services`, `models` y otros componentes internos.
+:::
+
+## Directorio Bootstrap
+
+El directorio `bootstrap` contiene el archivo `app.py`, responsable de crear e inicializar la instancia de la aplicación. Este archivo configura las rutas, el planificador de tareas, el manejador de excepciones, los proveedores de servicios y ejecuta el arranque del framework.
+
+```python
+from pathlib import Path
+from app.console.scheduler import Scheduler
+from app.exceptions.handler import ExceptionHandler
+from app.providers.app_service_provider import AppServiceProvider
+from orionis.foundation.application import Application
+
+app = Application(
+    base_path=Path(__file__).parent.parent,
+    compiled=True,
+    compiled_path="storage/framework/bootstrap",
+    compiled_invalidation_paths=[
+        "app", "bootstrap", "config",
+        "resources", "routes", ".env"
+    ],
+)
+
+app.withRouting(
+    console="routes/console.py",
+    web="routes/web.py",
+    api="routes/api.py",
+    health="/up",
+)
+
+app.withScheduler(Scheduler)
+app.withExceptionHandler(ExceptionHandler)
+
+app.withProviders(
+    AppServiceProvider,
+)
+
+app.create()
+```
+
+El parámetro `compiled=True` habilita el cache de configuración en `storage/framework/bootstrap`. Los paths listados en `compiled_invalidation_paths` son monitoreados para invalidar automáticamente el cache cuando se detectan cambios. Esto mejora el rendimiento en producción sin sacrificar la experiencia de desarrollo.
+
+## Directorio Config
+
+El directorio `config` contiene todos los archivos de configuración de tu aplicación. Cada archivo es un `dataclass` congelado (`frozen=True`) que define sus valores predeterminados y soporta la carga de variables de entorno mediante `Env.get()`.
+
+| Archivo | Descripción |
+|---|---|
+| `app.py` | Nombre, entorno, debug, host, puerto, workers, zona horaria, locale, cifrado |
+| `auth.py` | Configuración del sistema de autenticación |
+| `cache.py` | Drivers de cache (por defecto: basado en archivos) |
+| `cors.py` | Orígenes permitidos, métodos, headers, credenciales, max age |
+| `database.py` | Conexiones de base de datos (SQLite, PostgreSQL, MySQL, Oracle) |
+| `filesystems.py` | Discos de almacenamiento: local, público y AWS S3 |
+| `logging.py` | Canales de logging: stack, hourly, daily, weekly, monthly, chunked |
+| `mail.py` | Transportes de correo: SMTP y archivo |
+| `queue.py` | Configuración de brokers y colas de trabajo |
+| `session.py` | Cookie de sesión, duración, SameSite, HTTPS |
+| `testing.py` | Verbosidad, fail fast, directorio de tests, patrones de archivo |
+
+:::tip[Recomendación]
+Revisa cada archivo de configuración para familiarizarte con todas las opciones disponibles. El apartado anterior de la documentación cubre en profundidad el sistema de configuración de Orionis.
+:::
+
+## Directorio Database
+
+El directorio `database` está destinado a contener las migraciones de base de datos, seeders y fábricas de modelos para tu aplicación.
+
+## Directorio Resources
+
+El directorio `resources` almacena vistas, plantillas de correo, archivos de localización (traducciones) y assets sin compilar como CSS, JavaScript e imágenes.
+
+## Directorio Routes
+
+El directorio `routes` contiene las definiciones de rutas de tu aplicación. Por defecto, Orionis incluye tres archivos de rutas: `web.py`, `api.py` y `console.py`.
+
+### web.py
+
+Define las rutas para solicitudes HTTP de tu aplicación web. Soporta una API fluida con prefijos, agrupación de rutas y parámetros con tipado:
+
+```python
+from app.http.controllers.home_controller import HomeController
+from orionis.support.facades.router import Route
+
+Route.prefix("/home").group(
+    Route.get("/{slug:str}/{id:int}", [HomeController, 'index'])
+)
+```
+
+### api.py
+
+Contiene las rutas para tu API REST. Estas rutas están diseñadas para ser stateless y generalmente devuelven respuestas en formato JSON:
+
+```python
+from app.http.controllers.home_controller import HomeController
+from orionis.support.facades.router import Route
+
+Route.get("/ruta-api", [HomeController, "index"])
+```
+
+### console.py
+
+Registra los comandos de consola que se ejecutan a través del CLI `reactor`. Utiliza la facade `Reactor` con una API fluida para definir comandos con descripción, argumentos y opciones:
+
+```python
+from app.services.welcome_service import WelcomeService
+from orionis.console.args.argument import Argument
+from orionis.support.facades.reactor import Reactor
+
+Reactor.command("app:test", [WelcomeService, "greetUser"])\
+       .timestamp()\
+       .description("Command Test Defined as Route")\
+       .arguments([
+            Argument(
+                name_or_flags=["--name", "-n"],
+                type_=str,
+                required=False
+            )
+       ])
+```
+
+## Directorio Storage
+
+El directorio `storage` contiene archivos generados por tu aplicación y el framework. Está organizado en subdirectorios con propósitos específicos:
+
+### app/
+
+Almacena archivos generados por tu aplicación, divididos en dos categorías:
+
+- **`public/`**: Archivos accesibles públicamente a través del servidor web (imágenes subidas, documentos descargables, assets generados). Servido por defecto desde la URL `/static`.
+- **`private/`**: Archivos que no deben ser accesibles públicamente (documentos confidenciales, archivos temporales de procesamiento, backups).
+
+### framework/
+
+Contiene archivos generados automáticamente por el framework:
+
+- **`bootstrap/`**: Cache de configuración compilada. Se genera cuando `compiled=True` en la instancia de `Application`, acelerando el arranque de la aplicación.
+- **`cache/data/`**: Almacenamiento del sistema de cache basado en archivos (driver `FILE`).
+
+### logs/
+
+Contiene los archivos de registro de tu aplicación. Según la configuración de logging, puedes tener logs organizados por distintas estrategias de rotación: `stack`, `hourly`, `daily`, `weekly`, `monthly` o `chunked`.
+
+:::caution[Importante]
+El directorio `storage` y todos sus subdirectorios deben tener permisos de escritura para el servidor web. En entornos de producción, asegúrate de que solo `storage/app/public` sea accesible públicamente. El resto de los subdirectorios deben permanecer privados para proteger archivos sensibles.
+:::
+
+## Directorio Tests
+
+El directorio `tests` contiene tu suite de pruebas automatizadas. Orionis incluye un microframework propio para testing con configuración integrada en `config/testing.py`.
+
+Para ejecutar las pruebas, usa el CLI `reactor`:
+
+```bash
+python -B reactor test
+```
+
+La configuración de testing permite ajustar la verbosidad de salida, activar el modo fail-fast, especificar el directorio de pruebas y definir patrones de archivos y métodos de test.
+
+## Entorno Virtual
+
+El directorio `.venv` contiene el entorno virtual de Python para tu aplicación. Proporciona aislamiento de dependencias, garantizando que cada proyecto tenga sus propias versiones de paquetes sin conflictos con el sistema global.
+
+:::caution[Importante]
+Asegúrate de incluir el directorio `.venv` en tu archivo `.gitignore`. El entorno virtual debe recrearse en cada entorno de despliegue y nunca debe compartirse entre desarrolladores ni servidores.
+:::
+
+## Archivos de la Raíz
+
+### Archivos de Entorno
+
+**`.env`** — Contiene variables de entorno específicas para tu instalación local (credenciales de base de datos, claves de API, configuraciones del entorno). Este archivo **no debe versionarse**.
+
+**`.env.example`** — Plantilla de ejemplo del archivo `.env` que sí debe versionarse. Muestra qué variables de entorno requiere la aplicación sin exponer valores reales.
+
+### Archivos del Proyecto
+
+**`pyproject.toml`** — Define los metadatos del proyecto, las dependencias de Python y la configuración de herramientas de desarrollo. Orionis utiliza `pyproject.toml` como estándar para la gestión de dependencias.
+
+**`reactor`** — Punto de entrada del CLI del framework. Ejecuta comandos a través del kernel CLI de la aplicación en un entorno asíncrono:
+
+```python
+import sys
+from bootstrap.app import app
+from orionis.services.asynchrony.engine_cli import ReactorLoop
+
+if __name__ == "__main__":
+    sys.exit(
+        ReactorLoop.run(
+            app.handleCommand(sys.argv)
+        )
+    )
+```
+
+**`.gitignore`** — Especifica los archivos y directorios que Git debe ignorar (`.venv/`, `.env`, `__pycache__/`, `storage/logs/`).
+
+**`README.md`** — Documentación principal del proyecto con instrucciones de instalación y uso.
+
+## Organización del Directorio App
+
+El directorio `app` sigue una arquitectura basada en la separación de responsabilidades:
+
+| Capa | Directorio | Responsabilidad |
+|---|---|---|
+| **Entrada HTTP** | `http/` | Controladores, middleware, validación de requests |
+| **Entrada CLI** | `console/` | Comandos de consola, planificador de tareas |
+| **Lógica de negocio** | `services/` | Operaciones de dominio y reglas de negocio |
+| **Persistencia** | `models/` | Modelos ORM y acceso a datos |
+| **Infraestructura** | `providers/` | Registro y configuración de servicios |
+| **Contratos** | `contracts/` | Interfaces y abstracciones |
+| **Facades** | `facades/` | Acceso estático a servicios del contenedor |
+
+Orionis implementa los siguientes patrones de diseño:
+
+- **MVC (Model-View-Controller)**: Organización de la lógica de presentación y dominio.
+- **Service Layer**: Encapsulación de lógica de negocio compleja fuera de los controladores.
+- **Provider Pattern**: Registro y configuración de servicios en el contenedor de inyección de dependencias.
+- **Facade Pattern**: Acceso simplificado a servicios del contenedor a través de interfaces estáticas.
+
+:::tip[Generación automática de código]
+Muchas clases del directorio `app` pueden generarse automáticamente con el CLI `reactor`. Ejecuta `python -B reactor help` para consultar los comandos disponibles.
+:::

@@ -61,14 +61,14 @@ export default defineConfig({
 							label: 'Prologue',
 							slug: 'introduction/prologue',
 							translations: {
-								es: 'Prólogo',
+								es: '▪️ Prólogo',
 							},
 						},
 						{
 							label: 'Versions',
 							slug: 'introduction/versions',
 							translations: {
-								es: 'Versiones',
+								es: '▪️ Versiones',
 							},
 						},
 					],
@@ -91,14 +91,14 @@ export default defineConfig({
 							label: 'Configuration',
 							slug: 'getting-started/configuration',
 							translations: {
-								es: 'Configuración',
+								es: '▪️ Configuración',
 							},
 						},
 						{
 							label: 'Project Structure',
 							slug: 'getting-started/project-structure',
 							translations: {
-								es: 'Estructura Del Proyecto',
+								es: '▪️ Estructura Del Proyecto',
 							},
 						},
 						{
@@ -216,14 +216,14 @@ export default defineConfig({
 							label: 'Contribution Guide',
 							slug: 'contribute/guide',
 							translations: {
-								es: 'Guía de contribución',
+								es: '▪️ Guía de contribución',
 							},
 						},
 						{
 							label: 'Contributors',
-							slug: 'contribute/contributors',
+							link: '/contribute/contributors',
 							translations: {
-								es: 'Colaboradores',
+								es: '▪️ Colaboradores',
 							},
 						},
 					],

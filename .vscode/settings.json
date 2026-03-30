@@ -43,6 +43,26 @@
         {
             "folderPath": "documentation\\src\\content\\docs\\es\\architecture\\",
             "color": "foldercolorizer.color_00cccc"
+        },
+        {
+            "folderPath": "documentation\\src\\content\\docs\\es\\introduction\\",
+            "color": "foldercolorizer.color_00cccc"
+        },
+        {
+            "folderPath": "documentation\\src\\content\\docs\\es\\getting-started\\project-structure.mdx\\",
+            "color": "foldercolorizer.color_00cccc"
+        },
+        {
+            "folderPath": "documentation\\src\\content\\docs\\es\\getting-started\\configuration.md\\",
+            "color": "foldercolorizer.color_00cccc"
+        },
+        {
+            "folderPath": "documentation\\src\\content\\docs\\es\\contribute\\guide.md\\",
+            "color": "foldercolorizer.color_00cccc"
+        },
+        {
+            "folderPath": "documentation\\src\\content\\docs\\es\\contribute\\",
+            "color": "foldercolorizer.color_00cccc"
         }
     ]
 }
