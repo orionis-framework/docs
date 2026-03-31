@@ -10,6 +10,10 @@ template: doc
 
 Orionis provides a comprehensive environment variable management system that goes far beyond simple string reading. While most frameworks are limited to reading `.env` values as raw strings, Orionis incorporates **type hints**, **dynamic casting**, **bidirectional serialization**, and **strict key validation**, turning environment variables into first-class citizens of the Python type system.
 
+:::caution[Avoid runtime access to the `.env` file]
+Environment variables should be read during the **bootstrap phase** of the application (configuration files, service providers, etc.). Avoid calling `Env.get()` or `env()` inside request handlers, middleware, or any code that runs on every incoming request. Reading the `.env` file at runtime introduces unnecessary I/O overhead and can become a performance bottleneck under load. Instead, resolve the values once during startup and inject them through configuration objects or the service container.
+:::
+
 ---
 
 ## Module Architecture

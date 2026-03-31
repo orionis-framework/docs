@@ -10,6 +10,10 @@ template: doc
 
 Orionis ofrece un sistema completo para la gestión de variables de entorno que va mucho más allá de la simple lectura de cadenas de texto. Mientras que la mayoría de frameworks se limitan a leer valores del archivo `.env` como strings crudos, Orionis incorpora **type hints**, **casting dinámico**, **serialización bidireccional** y **validación estricta de claves**, convirtiendo las variables de entorno en ciudadanos de primera clase del sistema de tipos de Python.
 
+:::caution[Evita acceder al `.env` en tiempo de ejecución]
+Las variables de entorno deben leerse durante la **fase de arranque** de la aplicación (archivos de configuración, service providers, etc.). Evita llamar a `Env.get()` o `env()` dentro de handlers de peticiones, middleware o cualquier código que se ejecute en cada request entrante. Leer el archivo `.env` en tiempo de ejecución introduce sobrecarga de I/O innecesaria y puede convertirse en un cuello de botella de rendimiento bajo carga. En su lugar, resuelve los valores una sola vez durante el inicio e inyéctalos mediante objetos de configuración o el contenedor de servicios.
+:::
+
 ---
 
 ## Arquitectura del Módulo

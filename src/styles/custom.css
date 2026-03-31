@@ -132,6 +132,11 @@ nav[aria-labelledby] a[aria-current="page"]:hover {
     color: #000000 !important;
 }
 
+/* Prevent line breaks in inline code inside table cells */
+td code {
+    white-space: nowrap;
+}
+
 /* Hide the first content panel */
 .content-panel:first-of-type {
     display: none;

@@ -249,6 +249,13 @@ export default defineConfig({
 								es: '📄 Caché'
 							},
 						},
+						{
+							label: '📄 Logging',
+							slug: 'services/logging',
+							translations: {
+								es: '📄 Logging'
+							},
+						},
 					],
 				},
 								{
