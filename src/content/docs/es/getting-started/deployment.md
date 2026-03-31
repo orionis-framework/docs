@@ -1,5 +1,9 @@
 ---
 title: Despliegue
+tableOfContents: true
+editUrl: true
+lastUpdated: true
+template: doc
 ---
 
 ## Guía de despliegue próximamente disponible

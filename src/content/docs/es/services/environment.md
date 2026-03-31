@@ -1,6 +1,12 @@
 ---
 title: Variables de Entorno
+tableOfContents: true
+editUrl: true
+lastUpdated: true
+template: doc
 ---
+
+# Variables de Entorno
 
 Orionis ofrece un sistema completo para la gestión de variables de entorno que va mucho más allá de la simple lectura de cadenas de texto. Mientras que la mayoría de frameworks se limitan a leer valores del archivo `.env` como strings crudos, Orionis incorpora **type hints**, **casting dinámico**, **serialización bidireccional** y **validación estricta de claves**, convirtiendo las variables de entorno en ciudadanos de primera clase del sistema de tipos de Python.
 

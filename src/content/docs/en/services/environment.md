@@ -1,6 +1,12 @@
 ---
 title: Environment Variables
+tableOfContents: true
+editUrl: true
+lastUpdated: true
+template: doc
 ---
+
+# Environment Variables
 
 Orionis provides a comprehensive environment variable management system that goes far beyond simple string reading. While most frameworks are limited to reading `.env` values as raw strings, Orionis incorporates **type hints**, **dynamic casting**, **bidirectional serialization**, and **strict key validation**, turning environment variables into first-class citizens of the Python type system.
 

@@ -1,5 +1,9 @@
 ---
 title: Deployment
+tableOfContents: true
+editUrl: true
+lastUpdated: true
+template: doc
 ---
 
 ## Deployment Guide Coming Soon

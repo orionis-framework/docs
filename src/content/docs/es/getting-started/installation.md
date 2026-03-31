@@ -1,5 +1,9 @@
 ---
 title: Instalación
+tableOfContents: true
+editUrl: true
+lastUpdated: true
+template: doc
 ---
 
 ## Guía de instalación próximamente disponible
