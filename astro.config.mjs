@@ -230,16 +230,23 @@ export default defineConfig({
 					items: [
 						{
 							label: '📄 Encrypter',
-							slug: 'helpers/encrypter',
+							slug: 'services/encrypter',
 							translations: {
 								es: '📄 Cifrador'
 							},
 						},
 						{
 							label: '📄 Environment',
-							slug: 'helpers/environment',
+							slug: 'services/environment',
 							translations: {
 								es: '📄 Entorno'
+							},
+						},
+						{
+							label: '📄 Cache',
+							slug: 'services/cache',
+							translations: {
+								es: '📄 Caché'
 							},
 						},
 					],
