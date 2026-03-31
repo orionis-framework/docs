@@ -233,32 +233,32 @@ export default defineConfig({
 							slug: 'services/encrypter',
 							translations: {
 								es: '📄 Cifrador'
-							},
+							}
 						},
 						{
 							label: '📄 Environment',
 							slug: 'services/environment',
 							translations: {
 								es: '📄 Entorno'
-							},
+							}
 						},
 						{
-							label: '📄 Cache',
-							slug: 'services/cache',
+							label: '📄 File Based Cache',
+							slug: 'services/file_based_cache',
 							translations: {
-								es: '📄 Caché'
-							},
+								es: '📄 Cache Basada en Archivos'
+							}
 						},
 						{
 							label: '📄 Logging',
 							slug: 'services/logging',
 							translations: {
 								es: '📄 Logging'
-							},
+							}
 						},
 					],
 				},
-								{
+				{
 					label: '🧰 Helpers & Utilities',
 					collapsed: true,
 					translations: {
@@ -282,6 +282,13 @@ export default defineConfig({
 								text: 'No-op',
 								variant: 'note',
 							}
+						},
+						{
+							label: '📄 Workers',
+							slug: 'helpers/workers',
+							translations: {
+								es: '📄 Workers'
+							},
 						},
 					],
 				},
