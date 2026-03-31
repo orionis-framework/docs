@@ -222,10 +222,33 @@ export default defineConfig({
 					],
 				},
 				{
-					label: '🧩 Helpers & Utilities',
+					label: '🧩 Services',
 					collapsed: true,
 					translations: {
-						es: '🧩 Utilidades y Ayudantes'
+						es: '🧩 Servicios'
+					},
+					items: [
+						{
+							label: '📄 Encrypter',
+							slug: 'helpers/encrypter',
+							translations: {
+								es: '📄 Cifrador'
+							},
+						},
+						{
+							label: '📄 Environment',
+							slug: 'helpers/environment',
+							translations: {
+								es: '📄 Entorno'
+							},
+						},
+					],
+				},
+								{
+					label: '🧰 Helpers & Utilities',
+					collapsed: true,
+					translations: {
+						es: '🧰 Utilidades y Ayudantes'
 					},
 					items: [
 						{
@@ -236,25 +259,15 @@ export default defineConfig({
 							},
 						},
 						{
-							label: '📄 Encrypter',
-							slug: 'helpers/encrypter',
-							translations: {
-								es: '📄 Cifrador'
-							},
-						},
-						{
 							label: '📄 Inspirational',
 							slug: 'helpers/inspirational',
 							translations: {
 								es: '📄 Inspiración'
 							},
-						},
-						{
-							label: '📄 Environment',
-							slug: 'helpers/environment',
-							translations: {
-								es: '📄 Entorno'
-							},
+							badge: {
+								text: 'No-op',
+								variant: 'note',
+							}
 						},
 					],
 				},
