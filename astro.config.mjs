@@ -203,6 +203,13 @@ export default defineConfig({
 								es: '📄 Excepciones y Manejo de Errores',
 							},
 						},
+						{
+							label: '📄 Lifespan Events',
+							slug: 'console/lifespan',
+							translations: {
+								es: '📄 Eventos de Ciclo de Vida',
+							},
+						},
 					],
 				},
 				{
