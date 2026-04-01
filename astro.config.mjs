@@ -317,6 +317,13 @@ export default defineConfig({
 							translations: {
 								es: '📄 FreezeThaw'
 							},
+						},
+						{
+							label: '📄 Collection',
+							slug: 'helpers/collection',
+							translations: {
+								es: '📄 Collection'
+							},
 						}
 					],
 				},
