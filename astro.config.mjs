@@ -331,6 +331,13 @@ export default defineConfig({
 							translations: {
 								es: '📄 StdClass'
 							},
+						},
+						{
+							label: '📄 PerformanceCounter',
+							slug: 'helpers/performance-counter',
+							translations: {
+								es: '📄 PerformanceCounter'
+							},
 						}
 					],
 				},
