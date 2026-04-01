@@ -226,6 +226,13 @@ export default defineConfig({
 								es: '📄 Descripción General',
 							},
 						},
+						{
+							label: '📄 Background Tasks',
+							slug: 'http/background-tasks',
+							translations: {
+								es: '📄 Tareas en Segundo Plano',
+							},
+						},
 					],
 				},
 				{
@@ -337,6 +344,13 @@ export default defineConfig({
 							slug: 'helpers/performance-counter',
 							translations: {
 								es: '📄 PerformanceCounter'
+							},
+						},
+						{
+							label: '📄 DateTime',
+							slug: 'helpers/date-time',
+							translations: {
+								es: '📄 DateTime'
 							},
 						}
 					],
