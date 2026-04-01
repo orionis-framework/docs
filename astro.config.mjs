@@ -324,6 +324,13 @@ export default defineConfig({
 							translations: {
 								es: '📄 Collection'
 							},
+						},
+						{
+							label: '📄 StdClass',
+							slug: 'helpers/std-class',
+							translations: {
+								es: '📄 StdClass'
+							},
 						}
 					],
 				},
