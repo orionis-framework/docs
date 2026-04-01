@@ -290,6 +290,13 @@ export default defineConfig({
 								es: '📄 Workers'
 							},
 						},
+						{
+							label: '📄 Stringable',
+							slug: 'helpers/stringable',
+							translations: {
+								es: '📄 Stringable'
+							},
+						}
 					],
 				},
 				{
