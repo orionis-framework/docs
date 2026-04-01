@@ -303,6 +303,13 @@ export default defineConfig({
 							translations: {
 								es: '📄 Stringable'
 							},
+						},
+						{
+							label: '📄 DotDict',
+							slug: 'helpers/dot-dict',
+							translations: {
+								es: '📄 DotDict'
+							},
 						}
 					],
 				},
