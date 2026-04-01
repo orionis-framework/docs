@@ -310,6 +310,13 @@ export default defineConfig({
 							translations: {
 								es: '📄 DotDict'
 							},
+						},
+						{
+							label: '📄 FreezeThaw',
+							slug: 'helpers/freeze-thaw',
+							translations: {
+								es: '📄 FreezeThaw'
+							},
 						}
 					],
 				},
