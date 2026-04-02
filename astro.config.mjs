@@ -1,4 +1,4 @@
-// @ts-check
+﻿// @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import sitemap from '@astrojs/sitemap';
@@ -77,7 +77,7 @@ export default defineConfig({
 					label: '🚩 Getting Started',
 					collapsed: true,
 					translations: {
-						es: '🚩 Primeros Pasos'
+						es: '🚩 Primeros Pasos',
 					},
 					items: [
 						{
@@ -98,7 +98,7 @@ export default defineConfig({
 							label: '📄 Project Structure',
 							slug: 'getting-started/project-structure',
 							translations: {
-								es: '📄 Estructura Del Proyecto',
+								es: '📄 Estructura del Proyecto',
 							},
 						},
 						{
@@ -114,28 +114,28 @@ export default defineConfig({
 					label: '🏛️ Architecture',
 					collapsed: true,
 					translations: {
-						es: '🏛️ Arquitectura'
+						es: '🏛️ Arquitectura',
 					},
 					items: [
 						{
 							label: '📄 Request Lifecycle',
 							slug: 'architecture/request-lifecycle',
 							translations: {
-								es: '📄 Ciclo de vida de la petición',
+								es: '📄 Ciclo de Vida de la Petición',
 							},
 						},
 						{
 							label: '📄 Service Container',
 							slug: 'architecture/service-container',
 							translations: {
-								es: '📄 Contenedor de servicios',
+								es: '📄 Contenedor de Servicios',
 							},
 						},
 						{
 							label: '📄 Service Providers',
 							slug: 'architecture/service-providers',
 							translations: {
-								es: '📄 Proveedores de servicios',
+								es: '📄 Proveedores de Servicios',
 							},
 						},
 						{
@@ -151,7 +151,7 @@ export default defineConfig({
 					label: '💻 Console & Commands',
 					collapsed: true,
 					translations: {
-						es: '💻 Consola y Comandos'
+						es: '💻 Consola y Comandos',
 					},
 					items: [
 						{
@@ -179,14 +179,7 @@ export default defineConfig({
 							label: '📄 Command Routing',
 							slug: 'console/command-routing',
 							translations: {
-								es: '📄 Rutas de Comandos',
-							},
-						},
-						{
-							label: '📄 Task Scheduler',
-							slug: 'console/task-scheduler',
-							translations: {
-								es: '📄 Programador de Tareas',
+								es: '📄 Enrutamiento de Comandos',
 							},
 						},
 						{
@@ -197,17 +190,24 @@ export default defineConfig({
 							},
 						},
 						{
-							label: '📄 Exceptions & Error Handling',
-							slug: 'console/exceptions-error-handling',
+							label: '📄 Task Scheduler',
+							slug: 'console/task-scheduler',
 							translations: {
-								es: '📄 Excepciones y Manejo de Errores',
+								es: '📄 Programador de Tareas',
 							},
 						},
 						{
 							label: '📄 Lifespan Events',
 							slug: 'console/lifespan',
 							translations: {
-								es: '📄 Eventos de Ciclo de Vida',
+								es: '📄 Eventos del Ciclo de Vida',
+							},
+						},
+						{
+							label: '📄 Exceptions & Error Handling',
+							slug: 'console/exceptions-error-handling',
+							translations: {
+								es: '📄 Excepciones y Manejo de Errores',
 							},
 						},
 					],
@@ -216,7 +216,7 @@ export default defineConfig({
 					label: '🌐 HTTP & Requests',
 					collapsed: true,
 					translations: {
-						es: '🌐 HTTP y Peticiones'
+						es: '🌐 HTTP y Peticiones',
 					},
 					items: [
 						{
@@ -239,36 +239,101 @@ export default defineConfig({
 					label: '🧩 Services',
 					collapsed: true,
 					translations: {
-						es: '🧩 Servicios'
+						es: '🧩 Servicios',
 					},
 					items: [
-						{
-							label: '📄 Encrypter',
-							slug: 'services/encrypter',
-							translations: {
-								es: '📄 Cifrador'
-							}
-						},
 						{
 							label: '📄 Environment',
 							slug: 'services/environment',
 							translations: {
-								es: '📄 Entorno'
-							}
+								es: '📄 Entorno',
+							},
+						},
+						{
+							label: '📄 Encrypter',
+							slug: 'services/encrypter',
+							translations: {
+								es: '📄 Cifrador',
+							},
 						},
 						{
 							label: '📄 File Based Cache',
 							slug: 'services/file_based_cache',
 							translations: {
-								es: '📄 Cache Basada en Archivos'
-							}
+								es: '📄 Caché Basada en Archivos',
+							},
 						},
 						{
 							label: '📄 Logging',
 							slug: 'services/logging',
 							translations: {
-								es: '📄 Logging'
-							}
+								es: '📄 Logging',
+							},
+						},
+					],
+				},
+				{
+					label: '🧠 Reflection',
+					collapsed: true,
+					translations: {
+						es: '🧠 Reflexión',
+					},
+					items: [
+						{
+							label: '📄 Overview',
+							slug: 'reflection/overview',
+							translations: {
+								es: '📄 Descripción General',
+							},
+						},
+						{
+							label: '📄 Abstract Classes',
+							slug: 'reflection/abstract',
+							translations: {
+								es: '📄 Clases Abstractas',
+							},
+						},
+						{
+							label: '📄 Concrete Classes',
+							slug: 'reflection/concretes',
+							translations: {
+								es: '📄 Clases Concretas',
+							},
+						},
+						{
+							label: '📄 Instances',
+							slug: 'reflection/instances',
+							translations: {
+								es: '📄 Instancias',
+							},
+						},
+						{
+							label: '📄 Callables',
+							slug: 'reflection/callables',
+							translations: {
+								es: '📄 Invocables',
+							},
+						},
+						{
+							label: '📄 Modules',
+							slug: 'reflection/modules',
+							translations: {
+								es: '📄 Módulos',
+							},
+						},
+						{
+							label: '📄 Dependencies',
+							slug: 'reflection/dependencies',
+							translations: {
+								es: '📄 Dependencias',
+							},
+						},
+						{
+							label: '📄 Inspection',
+							slug: 'reflection/inspect',
+							translations: {
+								es: '📄 Inspección',
+							},
 						},
 					],
 				},
@@ -276,146 +341,118 @@ export default defineConfig({
 					label: '🧰 Helpers & Utilities',
 					collapsed: true,
 					translations: {
-						es: '🧰 Utilidades y Ayudantes'
+						es: '🧰 Ayudantes y Utilidades',
 					},
 					items: [
 						{
-							label: '📄 Metadata',
-							slug: 'helpers/metadata',
+							label: '📄 Collection',
+							slug: 'helpers/collection',
 							translations: {
-								es: '📄 Metadatos'
-							},
-						},
-						{
-							label: '📄 Inspirational',
-							slug: 'helpers/inspirational',
-							translations: {
-								es: '📄 Inspiración'
-							},
-							badge: {
-								text: 'No-op',
-								variant: 'note',
-							}
-						},
-						{
-							label: '📄 Workers',
-							slug: 'helpers/workers',
-							translations: {
-								es: '📄 Workers'
-							},
-						},
-						{
-							label: '📄 Stringable',
-							slug: 'helpers/stringable',
-							translations: {
-								es: '📄 Stringable'
+								es: '📄 Collection',
 							},
 						},
 						{
 							label: '📄 DotDict',
 							slug: 'helpers/dot-dict',
 							translations: {
-								es: '📄 DotDict'
-							},
-						},
-						{
-							label: '📄 FreezeThaw',
-							slug: 'helpers/freeze-thaw',
-							translations: {
-								es: '📄 FreezeThaw'
-							},
-						},
-						{
-							label: '📄 Collection',
-							slug: 'helpers/collection',
-							translations: {
-								es: '📄 Collection'
+								es: '📄 DotDict',
 							},
 						},
 						{
 							label: '📄 StdClass',
 							slug: 'helpers/std-class',
 							translations: {
-								es: '📄 StdClass'
+								es: '📄 StdClass',
 							},
 						},
 						{
-							label: '📄 PerformanceCounter',
-							slug: 'helpers/performance-counter',
+							label: '📄 Stringable',
+							slug: 'helpers/stringable',
 							translations: {
-								es: '📄 PerformanceCounter'
+								es: '📄 Stringable',
 							},
 						},
 						{
 							label: '📄 DateTime',
 							slug: 'helpers/date-time',
 							translations: {
-								es: '📄 DateTime'
+								es: '📄 DateTime',
 							},
-						}
+						},
+						{
+							label: '📄 FreezeThaw',
+							slug: 'helpers/freeze-thaw',
+							translations: {
+								es: '📄 FreezeThaw',
+							},
+						},
+						{
+							label: '📄 Workers',
+							slug: 'helpers/workers',
+							translations: {
+								es: '📄 Workers',
+							},
+						},
+						{
+							label: '📄 PerformanceCounter',
+							slug: 'helpers/performance-counter',
+							translations: {
+								es: '📄 PerformanceCounter',
+							},
+						},
+						{
+							label: '📄 Metadata',
+							slug: 'helpers/metadata',
+							translations: {
+								es: '📄 Metadatos',
+							},
+						},
+						{
+							label: '📄 Inspirational',
+							slug: 'helpers/inspirational',
+							translations: {
+								es: '📄 Inspiración',
+							},
+							badge: {
+								text: 'No-op',
+								variant: 'note',
+							},
+						},
 					],
 				},
 				{
-					label: '🧠 Reflection',
+					label: '🧪 Testing',
 					collapsed: true,
 					translations: {
-						es: '🧠 Reflexión'
+						es: '🧪 Testing',
 					},
 					items: [
 						{
 							label: '📄 Overview',
-							slug: 'reflection/overview',
+							slug: 'testing/testing-overview',
 							translations: {
-								es: '📄 Descripción General'
+								es: '📄 Descripción General',
 							},
 						},
 						{
-							label: '📄 Abstract Classes',
-							slug: 'reflection/abstract',
+							label: '📄 TestCase',
+							slug: 'testing/test-case',
 							translations: {
-								es: '📄 Clases Asbtractas'
+								es: '📄 TestCase',
 							},
 						},
 						{
-							label: '📄 Callables',
-							slug: 'reflection/callables',
+							label: '📄 TestingEngine',
+							slug: 'testing/testing-engine',
 							translations: {
-								es: '📄 Invocables'
+								es: '📄 TestingEngine',
 							},
 						},
 						{
-							label: '📄 Concrete Classes',
-							slug: 'reflection/concretes',
+							label: '📄 TestResult',
+							slug: 'testing/test-result',
 							translations: {
-								es: '📄 Clases Concretas'
-							},
-						},
-						{
-							label: '📄 Instances',
-							slug: 'reflection/instances',
-							translations: {
-								es: '📄 Instancias'
-							},
-						},
-						{
-							label: '📄 Modules',
-							slug: 'reflection/modules',
-							translations: {
-								es: '📄 Módulos'
-							},
-						},
-						{
-							label: '📄 Dependencies',
-							slug: 'reflection/dependencies',
-							translations: {
-								es: '📄 Dependencias'
-							},
-						},
-						{
-							label: '📄 Inspection',
-							slug: 'reflection/inspect',
-							translations: {
-								es: '📄 Inspección'
+								es: '📄 TestResult',
 							},
 						},
 					],
@@ -424,14 +461,14 @@ export default defineConfig({
 					label: '🤝 Contribute',
 					collapsed: true,
 					translations: {
-						es: '🤝 Contribuir'
+						es: '🤝 Contribuir',
 					},
 					items: [
 						{
 							label: '📄 Contribution Guide',
 							slug: 'contribute/guide',
 							translations: {
-								es: '📄 Guía de contribución',
+								es: '📄 Guía de Contribución',
 							},
 						},
 						{
