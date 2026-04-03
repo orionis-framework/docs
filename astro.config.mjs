@@ -108,6 +108,13 @@ export default defineConfig({
 								es: '📝 Despliegue',
 							},
 						},
+						{
+							label: '📄 SonarQube & Ruff',
+							slug: 'getting-started/static-analysis',
+							translations: {
+								es: '📄 SonarQube y Ruff',
+							},
+						},
 					],
 				},
 				{
