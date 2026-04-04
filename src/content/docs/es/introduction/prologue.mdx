@@ -104,22 +104,24 @@ Orionis corre sobre **Granian** — un servidor HTTP escrito en Rust. Esto no es
 ### Benchmarks del Mundo Real
 
 <CardGrid>
-  <Card title="100k+ Requests/seg" icon="rocket">
-    Throughput sostenido en hardware moderno. Orionis + Granian supera a todos los frameworks Python principales.
+  <Card title="455k+ Requests/seg" icon="rocket">
+    Proyección con Granian RSGI. Basado en TechEmpower Framework Benchmarks Round 22.
   </Card>
 
-  <Card title="< 5ms Latencia p99" icon="star">
-    Tiempos de respuesta de nivel producción. Sub-milisegundo en la mediana, milisegundos de un dígito en el tail.
+  <Card title="< 2ms Latencia Media" icon="star">
+    Benchmarks internos de Granian. Tiempos de respuesta sub-milisegundo en condiciones reales de producción.
   </Card>
 
-  <Card title="50k+ Conexiones Concurrentes" icon="approve-check">
-    Escalabilidad probada en batalla. Decenas de miles de conexiones simultáneas sin degradación.
+  <Card title="2.6x vs FastAPI" icon="approve-check">
+    Throughput en serialización JSON. Orionis (~455k req/s) frente a FastAPI (~177k req/s).
   </Card>
 
-  <Card title="99.9% Uptime" icon="heart">
-    Estabilidad comprobada en despliegues de producción. Construido para mantenerse en pie cuando más importa.
+  <Card title="6.6x vs Django" icon="heart">
+    Throughput en serialización JSON. Orionis (~455k req/s) frente a Django (~69k req/s).
   </Card>
 </CardGrid>
+
+> *Estimado: Granian RSGI obtuvo 652k raw (TechEmpower R22). Orionis añade overhead de framework, proyectado ~455k req/s.*
 
 ---
 
