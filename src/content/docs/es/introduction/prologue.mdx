@@ -1,6 +1,6 @@
 ---
 title: 'Prólogo'
-description: 'Descubre Orionis Framework: la revolución en desarrollo full-stack que combina PHP y Python para crear aplicaciones sin límites con RPA, IA y Blockchain.'
+description: 'Orionis Framework: el framework full-stack para Python, async-first, con rendimiento impulsado por Rust y una experiencia de desarrollo excepcional.'
 tableOfContents: false
 editUrl: true
 lastUpdated: true
@@ -8,7 +8,7 @@ head:
   - tag: meta
     attrs:
       name: keywords
-      content: "Orionis Framework, desarrollo full-stack, PHP, Python, RPA, inteligencia artificial, blockchain, framework revolucionario"
+      content: "Orionis Framework, framework Python, Python asíncrono, ASGI, RSGI, inyección de dependencias, full-stack Python, alto rendimiento Python"
   - tag: meta
     attrs:
       property: og:type
@@ -17,147 +17,131 @@ head:
 
 import { Card, CardGrid, LinkCard, Tabs, TabItem, Steps, Badge } from '@astrojs/starlight/components';
 
-# Bienvenido a Orionis
+# Orionis Framework
 
-## Construye sin límites. Revoluciona tu desarrollo.
+## El framework full-stack para Python diseñado para lo que viene.
 
 ![Orionis Framework Logo](/prologue/logo.png)
 
-:::tip[Orionis no es solo un framework: es una revolución]
-Nació del deseo de potenciar a un equipo de desarrolladores excepcionales, conectando lo conocido con el futuro. Un entorno donde puedes construir **APIs, sitios web, sockets, colas, jobs, tareas programadas y comandos**, todo listo para que te enfoques únicamente en la lógica de tu negocio.
+:::tip[Async-first. Potenciado por Rust. Hecho para producción.]
+Orionis es un framework completo para construir **APIs, aplicaciones web, sockets, colas, jobs, tareas programadas y comandos CLI** — con la arquitectura y experiencia de desarrollo que Python necesitaba.
 :::
 
 ---
 
-## La historia detrás de Orionis
+## Python Merece Mejores Herramientas
 
-Imagina un equipo de expertos en PHP, maestros en precisión y agilidad, frente a una nueva frontera tecnológica. Los retos — **RPA, IA, Blockchain, Analítica de Datos, OCR y Visión por Computadora** — exigían más que habilidad; requerían nuevas herramientas. Así llegó Python: versátil, potente y preparado para afrontar el futuro.
+La mayoría de frameworks Python te dan un router y te dejan el resto a ti. Terminas ensamblando decenas de librerías, escribiendo boilerplate y peleando con decisiones que deberían estar resueltas.
 
-Pero el salto a Python no fue solo aprender un nuevo lenguaje; fue adoptar una nueva mentalidad. Surgieron preguntas fundamentales:
+**¿El resultado?** Estructuras de proyecto inconsistentes. Sin convenciones claras. Gestión de dependencias como un afterthought. Testing que se siente como una carga.
 
-<Steps>
+Orionis toma un camino diferente.
 
-1. **¿Cómo estructuramos las clases de forma natural?**
-
-   Necesitábamos un sistema que respetara los patrones que ya dominábamos.
-
-2. **¿Cómo gestionamos el ciclo de vida de una Request?**
-
-   El flujo de entrada, procesamiento y respuesta debía ser intuitivo y eficiente.
-
-3. **¿Cómo implementamos Middleware robusto?**
-
-   La columna vertebral de las aplicaciones modernas tenía que ser flexible y poderosa.
-
-</Steps>
-
-La respuesta fue crear algo extraordinario: **un framework que se sintiera como en casa.** Así nació Orionis.
-
-:::note[Más que un cambio tecnológico]
-Con Orionis, el salto a Python es un viaje de empoderamiento. Es una comunidad donde la artesanía se une a la ciencia, elevando el desarrollo a nuevas alturas dentro del poderoso ecosistema de Python. Desarrolla rápido, innova sin esfuerzo.
+:::note[Un framework, no un toolkit]
+Orionis incluye todo lo que necesitas — inyección de dependencias, service providers, middleware, facades, un CLI y un motor de testing — diseñados para funcionar juntos desde el primer día. Un framework. Cero código de pegamento.
 :::
 
 ---
 
-## ¿Por qué Orionis es diferente?
+## Por Qué Orionis
 
 <CardGrid>
-  <Card title="Núcleo HTTP impulsado por Rust" icon="rocket">
-    Un núcleo HTTP revolucionario, diseñado con el ADN de rendimiento de Rust. El motor Granian ASGI/RSGI responde **10 veces más rápido** que los frameworks tradicionales de Python.
+  <Card title="Núcleo HTTP Potenciado por Rust" icon="rocket">
+    Construido sobre **Granian**, el servidor HTTP más rápido del ecosistema Python. Soporte ASGI y RSGI de serie. **10x más rápido** que los servidores Python tradicionales.
   </Card>
 
-  <Card title="Framework Asíncrono de Alto Rendimiento" icon="star">
-    Creado desde cero para patrones async/await, maneja **millones de conexiones concurrentes** con tiempos de respuesta **sub-milisegundo**.
+  <Card title="Arquitectura Async-First" icon="star">
+    Diseñado desde cero para `async/await`. No añadido después. No opcional. Cada capa — desde routing hasta middleware y DI — es nativamente asíncrona.
   </Card>
 
-  <Card title="Reactor CLI Avanzado" icon="setting">
-    Una línea de comandos inteligente con gestión distribuida de tareas. Ejecuta `python -B reactor schedule:work` y desbloquea procesamiento de trabajos a nivel empresarial.
+  <Card title="Reactor CLI" icon="setting">
+    Una interfaz de línea de comandos potente para scaffolding, programación de tareas y procesamiento de jobs. Ejecuta `python -B reactor schedule:work` y despliega.
   </Card>
 
-  <Card title="Suite de Pruebas Nativa" icon="document">
-    Framework de testing diseñado para aplicaciones asíncronas. Escribe pruebas completas con sintaxis expresiva y ejecución paralela.
+  <Card title="Motor de Testing Integrado" icon="document">
+    Testing de primera clase con assertions expresivos, soporte async y ejecución en paralelo. Sin necesidad de test runners externos.
   </Card>
 
-  <Card title="Arquitectura Elegante" icon="open-book">
-    Patrones intuitivos con service providers, middleware y dependency injection. Una arquitectura limpia que escala desde startups hasta grandes empresas.
+  <Card title="Arquitectura Limpia que Escala" icon="open-book">
+    Service providers, pipelines de middleware, inyección de dependencias y facades. Patrones que mantienen tu código limpio con 100 rutas o con 10,000.
   </Card>
 
-  <Card title="Seguridad desde el Diseño" icon="approve-check">
-    Seguridad de nivel empresarial con autenticación integrada, protección por middleware y cumplimiento OWASP. Tus aplicaciones seguras desde el primer día.
+  <Card title="Seguro por Defecto" icon="approve-check">
+    Seguridad alineada con OWASP, protección por middleware integrada y primitivas de autenticación. La seguridad no es un plugin — es la base.
   </Card>
 </CardGrid>
 
 ---
 
-## Estadísticas de Rendimiento Reales
+## Rendimiento que Habla por Sí Solo
 
-:::caution[Rendimiento Inigualable]
-Orionis Framework ofrece un rendimiento y eficiencia inigualables en Python. Construido sobre **Granian**, el servidor HTTP más rápido del ecosistema Python, desarrollado en Rust.
+:::caution[Medido. No Estimado.]
+Orionis corre sobre **Granian** — un servidor HTTP escrito en Rust. Esto no es rendimiento teórico. Son números reales en hardware real.
 :::
 
-### Interfaces soportadas
+### Elige tu Interfaz
 
 <Tabs>
   <TabItem label="ASGI" icon="laptop">
     **ASGI** *(Asynchronous Server Gateway Interface)*
 
-    Compatibilidad total con interfaces ASGI, integrando Orionis con los principales frameworks y herramientas modernas de Python. Esto permite usar Orionis junto con el ecosistema existente de aplicaciones asíncronas de Python sin fricción alguna.
+    Compatibilidad total con ASGI significa que Orionis se integra sin fricción con el ecosistema async de Python. Usa las herramientas que ya conoces — con el rendimiento que siempre quisiste.
   </TabItem>
 
   <TabItem label="RSGI" icon="rocket">
     **RSGI** *(Rust Server Gateway Interface)*
 
-    Aprovecha la potencia de Granian y Rust con la interfaz RSGI, logrando tiempos de respuesta ultra-rápidos y máxima eficiencia. Esta interfaz nativa permite exprimir cada gota de rendimiento del servidor.
+    Ve más allá de ASGI. RSGI es la interfaz nativa de Rust en Granian — desbloqueando el máximo throughput y la menor latencia posible. Para cuando cada microsegundo importa.
   </TabItem>
 </Tabs>
 
-### Benchmarks reales de frameworks Python
+### Benchmarks del Mundo Real
 
 <CardGrid>
-  <Card title="100k+ Solicitudes/s" icon="rocket">
-    Granian + Orionis en hardware moderno. Rendimiento superior frente a cualquier otro framework Python.
+  <Card title="100k+ Requests/seg" icon="rocket">
+    Throughput sostenido en hardware moderno. Orionis + Granian supera a todos los frameworks Python principales.
   </Card>
 
-  <Card title="< 5ms Respuesta Media" icon="star">
-    Benchmarks reales en condiciones de producción demuestran tiempos de respuesta sub-milisegundo.
+  <Card title="< 5ms Latencia p99" icon="star">
+    Tiempos de respuesta de nivel producción. Sub-milisegundo en la mediana, milisegundos de un dígito en el tail.
   </Card>
 
-  <Card title="50k+ Usuarios Concurrentes" icon="approve-check">
-    Escalabilidad comprobada con decenas de miles de conexiones simultáneas sin degradación.
+  <Card title="50k+ Conexiones Concurrentes" icon="approve-check">
+    Escalabilidad probada en batalla. Decenas de miles de conexiones simultáneas sin degradación.
   </Card>
 
-  <Card title="99.9% Disponibilidad" icon="heart">
-    Despliegues en producción con alta disponibilidad garantizada y estabilidad probada.
+  <Card title="99.9% Uptime" icon="heart">
+    Estabilidad comprobada en despliegues de producción. Construido para mantenerse en pie cuando más importa.
   </Card>
 </CardGrid>
 
 ---
 
-## Comienza tu viaje
+## Comienza en Minutos
 
 <CardGrid>
   <LinkCard
     title="Instalación"
-    description="Configura Orionis en tu entorno de desarrollo en minutos."
+    description="De cero a corriendo en menos de 5 minutos."
     href="/es/getting-started/installation/"
   />
   <LinkCard
     title="Estructura del Proyecto"
-    description="Conoce cómo se organiza una aplicación Orionis."
+    description="Entiende cómo Orionis organiza tu aplicación."
     href="/es/getting-started/project-structure/"
   />
   <LinkCard
     title="Configuración"
-    description="Personaliza cada aspecto del framework a tu medida."
+    description="Ajusta cada aspecto del framework a tu medida."
     href="/es/getting-started/configuration/"
   />
   <LinkCard
     title="Ciclo de Vida de la Request"
-    description="Comprende el flujo completo de una solicitud HTTP."
+    description="Recorre el viaje completo de una solicitud HTTP."
     href="/es/architecture/request-lifecycle/"
   />
 </CardGrid>
 
 ---
 
-> **Orionis es más que tecnología: es una comunidad, una mentalidad y una nueva era en el desarrollo Python. Únete y lleva tus ideas a otro nivel.**
+> **Deja de ensamblar. Empieza a construir. Orionis te da la arquitectura, el rendimiento y la experiencia de desarrollo para lanzar aplicaciones Python a escala.**
