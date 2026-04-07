@@ -86,10 +86,10 @@ Orionis runs through Granian, specifying the desired protocol:
 
 ```bash
 # RSGI mode (maximum performance — default option)
-granian --interface rsgi bootstrap:app
+granian --interface rsgi bootstrap.app:app
 
 # ASGI mode (standard compatibility)
-granian --interface asgi bootstrap:app
+granian --interface asgi bootstrap.app:app
 ```
 
 ### Configuration

@@ -86,10 +86,10 @@ Orionis se ejecuta a través de Granian, especificando el protocolo deseado:
 
 ```bash
 # Modo RSGI (rendimiento máximo — opción por defecto)
-granian --interface rsgi bootstrap:app
+granian --interface rsgi bootstrap.app:app
 
 # Modo ASGI (compatibilidad estándar)
-granian --interface asgi bootstrap:app
+granian --interface asgi bootstrap.app:app
 ```
 
 ### Configuración
