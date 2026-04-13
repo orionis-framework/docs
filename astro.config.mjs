@@ -234,6 +234,13 @@ export default defineConfig({
 							},
 						},
 						{
+							label: '📄 Client Disconnection',
+							slug: 'http/client_disconnection',
+							translations: {
+								es: '📄 Desconexión del Cliente',
+							},
+						},
+						{
 							label: '📄 Background Tasks',
 							slug: 'http/background-tasks',
 							translations: {
