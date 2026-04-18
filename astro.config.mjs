@@ -472,6 +472,22 @@ export default defineConfig({
 					],
 				},
 				{
+					label: '⏸️ Debug',
+					collapsed: true,
+					translations: {
+						es: '⏸️ Depuración',
+					},
+					items: [
+						{
+							label: '📄 VSCode',
+							slug: 'debug/vs-code-debugger',
+							translations: {
+								es: '📄 VSCode',
+							},
+						},
+					],
+				},
+				{
 					label: '🤝 Contribute',
 					collapsed: true,
 					translations: {
