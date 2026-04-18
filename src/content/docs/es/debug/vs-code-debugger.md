@@ -10,6 +10,11 @@ template: doc
 
 Orionis Framework es totalmente compatible con el depurador de **Visual Studio Code**, lo que te permite colocar **breakpoints**, inspeccionar variables, navegar por el call stack y ejecutar paso a paso cualquier parte de tu aplicación, ya sea el servidor web o comandos de consola.
 
+<video controls muted controlsList="novolume" width="100%" style="border-radius: 8px; margin: 1.5rem 0;">
+  <source src="/assets/videos/OrionisDebug.mp4" type="video/mp4" />
+  Tu navegador no soporta la reproducción de video.
+</video>
+
 ## 🗂️ Requisito previo: crear el archivo de configuración
 
 Para activar el soporte de depuración, crea el siguiente archivo en la raíz de tu proyecto (si la carpeta `.vscode/` no existe, créala también):

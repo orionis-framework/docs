@@ -10,6 +10,11 @@ template: doc
 
 Orionis Framework is fully compatible with the **Visual Studio Code** debugger, allowing you to set **breakpoints**, inspect variables, navigate the call stack, and step through any part of your application — whether it's the web server or console commands.
 
+<video controls muted controlsList="novolume" width="100%" style="border-radius: 8px; margin: 1.5rem 0;">
+  <source src="/assets/videos/OrionisDebug.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
+
 ## 🗂️ Prerequisite: create the configuration file
 
 To enable debugging support, create the following file at the root of your project (if the `.vscode/` folder does not exist, create it as well):
