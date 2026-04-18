@@ -10,6 +10,11 @@ template: doc
 
 Orionis incluye un subsistema de testing completamente integrado que elimina la fricción de configurar un entorno de pruebas. En lugar de arrancar la aplicación manualmente o hacer mocks de los internos del framework, cada método de prueba se ejecuta dentro del contexto real de la aplicación — el contenedor de servicios está activo, los valores de configuración están cargados y todos los proveedores registrados han sido iniciados. Esto permite verificar el comportamiento exactamente como se ejecutará en producción.
 
+<video controls muted controlsList="novolume" width="100%" style="border-radius: 8px; margin: 1.5rem 0;">
+  <source src="/assets/videos/TestOrionis.mp4" type="video/mp4" />
+  Tu navegador no soporta la reproducción de video.
+</video>
+
 El subsistema se compone de cuatro piezas principales:
 
 | Componente | Responsabilidad |

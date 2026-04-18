@@ -10,6 +10,11 @@ template: doc
 
 Orionis ships with a fully integrated testing subsystem that removes the friction of setting up a test environment. Instead of booting the application manually or mocking framework internals, every test method executes inside the real application context — the service container is live, configuration values are loaded, and all registered providers have been bootstrapped. This lets you verify behavior exactly as it will run in production.
 
+<video controls muted controlsList="novolume" width="100%" style="border-radius: 8px; margin: 1.5rem 0;">
+  <source src="/assets/videos/TestOrionis.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
+
 The subsystem is composed of four main pieces:
 
 | Component | Responsibility |
