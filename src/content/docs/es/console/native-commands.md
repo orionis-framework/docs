@@ -80,6 +80,11 @@ python -B reactor list
 - Después de crear comandos personalizados.
 - Para verificar la firma exacta de un comando antes de ejecutarlo.
 
+<video controls muted controlsList="novolume" width="100%" style="border-radius: 8px; margin: 1.5rem 0;">
+  <source src="/assets/videos/CLIListOrionis.mp4" type="video/mp4" />
+  Tu navegador no soporta la reproducción de video.
+</video>
+
 ## Comando `about`
 
 **Propósito**

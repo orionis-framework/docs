@@ -80,6 +80,11 @@ python -B reactor list
 - After creating custom commands.
 - To verify the exact signature of a command before running it.
 
+<video controls muted controlsList="novolume" width="100%" style="border-radius: 8px; margin: 1.5rem 0;">
+  <source src="/assets/videos/CLIListOrionis.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
+
 ## The `about` Command
 
 **Purpose**

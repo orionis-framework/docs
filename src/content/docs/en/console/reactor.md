@@ -53,6 +53,11 @@ Once the server is running, you can access your application at:
 http://localhost:8000
 ```
 
+<video controls muted controlsList="novolume" width="100%" style="border-radius: 8px; margin: 1.5rem 0;">
+  <source src="/assets/videos/HTTPServerOrionis.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
+
 ## Using the Python `-B` Flag
 
 In some cases it is recommended to run the CLI using the Python `-B` flag:

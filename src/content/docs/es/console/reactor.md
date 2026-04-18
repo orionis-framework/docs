@@ -53,6 +53,11 @@ Una vez iniciado el servidor, podrás acceder a tu aplicación desde:
 http://localhost:8000
 ```
 
+<video controls muted controlsList="novolume" width="100%" style="border-radius: 8px; margin: 1.5rem 0;">
+  <source src="/assets/videos/HTTPServerOrionis.mp4" type="video/mp4" />
+  Tu navegador no soporta la reproducción de video.
+</video>
+
 ## Uso de la bandera `-B` de Python
 
 En algunos casos es recomendable ejecutar el CLI utilizando la bandera `-B` de Python:
