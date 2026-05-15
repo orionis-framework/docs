@@ -1,53 +1,150 @@
 # Orionis Framework Documentation
-## Build without limits. Revolutionize your development.
+## Build Without Boundaries.
 
-This repository contains the official documentation for Orionis Framework, a revolutionary Python framework designed to empower exceptional developers.
+The async Python framework with a Rust-powered HTTP core that delivers **10x faster** responses. Elegant architecture, maximum productivity, zero compromise.
+
+```bash
+pip install orionis
+```
 
 ## 🌟 What is Orionis?
 
-Orionis is not just a framework: it's a revolution. Born from the desire to empower an exceptional team of developers, it bridges the familiar with the future.
+Orionis is a high-performance async Python framework designed for modern web applications. Built on Granian — the fastest HTTP server in the Python ecosystem — it combines the power of Rust with the expressiveness of Python to deliver a complete toolkit for building extraordinary applications. Every module is mission-critical and production-ready.
 
-Imagine a team of PHP experts, masters of precision and agility, facing a new technological frontier. The challenges—RPA, AI, Blockchain, Data Analytics, OCR, and Computer Vision—demanded more than skill; they required new tools. Enter Python: versatile, powerful, and ready to tackle the future.
+> ⚠️ **Pre-release build** — Current version v0.755.0. Not recommended for production environments yet.
 
-Built upon the methodology the team already mastered, Orionis captures the essence of their workflow and reinvents it in Python. With Orionis, the leap to Python is more than a technological change: it's a journey of empowerment.
+## 🚀 System Capabilities
 
-## 🚀 Key Features
+### ⚡ Rust-Powered HTTP Core
+Revolutionary HTTP engine built on Granian ASGI/RSGI. Responses **10x faster** than traditional Python frameworks.
 
-### ⚡ HTTP Core Powered by Rust
-A revolutionary HTTP core, designed with Rust's performance DNA. The Granian ASGI/RSGI engine responds **10 times faster** than traditional Python frameworks.
+### 🔥 Async-First Architecture
+Built from scratch for async/await patterns. Handle millions of concurrent connections with **sub-millisecond** response times.
 
-### 🔥 High-Performance Asynchronous Framework
-Built from the ground up for async/await patterns, it handles **millions of concurrent connections** with **sub-millisecond** response times.
+### 🧪 Reactor CLI
+Smart command line with distributed task management, custom commands, task scheduling, and enterprise-level job processing.
 
-### 🧪 Advanced Reactor CLI
-An intelligent command line with distributed task management. Run `python -B reactor schedule:work` and unlock enterprise-grade job processing.
+```bash
+# Initialize the reactor core
+python -B reactor serve
 
-### 🏛️ Elegant Architecture
-Intuitive patterns with service providers, middleware, and dependency injection. A clean architecture that scales from startups to large enterprises.
+# Fabricate a new command module
+python -B reactor make:command sync_users
+
+# Engage scheduled tasks
+python -B reactor schedule:work
+
+# Run diagnostics
+python -B reactor test
+
+# List all mission modules
+python -B reactor list
+```
 
 ### 🛡️ Security by Design
-Enterprise-grade security with built-in authentication, middleware protection, and OWASP compliance.
+Enterprise-grade security with built-in authentication, middleware protection, and OWASP compliance from day one.
 
-## 📈 Real Performance
+### 🏛️ Elegant Architecture
+Service providers, middleware, dependency injection, and facades. Clean patterns that scale from startups to enterprises.
 
-Orionis Framework delivers unmatched performance and efficiency in Python, built on Granian, the fastest HTTP server in the Python ecosystem:
+### 🧬 Native Testing Suite
+Testing framework designed for async applications. Expressive syntax, parallel execution, and complete coverage.
 
-- **100k+** Requests per second on modern hardware
-- **<5ms** Average response time in real benchmarks
-- **50k+** Concurrent users with proven scalability
-- **99.9%** Availability in production deployments
+## 📐 Code That Feels Like Home
+
+### Clean, Declarative Setup
+Configure your entire application in a single file. Routes, middleware, schedulers, exception handlers — all declared explicitly. No hidden configuration.
+
+```python
+# bootstrap/app.py
+from pathlib import Path
+from app.console.scheduler import Scheduler
+from app.exceptions.handler import ExceptionHandler
+from orionis.foundation.application import Application
+
+app = Application(base_path=Path(__file__).resolve().parent.parent)
+
+app.withRouting(
+    console="routes/console.py",
+    web="routes/web.py",
+    api="routes/api.py",
+    health="/up"
+)
+
+app.withScheduler(Scheduler)
+app.withExceptionHandler(ExceptionHandler)
+app.withProviders(
+    AppServiceProvider,
+    # Add additional providers below...
+)
+
+app.create()
+```
+
+### Powerful Dependency Injection
+Register services with elegant contracts. Singleton, transient, or scoped lifecycles — the IoC container resolves dependencies automatically through type annotations.
+
+```python
+# app/providers/app_service_provider.py
+from orionis.container.providers.service_provider import ServiceProvider
+from app.contracts.email import IEmailService
+from app.services.email import EmailService
+
+class AppServiceProvider(ServiceProvider):
+
+    def register(self):
+        self.app.singleton(
+            IEmailService,
+            EmailService
+        )
+
+    async def boot(self):
+        # Called after all providers are registered
+        pass
+```
+
+## 🏗️ Designed for Real-World Scale
+
+A layered architecture with clear separation of concerns:
+
+| Deck | Layer | Responsibilities |
+|------|-------|-----------------|
+| 01 | **HTTP / CLI** | Routes, Controllers, Commands, Middleware |
+| 02 | **Service Layer** | Providers, Facades, Services, Jobs |
+| 03 | **Core** | IoC Container, Request Lifecycle, Exception Handler, Scheduler |
+| 04 | **Infrastructure** | Granian ASGI/RSGI, Async Event Loop, Worker Management, Security |
+
+- **Convention over Config** — Sensible defaults that just work. Override only what you need.
+- **Modular by Design** — Service providers, deferred loading, and clean separation of concerns.
+- **Test-First Mindset** — Native testing suite with async support, mocking, and parallel execution.
+
+## 📈 Mission Telemetry
+
+Powered by Granian, the fastest HTTP server in the Python ecosystem, built with Rust:
+
+| Metric | Value | Source |
+|--------|-------|--------|
+| **455k+** req/s | Orionis (projected) | Granian RSGI baseline |
+| **<2ms** avg latency | Internal benchmarks | Granian RSGI |
+| **2.6x** faster than FastAPI | JSON serialization throughput | TechEmpower R22 |
+| **6.6x** faster than Django | JSON serialization throughput | TechEmpower R22 |
+
+> Granian RSGI scored 652k raw requests/sec (TechEmpower R22). Orionis adds framework overhead, projected ~455k req/s.
 
 ## 📚 Documentation
 
-This documentation is built with [Starlight](https://starlight.astro.build/) and contains:
+This documentation is built with [Starlight](https://starlight.astro.build/) and covers:
 
-- **Installation guides** - Prerequisites and setup steps
-- **Complete introduction** - Prologue and framework versions
-- **Multi-language documentation** - Available in Spanish and English
+- **Installation guides** — Prerequisites and setup steps
+- **Architecture** — Service container, facades, request lifecycle, service providers
+- **Console** — Reactor CLI, custom commands, task scheduling
+- **HTTP** — Overview, background tasks, client disconnection handling
+- **Services** — Encrypter, environment, cache, logging
+- **Testing** — Test engine, test cases, results
+- **Helpers** — Collections, date/time, stringable, workers, and more
+- **Multi-language** — Available in English and Spanish
 
 ## 🛠️ Local Development
-
-To run the documentation locally:
 
 ```bash
 # Install dependencies
@@ -62,12 +159,10 @@ npm run build
 
 ## 🌍 Available Languages
 
-- **English** (`/en/`) - Complete documentation in English
-- **Español** (`/es/`) - Documentación completa en español
+- **English** (`/en/`) — Complete documentation in English
+- **Español** (`/es/`) — Documentación completa en español
 
 ## 🤝 Contributing
-
-Want to contribute to Orionis documentation? Great!
 
 1. Fork the repository
 2. Create a branch for your contribution
@@ -76,8 +171,8 @@ Want to contribute to Orionis documentation? Great!
 
 ## 📄 License
 
-This project is under the license corresponding to the Orionis Framework.
+MIT License — © 2023–2026 Raul Mauricio Uñate Castro & Orionis Framework Team.
 
 ---
 
-> **Orionis is more than technology: it's a community, a mindset, and a new era in Python development. Join us and take your ideas to the next level.**
+> **[Launch Mission →](https://docs.orionis-framework.com) · [Source Code](https://github.com/orionis-framework/framework) · [orionis-framework.com](https://orionis-framework.com)**

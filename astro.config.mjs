@@ -15,7 +15,7 @@ export default defineConfig({
 		sitemap(),
 		starlight({
 			title: 'Orionis Framework',
-			description: 'Framework revolucionario para desarrollo full-stack con PHP y Python. Construye sin límites con RPA, IA, Blockchain y más.',
+			description: 'High-Performance Async Python Framework designed for modern web applications. Build scalable, fast, and efficient Python applications with Orionis Framework.',
 			logo: {
 				src: './public/favicon.svg',
 			},

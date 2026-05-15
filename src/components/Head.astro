@@ -11,8 +11,8 @@ const isSpanish = lang === 'es';
 // Metadatos específicos para SEO
 const siteTitle = 'Orionis Framework';
 const siteDescription = isSpanish
-  ? 'Framework revolucionario para desarrollo full-stack con PHP y Python. Construye sin límites con RPA, IA, Blockchain y más.'
-  : 'Revolutionary full-stack development framework with PHP and Python. Build without limits with RPA, AI, Blockchain and more.';
+  ? 'Framework Python Asíncrono de Alto Rendimiento diseñado para aplicaciones web modernas. Construye aplicaciones Python escalables, rápidas y eficientes con Orionis Framework.'
+  : 'High-Performance Async Python Framework designed for modern web applications. Build scalable, fast, and efficient Python applications with Orionis Framework.';
 
 const pageTitle = entry?.data.title ? `${entry.data.title} - ${siteTitle}` : siteTitle;
 const pageDescription = entry?.data.description || siteDescription;
@@ -23,9 +23,7 @@ const currentUrl = new URL(Astro.url.pathname, siteUrl).toString();
 const ogImage = `${siteUrl}/seo/seo.png`;
 
 // Palabras clave
-const keywords = isSpanish
-  ? 'Orionis, Framework, PHP, Python, RPA, Inteligencia Artificial, Blockchain, Desarrollo Web, Full Stack'
-  : 'Orionis, Framework, PHP, Python, RPA, Artificial Intelligence, Blockchain, Web Development, Full Stack';
+const keywords = 'python, async, framework, web development, high-performance, python framework, async framework, web framework, orionis';
 ---
 
 <!-- Include the default Starlight Head component first -->

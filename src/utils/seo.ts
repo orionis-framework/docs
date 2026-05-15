@@ -11,14 +11,14 @@ export interface SEOProps {
 export const defaultSEO = {
   en: {
     siteName: 'Orionis Framework',
-    description: 'Revolutionary full-stack development framework with PHP and Python. Build without limits with RPA, AI, Blockchain and more.',
-    keywords: 'Orionis Framework, full-stack development, PHP, Python, RPA, artificial intelligence, blockchain, web development',
+    description: 'High-Performance Async Python Framework designed for modern web applications. Build scalable, fast, and efficient Python applications with Orionis Framework.',
+    keywords: 'python, async, framework, web development, high-performance, python framework, async framework, web framework, orionis',
     author: 'Raul Mauricio Uñate Castro'
   },
   es: {
     siteName: 'Orionis Framework',
-    description: 'Framework revolucionario para desarrollo full-stack con PHP y Python. Construye sin límites con RPA, IA, Blockchain y más.',
-    keywords: 'Orionis Framework, desarrollo full-stack, PHP, Python, RPA, inteligencia artificial, blockchain, desarrollo web',
+    description: 'Framework Python Asíncrono de Alto Rendimiento diseñado para aplicaciones web modernas. Construye aplicaciones Python escalables, rápidas y eficientes con Orionis Framework.',
+    keywords: 'python, async, framework, web development, high-performance, python framework, async framework, web framework, orionis',
     author: 'Raul Mauricio Uñate Castro'
   }
 };
