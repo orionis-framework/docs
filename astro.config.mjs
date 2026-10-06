@@ -510,6 +510,17 @@ export default defineConfig({
 						},
 					],
 				},
+				{
+					label: 'API Reference',
+					link: 'https://api.orionis-framework.com/',
+					translations: {
+						es: 'Referencia de la API',
+					},
+					attrs: {
+						target: '_blank',
+						rel: 'noopener noreferrer',
+					},
+				},
 			],
 		})
 	],
