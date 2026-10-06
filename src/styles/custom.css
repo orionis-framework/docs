@@ -265,6 +265,23 @@ site-search button[data-open-modal]:hover {
     font-weight: 600;
 }
 
+.sidebar-content a.api-reference-link {
+    margin-block-start: 0.75rem;
+    padding: 0.625rem 0.75rem;
+    color: var(--orionis-warning);
+    background: var(--orionis-soft);
+    border: 1px solid var(--orionis-border);
+    border-inline-start: 3px solid var(--orionis-warning);
+    font-weight: 700;
+}
+
+.sidebar-content a.api-reference-link:hover,
+.sidebar-content a.api-reference-link:focus-visible {
+    color: var(--orionis-warning);
+    background: var(--orionis-surface);
+    border-color: var(--orionis-warning);
+}
+
 .right-sidebar a {
     color: var(--orionis-muted);
     font-size: 0.875rem;
