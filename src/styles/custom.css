@@ -1,21 +1,150 @@
-/* Import fonts from Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap');
-
-/* Set Urbanist as the main font */
-:root {
-    --font-family: 'Urbanist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-}
-
-/* Apply to all elements */
-* {
-    font-family: var(--font-family);
-}
-
-/* Specific styles for text elements */
-body {
-    font-family: var(--font-family);
+@font-face {
+    font-family: 'Titillium Web';
+    font-style: normal;
     font-weight: 400;
+    font-display: swap;
+    src: url('/fonts/titillium-web-400-latin-ext.woff2') format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+    font-family: 'Titillium Web';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('/fonts/titillium-web-400-latin.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: 'Titillium Web';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('/fonts/titillium-web-600-latin-ext.woff2') format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+    font-family: 'Titillium Web';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('/fonts/titillium-web-600-latin.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: 'Titillium Web';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('/fonts/titillium-web-700-latin-ext.woff2') format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+    font-family: 'Titillium Web';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('/fonts/titillium-web-700-latin.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: 'Fira Code';
+    font-style: normal;
+    font-weight: 300 700;
+    font-display: swap;
+    src: url('/fonts/fira-code.ttf') format('truetype');
+}
+
+:root {
+    --orionis-primary: #79c8ff;
+    --orionis-primary-hover: #b3e7ff;
+    --orionis-navy: #082b52;
+    --orionis-cyan: #66d5f4;
+    --orionis-gold: #f5ca37;
+    --orionis-text: #e3ebf5;
+    --orionis-muted: #9bacbf;
+    --orionis-canvas: #0b1421;
+    --orionis-surface: #101e30;
+    --orionis-soft: #182a40;
+    --orionis-border: #293b50;
+    --orionis-code: #9ed8ff;
+    --orionis-warning: #e8c968;
+    --orionis-success: #7dd8c0;
+    --orionis-danger: #ffaba4;
+    --orionis-radius: 0.375rem;
+    --orionis-shadow: 0 1px 3px rgb(0 0 0 / 16%);
+    --sl-font: 'Titillium Web', 'Segoe UI', sans-serif;
+    --sl-font-mono: 'Fira Code', 'Cascadia Code', Consolas, monospace;
+    --font-family: var(--sl-font);
+    --sl-text-h1: 2.25rem;
+    --sl-text-h2: 1.65rem;
+    --sl-text-h3: 1.25rem;
+    --sl-text-h4: 1.125rem;
+    --sl-line-height: 1.65;
+    --sl-content-width: 50rem;
+    --sl-nav-height: 4.75rem;
+    --sl-color-white: #e3ebf5;
+    --sl-color-gray-1: #e3ebf5;
+    --sl-color-gray-2: #9bacbf;
+    --sl-color-gray-3: #70839b;
+    --sl-color-gray-4: #41566e;
+    --sl-color-gray-5: #293b50;
+    --sl-color-gray-6: #101e30;
+    --sl-color-black: #0b1421;
+    --sl-color-accent-low: var(--orionis-soft);
+    --sl-color-accent: var(--orionis-primary);
+    --sl-color-accent-high: var(--orionis-primary-hover);
+    --sl-color-text: var(--orionis-text);
+    --sl-color-text-accent: var(--orionis-primary);
+    --sl-color-bg: var(--orionis-canvas);
+    --sl-color-bg-nav: var(--orionis-surface);
+    --sl-color-bg-sidebar: var(--orionis-canvas);
+    --sl-color-bg-inline-code: var(--orionis-soft);
+    --sl-color-hairline: var(--orionis-border);
+    --sl-color-hairline-light: var(--orionis-border);
+    --sl-color-hairline-shade: var(--orionis-border);
+}
+
+:root[data-theme='light'] {
+    --orionis-primary: #206bc4;
+    --orionis-primary-hover: #1a569d;
+    --orionis-text: #182433;
+    --orionis-muted: #626e7f;
+    --orionis-canvas: #f6f8fb;
+    --orionis-surface: #fff;
+    --orionis-soft: #edf3f9;
+    --orionis-border: #dce1e7;
+    --orionis-code: #174f86;
+    --orionis-warning: #916700;
+    --orionis-success: #14766d;
+    --orionis-danger: #b42318;
+    --orionis-shadow: 0 1px 3px rgb(24 36 51 / 4%);
+    --sl-color-white: #182433;
+    --sl-color-gray-1: #182433;
+    --sl-color-gray-2: #626e7f;
+    --sl-color-gray-3: #626e7f;
+    --sl-color-gray-4: #aab4c1;
+    --sl-color-gray-5: #dce1e7;
+    --sl-color-gray-6: #f6f8fb;
+    --sl-color-gray-7: #edf3f9;
+    --sl-color-black: #fff;
+}
+
+body {
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select,
+textarea {
+    font-family: var(--sl-font);
 }
 
 h1,
@@ -24,112 +153,241 @@ h3,
 h4,
 h5,
 h6 {
-    font-family: var(--font-family);
     font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: 0;
 }
 
-/* Styles for code elements keeping monospace font */
 pre,
-kbd,
-samp {
-    font-family: 'Fira Code', 'Monaco', 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace !important;
-}
-
 code,
-code *,
-.code,
-[class*="code"],
+kbd,
+samp,
 tt {
-    font-family: 'Fira Code', 'Monaco', 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace !important;
+    font-family: var(--sl-font-mono);
+    font-variant-ligatures: none;
 }
 
-/* Additional selectors for framework-specific code elements */
-.astro-code,
-.shiki,
-.highlight,
-.language-*,
-[data-language],
-.token,
-.hljs {
-    font-family: 'Fira Code', 'Monaco', 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace !important;
+.expressive-code {
+    --ec-codeFontFamily: var(--sl-font-mono);
+    --ec-uiFontFamily: var(--sl-font);
+    --ec-borderRadius: var(--orionis-radius);
+    --ec-borderColor: var(--orionis-border);
 }
 
-/* Override any inherited font-family from parent elements */
-* code,
-* pre,
-* kbd,
-* samp,
-* tt {
-    font-family: 'Fira Code', 'Monaco', 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace !important;
+a {
+    text-underline-offset: 0.18em;
 }
 
-/* Documentation title/name styles */
-.site-title,
-.navbar-brand,
-.header-title,
-[data-page-title],
-.starlight-banner h1,
-.site-header h1,
-.main-header h1 {
-    color: #134675 !important;
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+    outline: 2px solid var(--orionis-primary);
+    outline-offset: 3px;
+}
+
+::selection {
+    color: var(--orionis-text);
+    background: #66d5f459;
+}
+
+header.header {
+    border-top: 3px solid var(--orionis-navy);
+    border-bottom: 1px solid var(--orionis-border);
+    box-shadow: var(--orionis-shadow);
+}
+
+.site-title {
+    color: var(--orionis-text);
+    font-size: 1.25rem;
     font-weight: 700;
+    line-height: 1.25;
 }
 
-/* Icon styles */
-.icon,
-.nav-icon,
-.menu-icon,
-svg,
-[class*="icon"],
-i {
-    fill: #134675 !important;
-    color: #134675 !important;
-    transition: all 0.3s ease;
+.site-title:hover {
+    color: var(--orionis-primary-hover);
 }
 
-.icon:hover,
-.nav-icon:hover,
-.menu-icon:hover,
-svg:hover,
-[class*="icon"]:hover,
-i:hover,
-a:hover .icon,
-a:hover .nav-icon,
-a:hover .menu-icon,
-a:hover svg,
-a:hover [class*="icon"],
-a:hover i {
-    fill: #4CC9F0 !important;
-    color: #4CC9F0 !important;
-    transform: scale(1.05);
+@media (max-width: 50rem) {
+    .site-title {
+        gap: 0.5rem;
+        font-size: 1rem;
+    }
+
+    .site-title img {
+        width: auto;
+        height: 2rem;
+    }
 }
 
-/* Sidebar styles for Starlight */
-/* Active/current page item */
-.sidebar nav a[aria-current="page"],
-.sidebar nav a.active,
-.sidebar-content a[aria-current="page"],
-.sidebar-content a.active,
-[data-starlight-sidebar] a[aria-current="page"],
-[data-starlight-sidebar] a.active,
-.sidebar a[data-current-parent],
-nav[aria-labelledby] a[aria-current="page"] {
-    background-color: #134675 !important;
+.social-icons a {
+    color: var(--orionis-muted);
+}
+
+.social-icons a:hover {
+    color: var(--orionis-primary);
+}
+
+site-search button[data-open-modal] {
+    min-height: 2.375rem;
+    color: var(--orionis-muted);
+    background: var(--orionis-canvas);
+    border: 1px solid var(--orionis-border);
+    border-radius: var(--orionis-radius);
+    box-shadow: var(--orionis-shadow);
+}
+
+site-search button[data-open-modal]:hover {
+    color: var(--orionis-primary);
+    border-color: var(--orionis-primary);
+}
+
+.sidebar-content a {
+    color: var(--orionis-muted);
+    border-radius: var(--orionis-radius);
+    line-height: 1.5;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.sidebar-content a:hover {
+    color: var(--orionis-primary);
+    background: var(--orionis-soft);
+}
+
+.sidebar-content a[aria-current='page'],
+.sidebar-content a[aria-current='page']:hover {
+    color: var(--orionis-primary);
+    background: var(--orionis-soft);
     font-weight: 600;
-    border-radius: 6px;
-    transition: all 0.3s ease;
+    box-shadow: inset 3px 0 0 var(--orionis-primary);
 }
 
-/* Make sure active state takes precedence over hover */
-.sidebar nav a[aria-current="page"]:hover,
-.sidebar nav a.active:hover,
-.sidebar-content a[aria-current="page"]:hover,
-.sidebar-content a.active:hover,
-[data-starlight-sidebar] a[aria-current="page"]:hover,
-[data-starlight-sidebar] a.active:hover,
-nav[aria-labelledby] a[aria-current="page"]:hover {
-    background-color: #F4C430 !important;
-    color: #000000 !important;
+.sidebar-content .large {
+    color: var(--orionis-text);
+    font-size: 0.9375rem;
+    font-weight: 600;
+}
+
+.right-sidebar a {
+    color: var(--orionis-muted);
+    font-size: 0.875rem;
+}
+
+.right-sidebar a:hover,
+.right-sidebar a[aria-current='true'] {
+    color: var(--orionis-primary);
+}
+
+.main-pane {
+    min-width: 0;
+    background: var(--orionis-surface);
+}
+
+.sl-markdown-content {
+    overflow-wrap: anywhere;
+}
+
+.sl-markdown-content h2 {
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--orionis-border);
+}
+
+.sl-markdown-content :not(pre) > code {
+    color: var(--orionis-code);
+    background: var(--orionis-soft);
+    border-radius: 4px;
+}
+
+.sl-markdown-content table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    border: 1px solid var(--orionis-border);
+    border-radius: var(--orionis-radius);
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.9375rem;
+}
+
+.sl-markdown-content th,
+.sl-markdown-content td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--orionis-border);
+}
+
+.sl-markdown-content th {
+    color: var(--orionis-muted);
+    background: var(--orionis-soft);
+    font-weight: 600;
+}
+
+.sl-markdown-content tr:last-child td {
+    border-bottom: 0;
+}
+
+.sl-markdown-content blockquote {
+    padding: 0.75rem 1rem;
+    background: var(--orionis-soft);
+    border-inline-start: 3px solid var(--orionis-primary);
+    border-radius: var(--orionis-radius);
+}
+
+.starlight-aside,
+.sl-markdown-content .card,
+.sl-link-card,
+.pagination-links a {
+    border-radius: var(--orionis-radius);
+}
+
+.starlight-aside {
+    color: var(--orionis-text);
+}
+
+.starlight-aside--note {
+    --sl-color-asides-text-accent: var(--orionis-primary);
+    --sl-color-asides-border: var(--orionis-primary);
+    background-color: var(--orionis-soft);
+}
+
+.starlight-aside--tip {
+    --sl-color-asides-text-accent: var(--orionis-success);
+    --sl-color-asides-border: var(--orionis-success);
+    background-color: color-mix(in srgb, var(--orionis-success) 8%, var(--orionis-surface));
+}
+
+.starlight-aside--caution {
+    --sl-color-asides-text-accent: var(--orionis-warning);
+    --sl-color-asides-border: var(--orionis-gold);
+    background-color: color-mix(in srgb, var(--orionis-gold) 12%, var(--orionis-surface));
+}
+
+.starlight-aside--danger {
+    --sl-color-asides-text-accent: var(--orionis-danger);
+    --sl-color-asides-border: var(--orionis-danger);
+    background-color: color-mix(in srgb, var(--orionis-danger) 8%, var(--orionis-surface));
+}
+
+.sl-markdown-content .card,
+.sl-link-card,
+.pagination-links a {
+    background: var(--orionis-surface);
+    border-color: var(--orionis-border);
+    box-shadow: var(--orionis-shadow);
+}
+
+.sl-markdown-content .card .title,
+.sl-link-card .title {
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+.sl-markdown-content .card .icon {
+    color: var(--orionis-primary);
+    background: var(--orionis-soft);
+    border-color: var(--orionis-border);
+}
+
+.sl-link-card:hover,
+.pagination-links a:hover {
+    background: var(--orionis-soft);
+    border-color: var(--orionis-primary);
 }
 
 /* Prevent line breaks in inline code inside table cells */
@@ -137,8 +395,7 @@ td code {
     white-space: nowrap;
 }
 
-/* Hide the first content panel */
-.content-panel:first-of-type {
+.content-panel:first-of-type:has(~ .content-panel .sl-markdown-content h1) {
     display: none;
 }
 
@@ -153,11 +410,11 @@ td code {
 
 /* Contributors page enhancements */
 .contributors-showcase {
-  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --accent-gradient: linear-gradient(135deg, #ffd700, #ffed4a);
-  --shadow-primary: 0 10px 30px rgba(102, 126, 234, 0.3);
-  --shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.15);
-  --border-radius-xl: 20px;
+    --primary-gradient: var(--orionis-primary);
+    --accent-gradient: var(--orionis-gold);
+    --shadow-primary: var(--orionis-shadow);
+    --shadow-hover: var(--orionis-shadow);
+    --border-radius-xl: var(--orionis-radius);
 }
 
 /* Smooth scrolling for better UX */
@@ -167,12 +424,12 @@ html {
 
 /* Enhanced focus states for accessibility */
 .contributor-card:focus-within {
-  outline: 2px solid #667eea;
+    outline: 2px solid var(--orionis-primary);
   outline-offset: 2px;
 }
 
 .contributor-name a:focus {
-  outline: 2px solid #667eea;
+    outline: 2px solid var(--orionis-primary);
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -196,19 +453,19 @@ html {
     align-items: center;
     gap: 0.85rem;
     width: 100%;
-    background: var(--sl-color-bg-inline-code);
-    border: 1px solid var(--sl-color-gray-5);
-    border-left: 4px solid #134675;
-    border-radius: 8px;
+    background: var(--orionis-surface);
+    border: 1px solid var(--orionis-border);
+    border-left: 4px solid var(--orionis-primary);
+    border-radius: var(--orionis-radius);
     padding: 0.65rem 1.1rem 0.65rem 0.85rem;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+    box-shadow: var(--orionis-shadow);
     transition: border-left-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
     cursor: default;
 }
 
 .flow-node:hover {
-    border-left-color: #ffd700;
-    box-shadow: 0 4px 14px rgba(76, 201, 240, 0.18);
+    border-left-color: var(--orionis-gold);
+    box-shadow: var(--orionis-shadow);
     transform: translateX(3px);
 }
 
@@ -219,8 +476,8 @@ html {
     flex-shrink: 0;
     width: 1.6rem;
     height: 1.6rem;
-    background: #134675;
-    color: #fff;
+    background: var(--orionis-primary);
+    color: var(--orionis-surface);
     border-radius: 50%;
     font-size: 0.7rem;
     font-weight: 700;
@@ -229,8 +486,8 @@ html {
 }
 
 .flow-node:hover .flow-node-badge {
-    background: #ffd700;
-    color: #000000;
+    background: var(--orionis-gold);
+    color: var(--orionis-navy);
 }
 
 .flow-node-info {
@@ -238,10 +495,11 @@ html {
     flex-direction: column;
     gap: 0.1rem;
     flex: 1;
+    min-width: 0;
 }
 
 .flow-node-label {
-    font-family: 'Fira Code', monospace !important;
+    font-family: var(--sl-font-mono) !important;
     font-size: 0.84rem;
     font-weight: 600;
     color: var(--sl-color-text);
@@ -272,7 +530,7 @@ html {
     bottom: 10px;
     left: calc(0.85rem + 0.8rem + 2px);
     width: 2px;
-    background: linear-gradient(to bottom, #134675, #ffd700);
+    background: linear-gradient(to bottom, var(--orionis-primary), var(--orionis-gold));
     opacity: 0.35;
     border-radius: 2px;
 }
@@ -284,7 +542,7 @@ html {
     left: calc(0.85rem + 0.8rem + 2px - 5px);
     border-left: 6px solid transparent;
     border-right: 6px solid transparent;
-    border-top: 9px solid #ffd700;
+    border-top: 9px solid var(--orionis-gold);
     opacity: 0.5;
 }
 /* ─────────────────────────────────────────────
@@ -294,14 +552,7 @@ html {
 .advantage-banner {
     position: relative;
     margin: 2.5rem 0;
-    border-radius: 12px;
-    overflow: hidden;
-    border: 1px solid rgba(76, 201, 240, 0.25);
-    background: linear-gradient(
-        135deg,
-        rgba(19, 70, 117, 0.06) 0%,
-        rgba(76, 201, 240, 0.06) 100%
-    );
+    border-block: 1px solid var(--orionis-border);
 }
 
 .advantage-banner-header {
@@ -309,7 +560,8 @@ html {
     align-items: center;
     gap: 0.75rem;
     padding: 1rem 1.4rem;
-    background: linear-gradient(90deg, #134675 0%, #1a5a9a 100%);
+    background: var(--orionis-soft);
+    border-left: 3px solid var(--orionis-primary);
 }
 
 .advantage-banner-icon {
@@ -320,9 +572,9 @@ html {
 
 .advantage-banner-title {
     font-size: 0.95rem;
-    font-weight: 700;
-    color: #ffffff !important;
-    letter-spacing: 0.04em;
+    font-weight: 600;
+    color: var(--orionis-text);
+    letter-spacing: 0;
     text-transform: uppercase;
     margin: 0;
     font-family: var(--font-family) !important;
@@ -330,7 +582,7 @@ html {
 
 .advantage-banner-subtitle {
     font-size: 0.78rem;
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--orionis-muted);
     font-family: var(--font-family) !important;
     margin: 0;
 }
@@ -360,18 +612,18 @@ html {
     align-items: center;
     gap: 1rem;
     padding: 0.8rem 1.1rem;
-    border-radius: 8px;
-    border: 1px solid var(--sl-color-gray-5);
-    background: var(--sl-color-bg-inline-code);
-    border-left: 3px solid #4CC9F0;
+    border-radius: var(--orionis-radius);
+    border: 1px solid var(--orionis-border);
+    background: var(--orionis-surface);
+    border-left: 3px solid var(--orionis-primary);
     transition: border-left-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
     width: 100%;
     box-sizing: border-box;
 }
 
 .advantage-card:hover {
-    border-left-color: #134675;
-    box-shadow: 0 4px 14px rgba(76, 201, 240, 0.15);
+    border-left-color: var(--orionis-gold);
+    box-shadow: var(--orionis-shadow);
     transform: translateX(3px);
 }
 
@@ -406,7 +658,7 @@ html {
 
 .advantage-context-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.75rem;
     margin-top: 0.4rem;
 }
@@ -415,6 +667,21 @@ html {
     .advantage-context-grid {
         grid-template-columns: 1fr;
     }
+
+    .advantage-card {
+        flex-wrap: wrap;
+    }
+
+    .advantage-card-title {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .advantage-card-desc {
+        flex-basis: 100%;
+        border-left: 0;
+        padding-left: 0;
+    }
 }
 
 .advantage-context-item {
@@ -422,14 +689,14 @@ html {
     gap: 0.7rem;
     align-items: flex-start;
     padding: 0.75rem 0.9rem;
-    border-radius: 8px;
-    border: 1px solid var(--sl-color-gray-5);
-    background: var(--sl-color-bg-inline-code);
+    border-radius: var(--orionis-radius);
+    border: 1px solid var(--orionis-border);
+    background: var(--orionis-surface);
     transition: border-color 0.2s ease;
 }
 
 .advantage-context-item:hover {
-    border-color: rgba(76, 201, 240, 0.4);
+    border-color: var(--orionis-primary);
 }
 
 .advantage-context-icon {
@@ -442,6 +709,7 @@ html {
     display: flex;
     flex-direction: column;
     gap: 0.2rem;
+    min-width: 0;
 }
 
 .advantage-context-title {
@@ -477,19 +745,20 @@ html {
     align-items: center;
     gap: 0.85rem;
     width: 280px;
-    background: var(--sl-color-bg-inline-code);
-    border: 1px solid var(--sl-color-gray-5);
-    border-left: 4px solid #134675;
-    border-radius: 8px;
+    max-width: 100%;
+    background: var(--orionis-surface);
+    border: 1px solid var(--orionis-border);
+    border-left: 4px solid var(--orionis-primary);
+    border-radius: var(--orionis-radius);
     padding: 0.6rem 1rem 0.6rem 0.8rem;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+    box-shadow: var(--orionis-shadow);
     transition: border-left-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
     cursor: default;
 }
 
 .http-flow-node:hover {
-    border-left-color: #ffd700;
-    box-shadow: 0 4px 14px rgba(76, 201, 240, 0.18);
+    border-left-color: var(--orionis-gold);
+    box-shadow: var(--orionis-shadow);
     transform: translateY(-2px);
 }
 
@@ -500,8 +769,8 @@ html {
     flex-shrink: 0;
     width: 1.8rem;
     height: 1.8rem;
-    background: #134675;
-    color: #fff;
+    background: var(--orionis-primary);
+    color: var(--orionis-surface);
     border-radius: 50%;
     font-size: 0.85rem;
     line-height: 1;
@@ -509,8 +778,8 @@ html {
 }
 
 .http-flow-node:hover .http-flow-node-icon {
-    background: #ffd700;
-    color: #000;
+    background: var(--orionis-gold);
+    color: var(--orionis-navy);
 }
 
 .http-flow-node-info {
@@ -518,10 +787,11 @@ html {
     flex-direction: column;
     gap: 0.05rem;
     flex: 1;
+    min-width: 0;
 }
 
 .http-flow-node-label {
-    font-family: 'Fira Code', monospace !important;
+    font-family: var(--sl-font-mono) !important;
     font-size: 0.82rem;
     font-weight: 600;
     color: var(--sl-color-text);
@@ -554,7 +824,7 @@ html {
     left: 50%;
     transform: translateX(-50%);
     width: 2px;
-    background: linear-gradient(to bottom, #134675, #ffd700);
+    background: linear-gradient(to bottom, var(--orionis-primary), var(--orionis-gold));
     opacity: 0.35;
     border-radius: 2px;
 }
@@ -567,7 +837,7 @@ html {
     transform: translateX(-50%);
     border-left: 5px solid transparent;
     border-right: 5px solid transparent;
-    border-top: 8px solid #ffd700;
+    border-top: 8px solid var(--orionis-gold);
     opacity: 0.5;
 }
 
@@ -595,7 +865,7 @@ html {
     transform: translateX(-50%);
     width: 2px;
     height: 50%;
-    background: linear-gradient(to bottom, #134675, #4CC9F0);
+    background: linear-gradient(to bottom, var(--orionis-primary), var(--orionis-cyan));
     opacity: 0.35;
 }
 
@@ -606,7 +876,7 @@ html {
     left: 0;
     right: 0;
     height: 2px;
-    background: linear-gradient(to right, #134675, #4CC9F0, #134675);
+    background: linear-gradient(to right, var(--orionis-primary), var(--orionis-cyan), var(--orionis-primary));
     opacity: 0.35;
 }
 
@@ -640,7 +910,7 @@ html {
     bottom: 6px;
     left: 0;
     width: 2px;
-    background: linear-gradient(to bottom, #4CC9F0, #134675);
+    background: linear-gradient(to bottom, var(--orionis-cyan), var(--orionis-primary));
     opacity: 0.35;
     border-radius: 2px;
 }
@@ -652,7 +922,7 @@ html {
     left: -4px;
     border-left: 5px solid transparent;
     border-right: 5px solid transparent;
-    border-top: 7px solid #134675;
+    border-top: 7px solid var(--orionis-primary);
     opacity: 0.4;
 }
 
@@ -662,25 +932,26 @@ html {
     align-items: center;
     gap: 0.6rem;
     width: 220px;
-    background: var(--sl-color-bg-inline-code);
-    border: 1px solid var(--sl-color-gray-5);
-    border-radius: 8px;
+    max-width: 100%;
+    background: var(--orionis-surface);
+    border: 1px solid var(--orionis-border);
+    border-radius: var(--orionis-radius);
     padding: 0.5rem 0.8rem;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+    box-shadow: var(--orionis-shadow);
     transition: box-shadow 0.2s ease, transform 0.2s ease;
     cursor: default;
 }
 
 .http-flow-branch-node.asgi {
-    border-left: 4px solid #4CC9F0;
+    border-left: 4px solid var(--orionis-cyan);
 }
 
 .http-flow-branch-node.rsgi {
-    border-left: 4px solid #ffd700;
+    border-left: 4px solid var(--orionis-gold);
 }
 
 .http-flow-branch-node:hover {
-    box-shadow: 0 4px 14px rgba(76, 201, 240, 0.18);
+    box-shadow: var(--orionis-shadow);
     transform: translateY(-2px);
 }
 
@@ -693,18 +964,18 @@ html {
     border-radius: 4px;
     font-size: 0.65rem;
     font-weight: 700;
-    font-family: 'Fira Code', monospace !important;
-    letter-spacing: 0.04em;
+    font-family: var(--sl-font-mono) !important;
+    letter-spacing: 0;
 }
 
 .http-flow-branch-tag.asgi {
-    background: rgba(76, 201, 240, 0.15);
-    color: #0e7fa5;
+    background: var(--orionis-soft);
+    color: var(--orionis-primary);
 }
 
 .http-flow-branch-tag.rsgi {
-    background: rgba(255, 215, 0, 0.15);
-    color: #b8960b;
+    background: color-mix(in srgb, var(--orionis-gold) 15%, transparent);
+    color: var(--orionis-warning);
 }
 
 .http-flow-branch-info {
@@ -712,10 +983,11 @@ html {
     flex-direction: column;
     gap: 0.05rem;
     flex: 1;
+    min-width: 0;
 }
 
 .http-flow-branch-label {
-    font-family: 'Fira Code', monospace !important;
+    font-family: var(--sl-font-mono) !important;
     font-size: 0.75rem;
     font-weight: 600;
     color: var(--sl-color-text);
@@ -743,7 +1015,7 @@ html {
     left: 0;
     right: 0;
     height: 2px;
-    background: linear-gradient(to right, #134675, #4CC9F0, #134675);
+    background: linear-gradient(to right, var(--orionis-primary), var(--orionis-cyan), var(--orionis-primary));
     opacity: 0.35;
 }
 
@@ -755,7 +1027,7 @@ html {
     left: 50%;
     transform: translateX(-50%);
     width: 2px;
-    background: linear-gradient(to bottom, #4CC9F0, #134675);
+    background: linear-gradient(to bottom, var(--orionis-cyan), var(--orionis-primary));
     opacity: 0.35;
 }
 
@@ -773,7 +1045,7 @@ html {
     bottom: 6px;
     left: 0;
     width: 2px;
-    background: linear-gradient(to bottom, #134675, #4CC9F0);
+    background: linear-gradient(to bottom, var(--orionis-primary), var(--orionis-cyan));
     opacity: 0.3;
     border-radius: 2px;
 }
@@ -785,7 +1057,7 @@ html {
     left: -4px;
     border-left: 5px solid transparent;
     border-right: 5px solid transparent;
-    border-top: 7px solid #4CC9F0;
+    border-top: 7px solid var(--orionis-cyan);
     opacity: 0.35;
 }
 

@@ -220,19 +220,20 @@ const totalCommits = contributors.reduce((sum, c) => sum + c.totalContributions,
       width: 100%;
       margin: 0;
       padding: 0;
+      overflow-wrap: anywhere;
     }
 
     /* ── Section common ── */
     .section-title {
       text-align: center;
       font-size: 1.6rem;
-      font-weight: 700;
-      color: #134675;
+      font-weight: 600;
+      color: var(--orionis-text);
       margin: 0 0 0.25rem 0;
     }
     .section-subtitle {
       text-align: center;
-      color: #64748b;
+      color: var(--orionis-muted);
       font-size: 1rem;
       margin: 0 0 2rem 0;
     }
@@ -240,22 +241,20 @@ const totalCommits = contributors.reduce((sum, c) => sum + c.totalContributions,
     /* ── Hero ── */
     .hero-section {
       text-align: center;
-      padding: 2.5rem 2rem 2rem;
-      background: linear-gradient(135deg, #f0f7ff 0%, #e8f4f8 50%, #fef9e7 100%);
-      border-radius: 16px;
+      padding: 1rem 0 2rem;
       margin-bottom: 2.5rem;
-      border: 1px solid #e2e8f0;
+      border-bottom: 1px solid var(--orionis-border);
     }
     .hero-tagline {
       font-size: 1.3rem;
-      font-weight: 700;
-      color: #134675;
+      font-weight: 600;
+      color: var(--orionis-text);
       margin: 0 0 0.75rem 0;
       line-height: 1.3;
     }
     .hero-description {
       font-size: 1rem;
-      color: #475569;
+      color: var(--orionis-muted);
       max-width: 680px;
       margin: 0 auto 2rem;
       line-height: 1.7;
@@ -274,22 +273,22 @@ const totalCommits = contributors.reduce((sum, c) => sum + c.totalContributions,
     }
     .stat-number {
       font-size: 2rem;
-      font-weight: 800;
-      color: #134675;
+      font-weight: 700;
+      color: var(--orionis-primary);
       line-height: 1;
     }
     .stat-label {
       font-size: 0.85rem;
-      color: #64748b;
+      color: var(--orionis-muted);
       margin-top: 0.25rem;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      font-weight: 500;
+      letter-spacing: 0;
+      font-weight: 600;
     }
     .stat-divider {
       width: 1px;
       height: 40px;
-      background: #cbd5e1;
+      background: var(--orionis-border);
     }
 
     /* ── Ways to contribute ── */
@@ -299,21 +298,20 @@ const totalCommits = contributors.reduce((sum, c) => sum + c.totalContributions,
     }
     .ways-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
       gap: 1.25rem;
     }
     .way-card {
-      background: white;
-      border: 2px solid #e2e8f0;
-      border-radius: 12px;
+      background: var(--orionis-surface);
+      border: 1px solid var(--orionis-border);
+      border-radius: var(--orionis-radius);
       padding: 1.5rem;
       text-align: center;
-      transition: all 0.25s ease;
+      box-shadow: var(--orionis-shadow);
+      transition: border-color 0.2s ease;
     }
     .way-card:hover {
-      border-color: #4CC9F0;
-      transform: translateY(-3px);
-      box-shadow: 0 8px 24px rgba(76, 201, 240, 0.15);
+      border-color: var(--orionis-primary);
     }
     .way-icon {
       font-size: 2rem;
@@ -321,13 +319,13 @@ const totalCommits = contributors.reduce((sum, c) => sum + c.totalContributions,
     }
     .way-card h3 {
       font-size: 1.05rem;
-      font-weight: 700;
-      color: #134675;
+      font-weight: 600;
+      color: var(--orionis-text);
       margin: 0 0 0.5rem 0;
     }
     .way-card p {
       font-size: 0.88rem;
-      color: #64748b;
+      color: var(--orionis-muted);
       margin: 0;
       line-height: 1.5;
     }
@@ -347,26 +345,26 @@ const totalCommits = contributors.reduce((sum, c) => sum + c.totalContributions,
       grid-template-columns: 48px minmax(120px, 180px) 1fr;
       align-items: center;
       gap: 1rem;
-      height: 72px;
-      padding: 0 1.25rem;
-      border: 1.5px solid #e2e8f0;
-      border-radius: 12px;
+      min-height: 72px;
+      padding: 0.75rem 1.25rem;
+      border: 1px solid var(--orionis-border);
+      border-radius: var(--orionis-radius);
       text-decoration: none;
       color: inherit;
-      background: white;
-      transition: all 0.2s ease;
+      background: var(--orionis-surface);
+      box-shadow: var(--orionis-shadow);
+      transition: border-color 0.2s ease;
       box-sizing: border-box;
     }
     .contributor-card:hover {
-      border-color: #4CC9F0;
-      box-shadow: 0 4px 16px rgba(76, 201, 240, 0.12);
+      border-color: var(--orionis-primary);
     }
     .card-avatar-ring {
       width: 42px;
       height: 42px;
       border-radius: 50%;
       padding: 2px;
-      background: linear-gradient(135deg, #4CC9F0, #134675);
+      background: var(--orionis-border);
       flex-shrink: 0;
     }
     .card-avatar {
@@ -389,8 +387,8 @@ const totalCommits = contributors.reduce((sum, c) => sum + c.totalContributions,
     }
     .card-username {
       font-size: 0.92rem;
-      font-weight: 700;
-      color: #134675;
+      font-weight: 600;
+      color: var(--orionis-text);
       line-height: 1.3;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -404,7 +402,7 @@ const totalCommits = contributors.reduce((sum, c) => sum + c.totalContributions,
     .card-commits {
       font-size: 0.75rem;
       font-weight: 600;
-      color: #4CC9F0;
+      color: var(--orionis-primary);
       line-height: 1.3;
     }
     .card-pills {
@@ -438,12 +436,6 @@ const totalCommits = contributors.reduce((sum, c) => sum + c.totalContributions,
     }
 
     /* Dark mode */
-    :global([data-theme="dark"]) .contributor-card {
-      background: #0f172a;
-      border-color: #1e3a5f;
-    }
-    :global([data-theme="dark"]) .contributor-card:hover { border-color: #4CC9F0; }
-    :global([data-theme="dark"]) .card-username { color: #e2e8f0; }
     :global([data-theme="dark"]) .pill-framework { background: rgba(3,105,161,0.2); color: #7dd3fc; }
     :global([data-theme="dark"]) .pill-skeleton { background: rgba(146,64,14,0.2); color: #fcd34d; }
     :global([data-theme="dark"]) .pill-docs { background: rgba(22,101,52,0.2); color: #86efac; }
@@ -465,10 +457,9 @@ const totalCommits = contributors.reduce((sum, c) => sum + c.totalContributions,
     /* ── Steps ── */
     .steps-section {
       margin-bottom: 2.5rem;
-      padding: 2rem;
-      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-      border-radius: 16px;
-      border: 1px solid #e2e8f0;
+      padding: 2rem 1rem;
+      border-top: 1px solid var(--orionis-border);
+      border-bottom: 1px solid var(--orionis-border);
     }
     .steps-timeline {
       max-width: 640px;
@@ -486,8 +477,8 @@ const totalCommits = contributors.reduce((sum, c) => sum + c.totalContributions,
       flex-shrink: 0;
       width: 36px;
       height: 36px;
-      background: #134675;
-      color: white;
+      background: var(--orionis-primary);
+      color: var(--orionis-surface);
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -497,27 +488,29 @@ const totalCommits = contributors.reduce((sum, c) => sum + c.totalContributions,
     }
     .step-content {
       flex: 1;
+      min-width: 0;
       padding-top: 0.15rem;
     }
     .step-content h3 {
       font-size: 1rem;
-      font-weight: 700;
-      color: #134675;
+      font-weight: 600;
+      color: var(--orionis-text);
       margin: 0 0 0.25rem 0;
     }
     .step-content p {
       font-size: 0.9rem;
-      color: #64748b;
+      color: var(--orionis-muted);
       margin: 0;
       line-height: 1.5;
     }
     .step-content a {
-      color: #4CC9F0;
+      color: var(--orionis-primary);
       text-decoration: underline;
-      font-weight: 500;
+      font-weight: 600;
     }
     .step-content code {
-      background: #e2e8f0;
+      background: var(--orionis-soft);
+      color: var(--orionis-code);
       padding: 0.1em 0.4em;
       border-radius: 4px;
       font-size: 0.85em;
@@ -530,7 +523,7 @@ const totalCommits = contributors.reduce((sum, c) => sum + c.totalContributions,
     }
     .why-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
       gap: 1.25rem;
     }
     .why-item {
@@ -538,14 +531,14 @@ const totalCommits = contributors.reduce((sum, c) => sum + c.totalContributions,
       gap: 0.85rem;
       align-items: flex-start;
       padding: 1.25rem;
-      border-radius: 10px;
-      background: white;
-      border: 2px solid #e2e8f0;
-      transition: all 0.2s ease;
+      border-radius: var(--orionis-radius);
+      background: var(--orionis-surface);
+      border: 1px solid var(--orionis-border);
+      box-shadow: var(--orionis-shadow);
+      transition: border-color 0.2s ease;
     }
     .why-item:hover {
-      border-color: #F4C430;
-      box-shadow: 0 4px 12px rgba(244, 196, 48, 0.15);
+      border-color: var(--orionis-gold);
     }
     .why-icon {
       font-size: 1.5rem;
@@ -555,12 +548,12 @@ const totalCommits = contributors.reduce((sum, c) => sum + c.totalContributions,
     .why-item strong {
       display: block;
       font-size: 0.95rem;
-      color: #134675;
+      color: var(--orionis-text);
       margin-bottom: 0.25rem;
     }
     .why-item p {
       font-size: 0.88rem;
-      color: #64748b;
+      color: var(--orionis-muted);
       margin: 0;
       line-height: 1.5;
     }
@@ -571,20 +564,9 @@ const totalCommits = contributors.reduce((sum, c) => sum + c.totalContributions,
     }
     .cta-content {
       text-align: center;
-      padding: 2.5rem 2rem;
-      background: linear-gradient(135deg, #134675 0%, #1a5a8a 50%, #0d3454 100%);
-      border-radius: 16px;
-      position: relative;
-      overflow: hidden;
-    }
-    .cta-content::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, #4CC9F0, #F4C430, #4CC9F0);
+      padding: 2rem 1rem;
+      background: var(--orionis-canvas);
+      border-top: 1px solid var(--orionis-border);
     }
     .cta-icon {
       font-size: 2rem;
@@ -592,12 +574,12 @@ const totalCommits = contributors.reduce((sum, c) => sum + c.totalContributions,
       margin-bottom: 0.5rem;
     }
     .cta-content h2 {
-      color: white;
+      color: var(--orionis-text);
       font-size: 1.5rem;
       margin: 0 0 0.5rem 0;
     }
     .cta-content > p {
-      color: #b0c6d6;
+      color: var(--orionis-muted);
       font-size: 1rem;
       margin: 0 0 1.5rem 0;
       line-height: 1.6;
@@ -612,103 +594,53 @@ const totalCommits = contributors.reduce((sum, c) => sum + c.totalContributions,
     .cta-btn {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 0.4rem;
-      padding: 0.7rem 1.3rem;
-      border-radius: 8px;
+      min-height: 2.375rem;
+      padding: 0.4375rem 1rem;
+      border-radius: var(--orionis-radius);
       text-decoration: none;
       font-weight: 600;
-      font-size: 0.9rem;
-      transition: all 0.2s ease;
-      border: 2px solid transparent;
+      font-size: 0.875rem;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+      border: 1px solid transparent;
+      box-shadow: var(--orionis-shadow);
     }
     .cta-btn.primary {
-      background: #4CC9F0;
-      color: #134675;
+      background: var(--orionis-primary);
+      color: var(--orionis-surface);
     }
     .cta-btn.primary:hover {
-      background: white;
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(76, 201, 240, 0.35);
+      background: var(--orionis-primary-hover);
     }
     .cta-btn.secondary {
-      background: transparent;
-      color: #4CC9F0;
-      border-color: #4CC9F0;
+      background: var(--orionis-surface);
+      color: var(--orionis-primary);
+      border-color: var(--orionis-primary);
     }
     .cta-btn.secondary:hover {
-      background: #4CC9F0;
-      color: #134675;
-      transform: translateY(-2px);
+      background: var(--orionis-soft);
+      color: var(--orionis-primary-hover);
     }
     .cta-btn.tertiary {
-      background: transparent;
-      color: #F4C430;
-      border-color: #F4C430;
+      background: var(--orionis-surface);
+      color: var(--orionis-text);
+      border-color: var(--orionis-border);
     }
     .cta-btn.tertiary:hover {
-      background: #F4C430;
-      color: #134675;
-      transform: translateY(-2px);
+      background: var(--orionis-soft);
+      border-color: var(--orionis-primary);
     }
     .cta-hint {
-      color: #7ba3bf !important;
+      color: var(--orionis-muted) !important;
       font-size: 0.85rem !important;
       margin: 0 !important;
     }
 
-    /* ── Dark mode ── */
-    :global([data-theme="dark"]) .hero-section {
-      background: linear-gradient(135deg, #0d1b2a 0%, #132f4c 50%, #1a2332 100%);
-      border-color: #1e3a5f;
-    }
-    :global([data-theme="dark"]) .hero-tagline { color: #e2e8f0; }
-    :global([data-theme="dark"]) .hero-description { color: #94a3b8; }
-    :global([data-theme="dark"]) .stat-number { color: #4CC9F0; }
-    :global([data-theme="dark"]) .stat-label { color: #94a3b8; }
-    :global([data-theme="dark"]) .stat-divider { background: #334155; }
-
-    :global([data-theme="dark"]) .way-card {
-      background: #0f172a;
-      border-color: #1e3a5f;
-    }
-    :global([data-theme="dark"]) .way-card:hover { border-color: #4CC9F0; }
-    :global([data-theme="dark"]) .way-card h3 { color: #e2e8f0; }
-    :global([data-theme="dark"]) .way-card p { color: #94a3b8; }
-
-    :global([data-theme="dark"]) .contributor-link {
-      background: #0f172a;
-      border-color: #1e3a5f;
-    }
-    :global([data-theme="dark"]) .contributor-link:hover { border-color: #4CC9F0; }
-    :global([data-theme="dark"]) .username { color: #e2e8f0; }
-    :global([data-theme="dark"]) .repo { color: #94a3b8; }
-
-    :global([data-theme="dark"]) .steps-section {
-      background: linear-gradient(135deg, #0d1b2a 0%, #132f4c 100%);
-      border-color: #1e3a5f;
-    }
-    :global([data-theme="dark"]) .step-content h3 { color: #e2e8f0; }
-    :global([data-theme="dark"]) .step-content p { color: #94a3b8; }
-    :global([data-theme="dark"]) .step-content code {
-      background: #1e293b;
-      color: #e2e8f0;
-    }
-
-    :global([data-theme="dark"]) .why-item {
-      background: #0f172a;
-      border-color: #1e3a5f;
-    }
-    :global([data-theme="dark"]) .why-item:hover { border-color: #F4C430; }
-    :global([data-theme="dark"]) .why-item strong { color: #e2e8f0; }
-    :global([data-theme="dark"]) .why-item p { color: #94a3b8; }
-
-    :global([data-theme="dark"]) .section-title { color: #e2e8f0; }
-    :global([data-theme="dark"]) .section-subtitle { color: #94a3b8; }
-
     /* ── Responsive ── */
     @media (max-width: 640px) {
       .contributors-list { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
-      .ways-grid { grid-template-columns: 1fr 1fr; }
+      .ways-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .why-grid { grid-template-columns: 1fr; }
       .hero-stats { gap: 1.25rem; }
       .stat-number { font-size: 1.5rem; }

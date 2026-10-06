@@ -65,9 +65,8 @@ const keywords = 'python, async, framework, web development, high-performance, p
 )}
 <link rel="alternate" hreflang="x-default" href={currentUrl.replace(`/${lang}/`, '/en/')} />
 
-<!-- Preconnect to external domains -->
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preload" href="/fonts/titillium-web-400-latin.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/fonts/titillium-web-600-latin.woff2" as="font" type="font/woff2" crossorigin />
 
 <!-- JSON-LD Structured Data -->
 <script type="application/ld+json" set:html={JSON.stringify({
