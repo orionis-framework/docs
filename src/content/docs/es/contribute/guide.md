@@ -6,8 +6,6 @@ lastUpdated: true
 template: doc
 ---
 
-# Guía de Contribución
-
 Bienvenido/a a la guía oficial para contribuir a **Orionis Framework**. Aquí encontrarás las mejores prácticas, requisitos y flujos de trabajo para colaborar de manera efectiva, garantizando calidad, seguridad y coherencia en cada aporte.
 
 ---
@@ -195,10 +193,11 @@ ruff check .
 
 ### Configuración de SonarLint para VSCode
 
-Si usas **Visual Studio Code**, aplica la siguiente configuración en tu archivo `settings.json`:
+Si usas **Visual Studio Code**, añade estas claves al objeto principal de tu archivo `settings.json`, conservando las demás opciones:
 
 ```json
-"sonarlint.rules": {
+{
+  "sonarlint.rules": {
     "python:S100": {
         "level": "on",
         "parameters": {
@@ -214,8 +213,9 @@ Si usas **Visual Studio Code**, aplica la siguiente configuración en tu archivo
             "format": "^_{0,2}[a-z][a-zA-Z0-9_]*_{0,2}$"
         }
     }
-},
-"sonarlint.automaticAnalysis": true
+  },
+  "sonarlint.automaticAnalysis": true
+}
 ```
 
 :::note[Nota]
@@ -238,7 +238,7 @@ Algunos métodos pueden superar el límite de complejidad cognitiva por defecto 
 - Usa `# NOSONAR` con moderación y solo cuando la complejidad sea justificada y revisada.
 
 ```python
-def metodo_complejo(...):  # NOSONAR
+def metodo_complejo(valor: str) -> None:  # NOSONAR
     # Lógica compleja que requiere excepción documentada
     ...
 ```

@@ -1,0 +1,38 @@
+---
+import Select from '@astrojs/starlight/components/Select.astro';
+import { getPageBySlug, getTranslations } from '../utils/documentation-menu.mjs';
+
+const page = getPageBySlug(Astro.url.pathname);
+const locale = Astro.locals.starlightRoute.locale;
+const labels: Record<string, string> = { en: 'English', es: 'Español' };
+const translations = page ? getTranslations(page.id) : [
+  { locale: 'en', slug: '/en/getting-started' },
+  { locale: 'es', slug: '/es/getting-started' },
+];
+---
+
+<orionis-language-select>
+  <Select
+    icon="translate"
+    label={Astro.locals.t('languageSelect.accessibleLabel')}
+    options={translations.map((translation) => ({
+      value: translation.slug,
+      selected: translation.locale === locale,
+      label: labels[translation.locale],
+    }))}
+    width="7em"
+  />
+</orionis-language-select>
+
+<script>
+  class OrionisLanguageSelect extends HTMLElement {
+    connectedCallback() {
+      const select = this.querySelector('select');
+      select?.addEventListener('change', () => { window.location.assign(select.value); });
+      window.addEventListener('pageshow', (event) => {
+        if (event.persisted && select) select.selectedIndex = select.querySelector<HTMLOptionElement>('option[selected]')?.index ?? 0;
+      });
+    }
+  }
+  customElements.define('orionis-language-select', OrionisLanguageSelect);
+</script>

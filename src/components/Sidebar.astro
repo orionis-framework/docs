@@ -1,0 +1,61 @@
+---
+import { Icon } from '@astrojs/starlight/components';
+import MobileMenuFooter from '@astrojs/starlight/components/MobileMenuFooter.astro';
+import SidebarSublist from '@astrojs/starlight/components/SidebarSublist.astro';
+import NavigationIcon from './NavigationIcon.astro';
+import { documentationNavigation, navigationSections } from '../utils/documentation-menu.mjs';
+
+const { sidebar, lang } = Astro.locals.starlightRoute;
+const spanish = lang === 'es';
+const locale = spanish ? 'es' : 'en';
+const groups = new Map(navigationSections.map((section) => [section.id, section]));
+const bands = new Map(documentationNavigation.bands.map((band) => [band.id, band]));
+const entries = sidebar.map((entry) => {
+  const firstLink = entry.type === 'group' && entry.entries.find((item) => item.type === 'link');
+  const section = firstLink ? groups.get(firstLink.attrs['data-nav-group']) : undefined;
+  if (entry.type === 'group' && !section) throw new Error(`Missing navigation metadata: ${entry.label}`);
+  return { entry, section };
+});
+---
+
+<div class="sidebar-heading">
+  <p class="sidebar-kicker">{spanish ? 'Documentación' : 'Documentation'}</p>
+  <p class="sidebar-caption">{spanish ? 'Desarrolla con Orionis' : 'Build with Orionis'}</p>
+</div>
+
+<div class="mobile-sidebar-controls md:sl-hidden">
+  <MobileMenuFooter />
+</div>
+
+{/* Open state comes from the current route, without restoring past expanded groups. */}
+<ul class="sidebar-tree top-level">
+  {entries.map(({ entry, section }, index) => {
+    if (entry.type === 'group') {
+      const startsBand = index === 0 || entries[index - 1].section?.band !== section.band;
+      const active = entry.entries.some((item) => item.type === 'link' && item.isCurrent);
+      return (
+        <li>
+          {startsBand && <p class="sidebar-band" data-band-id={section.band}>{bands.get(section.band).title[locale]}</p>}
+          <details class:list={['sidebar-section', { 'is-active': active }]}
+            data-section-id={section.id} open={active}>
+            <summary>
+              <span class="section-icon"><NavigationIcon name={section.icon} /></span>
+              <span class="section-label large">{entry.label}</span>
+              <Icon name="right-caret" class="caret" size="1rem" />
+            </summary>
+            <SidebarSublist sublist={entry.entries} nested />
+          </details>
+        </li>
+      );
+    }
+    return (
+      <li>
+        <a href={entry.href} {...entry.attrs} aria-current={entry.isCurrent && 'page'}>
+          <span class="resource-icon"><NavigationIcon name="api" /></span>
+          <span class="resource-label">{entry.label}</span>
+          <Icon name="external" class="resource-external" size="0.875rem" />
+        </a>
+      </li>
+    );
+  })}
+</ul>

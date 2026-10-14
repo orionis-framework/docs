@@ -6,8 +6,6 @@ lastUpdated: true
 template: doc
 ---
 
-# Contribution Guide
-
 Welcome to the official guide for contributing to **Orionis Framework**. Here you will find best practices, requirements, and workflows to collaborate effectively, ensuring quality, security, and consistency in every contribution.
 
 ---
@@ -195,10 +193,11 @@ ruff check .
 
 ### SonarLint Configuration for VSCode
 
-If you use **Visual Studio Code**, apply the following configuration in your `settings.json` file:
+If you use **Visual Studio Code**, add these keys to the root object in your `settings.json` file, keeping your other settings:
 
 ```json
-"sonarlint.rules": {
+{
+  "sonarlint.rules": {
     "python:S100": {
         "level": "on",
         "parameters": {
@@ -214,8 +213,9 @@ If you use **Visual Studio Code**, apply the following configuration in your `se
             "format": "^_{0,2}[a-z][a-zA-Z0-9_]*_{0,2}$"
         }
     }
-},
-"sonarlint.automaticAnalysis": true
+  },
+  "sonarlint.automaticAnalysis": true
+}
 ```
 
 :::note[Note]
@@ -238,7 +238,7 @@ Some methods may exceed the default cognitive complexity threshold of **15**. In
 - Use `# NOSONAR` sparingly and only when the complexity is justified and reviewed.
 
 ```python
-def complex_method(...):  # NOSONAR
+def complex_method(value: str) -> None:  # NOSONAR
     # Complex logic that requires a documented exception
     ...
 ```

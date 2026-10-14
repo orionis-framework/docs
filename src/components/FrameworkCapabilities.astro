@@ -1,0 +1,207 @@
+---
+import NavigationIcon from './NavigationIcon.astro';
+import { getTranslations } from '../utils/documentation-menu.mjs';
+
+const spanish = Astro.locals.starlightRoute.lang === 'es';
+const locale = spanish ? 'es' : 'en';
+const copy = spanish ? {
+  label: 'Capacidades de Orionis',
+  intro: 'Construye tu aplicación con las herramientas de Orionis. Elige lo que necesitas desarrollar para empezar por su guía.',
+  more: 'También incluye',
+} : {
+  label: 'Orionis capabilities',
+  intro: 'Build your application with the tools in Orionis. Choose what you need to develop and start with its guide.',
+  more: 'Also included',
+};
+
+const features = [
+  {
+    id: 'http-overview', icon: 'http-development',
+    title: { es: 'Web y APIs', en: 'Web and APIs' },
+    description: { es: 'Rutas, controladores, middleware y respuestas HTTP.', en: 'Routes, controllers, middleware and HTTP responses.' },
+  },
+  {
+    id: 'realtime-overview', icon: 'realtime', accent: 'cyan',
+    title: { es: 'Realtime y WebSockets', en: 'Realtime and WebSockets' },
+    description: { es: 'Hubs, llamadas tipadas, streaming y grupos.', en: 'Hubs, typed calls, streaming and groups.' },
+  },
+  {
+    id: 'mcp-overview', icon: 'mcp', accent: 'gold',
+    title: { es: 'Servidores MCP', en: 'MCP servers' },
+    description: { es: 'Tools, recursos y prompts por HTTP o STDIO.', en: 'Tools, resources and prompts over HTTP or STDIO.' },
+  },
+  {
+    id: 'orm-overview', icon: 'database-and-orm',
+    title: { es: 'Bases de datos y ORM', en: 'Database and ORM' },
+    description: { es: 'Modelos, relaciones, consultas y migraciones.', en: 'Models, relationships, queries and migrations.' },
+  },
+  {
+    id: 'auth-overview', icon: 'security',
+    title: { es: 'Autenticación y permisos', en: 'Authentication and permissions' },
+    description: { es: 'Sesiones, tokens de API, roles y políticas.', en: 'Sessions, API tokens, roles and policies.' },
+  },
+  {
+    id: 'queues-overview', icon: 'queues',
+    title: { es: 'Colas y jobs', en: 'Queues and jobs' },
+    description: { es: 'Trabajo en workers con reintentos y control de fallos.', en: 'Worker execution with retries and failure handling.' },
+  },
+  {
+    id: 'storage-overview', icon: 'storage',
+    title: { es: 'Archivos y cloud', en: 'Files and cloud storage' },
+    description: { es: 'Uploads y discos locales, S3, Azure o GCS.', en: 'Uploads and local, S3, Azure or GCS disks.' },
+  },
+  {
+    id: 'view-overview', icon: 'views',
+    title: { es: 'Vistas y plantillas', en: 'Views and templates' },
+    description: { es: 'HTML con Jinja2, layouts y helpers.', en: 'HTML with Jinja2, layouts and helpers.' },
+  },
+];
+const additional = [
+  { id: 'mail-overview', title: { es: 'correo', en: 'mail' } },
+  { id: 'cache-overview', title: { es: 'caché y locks', en: 'cache and locks' } },
+  { id: 'schemas-overview', title: { es: 'validación', en: 'validation' } },
+  { id: 'test-overview', title: { es: 'pruebas', en: 'testing' } },
+  { id: 'localization-overview', title: { es: 'traducciones', en: 'translations' } },
+];
+
+function href(pageId: string): string {
+  const translation = getTranslations(pageId).find((page: { locale: string }) => page.locale === locale);
+  if (!translation) throw new Error(`Missing capability destination: ${pageId} (${locale})`);
+  return translation.slug;
+}
+---
+
+<section class="framework-capabilities" aria-label={copy.label}>
+  <p class="capability-intro">{copy.intro}</p>
+  <div class="capability-grid">
+    {features.map((feature) => (
+      <a class:list={['capability-card', feature.accent]} href={href(feature.id)}>
+        <span class="capability-icon"><NavigationIcon name={feature.icon} /></span>
+        <span class="capability-copy">
+          <strong>{feature.title[locale]}</strong>
+          <span>{feature.description[locale]}</span>
+        </span>
+        <span class="capability-arrow" aria-hidden="true">→</span>
+      </a>
+    ))}
+  </div>
+  <p class="additional-capabilities">
+    {copy.more}{' '}
+    {additional.map((feature, index) => (
+      <>{index > 0 && <span aria-hidden="true"> · </span>}<a href={href(feature.id)}>{feature.title[locale]}</a></>
+    ))}.
+  </p>
+</section>
+
+<style>
+  .framework-capabilities {
+    margin-block-start: 1.25rem;
+    color: var(--orionis-text);
+  }
+
+  .capability-intro {
+    margin: 0 0 1rem;
+    line-height: 1.6;
+    color: var(--orionis-muted);
+  }
+
+  .capability-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+  }
+
+  .capability-card {
+    --capability-accent: var(--orionis-primary);
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    min-width: 0;
+    padding: 0.85rem;
+    border: 1px solid var(--orionis-border);
+    border-inline-start: 3px solid var(--capability-accent);
+    border-radius: var(--orionis-radius);
+    background: var(--orionis-surface);
+    color: var(--orionis-text);
+    text-decoration: none;
+    transition: border-color 150ms ease, background-color 150ms ease;
+  }
+
+  .capability-card.cyan {
+    --capability-accent: var(--orionis-cyan);
+  }
+
+  .capability-card.gold {
+    --capability-accent: var(--orionis-gold);
+  }
+
+  .capability-card:hover {
+    border-color: var(--capability-accent);
+    background: var(--orionis-soft);
+  }
+
+  .capability-card:focus-visible {
+    outline: 2px solid var(--orionis-primary);
+    outline-offset: 3px;
+  }
+
+  .capability-icon {
+    display: flex;
+    flex: 0 0 auto;
+    margin-block-start: 0.15rem;
+    color: var(--orionis-primary);
+  }
+
+  .gold .capability-icon {
+    color: var(--orionis-warning);
+  }
+
+  .capability-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+    line-height: 1.4;
+  }
+
+  .capability-copy strong {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .capability-copy > span {
+    color: var(--orionis-muted);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .capability-arrow {
+    flex: 0 0 auto;
+    margin-inline-start: auto;
+    color: var(--orionis-muted);
+  }
+
+  .additional-capabilities {
+    margin: 0.9rem 0 0;
+    color: var(--orionis-muted);
+    font-size: 0.95rem;
+    line-height: 1.7;
+  }
+
+  .additional-capabilities a {
+    color: var(--orionis-primary);
+    text-underline-offset: 0.2em;
+  }
+
+  @media (max-width: 38rem) {
+    .capability-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .capability-card {
+      transition: none;
+    }
+  }
+</style>

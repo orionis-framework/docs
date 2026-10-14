@@ -3,13 +3,11 @@
 
 interface GitHubContributor {
   login?: string;
-  id?: number;
   avatar_url?: string;
   html_url?: string;
   contributions: number;
   // Anonymous contributor fields
   type?: string;
-  email?: string;
   name?: string;
 }
 
@@ -25,13 +23,21 @@ interface ContributorData {
   rank: number;
 }
 
+class GitHubContributorsHTTPError extends Error {
+  constructor(readonly status: number, statusText: string) {
+    super(`HTTP ${status}: ${statusText}`);
+  }
+}
+
 export class ContributorsAPI {
   private static readonly FRAMEWORK_API = 'https://api.github.com/repos/orionis-framework/framework/contributors?anon=1';
   private static readonly SKELETON_API = 'https://api.github.com/repos/orionis-framework/skeleton/contributors?anon=1';
   private static readonly DOCS_API = 'https://api.github.com/repos/orionis-framework/docs/contributors?anon=1';
   private static readonly WEB_API = 'https://api.github.com/repos/orionis-framework/web/contributors?anon=1';
-  private static readonly CACHE_KEY = 'orionis_contributors_cache';
   private static readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+  private static serverCache: { contributors: ContributorData[]; timestamp: number } | null = null;
+  private static currentFetch: Promise<ContributorData[]> | undefined;
+  private static incompleteData = false;
 
   // Owner login: direct/owner commits from GitHub are consolidated under this user
   private static readonly OWNER_LOGIN = 'rmunate';
@@ -51,50 +57,75 @@ export class ContributorsAPI {
    * Fetch contributors from GitHub APIs with caching support
    */
   static async fetchContributors(): Promise<ContributorData[]> {
+    // Both locale pages share one request and one process cache during a build.
+    if (this.currentFetch) return this.currentFetch;
+    this.currentFetch = this.fetchFreshContributors();
     try {
-      // Check cache first (only in browser environment)
-      if (globalThis.window !== undefined) {
-        const cached = this.getFromCache();
-        if (cached) {
-          return cached;
-        }
+      return await this.currentFetch;
+    } finally {
+      this.currentFetch = undefined;
+    }
+  }
+
+  private static async fetchFreshContributors(): Promise<ContributorData[]> {
+    try {
+      if (this.serverCache && Date.now() - this.serverCache.timestamp <= this.CACHE_DURATION) {
+        return this.serverCache.contributors;
       }
 
-      // Fetch fresh data
-      const [frameworkResponse, skeletonResponse, docsResponse, webResponse] = await Promise.all([
-        this.fetchWithRetry(this.FRAMEWORK_API),
-        this.fetchWithRetry(this.SKELETON_API),
-        this.fetchWithRetry(this.DOCS_API),
-        this.fetchWithRetry(this.WEB_API)
+      // One unavailable repository must not discard the other repositories' data.
+      const responses = await Promise.allSettled([
+        this.fetchAllContributors(this.FRAMEWORK_API),
+        this.fetchAllContributors(this.SKELETON_API),
+        this.fetchAllContributors(this.DOCS_API),
+        this.fetchAllContributors(this.WEB_API)
       ]);
-
-      const frameworkData: GitHubContributor[] = await frameworkResponse.json();
-      const skeletonData: GitHubContributor[] = await skeletonResponse.json();
-      const docsData: GitHubContributor[] = await docsResponse.json();
-      const webData: GitHubContributor[] = await webResponse.json();
+      this.incompleteData = responses.some(response => response.status === 'rejected');
+      if (responses.every(response => response.status === 'rejected')) {
+        throw new Error('GitHub contributor data is unavailable for all repositories.');
+      }
+      const [frameworkData, skeletonData, docsData, webData] = responses.map(response => {
+        if (response.status === 'fulfilled') return response.value;
+        console.warn('A repository could not provide contributor data:', response.reason);
+        return [];
+      });
 
       const contributors = this.mergeContributorData(frameworkData, skeletonData, docsData, webData);
 
-      // Cache the result (only in browser environment)
-      if (globalThis.window !== undefined) {
-        this.saveToCache(contributors);
-      }
+      this.serverCache = { contributors, timestamp: Date.now() };
 
       return contributors;
     } catch (error) {
+      this.incompleteData = true;
       console.error('Error fetching contributors:', error);
 
       // Try to return cached data as fallback
-      if (globalThis.window !== undefined) {
-        const cached = this.getFromCache(true); // ignore expiry for fallback
-        if (cached) {
-          console.log('Returning cached data as fallback');
-          return cached;
-        }
+      if (this.serverCache) {
+        return this.serverCache.contributors;
       }
 
+      // Cache the unavailable state so the second locale does not repeat failed requests.
+      this.serverCache = { contributors: [], timestamp: Date.now() };
       return [];
     }
+  }
+
+  /** Retrieve every contributor page, including anonymous contributors. */
+  private static async fetchAllContributors(url: string): Promise<GitHubContributor[]> {
+    const requestURL = new URL(url);
+    requestURL.searchParams.set('per_page', '100');
+    const contributors: GitHubContributor[] = [];
+    for (let page = 1; ; page++) {
+      requestURL.searchParams.set('page', String(page));
+      const response = await this.fetchWithRetry(requestURL.toString());
+      if (response.status === 204) break;
+      const data: unknown = await response.json();
+      if (!Array.isArray(data)) throw new Error('GitHub returned an invalid contributor list.');
+      contributors.push(...data as GitHubContributor[]);
+      const links = response.headers.get('link');
+      if (links ? !/rel="next"/.test(links) : data.length < 100) break;
+    }
+    return contributors;
   }
 
   /**
@@ -104,6 +135,7 @@ export class ContributorsAPI {
     for (let i = 0; i < retries; i++) {
       try {
         const response = await fetch(url, {
+          signal: AbortSignal.timeout(8000),
           headers: {
             'Accept': 'application/vnd.github.v3+json',
             'User-Agent': 'Orionis-Framework-Docs'
@@ -111,12 +143,17 @@ export class ContributorsAPI {
         });
 
         if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          throw new GitHubContributorsHTTPError(response.status, response.statusText);
         }
 
         return response;
       } catch (error) {
         console.warn(`Attempt ${i + 1} failed for ${url}:`, error);
+
+        // Retrying rate limits or missing repositories immediately cannot resolve them.
+        if (error instanceof GitHubContributorsHTTPError && error.status < 500) {
+          throw error;
+        }
 
         if (i === retries - 1) {
           throw error;
@@ -226,48 +263,15 @@ export class ContributorsAPI {
   }
 
   /**
-   * Get cached data if available and not expired
-   */
-  private static getFromCache(ignoreExpiry = false): ContributorData[] | null {
-    try {
-      const cached = localStorage.getItem(this.CACHE_KEY);
-      if (!cached) return null;
-
-      const data = JSON.parse(cached);
-      const now = Date.now();
-
-      if (!ignoreExpiry && now - data.timestamp > this.CACHE_DURATION) {
-        localStorage.removeItem(this.CACHE_KEY);
-        return null;
-      }
-
-      return data.contributors;
-    } catch (error) {
-      console.warn('Error reading from cache:', error);
-      return null;
-    }
-  }
-
-  /**
-   * Save data to cache with timestamp
-   */
-  private static saveToCache(contributors: ContributorData[]): void {
-    try {
-      const data = {
-        contributors,
-        timestamp: Date.now()
-      };
-      localStorage.setItem(this.CACHE_KEY, JSON.stringify(data));
-    } catch (error) {
-      console.warn('Error saving to cache:', error);
-    }
-  }
-
-  /**
    * Utility function for delays
    */
   private static delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  /** Whether some repositories could not be refreshed for this result. */
+  static hasIncompleteData(): boolean {
+    return this.incompleteData;
   }
 
   /**
@@ -281,26 +285,4 @@ export class ContributorsAPI {
       default: return `#${rank}`;
     }
   }
-
-  /**
-   * Get CSS class for rank styling
-   */
-  static getRankClass(rank: number): string {
-    switch (rank) {
-      case 1: return 'rank-gold';
-      case 2: return 'rank-silver';
-      case 3: return 'rank-bronze';
-      default: return 'rank-default';
-    }
-  }
-
-  /**
-   * Calculate progress percentage for contribution bars
-   */
-  static getProgressPercentage(contributions: number, maxContributions: number): number {
-    return Math.min((contributions / maxContributions) * 100, 100);
-  }
 }
-
-// Export interfaces for use in components
-export type { GitHubContributor, ContributorData };

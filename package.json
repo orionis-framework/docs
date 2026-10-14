@@ -3,17 +3,26 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
+    "docs:validate": "node scripts/validate-documentation.mjs",
+    "docs:test": "node --test scripts/documentation.test.mjs scripts/contributors.test.mjs",
+    "docs:examples": "node scripts/check-code-examples.mjs",
+    "postbuild": "node scripts/validate-documentation.mjs --built",
     "dev": "astro dev",
-    "start": "astro dev",
     "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro"
+    "preview": "astro preview"
   },
   "dependencies": {
-    "@astrojs/mdx": "^4.3.12",
     "@astrojs/sitemap": "^3.6.0",
     "@astrojs/starlight": "^0.36.2",
-    "astro": "^5.6.1",
-    "sharp": "^0.34.2"
+    "astro": "^5.6.1"
+  },
+  "devDependencies": {
+    "github-slugger": "^2.0.0",
+    "mdast-util-to-string": "^4.0.0",
+    "parse5": "^7.3.0",
+    "remark-gfm": "^4.0.1",
+    "remark-parse": "^11.0.0",
+    "unified": "^11.0.5",
+    "typescript": "^5.9.3"
   }
 }

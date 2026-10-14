@@ -1,0 +1,36 @@
+---
+interface Props {
+  name: string;
+}
+
+// A small, consistent line-icon set for Orionis documentation categories.
+// Paths are local markup; no asset request or icon dependency is needed.
+const paths: Record<string, string> = {
+  'getting-started': '<circle cx="12" cy="12" r="9"/><path d="m16 8-2.5 5.5L8 16l2.5-5.5L16 8Z"/>',
+  architecture: '<path d="m12 3 9 5-9 5-9-5 9-5Zm-9 9 9 5 9-5M3 16l9 5 9-5"/>',
+  'http-development': '<circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/>',
+  security: '<path d="m12 3 8 3v6c0 4-4 7-8 9-4-2-8-5-8-9V6l8-3Z"/><path d="m8.5 12 2.5 2.5 4.5-5"/>',
+  validation: '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2h6v2M8 10l1 1 2-2m2 1h3M8 16l1 1 2-2m2 1h3"/>',
+  'database-and-orm': '<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>',
+  'console-and-protocols': '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="m7 9 3 3-3 3m6 0h4"/>',
+  testing: '<path d="M9 3h6M10 3v6L4 19a1.3 1.3 0 0 0 1 2h14a1.3 1.3 0 0 0 1-2L14 9V3M7 15h10"/>',
+  advanced: '<path d="M8 3v4H4v5h4v5h5v4h5v-4h3v-5h-4V7h-5V3H8Z"/>',
+  realtime: '<circle cx="12" cy="12" r="2"/><path d="M7.8 7.8a6 6 0 0 0 0 8.4m8.4-8.4a6 6 0 0 1 0 8.4M4.9 4.9a10 10 0 0 0 0 14.2m14.2-14.2a10 10 0 0 1 0 14.2"/>',
+  mcp: '<rect x="9" y="9" width="6" height="6" rx="1.5"/><circle cx="4" cy="4" r="2"/><circle cx="20" cy="4" r="2"/><circle cx="4" cy="20" r="2"/><circle cx="20" cy="20" r="2"/><path d="m5.5 5.5 4 4m5-0 4-4m-9 9-4 4m9-4 4 4"/>',
+  views: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 9v11M6 6.5h.01m3 0h.01"/>',
+  storage: '<path d="M3 7h7l2 2h9v11H3V7Zm0 0V4h7l2 3h6"/><path d="M8 14h8m-8 3h5"/>',
+  cache: '<path d="M20 8a8 8 0 1 0 .3 7M20 3v5h-5m-3 0v4l3 2"/>',
+  mail: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
+  queues: '<rect x="3" y="4" width="12" height="4" rx="1"/><rect x="3" y="10" width="12" height="4" rx="1"/><rect x="3" y="16" width="12" height="4" rx="1"/><path d="M19 5v14m-2-2 2 2 2-2"/>',
+  deployment: '<path d="M3 12h4l3-7 4 14 3-7h4"/><path d="M3 21h18"/>',
+  contribute: '<circle cx="9" cy="7" r="3"/><path d="M3 21v-3a6 6 0 0 1 12 0v3M16 4a3 3 0 0 1 0 6m2 4a5 5 0 0 1 3 4v3"/>',
+  api: '<path d="m7 7-5 5 5 5m10-10 5 5-5 5M14 4l-4 16"/>',
+};
+const { name } = Astro.props;
+const icon = paths[name];
+if (!icon) throw new Error(`Unknown documentation navigation icon: ${name}`);
+---
+
+<svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24"
+  fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+  set:html={icon} />

@@ -1,0 +1,365 @@
+{
+  "bands": [
+    {
+      "id": "build",
+      "title": {
+        "en": "Build your application",
+        "es": "Construye tu aplicación"
+      }
+    },
+    {
+      "id": "data",
+      "title": {
+        "en": "Data and services",
+        "es": "Datos y servicios"
+      }
+    },
+    {
+      "id": "automate",
+      "title": {
+        "en": "Tasks and automation",
+        "es": "Tareas y automatización"
+      }
+    },
+    {
+      "id": "operate",
+      "title": {
+        "en": "Application and operation",
+        "es": "Aplicación y operación"
+      }
+    },
+    {
+      "id": "resources",
+      "title": {
+        "en": "Reference and community",
+        "es": "Referencia y comunidad"
+      }
+    }
+  ],
+  "sections": [
+    {
+      "id": "getting-started",
+      "band": "build",
+      "icon": "getting-started",
+      "title": {
+        "en": "Getting started",
+        "es": "Primeros pasos"
+      },
+      "pageIds": [
+        "foundation-overview",
+        "foundation-installation",
+        "foundation-getting-started"
+      ]
+    },
+    {
+      "id": "http",
+      "band": "build",
+      "icon": "http-development",
+      "title": {
+        "en": "HTTP and APIs",
+        "es": "HTTP y APIs"
+      },
+      "pageIds": [
+        "http-overview",
+        "http-routing",
+        "http-request-lifecycle",
+        "http-requests-and-validation",
+        "http-forms-and-uploads",
+        "http-responses",
+        "http-middleware-and-security",
+        "http-default-responses"
+      ]
+    },
+    {
+      "id": "realtime",
+      "band": "build",
+      "icon": "realtime",
+      "title": {
+        "en": "Realtime and WebSockets",
+        "es": "Realtime y WebSockets"
+      },
+      "pageIds": [
+        "realtime-overview",
+        "realtime-hubs-and-methods",
+        "realtime-protocol-and-streaming",
+        "realtime-groups-and-deployment",
+        "http-websockets",
+        "http-streaming-and-sse"
+      ]
+    },
+    {
+      "id": "mcp",
+      "band": "build",
+      "icon": "mcp",
+      "title": {
+        "en": "MCP servers",
+        "es": "Servidores MCP"
+      },
+      "pageIds": [
+        "mcp-overview",
+        "mcp-servers-and-tools",
+        "mcp-resources-and-prompts",
+        "mcp-responses-and-content",
+        "mcp-transports-and-configuration",
+        "mcp-advanced-workflows",
+        "test-mcp-testing"
+      ]
+    },
+    {
+      "id": "views",
+      "band": "build",
+      "icon": "views",
+      "title": {
+        "en": "Views and localization",
+        "es": "Vistas y traducciones"
+      },
+      "pageIds": [
+        "view-overview",
+        "view-rendering-templates",
+        "view-template-language",
+        "view-configuration-and-extensions",
+        "localization-overview",
+        "localization-translating-content"
+      ]
+    },
+    {
+      "id": "authentication",
+      "band": "build",
+      "icon": "security",
+      "title": {
+        "en": "Authentication and security",
+        "es": "Autenticación y seguridad"
+      },
+      "pageIds": [
+        "auth-overview",
+        "auth-identity-and-session",
+        "auth-authorization",
+        "auth-personal-access-tokens",
+        "auth-account-recovery",
+        "session-overview",
+        "session-state-and-flash",
+        "session-stores-and-concurrency",
+        "session-configuration-and-security",
+        "hashing-overview",
+        "hashing-password-storage",
+        "encrypter-overview",
+        "encrypter-encrypting-values"
+      ]
+    },
+    {
+      "id": "validation",
+      "band": "build",
+      "icon": "validation",
+      "title": {
+        "en": "Schemas and validation",
+        "es": "Schemas y validación"
+      },
+      "pageIds": [
+        "schemas-overview",
+        "schemas-declaring-schemas",
+        "schemas-validation-and-errors",
+        "schemas-application-rules",
+        "schemas-constraints-and-reference"
+      ]
+    },
+    {
+      "id": "database-and-orm",
+      "band": "data",
+      "icon": "database-and-orm",
+      "title": {
+        "en": "Database and ORM",
+        "es": "Bases de datos y ORM"
+      },
+      "pageIds": [
+        "database-overview",
+        "database-connections",
+        "database-transactions",
+        "database-schema",
+        "database-migrations-and-seeders",
+        "database-dialects-and-production",
+        "orm-overview",
+        "orm-models-and-attributes",
+        "orm-querying",
+        "orm-relationships",
+        "orm-events-and-scopes",
+        "orm-factories-and-testing",
+        "orm-schema-and-type-reference"
+      ]
+    },
+    {
+      "id": "storage",
+      "band": "data",
+      "icon": "storage",
+      "title": {
+        "en": "Files and cloud storage",
+        "es": "Archivos y storage cloud"
+      },
+      "pageIds": [
+        "storage-overview",
+        "storage-files-and-directories",
+        "storage-streaming-and-uploads",
+        "storage-disks-and-drivers"
+      ]
+    },
+    {
+      "id": "cache",
+      "band": "data",
+      "icon": "cache",
+      "title": {
+        "en": "Cache and locks",
+        "es": "Caché y locks"
+      },
+      "pageIds": [
+        "cache-overview",
+        "cache-caching-values",
+        "cache-stores-and-locks",
+        "cache-source-artifacts"
+      ]
+    },
+    {
+      "id": "mail",
+      "band": "data",
+      "icon": "mail",
+      "title": {
+        "en": "Mail and attachments",
+        "es": "Correo y adjuntos"
+      },
+      "pageIds": [
+        "mail-overview",
+        "mail-composing-mail",
+        "mail-sending-and-results",
+        "mail-transports-and-extensions"
+      ]
+    },
+    {
+      "id": "queues",
+      "band": "automate",
+      "icon": "queues",
+      "title": {
+        "en": "Queues, jobs and scheduling",
+        "es": "Colas, jobs y tareas programadas"
+      },
+      "pageIds": [
+        "queues-overview",
+        "queues-jobs-and-dispatch",
+        "queues-drivers-and-configuration",
+        "queues-workers-and-failures",
+        "background-overview",
+        "background-response-tasks",
+        "console-task-scheduling"
+      ]
+    },
+    {
+      "id": "console",
+      "band": "automate",
+      "icon": "console-and-protocols",
+      "title": {
+        "en": "Console and generators",
+        "es": "Consola y generadores"
+      },
+      "pageIds": [
+        "console-overview",
+        "console-commands-and-arguments",
+        "console-output-and-programmatic-execution",
+        "console-built-in-commands"
+      ]
+    },
+    {
+      "id": "application",
+      "band": "operate",
+      "icon": "architecture",
+      "title": {
+        "en": "Application and container",
+        "es": "Aplicación y contenedor"
+      },
+      "pageIds": [
+        "foundation-configuration",
+        "environment-overview",
+        "environment-typed-configuration",
+        "environment-operations-and-reference",
+        "foundation-application-lifecycle",
+        "foundation-paths-and-caching",
+        "container-overview",
+        "container-bindings-and-invocation",
+        "container-providers-and-facades",
+        "container-scopes-and-concurrency",
+        "aio-overview",
+        "aio-async-execution"
+      ]
+    },
+    {
+      "id": "deployment",
+      "band": "operate",
+      "icon": "deployment",
+      "title": {
+        "en": "Deployment, logs and errors",
+        "es": "Despliegue, logs y errores"
+      },
+      "pageIds": [
+        "foundation-deployment-and-reference",
+        "logging-overview",
+        "logging-writing-logs",
+        "logging-rotation-and-lifecycle",
+        "failure-overview",
+        "failure-handling-exceptions",
+        "failure-policies-and-reference"
+      ]
+    },
+    {
+      "id": "testing",
+      "band": "operate",
+      "icon": "testing",
+      "title": {
+        "en": "Application testing",
+        "es": "Pruebas de aplicaciones"
+      },
+      "pageIds": [
+        "test-overview",
+        "test-writing-and-running-tests",
+        "test-results-and-reference"
+      ]
+    },
+    {
+      "id": "utilities",
+      "band": "resources",
+      "icon": "advanced",
+      "title": {
+        "en": "Utilities and extensions",
+        "es": "Utilidades y extensión"
+      },
+      "pageIds": [
+        "support-overview",
+        "support-collections-and-strings",
+        "support-entities-and-structures",
+        "support-facades-and-runtime-utilities",
+        "introspection-overview",
+        "introspection-reflection",
+        "introspection-dependencies-and-discovery",
+        "metadata-overview"
+      ]
+    },
+    {
+      "id": "contribute",
+      "band": "resources",
+      "icon": "contribute",
+      "title": {
+        "en": "Contribute",
+        "es": "Contribuir"
+      },
+      "pageIds": [
+        "contribution-guide",
+        "community-contributors"
+      ]
+    }
+  ],
+  "externalLinks": [
+    {
+      "id": "api-reference",
+      "title": {
+        "en": "API Reference",
+        "es": "Referencia API"
+      },
+      "url": "https://api.orionis-framework.com/"
+    }
+  ]
+}

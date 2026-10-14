@@ -1,98 +1,89 @@
 ---
-// src/components/Head.astro
 import StarlightHead from '@astrojs/starlight/components/Head.astro';
-import type { Props as StarlightProps } from '@astrojs/starlight/props';
+import { getPageBySlug, getTranslations } from '../utils/documentation-menu.mjs';
+import {
+  defaultSEO,
+  generateCanonicalURL,
+  generateOGImageURL,
+  generateSEODescription,
+  generateTechArticleSchema,
+} from '../utils/seo';
 
-export interface HeadProps extends StarlightProps {}
+const route = Astro.locals.starlightRoute;
+const { entry, lang, lastUpdated } = route;
+const baseURL = Astro.site?.href || 'https://docs.orionis-framework.com';
+const canonical = route.head.find(({ tag, attrs }) => tag === 'link' && attrs?.rel === 'canonical');
+const currentURL = String(canonical?.attrs?.href || generateCanonicalURL(Astro.url.pathname, baseURL));
+const nativeDescription = route.head.find(({ tag, attrs }) => tag === 'meta' && attrs?.name === 'description');
+const description = String(nativeDescription?.attrs?.content || generateSEODescription(entry.data.description || '', lang));
+const languageURL = (slug: string) => generateCanonicalURL(
+  slug.replace(/\/+$/, '') + (new URL(currentURL).pathname.endsWith('/') ? '/' : ''),
+  baseURL,
+);
+const ogImage = generateOGImageURL(baseURL);
+const page = getPageBySlug(Astro.url.pathname);
+const translations = page ? getTranslations(page.id) : [];
 
-const { entry, lang } = Astro.props;
-const isSpanish = lang === 'es';
+// Starlight supplies title, description, canonical, Open Graph and Twitter card metadata.
+// Its default locale links assume matching slugs; this catalogue pairs pages by ID.
+route.head = route.head.filter(({ tag, attrs }) =>
+  !(tag === 'link' && attrs?.rel === 'alternate' && attrs?.hreflang)
+);
+for (const translation of translations) {
+  route.head.push({
+    tag: 'link',
+    attrs: {
+      rel: 'alternate',
+      hreflang: translation.locale,
+      href: languageURL(translation.slug),
+    },
+  });
+}
+const defaultTranslation = translations.find(({ locale }) => locale === 'en');
+if (defaultTranslation) {
+  route.head.push({
+    tag: 'link',
+    attrs: {
+      rel: 'alternate',
+      hreflang: 'x-default',
+      href: languageURL(defaultTranslation.slug),
+    },
+  });
+}
 
-// Metadatos específicos para SEO
-const siteTitle = 'Orionis Framework';
-const siteDescription = isSpanish
-  ? 'Framework Python Asíncrono de Alto Rendimiento diseñado para aplicaciones web modernas. Construye aplicaciones Python escalables, rápidas y eficientes con Orionis Framework.'
-  : 'High-Performance Async Python Framework designed for modern web applications. Build scalable, fast, and efficient Python applications with Orionis Framework.';
+const extraMetadata = [
+  { name: 'author', content: defaultSEO.en.author },
+  { property: 'og:image', content: ogImage },
+  { property: 'og:image:alt', content: `Orionis Framework — ${entry.data.title}` },
+  { name: 'twitter:title', content: entry.data.title },
+  { name: 'twitter:description', content: description },
+  { name: 'twitter:image', content: ogImage },
+  { name: 'twitter:image:alt', content: `Orionis Framework — ${entry.data.title}` },
+];
+for (const attrs of extraMetadata) {
+  const key = 'name' in attrs ? 'name' : 'property';
+  if (!route.head.some(({ tag, attrs: existing }) => tag === 'meta' && existing?.[key] === attrs[key])) {
+    route.head.push({ tag: 'meta', attrs });
+  }
+}
 
-const pageTitle = entry?.data.title ? `${entry.data.title} - ${siteTitle}` : siteTitle;
-const pageDescription = entry?.data.description || siteDescription;
-
-// URLs para Open Graph
-const siteUrl = 'https://docs.orionis-framework.com';
-const currentUrl = new URL(Astro.url.pathname, siteUrl).toString();
-const ogImage = `${siteUrl}/seo/seo.png`;
-
-// Palabras clave
-const keywords = 'python, async, framework, web development, high-performance, python framework, async framework, web framework, orionis';
+const article = page ? generateTechArticleSchema({
+  title: entry.data.title,
+  description,
+  url: currentURL,
+  lang,
+  dateModified: lastUpdated?.toISOString(),
+}) : undefined;
+// Escape markup so content cannot terminate the JSON-LD script element.
+const structuredData = article ? JSON.stringify(article).replace(/</g, '\\u003c') : undefined;
 ---
 
-<!-- Include the default Starlight Head component first -->
-<StarlightHead {...Astro.props} />
-
-<!-- SEO Meta Tags -->
-<meta name="description" content={pageDescription} />
-<meta name="keywords" content={keywords} />
-<meta name="author" content="Raul Mauricio Uñate Castro" />
-<meta name="robots" content="index, follow" />
-<meta name="language" content={lang} />
-
-<!-- Open Graph Meta Tags -->
-<meta property="og:type" content="website" />
-<meta property="og:site_name" content={siteTitle} />
-<meta property="og:title" content={pageTitle} />
-<meta property="og:description" content={pageDescription} />
-<meta property="og:url" content={currentUrl} />
-<meta property="og:image" content={ogImage} />
-<meta property="og:image:alt" content={`${siteTitle} - ${pageDescription}`} />
-<meta property="og:locale" content={lang === 'es' ? 'es_ES' : 'en_US'} />
-
-<!-- Twitter Card Meta Tags -->
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content={pageTitle} />
-<meta name="twitter:description" content={pageDescription} />
-<meta name="twitter:image" content={ogImage} />
-<meta name="twitter:image:alt" content={`${siteTitle} - ${pageDescription}`} />
-
-<!-- Canonical URL -->
-<link rel="canonical" href={currentUrl} />
-
-<!-- Alternate language URLs -->
-{lang === 'es' && (
-  <link rel="alternate" hreflang="en" href={currentUrl.replace('/es/', '/en/')} />
-)}
-{lang === 'en' && (
-  <link rel="alternate" hreflang="es" href={currentUrl.replace('/en/', '/es/')} />
-)}
-<link rel="alternate" hreflang="x-default" href={currentUrl.replace(`/${lang}/`, '/en/')} />
+<StarlightHead />
 
 <link rel="preload" href="/fonts/titillium-web-400-latin.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="preload" href="/fonts/titillium-web-600-latin.woff2" as="font" type="font/woff2" crossorigin />
+{page && page.kind !== 'astro' && <link rel="preload" href="/fonts/jetbrains-mono-regular.woff2" as="font" type="font/woff2" crossorigin />}
 
-<!-- JSON-LD Structured Data -->
-<script type="application/ld+json" set:html={JSON.stringify({
-  "@context": "https://schema.org",
-  "@type": "TechArticle",
-  "headline": pageTitle,
-  "description": pageDescription,
-  "url": currentUrl,
-  "author": {
-    "@type": "Organization",
-    "name": "Orionis Framework Team",
-    "url": siteUrl
-  },
-  "publisher": {
-    "@type": "Organization",
-    "name": siteTitle,
-    "url": siteUrl,
-    "logo": {
-      "@type": "ImageObject",
-      "url": `${siteUrl}/favicon.svg`
-    }
-  },
-  "inLanguage": lang,
-  "datePublished": entry?.data.lastUpdated || new Date().toISOString(),
-  "dateModified": entry?.data.lastUpdated || new Date().toISOString()
-})} />
+{structuredData && <script type="application/ld+json" set:html={structuredData} />}
 
-<!-- Add our custom global script -->
 <script is:inline src="/js/global.js"></script>

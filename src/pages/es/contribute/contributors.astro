@@ -3,13 +3,15 @@ import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 import { ContributorsAPI } from '../../../utils/contributors';
 
 const contributors = await ContributorsAPI.fetchContributors();
+const incompleteData = ContributorsAPI.hasIncompleteData();
 const totalCommits = contributors.reduce((sum, c) => sum + c.totalContributions, 0);
 ---
 
 <StarlightPage
   frontmatter={{
     title: "Contribuidores",
-    description: "Conoce a la comunidad que impulsa Orionis Framework y descubre cómo unirte al movimiento"
+    description: "Conoce a la comunidad que impulsa Orionis Framework y descubre cómo unirte al movimiento",
+    tableOfContents: false
   }}
 >
   <div class="contributors-page">
@@ -23,12 +25,12 @@ const totalCommits = contributors.reduce((sum, c) => sum + c.totalContributions,
       </p>
       <div class="hero-stats">
         <div class="stat-item">
-          <span class="stat-number">{contributors.length}</span>
+          <span class="stat-number">{contributors.length ? contributors.length : '—'}</span>
           <span class="stat-label">Contribuidores</span>
         </div>
         <div class="stat-divider"></div>
         <div class="stat-item">
-          <span class="stat-number">{totalCommits}</span>
+          <span class="stat-number">{contributors.length ? totalCommits : '—'}</span>
           <span class="stat-label">Commits</span>
         </div>
         <div class="stat-divider"></div>
@@ -71,6 +73,9 @@ const totalCommits = contributors.reduce((sum, c) => sum + c.totalContributions,
     <section class="gallery-section">
       <h2 class="section-title">Muro de la Fama</h2>
       <p class="section-subtitle">Personas que han dedicado su tiempo y talento a hacer de Orionis un framework excepcional</p>
+      {contributors.length > 0 && incompleteData && (
+        <p class="section-subtitle">Las estadísticas reflejan los datos disponibles de GitHub. No se pudieron actualizar algunos repositorios.</p>
+      )}
 
       <div class="contributors-list">
         {contributors.map((contributor) => (
@@ -99,7 +104,7 @@ const totalCommits = contributors.reduce((sum, c) => sum + c.totalContributions,
 
       {contributors.length === 0 && (
         <div class="loading">
-          <p>Cargando contribuidores...</p>
+          <p>Las estadísticas de colaboradores no están disponibles temporalmente. Puedes seguir la <a href="/es/contribute/guide">guía de contribución</a> y explorar los repositorios de abajo.</p>
         </div>
       )}
     </section>
@@ -208,13 +213,6 @@ const totalCommits = contributors.reduce((sum, c) => sum + c.totalContributions,
   </div>
 
   <style>
-    :global(.right-sidebar-container) {
-      display: none !important;
-    }
-    :global(.main-frame) {
-      grid-template-columns: var(--sl-sidebar-width) 1fr !important;
-    }
-
     .contributors-page {
       max-width: none;
       width: 100%;

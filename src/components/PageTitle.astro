@@ -1,0 +1,10 @@
+---
+import NativePageTitle from '@astrojs/starlight/components/PageTitle.astro';
+import FrameworkCapabilities from './FrameworkCapabilities.astro';
+import { getPageBySlug } from '../utils/documentation-menu.mjs';
+
+const isManualEntry = getPageBySlug(Astro.url.pathname)?.id === 'foundation-overview';
+---
+
+<NativePageTitle />
+{isManualEntry && <FrameworkCapabilities />}
