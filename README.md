@@ -39,6 +39,22 @@ Para añadir una guía, crear ambos Markdown, registrar un ID con sus rutas en e
 
 El menú tiene categorías y enlaces, con iconos SVG locales. Sólo la categoría activa aparece desplegada al cargar una página. Las traducciones se vinculan por ID. La entrada del manual incluye un mapa de capacidades; la referencia API y las opciones de contribución permanecen accesibles desde el menú.
 
+## Rastreo e indexación en ChatGPT
+
+[`public/robots.txt`](public/robots.txt) permite todo el sitio a los rastreadores generales y declara permisos explícitos para:
+
+- `OAI-SearchBot`: descubre contenido para los resultados de búsqueda de ChatGPT.
+- `GPTBot`: rastrea contenido que podría utilizarse para entrenar modelos de OpenAI. Este permiso es independiente y no es necesario para aparecer en la búsqueda de ChatGPT.
+- `ChatGPT-User`: puede visitar páginas por acciones de usuarios de ChatGPT o GPTs personalizados. No es un rastreador automático ni controla la inclusión en búsquedas; sus solicitudes pueden no seguir `robots.txt`.
+
+Astro genera el contenido como HTML estático, legible sin ejecutar JavaScript. Las páginas publican sus URL canónicas, descripciones y enlaces de idioma. El sitemap se genera durante la compilación y se anuncia en https://docs.orionis-framework.com/robots.txt mediante https://docs.orionis-framework.com/sitemap-index.xml.
+
+`npm run docs:validate` verifica los permisos explícitos y la URL del sitemap. `npm run build` también comprueba que se publique el mismo `robots.txt`, que las páginas tengan contenido estático sin metadatos `noindex`, `nofollow` o `none`, y que el índice de sitemaps apunte a los archivos publicados con todas las páginas canónicas. Los errores y las redirecciones no se tratan como páginas del manual indexables.
+
+Después de desplegar, comprobar que `robots.txt`, los sitemaps y las páginas respondan públicamente por HTTPS. Si se añade un proxy, CDN o firewall, no bloquear los rangos oficiales de [OAI-SearchBot](https://openai.com/searchbot.json), [GPTBot](https://openai.com/gptbot.json) y [ChatGPT-User](https://openai.com/chatgpt-user.json); mantenerlos actualizados desde esas fuentes. Evitar autenticación, CAPTCHA y cabeceras `X-Robots-Tag: noindex` en el contenido público. Estas restricciones del alojamiento no se pueden controlar desde `robots.txt`.
+
+Permitir el rastreo no garantiza indexación, posición ni citas en las respuestas. OpenAI indica que sus sistemas pueden tardar aproximadamente 24 horas en ajustar las reglas tras cambiar `robots.txt`; no es un plazo garantizado de indexación. `llms.txt` no figura como requisito en su [documentación oficial de rastreadores](https://developers.openai.com/api/docs/bots) y no sustituye a `robots.txt` ni al sitemap.
+
 ## Tipografía y ejemplos
 
 Todo el código utiliza **JetBrains Mono local** en pesos 400, 600 y 700, normales e itálicos. El texto general usa Titillium Web local. Los archivos y sus licencias están en `public/fonts/`; las declaraciones CSS están en `src/styles/custom.css`. La validación comprueba las fuentes de código y rechaza cargas desde CDN.

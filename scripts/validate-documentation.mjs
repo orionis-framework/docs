@@ -6,10 +6,19 @@ import { createSidebar, createRedirects, getTranslations, supplementalPages, doc
 
 const catalog = documentationCatalog;
 const pages = validateCatalog(catalog);
+const site = 'https://docs.orionis-framework.com';
 const fontAssets = JSON.parse(await fs.readFile(path.join(root, 'config/font-assets.json'), 'utf8'));
 const errors = [], routeMap = new Map();
 const normalize = (pathname) => decodeURI(pathname).replace(/\/+$/, '') || '/';
 function check(condition, message) { if (!condition) errors.push(message); }
+
+const robots = (await fs.readFile(path.join(root, 'public/robots.txt'), 'utf8')).replaceAll('\r\n', '\n');
+const robotsGroups = robots.trim().split(/\n\s*\n/);
+for (const agent of ['*', 'OAI-SearchBot', 'GPTBot', 'ChatGPT-User']) {
+  const groups = robotsGroups.filter((group) => group.startsWith(`User-agent: ${agent}\n`));
+  check(groups.length === 1 && groups[0] === `User-agent: ${agent}\nAllow: /`, `Expected one unrestricted robots.txt group for ${agent}.`);
+}
+check(robotsGroups.includes(`Sitemap: ${site}/sitemap-index.xml`), 'robots.txt must advertise the canonical sitemap index.');
 
 async function validateFontAssets(directory) {
   for (const asset of [...fontAssets.files, fontAssets.license]) {
@@ -94,7 +103,9 @@ check(Object.values(redirects).every((slug) => routeMap.has(slug)), 'Redirect wi
 check(Object.keys(redirects).every((slug) => !routeMap.has(slug)), 'Redirect shadows a canonical page.');
 
 if (process.argv.includes('--built')) {
-  const output = path.join(root, 'dist'), site = 'https://docs.orionis-framework.com';
+  const output = path.join(root, 'dist');
+  const builtRobots = (await fs.readFile(path.join(output, 'robots.txt'), 'utf8')).replaceAll('\r\n', '\n');
+  check(builtRobots === robots, 'Published robots.txt must preserve the crawler permissions and sitemap.');
   await validateFontAssets(output);
   const fontCSS = (await Promise.all((await filesUnder(output)).filter((file) => file.endsWith('.css')).map((file) => fs.readFile(file, 'utf8')))).join('\n');
   check(/--sl-font-mono\s*:[^;}]*JetBrains Mono/.test(fontCSS), 'Inline code must use JetBrains Mono.');
@@ -127,11 +138,17 @@ if (process.argv.includes('--built')) {
     elements(parse(html), (node, attrs) => {
       if (attrs.id) data.ids.add(attrs.id);
       if (node.tagName === 'h1') data.h1++;
-      if ('data-pagefind-body' in attrs) data.searchable = true;
+      if ('data-pagefind-body' in attrs) {
+        data.searchable = true;
+        check(textContent(node).length > 100, `Page content must be available in static HTML without JavaScript: ${slug}`);
+      }
       if (node.tagName === 'a' && attrs.href) data.links.push(attrs.href);
       if (node.tagName === 'link' && attrs.rel === 'canonical') data.canonicals.push(attrs.href);
       if (node.tagName === 'link' && attrs.rel === 'alternate' && attrs.hreflang) data.alternates.push(attrs);
       if (node.tagName === 'meta' && attrs.name === 'description') data.descriptions.push(attrs.content);
+      if (node.tagName === 'meta' && /^(?:robots|oai-searchbot|gptbot|chatgpt-user)$/i.test(attrs.name || '')) {
+        check(!/(?:^|[\s,;])(?:noindex|nofollow|none)(?:$|[\s,;])/i.test(attrs.content || ''), `Crawler-blocking meta directive: ${slug}`);
+      }
       if (node.tagName === 'option' && /\/(en|es)\//.test(attrs.value || '')) data.languages.push(attrs.value);
       if (node.tagName === 'link' && attrs.as === 'font') check(attrs.href?.startsWith('/') && !attrs.href.startsWith('//'), `Font preload must use a local asset: ${slug}`);
       if (node.tagName === 'sl-sidebar-state-persist') data.sidebarPersistence = true;
@@ -207,8 +224,14 @@ if (process.argv.includes('--built')) {
     } catch (error) { errors.push(error.message); }
   }
   const sitemapFiles = (await filesUnder(output)).filter((file) => /sitemap-\d+\.xml$/.test(file));
+  const sitemapIndex = await fs.readFile(path.join(output, 'sitemap-index.xml'), 'utf8');
+  const sitemapURLs = [...sitemapIndex.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
+  const expectedSitemapURLs = sitemapFiles.map((file) => new URL(path.basename(file), site).href);
+  check(sitemapURLs.length > 0 && sitemapURLs.length === expectedSitemapURLs.length && new Set(sitemapURLs).size === sitemapURLs.length && expectedSitemapURLs.every((url) => sitemapURLs.includes(url)), 'Sitemap index must reference every published sitemap on the canonical domain.');
   const sitemap = (await Promise.all(sitemapFiles.map((file) => fs.readFile(file, 'utf8')))).join('');
-  const sitemapRoutes = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => normalize(new URL(match[1]).pathname));
+  const sitemapPageURLs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => new URL(match[1]));
+  check(sitemapPageURLs.every((url) => url.origin === site), 'Sitemap pages must use the canonical domain.');
+  const sitemapRoutes = sitemapPageURLs.map((url) => normalize(url.pathname));
   const sitemapSet = new Set(sitemapRoutes);
   check(sitemapRoutes.length === sitemapSet.size && sitemapSet.size === routeMap.size && [...routeMap.keys()].every((slug) => sitemapSet.has(slug)), `Sitemap must contain exactly ${routeMap.size} unique canonical documents, found ${sitemapRoutes.length}`);
   const allowed = new Set([...routeMap.keys(), ...Object.keys(redirects).map(normalize), '/404']);
@@ -217,7 +240,7 @@ if (process.argv.includes('--built')) {
     check(allowed.has(slug), `Unexpected published HTML page: ${slug}`);
   }
   check((await filesUnder(path.join(output, 'pagefind'))).length > 0, 'Search index was not generated.');
-  console.log(`Verified ${htmlPages.size} rendered pages, local links/fragments, translations, redirects, sitemap, and search output.`);
+  console.log(`Verified ${htmlPages.size} rendered pages, crawler permissions, indexable static content, local links/fragments, translations, redirects, sitemap, and search output.`);
 }
 if (errors.length) {
   console.error(errors.join('\n'));
