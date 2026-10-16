@@ -1,0 +1,52 @@
+<script>
+  async function initializeDiagrams() {
+    const figures = [...document.querySelectorAll<HTMLElement>('[data-mermaid]')];
+    if (!figures.length) return;
+
+    const { default: mermaid } = await import('mermaid');
+    let revision = 0;
+    let rendering = false;
+    let pending = false;
+
+    async function renderDiagrams() {
+      pending = true;
+      if (rendering) return;
+      rendering = true;
+      while (pending) {
+        pending = false;
+        const generation = ++revision;
+        mermaid.initialize({
+          startOnLoad: false,
+          securityLevel: 'strict',
+          theme: document.documentElement.dataset.theme === 'dark' ? 'dark' : 'default',
+          fontFamily: 'Titillium Web, sans-serif',
+          flowchart: { htmlLabels: false, useMaxWidth: false, wrappingWidth: 280, rankSpacing: 28 },
+        });
+        for (const [index, figure] of figures.entries()) {
+          const source = figure.querySelector<HTMLElement>('[data-mermaid-source]');
+          const output = figure.querySelector<HTMLElement>('[data-mermaid-output]');
+          if (!source || !output) continue;
+          try {
+            const { svg, bindFunctions } = await mermaid.render(`orionis-diagram-${generation}-${index}`, source.textContent || '');
+            output.innerHTML = svg;
+            bindFunctions?.(output);
+            source.hidden = true;
+          } catch (error) {
+            output.replaceChildren();
+            source.hidden = false;
+            console.error('Unable to render the documentation diagram.', error);
+          }
+        }
+      }
+      rendering = false;
+    }
+
+    await renderDiagrams();
+    new MutationObserver(() => { void renderDiagrams(); }).observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+  }
+
+  void initializeDiagrams();
+</script>

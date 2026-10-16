@@ -1,6 +1,6 @@
 # Orionis Framework Documentation
 
-Documentación de Orionis Framework en inglés y español, construida con Astro y Starlight. El sitio publica 114 páginas del manual por idioma y cuatro páginas de contribución: **232 páginas**, además de las redirecciones y el 404. Su dominio es https://docs.orionis-framework.com.
+Documentación de Orionis Framework en inglés y español, construida con Astro y Starlight. El sitio publica 115 páginas del manual por idioma y cuatro páginas de contribución: **234 páginas**, además de las redirecciones y el 404. Su dominio es https://docs.orionis-framework.com.
 
 ## Desarrollo
 
@@ -24,7 +24,7 @@ npm run preview
 
 ## Editar documentación
 
-Los archivos en `src/content/docs/{en,es}/` son las fuentes definitivas del manual y las guías de contribución. Editar directamente el Markdown de cada idioma; la compilación no necesita otros repositorios ni una sincronización previa. La instalación documentada corresponde al instalador de Orionis y sus proyectos Blank y SSR.
+Los archivos en `src/content/docs/{en,es}/` son las fuentes definitivas del manual y las guías de contribución. Editar directamente el Markdown de cada idioma; la compilación no necesita otros repositorios ni una sincronización previa. La instalación documentada corresponde al instalador de Orionis y sus proyectos Blank, SSR, Slim API y Slim MCP.
 
 Las páginas de colaboradores se mantienen en `src/pages/{en,es}/contribute/contributors.astro`. Comparten la consulta, paginación y caché de GitHub implementadas en `src/utils/contributors.ts`. Los errores de red permiten compilar con los datos disponibles o un estado sin estadísticas.
 

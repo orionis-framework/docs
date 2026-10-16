@@ -1,5 +1,6 @@
 ---
 import StarlightHead from '@astrojs/starlight/components/Head.astro';
+import MermaidDiagrams from './MermaidDiagrams.astro';
 import { getPageBySlug, getTranslations } from '../utils/documentation-menu.mjs';
 import {
   defaultSEO,
@@ -79,6 +80,7 @@ const structuredData = article ? JSON.stringify(article).replace(/</g, '\\u003c'
 ---
 
 <StarlightHead />
+<MermaidDiagrams />
 
 <link rel="preload" href="/fonts/titillium-web-400-latin.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="preload" href="/fonts/titillium-web-600-latin.woff2" as="font" type="font/woff2" crossorigin />

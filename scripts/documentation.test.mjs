@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import remarkMermaid from '../src/plugins/remark-mermaid.mjs';
 import path from 'node:path';
-import { root, validateCatalog, within, stripFrontmatter, markdownLinks, headingIds } from './documentation-lib.mjs';
+import { root, validateCatalog, within, stripFrontmatter, markdownLinks, headingIds, parser } from './documentation-lib.mjs';
 import { createSidebar, documentationCatalog, documentationNavigation, navigationSections, resolveNavigation, sitePages, documentationPages, getPageBySlug, getTranslations } from '../src/utils/documentation-menu.mjs';
 
 test('local catalog rejects collisions, unsupported pages, and incomplete translations', () => {
@@ -40,6 +41,17 @@ test('Markdown parsing preserves examples and ignores links inside code', () => 
 });
 test('repeated headings have distinct fragment IDs', () => {
   assert.deepEqual([...headingIds('## Same\n\n## Same\n')], ['_top', 'same', 'same-1']);
+});
+
+test('diagram fallback keeps markup inert and leaves ordinary code fences intact', () => {
+  const tree = parser.parse('```mermaid\nflowchart TD\n  accTitle: A "quoted" diagram\n  A["</pre><script>alert(1)</script>"]\n```\n\n```python\nprint("<script>")\n```');
+  const ordinaryCode = structuredClone(tree.children[1]);
+  remarkMermaid()(tree);
+  assert.equal(tree.children[0].type, 'html');
+  assert.ok(tree.children[0].value.includes('aria-label="A &quot;quoted&quot; diagram"'));
+  assert.ok(tree.children[0].value.includes('&lt;/pre&gt;&lt;script&gt;'));
+  assert.ok(!tree.children[0].value.includes('<script>'));
+  assert.deepEqual(tree.children[1], ordinaryCode);
 });
 test('navigation exposes all chapters in two levels and keeps API/contribution resources', () => {
   const sidebar = createSidebar();
@@ -81,7 +93,7 @@ test('regrouping navigation preserves page IDs, page records, and both locale ro
 });
 test('the menu makes realtime, MCP, and application services distinct visible capabilities', () => {
   assert.deepEqual(navigationSections.slice(0, 4).map((section) => section.id), ['getting-started', 'http', 'realtime', 'mcp']);
-  assert.deepEqual(navigationSections[0].pageIds, ['foundation-overview', 'foundation-installation', 'foundation-getting-started']);
+  assert.deepEqual(navigationSections[0].pageIds, ['foundation-overview', 'foundation-installation', 'foundation-getting-started', 'foundation-architecture-and-lifecycle']);
   const sectionFor = (pageId) => navigationSections.find((section) => section.pageIds.includes(pageId));
   for (const id of ['realtime-overview', 'realtime-protocol-and-streaming', 'http-websockets', 'http-streaming-and-sse']) assert.equal(sectionFor(id).id, 'realtime');
   for (const id of ['mcp-overview', 'mcp-transports-and-configuration', 'test-mcp-testing']) assert.equal(sectionFor(id).id, 'mcp');

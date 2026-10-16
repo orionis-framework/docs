@@ -14,7 +14,8 @@
   "dependencies": {
     "@astrojs/sitemap": "^3.6.0",
     "@astrojs/starlight": "^0.36.2",
-    "astro": "^5.6.1"
+    "astro": "^5.6.1",
+    "mermaid": "^12.2.0"
   },
   "devDependencies": {
     "github-slugger": "^2.0.0",
@@ -22,7 +23,7 @@
     "parse5": "^7.3.0",
     "remark-gfm": "^4.0.1",
     "remark-parse": "^11.0.0",
-    "unified": "^11.0.5",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "unified": "^11.0.5"
   }
 }

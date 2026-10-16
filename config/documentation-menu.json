@@ -54,6 +54,22 @@
       }
     },
     {
+      "id": "foundation-architecture-and-lifecycle",
+      "kind": "doc",
+      "title": {
+        "es": "Arquitectura y ciclo de vida de la aplicación",
+        "en": "Application architecture and lifecycle"
+      },
+      "label": {
+        "en": "Architecture and lifecycle",
+        "es": "Arquitectura y ciclo de vida"
+      },
+      "slug": {
+        "es": "/es/getting-started/architecture-and-lifecycle",
+        "en": "/en/getting-started/architecture-and-lifecycle"
+      }
+    },
+    {
       "id": "foundation-application-lifecycle",
       "kind": "doc",
       "title": {

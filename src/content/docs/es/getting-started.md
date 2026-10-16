@@ -9,8 +9,8 @@ Construye tu aplicación a partir del esqueleto oficial y añade las funciones q
 
 ## Tu primera sesión de desarrollo
 
-1. [Instala y crea un proyecto](/es/getting-started/installation): prepara uv y Git, elige Blank o SSR y crea el entorno de la aplicación.
-2. [Arranca la aplicación](/es/getting-started/getting-started): ejecuta el servidor desde la raíz del proyecto y comprueba la página de bienvenida.
+1. [Instala y crea un proyecto](/es/getting-started/installation): prepara uv y Git, elige un stack y crea el entorno de la aplicación.
+2. [Arranca la aplicación](/es/getting-started/getting-started): ejecuta el servidor desde la raíz del proyecto y abre la URL indicada en consola.
 3. [Configura la aplicación](/es/getting-started/configuration): utiliza `.env` para los valores de cada entorno y `config/` para los ajustes tipados.
 4. [Añade tu primera ruta HTTP](/es/http/routing) y elige entre [plantillas](/es/services/views) y una API JSON.
 5. [Escribe y ejecuta una prueba](/es/testing/writing-and-running-tests) antes de incorporar persistencia, autenticación, trabajos en segundo plano, Realtime o MCP.
@@ -33,6 +33,7 @@ Foundation también define entidades congeladas para cada subsistema, metadata c
 
 ## Recorrido del módulo
 
+- [Arquitectura y ciclo de vida de la aplicación](/es/getting-started/architecture-and-lifecycle)
 - [Ciclo de vida y recursos de aplicación](/es/getting-started/application-lifecycle)
 - [Configuración tipada y valores en ejecución](/es/getting-started/configuration)
 - [Despliegue, diagnóstico y referencia de Application](/es/getting-started/deployment-and-reference)

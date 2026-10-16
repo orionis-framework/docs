@@ -998,3 +998,25 @@ h1,
     outline: 2px solid var(--orionis-primary);
     outline-offset: 2px;
 }
+/* Diagrams scroll within the article on small screens, like code and tables. */
+.orionis-diagram {
+  margin: 1.5rem 0;
+  max-inline-size: 100%;
+  overflow-x: auto;
+  padding: 1rem;
+  border: 1px solid var(--sl-color-hairline-light);
+  border-radius: 0.5rem;
+  background: var(--sl-color-bg-nav);
+}
+
+.orionis-diagram svg {
+  display: block;
+  margin-inline: auto;
+  max-inline-size: none;
+  block-size: auto;
+}
+
+.orionis-diagram pre {
+  margin: 0;
+  white-space: pre;
+}

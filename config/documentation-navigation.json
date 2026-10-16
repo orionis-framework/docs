@@ -42,13 +42,14 @@
       "band": "build",
       "icon": "getting-started",
       "title": {
-        "en": "Getting started",
-        "es": "Primeros pasos"
+        "en": "Fundamentals",
+        "es": "Fundamentos"
       },
       "pageIds": [
         "foundation-overview",
         "foundation-installation",
-        "foundation-getting-started"
+        "foundation-getting-started",
+        "foundation-architecture-and-lifecycle"
       ]
     },
     {

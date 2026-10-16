@@ -9,8 +9,8 @@ Build your application from the official skeleton, then add the features your pr
 
 ## Your first development session
 
-1. [Install and create a project](/en/getting-started/installation): prepare uv and Git, choose Blank or SSR, and create the application's environment.
-2. [Start the application](/en/getting-started/getting-started): run the server from the project root and check the welcome page.
+1. [Install and create a project](/en/getting-started/installation): prepare uv and Git, choose a stack, and create the application's environment.
+2. [Start the application](/en/getting-started/getting-started): run the server from the project root and open the URL shown in the console.
 3. [Configure the application](/en/getting-started/configuration): use `.env` for deployment values and `config/` for typed settings.
 4. [Add your first HTTP route](/en/http/routing), then choose [templates](/en/services/views) or a JSON API.
 5. [Write and run a test](/en/testing/writing-and-running-tests) before adding persistence, authentication, background jobs, Realtime, or MCP.
@@ -33,6 +33,7 @@ Foundation also defines frozen configuration entities for every major subsystem,
 
 ## Module learning path
 
+- [Application architecture and lifecycle](/en/getting-started/architecture-and-lifecycle)
 - [Application lifecycle and resource ownership](/en/getting-started/application-lifecycle)
 - [Typed configuration and runtime values](/en/getting-started/configuration)
 - [Deployment, diagnostics, and Application reference](/en/getting-started/deployment-and-reference)
