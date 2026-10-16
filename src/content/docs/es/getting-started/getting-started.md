@@ -12,12 +12,12 @@ Comienza con la aplicación creada en [Instalación y primer proyecto](/es/getti
 Para un proyecto local nuevo con Blank:
 
 ```bash
-uvx --python 3.14 --from orionis-installer==0.7.0 orionis new blog --no-interaction --no-migrate
+uvx --python 3.14 --from orionis-installer orionis new blog --no-interaction --no-migrate
 cd blog
 uv run python -B reactor serve
 ```
 
-Si ya creaste `blog`, continúa desde `cd blog` en lugar de ejecutar `new` otra vez. El instalador prepara el entorno y la clave de aplicación; `serve` inicia el servidor HTTP. Abre [http://127.0.0.1:8000](http://127.0.0.1:8000) para ver la bienvenida o [la ruta de salud](http://127.0.0.1:8000/up). Detén el servidor con Ctrl+C. Si el puerto está ocupado, usa `uv run python -B reactor serve --port 8001`.
+Si ya creaste `blog`, continúa desde `cd blog` en lugar de ejecutar `new` otra vez. El instalador prepara el entorno y la clave de aplicación; `serve` inicia el servidor HTTP. Comprueba [la ruta de salud](http://127.0.0.1:8000/up); Blank no registra una página de bienvenida en `/`. Detén el servidor con Ctrl+C. Si el puerto está ocupado, usa `uv run python -B reactor serve --port 8001`.
 
 El stack SSR también incluye vistas de autenticación, perfil y administración. Prepara sus tablas antes de utilizar esas funciones:
 
@@ -27,7 +27,7 @@ uv run python -B reactor migrate
 uv run python -B reactor serve
 ```
 
-Esto supone que creaste `portal` con `--stack ssr`. `reactor migrate` aplica el esquema sin seeders. En el instalador 0.7.0, su propia opción `--migrate` solicita `reactor migrate --seed`; revisa el seeder administrativo del esqueleto antes de elegirla. Consulta [el comportamiento de las migraciones](/es/getting-started/installation#comportamiento-de-las-migraciones-en-el-instalador-070).
+Esto supone que creaste `portal` con `--stack ssr`. `reactor migrate` aplica el esquema sin seeders. La opción `--migrate` del instalador solicita `reactor migrate --seed`; revisa el seeder administrativo del esqueleto antes de elegirla. Consulta [migraciones y datos iniciales](/es/getting-started/installation#migraciones-y-datos-iniciales).
 
 ## Seguir el arranque
 

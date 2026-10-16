@@ -4,6 +4,8 @@ function restoreActiveNavigation() {
     const sidebar = document.getElementById('starlight__sidebar');
     const current = sidebar?.querySelector('a[aria-current="page"]');
     if (!sidebar) return;
+    // A restored filter owns its visible rows and expanded result categories.
+    if (sidebar.querySelector('orionis-sidebar[data-filtering]')) return;
     for (const section of sidebar.querySelectorAll('.sidebar-section')) {
         section.open = Boolean(current && section.contains(current));
     }
@@ -13,7 +15,7 @@ function restoreActiveNavigation() {
         group.open = true;
         group = group.parentElement?.closest('details');
     }
-    if (!matchMedia('(min-width: 50em)').matches) return;
+    if (!matchMedia('(min-width: 50rem)').matches) return;
     const panel = sidebar.getBoundingClientRect();
     const link = current.getBoundingClientRect();
     if (link.top < panel.top || link.bottom > panel.bottom) {

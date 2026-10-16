@@ -37,7 +37,9 @@ La configuración utilizada por el sitio está en cuatro archivos:
 
 Para añadir una guía, crear ambos Markdown, registrar un ID con sus rutas en el catálogo y ubicarlo en una categoría del menú. Las rutas de ambos idiomas deben compartir el sufijo después de `/en/` y `/es/`. Mantener los títulos del frontmatter iguales a los del catálogo, `editUrl: true` y enlaces internos absolutos con el idioma correspondiente.
 
-El menú tiene categorías y enlaces, con iconos SVG locales. Sólo la categoría activa aparece desplegada al cargar una página. Las traducciones se vinculan por ID. La entrada del manual incluye un mapa de capacidades; la referencia API y las opciones de contribución permanecen accesibles desde el menú.
+El menú tiene categorías y enlaces, con iconos SVG locales. Sólo la categoría activa aparece desplegada al cargar una página. El filtro busca guías o categorías en el idioma actual e ignora las tildes. En móvil se despliega una categoría a la vez; las preferencias de tema e idioma están después de las guías. El botón del menú sincroniza su estado accesible, permite cerrar con Escape y conserva el foco dentro de la navegación abierta. Las traducciones se vinculan por ID. La entrada del manual incluye un mapa de capacidades; la referencia API y las opciones de contribución permanecen accesibles desde el menú.
+
+Para revisar cambios de interfaz, usar la compilación con `npm run preview`: comprobar pantallas de 320, 375, 768, 799, 800, 1024, 1152 y 1440 px, además de orientación horizontal. Validar apertura y cierre del menú, acordeones, filtro con y sin resultados, botón Atrás, tema, idioma, búsqueda y tabla de contenidos. Las tablas y los bloques de código pueden desplazarse dentro de su propio contenedor; la página completa no debe desbordarse horizontalmente. Las tarjetas de capacidades y colaboradores se ajustan al ancho disponible después de descontar las barras laterales.
 
 ## Rastreo e indexación en ChatGPT
 

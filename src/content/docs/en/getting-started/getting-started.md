@@ -12,12 +12,12 @@ Start with the application created by [Installation and your first project](/en/
 For a new local Blank project:
 
 ```bash
-uvx --python 3.14 --from orionis-installer==0.7.0 orionis new blog --no-interaction --no-migrate
+uvx --python 3.14 --from orionis-installer orionis new blog --no-interaction --no-migrate
 cd blog
 uv run python -B reactor serve
 ```
 
-If you already created `blog`, continue from `cd blog` instead of running `new` again. The installer prepares the environment and application key; `serve` starts the HTTP server. Open [http://127.0.0.1:8000](http://127.0.0.1:8000) for the welcome page or [the health route](http://127.0.0.1:8000/up). Stop it with Ctrl+C. If the port is busy, use `uv run python -B reactor serve --port 8001`.
+If you already created `blog`, continue from `cd blog` instead of running `new` again. The installer prepares the environment and application key; `serve` starts the HTTP server. Check [the health route](http://127.0.0.1:8000/up); Blank does not initially register a welcome page at `/`. Stop it with Ctrl+C. If the port is busy, use `uv run python -B reactor serve --port 8001`.
 
 The SSR stack also includes authentication, profile, and administration views. Prepare its database tables before using those features:
 
@@ -27,7 +27,7 @@ uv run python -B reactor migrate
 uv run python -B reactor serve
 ```
 
-This assumes `portal` was created with `--stack ssr`. `reactor migrate` applies the schema without seeders. In installer 0.7.0, its own `--migrate` option requests `reactor migrate --seed`; review the skeleton's administrative seeder before choosing that option. See [migration behavior](/en/getting-started/installation#migration-behavior-in-installer-070).
+This assumes `portal` was created with `--stack ssr`. `reactor migrate` applies the schema without seeders. The installer's `--migrate` option requests `reactor migrate --seed`; review the skeleton's administrative seeder before choosing that option. See [migrations and initial data](/en/getting-started/installation#migrations-and-initial-data).
 
 ## Follow the bootstrap
 

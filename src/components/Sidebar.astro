@@ -1,6 +1,7 @@
 ---
 import { Icon } from '@astrojs/starlight/components';
-import MobileMenuFooter from '@astrojs/starlight/components/MobileMenuFooter.astro';
+import ThemeSelect from '@astrojs/starlight/components/ThemeSelect.astro';
+import LanguageSelect from './LanguageSelect.astro';
 import SidebarSublist from '@astrojs/starlight/components/SidebarSublist.astro';
 import NavigationIcon from './NavigationIcon.astro';
 import { documentationNavigation, navigationSections } from '../utils/documentation-menu.mjs';
@@ -18,17 +19,27 @@ const entries = sidebar.map((entry) => {
 });
 ---
 
+<orionis-sidebar>
 <div class="sidebar-heading">
   <p class="sidebar-kicker">{spanish ? 'Documentación' : 'Documentation'}</p>
   <p class="sidebar-caption">{spanish ? 'Desarrolla con Orionis' : 'Build with Orionis'}</p>
 </div>
 
-<div class="mobile-sidebar-controls md:sl-hidden">
-  <MobileMenuFooter />
+<div class="sidebar-filter" hidden>
+  <label for="navigation-filter">{spanish ? 'Filtrar menú' : 'Filter menu'}</label>
+  <div class="sidebar-filter-field">
+    <input id="navigation-filter" type="search" placeholder={spanish ? 'Buscar una guía…' : 'Find a guide…'}
+      autocomplete="off" aria-controls="orionis-sidebar-tree" />
+    <button type="button" data-clear-filter aria-label={spanish ? 'Limpiar filtro' : 'Clear filter'} hidden>
+      <Icon name="close" size="1.25rem" />
+    </button>
+  </div>
+  <p role="status" data-filter-status data-empty={spanish ? 'No se encontraron guías.' : 'No guides found.'}
+    data-count={spanish ? 'Guías encontradas:' : 'Guides found:'}></p>
 </div>
 
 {/* Open state comes from the current route, without restoring past expanded groups. */}
-<ul class="sidebar-tree top-level">
+<ul id="orionis-sidebar-tree" class="sidebar-tree top-level">
   {entries.map(({ entry, section }, index) => {
     if (entry.type === 'group') {
       const startsBand = index === 0 || entries[index - 1].section?.band !== section.band;
@@ -59,3 +70,76 @@ const entries = sidebar.map((entry) => {
     );
   })}
 </ul>
+
+<div class="mobile-sidebar-controls md:sl-hidden">
+  <p class="sidebar-preferences-title">{spanish ? 'Preferencias' : 'Preferences'}</p>
+  <div class="mobile-preferences">
+    <div><p>{spanish ? 'Tema' : 'Theme'}</p><ThemeSelect /></div>
+    <div><p>{spanish ? 'Idioma' : 'Language'}</p><LanguageSelect /></div>
+  </div>
+  <a class="sidebar-github" href="https://github.com/orionis-framework">
+    <Icon name="github" size="1.25rem" /> GitHub
+  </a>
+</div>
+</orionis-sidebar>
+
+<script>
+  class OrionisSidebar extends HTMLElement {
+    connectedCallback() {
+      const filter = this.querySelector<HTMLElement>('.sidebar-filter')!;
+      const input = filter.querySelector('input')!;
+      const clear = filter.querySelector<HTMLButtonElement>('button')!;
+      const status = filter.querySelector<HTMLElement>('[data-filter-status]')!;
+      const groups = [...this.querySelectorAll<HTMLDetailsElement>('.sidebar-section')];
+      const rows = [...this.querySelectorAll<HTMLElement>('.sidebar-tree > li')];
+      const savedOpen = new Map<HTMLDetailsElement, boolean>();
+      const normalize = (text: string) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase();
+      const controller = new AbortController();
+      this.cleanup = () => controller.abort();
+      const options = { signal: controller.signal };
+
+      filter.hidden = false;
+      input.addEventListener('input', () => {
+        const query = normalize(input.value.trim());
+        const filtering = this.hasAttribute('data-filtering');
+        if (query && !filtering) groups.forEach((group) => savedOpen.set(group, group.open));
+        this.toggleAttribute('data-filtering', Boolean(query));
+        clear.hidden = !query;
+        let count = 0;
+        for (const row of rows) {
+          const group = row.querySelector<HTMLDetailsElement>('details');
+          const categoryMatches = query && normalize(group?.querySelector('summary')?.textContent || '').includes(query);
+          let matches = 0;
+          for (const link of row.querySelectorAll<HTMLAnchorElement>('a')) {
+            const match = !query || categoryMatches || normalize(link.textContent || '').includes(query);
+            link.parentElement!.hidden = !match;
+            if (match) matches++;
+          }
+          row.hidden = matches === 0;
+          if (group) group.open = query ? matches > 0 : (savedOpen.get(group) ?? group.open);
+          count += matches;
+        }
+        status.textContent = query ? (count ? `${status.dataset.count} ${count}` : status.dataset.empty!) : '';
+        if (!query) savedOpen.clear();
+      }, options);
+      clear.addEventListener('click', () => {
+        input.value = '';
+        input.dispatchEvent(new Event('input'));
+        input.focus();
+      }, options);
+      // Keep a single category expanded on phones, so other categories stay within reach.
+      this.addEventListener('click', (event) => {
+        const summary = (event.target as Element).closest('.sidebar-section > summary');
+        if (!summary || this.hasAttribute('data-filtering') || window.matchMedia('(min-width: 50rem)').matches) return;
+        event.preventDefault();
+        const selected = summary.parentElement as HTMLDetailsElement;
+        const open = !selected.open;
+        groups.forEach((group) => { group.open = group === selected && open; });
+      }, options);
+    }
+
+    cleanup?: () => void;
+    disconnectedCallback() { this.cleanup?.(); }
+  }
+  customElements.define('orionis-sidebar', OrionisSidebar);
+</script>

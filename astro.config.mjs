@@ -26,6 +26,7 @@ export default defineConfig({
         Head: './src/components/Head.astro',
         LanguageSelect: './src/components/LanguageSelect.astro',
         Sidebar: './src/components/Sidebar.astro',
+        MobileMenuToggle: './src/components/MobileMenuToggle.astro',
         PageTitle: './src/components/PageTitle.astro',
       },
       locales: {

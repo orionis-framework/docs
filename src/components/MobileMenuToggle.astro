@@ -1,0 +1,118 @@
+---
+import { Icon } from '@astrojs/starlight/components';
+---
+
+<orionis-menu-toggle aria-expanded="false" class="print:hidden">
+  <button type="button" aria-expanded="false" aria-label={Astro.locals.t('menuButton.accessibleLabel')}
+    aria-controls="starlight__sidebar" class="md:sl-hidden">
+    <Icon name="bars" class="open-menu" size="1.5rem" />
+    <Icon name="close" class="close-menu" size="1.5rem" />
+  </button>
+</orionis-menu-toggle>
+
+<script>
+  class OrionisMenuToggle extends HTMLElement {
+    connectedCallback() {
+      const button = this.querySelector('button')!;
+      const sidebar = document.getElementById('starlight__sidebar')!;
+      const nav = this.closest('nav')!;
+      const main = document.querySelector<HTMLElement>('.main-frame');
+      const desktop = window.matchMedia('(min-width: 50rem)');
+      const controller = new AbortController();
+      this.cleanup = () => {
+        controller.abort();
+        main?.removeAttribute('inert');
+        document.body.removeAttribute('data-mobile-menu-expanded');
+      };
+      const options = { signal: controller.signal };
+      const expanded = () => button.getAttribute('aria-expanded') === 'true';
+      const setExpanded = (open: boolean, restoreFocus = false) => {
+        open = open && !desktop.matches;
+        this.setAttribute('aria-expanded', String(open));
+        button.setAttribute('aria-expanded', String(open));
+        document.body.toggleAttribute('data-mobile-menu-expanded', open);
+        if (main) main.inert = open;
+        if (open) {
+          const current = sidebar.querySelector<HTMLElement>('a[aria-current="page"]');
+          if (current && current.getClientRects().length) {
+            // Reveal the current guide without moving the document behind the menu.
+            const pane = sidebar.getBoundingClientRect();
+            const link = current.getBoundingClientRect();
+            if (link.top < pane.top || link.bottom > pane.bottom) {
+              sidebar.scrollTop += link.top - pane.top - sidebar.clientHeight / 3;
+            }
+          }
+        } else if (restoreFocus) button.focus();
+      };
+
+      button.addEventListener('click', () => setExpanded(!expanded()), options);
+      nav.addEventListener('click', (event) => {
+        if ((event.target as Element).closest('a[href]')) setExpanded(false);
+      }, options);
+      document.addEventListener('click', (event) => {
+        if ((event.target as Element).closest('header.header')) setExpanded(false);
+      }, options);
+      document.addEventListener('keydown', (event) => {
+        if (!expanded()) return;
+        if (event.key === 'Escape') {
+          event.preventDefault();
+          setExpanded(false, true);
+        } else if (event.key === 'Tab') {
+          const focusable = [...nav.querySelectorAll<HTMLElement>('button, a[href], summary, input, select')]
+            .filter((element) => !element.hasAttribute('disabled') && element.getClientRects().length > 0);
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+          if (event.shiftKey && (document.activeElement === first || !nav.contains(document.activeElement))) {
+            event.preventDefault();
+            last?.focus();
+          } else if (!event.shiftKey && (document.activeElement === last || !nav.contains(document.activeElement))) {
+            event.preventDefault();
+            first?.focus();
+          }
+        }
+      }, options);
+      desktop.addEventListener('change', () => {
+        const focused = document.activeElement;
+        setExpanded(false);
+        if (!desktop.matches && sidebar.contains(focused)) button.focus();
+        if (desktop.matches && focused === button) {
+          sidebar.querySelector<HTMLElement>('a[aria-current="page"], input')?.focus({ preventScroll: true });
+        }
+      }, options);
+      window.addEventListener('pageshow', () => setExpanded(false), options);
+    }
+
+    cleanup?: () => void;
+    disconnectedCallback() { this.cleanup?.(); }
+  }
+  customElements.define('orionis-menu-toggle', OrionisMenuToggle);
+</script>
+
+<style>
+  button {
+    position: fixed;
+    top: calc((var(--sl-nav-height) - var(--sl-menu-button-size)) / 2);
+    inset-inline-end: var(--sl-nav-pad-x);
+    z-index: var(--sl-z-index-navbar);
+    align-items: center;
+    justify-content: center;
+    width: var(--sl-menu-button-size);
+    height: var(--sl-menu-button-size);
+    padding: 0;
+    border: 1px solid var(--orionis-border);
+    border-radius: var(--orionis-radius);
+    background: var(--orionis-soft);
+    color: var(--orionis-text);
+    cursor: pointer;
+  }
+  button:not([aria-expanded='true']) .close-menu,
+  button[aria-expanded='true'] .open-menu { display: none; }
+  @media (width < 50rem) { button { display: flex; } }
+</style>
+
+<style is:global>
+  body[data-mobile-menu-expanded] { overflow: hidden; }
+  @media (min-width: 50rem) {
+    body[data-mobile-menu-expanded] { overflow: auto; }
+  }
+</style>

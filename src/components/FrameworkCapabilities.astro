@@ -107,7 +107,7 @@ function href(pageId: string): string {
 
   .capability-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
     gap: 0.65rem;
   }
 
@@ -162,6 +162,7 @@ function href(pageId: string): string {
     gap: 0.2rem;
     min-width: 0;
     line-height: 1.4;
+    overflow-wrap: anywhere;
   }
 
   .capability-copy strong {
@@ -191,12 +192,6 @@ function href(pageId: string): string {
   .additional-capabilities a {
     color: var(--orionis-primary);
     text-underline-offset: 0.2em;
-  }
-
-  @media (max-width: 38rem) {
-    .capability-grid {
-      grid-template-columns: minmax(0, 1fr);
-    }
   }
 
   @media (prefers-reduced-motion: reduce) {
