@@ -4,13 +4,17 @@ import starlight from '@astrojs/starlight';
 import sitemap from '@astrojs/sitemap';
 import { createSidebar, createRedirects } from './src/utils/documentation-menu.mjs';
 import remarkMermaid from './src/plugins/remark-mermaid.mjs';
+import rehypeResponsiveTables from './src/plugins/rehype-responsive-tables.mjs';
 
 const redirects = createRedirects();
 export default defineConfig({
   site: 'https://docs.orionis-framework.com',
   trailingSlash: 'never',
   redirects,
-  markdown: { remarkPlugins: [remarkMermaid] },
+  markdown: {
+    remarkPlugins: [remarkMermaid],
+    rehypePlugins: [rehypeResponsiveTables],
+  },
   integrations: [
     sitemap({ filter: (url) => !Object.hasOwn(redirects, new URL(url).pathname) }),
     starlight({

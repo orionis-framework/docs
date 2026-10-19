@@ -51,7 +51,8 @@ export function getTranslations(pageId) {
 export function createSidebar() {
   function link(page, section, index) {
     const titles = page.label || page.title;
-    const attrs = { class: index === 0 || page.id.endsWith('-overview') ? 'module-overview' : 'module-chapter', 'data-page-id': page.id, 'data-nav-group': section.id };
+    const overview = index === 0 || (section.id !== 'http' && page.id.endsWith('-overview'));
+    const attrs = { class: overview ? 'module-overview' : 'module-chapter', 'data-page-id': page.id, 'data-nav-group': section.id };
     const item = {
       label: titles[catalog.defaultLocale],
       translations: titles,

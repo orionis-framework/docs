@@ -1,53 +1,531 @@
 ---
-title: "Ciclo de petición y controladores"
-description: "Una petición entra por un adaptador ASGI o RSGI. El kernel aplica políticas globales, resuelve la ruta compilada, abre el scope del contenedor y construye el pipeline…"
+title: "Controladores HTTP"
+description: "Genera controladores Resource o Invokable, utiliza --api, registra sus acciones en rutas y recibe parámetros y dependencias."
 editUrl: true
 lastUpdated: false
 ---
 
-Una petición entra por un adaptador ASGI o RSGI. El kernel aplica políticas globales, resuelve la ruta compilada, abre el scope del contenedor y construye el pipeline correspondiente. El controlador trabaja con `Request`, servicios inyectados y respuestas independientes del servidor. Al finalizar se persiste la sesión cuando corresponde, se envía la respuesta y se liberan cuerpos, archivos y servicios del scope.
+Un controlador HTTP organiza la lógica de uno o varios endpoints. Cuando el router encuentra una coincidencia y los middleware permiten continuar, Orionis construye el controlador mediante el contenedor, invoca su acción y procesa la respuesta devuelta.
 
-## Un controlador de lectura
+Mantener las acciones en controladores permite que los archivos de rutas se concentren en declarar endpoints y que los servicios se ocupen de la lógica de negocio.
 
-Guarda el controlador en `app/http/controllers/catalog_controller.py`:
+**Resource e Invokable son dos estructuras de controlador. `--api` es una opción independiente que cambia las anotaciones de respuesta; puede utilizarse con cualquiera de las dos.**
 
-```python
-from orionis.http import Request, Response, response
-from orionis.http.base.controller import BaseController
+## Generar un controlador
 
-class CatalogController(BaseController):
-    async def show(self, request: Request) -> Response:
-        product_id = request.routeParam("product_id")
-        return response.json({"id": product_id, "currency": "USD"})
+Desde la raíz del proyecto, con su entorno Python activo, puedes utilizar el comando directo:
+
+```bash
+orionis make:http-controller ExampleController
 ```
 
-Regístralo en `routes/api.py`:
+O su alternativa mediante el archivo local `reactor`:
+
+```bash
+python -B reactor make:http-controller ExampleController
+```
+
+La sintaxis es `make:http-controller name [--invoke] [--api]`:
+
+| Argumento u opción | Obligatorio | Predeterminado | Efecto |
+| --- | --- | --- | --- |
+| `name` | Sí | Sin valor | Nombre utilizado para construir el archivo y la clase. |
+| `--invoke` | No | `False` | Generar únicamente la acción `__call__`, en lugar de las siete acciones Resource. |
+| `--api` | No | `False` | Importar `JSONResponse` y utilizarlo en las anotaciones de retorno y docstrings. |
+
+`-h` o `--help` muestran la ayuda. Las opciones `--invoke` y `--api` se pueden combinar.
+
+### Ubicación y normalización de nombres
+
+El destino predeterminado es `app/http/controllers`, obtenido de la ruta de aplicación `app_http_controllers`. Si personalizas esa ruta, el generador utiliza su ubicación configurada.
+
+| `name` | Clase generada | Archivo relativo al proyecto |
+| --- | --- | --- |
+| `ExampleController` | `ExampleController` | `app/http/controllers/examplecontroller.py` |
+| `UserController` | `UserController` | `app/http/controllers/usercontroller.py` |
+| `user_controller` o `user` | `UserController` | `app/http/controllers/user_controller.py` |
+| `admin/user` | `UserController` | `app/http/controllers/admin/user_controller.py` |
+
+El archivo utiliza minúsculas y añade `_controller` cuando falta el sufijo. La clase se forma a partir de los segmentos separados por `_` y añade `Controller` si falta. **No se insertan guiones bajos entre palabras PascalCase**: `UserController` produce `usercontroller.py`, no `user_controller.py`.
+
+Se admiten subdirectorios con `/` o `\`, normalizados a minúsculas, y una extensión final como `.py`. Los directorios se crean automáticamente. No se admiten rutas absolutas, segmentos `..` ni nombres con guiones.
+
+El generador no sobrescribe archivos existentes y no ofrece `--force`. Las modalidades siguientes son alternativas: usa un nombre distinto para conservar varias o edita el archivo ya generado.
+
+:::note[Código generado y código implementado]
+El generador utiliza una plantilla común y selecciona sus importaciones y acciones según las opciones. Las cuatro salidas completas se muestran a continuación, conservando sus docstrings.
+
+Las acciones generadas sólo contienen una docstring: devuelven `None` implícitamente. Debes implementar una respuesta antes de utilizarlas como endpoints; el kernel rechaza ese `None`. Los ejemplos posteriores de rutas utilizan acciones ya implementadas.
+:::
+
+## Resource Controllers
+
+Un Resource Controller reúne acciones relacionadas con un recurso. Resulta útil cuando consultas, formularios, creación, actualización y eliminación pertenecen a la misma entidad.
+
+Es la estructura predeterminada:
+
+```bash
+orionis make:http-controller UserController
+```
+
+Alternativa local:
+
+```bash
+python -B reactor make:http-controller UserController
+```
+
+### Código generado
+
+El archivo `app/http/controllers/usercontroller.py` contiene:
 
 ```python
-from app.http.controllers.catalog_controller import CatalogController
+from orionis.http import HttpResponse
+from orionis.http.base import BaseController
+
+class UserController(BaseController):
+    """
+    Handle HTTP requests through asynchronous controller actions.
+
+    Resource actions are generated by default. Use the invokable option to
+    generate only ``__call__`` and the API option to annotate JSON responses.
+    """
+
+    async def index(self) -> HttpResponse:
+        """Display a listing of the resource.
+
+        Returns
+        -------
+        HttpResponse
+            Response produced when this action is implemented.
+        """
+
+    async def create(self) -> HttpResponse:
+        """Show the form for creating a resource.
+
+        Returns
+        -------
+        HttpResponse
+            Response produced when this action is implemented.
+        """
+
+    async def store(self) -> HttpResponse:
+        """Store a newly created resource.
+
+        Returns
+        -------
+        HttpResponse
+            Response produced when this action is implemented.
+        """
+
+    async def show(self) -> HttpResponse:
+        """Display the specified resource.
+
+        Returns
+        -------
+        HttpResponse
+            Response produced when this action is implemented.
+        """
+
+    async def edit(self) -> HttpResponse:
+        """Show the form for editing the resource.
+
+        Returns
+        -------
+        HttpResponse
+            Response produced when this action is implemented.
+        """
+
+    async def update(self) -> HttpResponse:
+        """Update the specified resource.
+
+        Returns
+        -------
+        HttpResponse
+            Response produced when this action is implemented.
+        """
+
+    async def destroy(self) -> HttpResponse:
+        """Remove the specified resource.
+
+        Returns
+        -------
+        HttpResponse
+            Response produced when this action is implemented.
+        """
+```
+
+`BaseController`, importado desde `orionis.http.base`, es una clase base marcadora: no implementa CRUD, validación, autorización ni acceso a datos. `HttpResponse` es el alias de tipos del framework para `Response`.
+
+Todas las acciones son asíncronas, reciben únicamente `self` y están anotadas con `HttpResponse`. El generador no añade automáticamente `Request`, identificadores ni dependencias.
+
+| Acción | Propósito indicado por la plantilla |
+| --- | --- |
+| `index` | Listar el recurso. |
+| `create` | Mostrar el formulario de creación. |
+| `store` | Guardar un nuevo recurso. |
+| `show` | Mostrar un recurso concreto. |
+| `edit` | Mostrar el formulario de edición. |
+| `update` | Actualizar un recurso concreto. |
+| `destroy` | Eliminar un recurso concreto. |
+
+Estos nombres organizan responsabilidades; sus cuerpos no realizan esas operaciones hasta que los implementes.
+
+### Implementar acciones y registrarlas en rutas
+
+Para probar dos acciones de lectura, sustituye el archivo del ejemplo por esta implementación mínima:
+
+```python
+from orionis.http import HttpResponse, response
+from orionis.http.base import BaseController
+
+
+class UserController(BaseController):
+    async def index(self) -> HttpResponse:
+        return response.json({"users": []})
+
+    async def show(self, user_id: int) -> HttpResponse:
+        return response.json({"id": user_id})
+```
+
+En el archivo registrado como API, normalmente `routes/api.py`:
+
+```python
+from app.http.controllers.usercontroller import UserController
 from orionis.support.facades import Route
 
-Route.get("/products/{product_id:int}", [CatalogController, "show"])
+Route.get("/users", [UserController, "index"])
+Route.get("/users/{user_id:int}", [UserController, "show"])
 ```
 
-Con el servidor de desarrollo iniciado, `GET /products/42` devuelve HTTP 200 y `{"id": 42, "currency": "USD"}`. El convertidor de ruta entrega el entero `42`. `BaseController` es un marcador vacío: no proporciona métodos de autorización, validación ni acceso al ORM. Esas tareas pertenecen a sus servicios.
+`GET /users` devuelve `{"users": []}`; `GET /users/42` devuelve `{"id": 42}`. La segunda acción añade `user_id` a la firma para recibir el parámetro de su ruta.
 
-También puedes registrar una función o una clase con `__call__`. Para completar una declaración diferida usa `Route.get("/products").action(CatalogController, "show")` antes de compilar las rutas. El método y su información de tipos se inspeccionan durante el arranque; las dependencias del controlador se construyen mediante el contenedor.
+La pareja `[Clase, "acción"]` identifica el método sin ejecutarlo. También se admite una tupla. Pasa la clase, sin instanciarla.
 
-## Elegir web o API
+**No hay registro automático de rutas Resource.** El generador no asocia verbos HTTP a las acciones: en este ejemplo elegimos GET para ambas lecturas. Declara las demás rutas explícitamente con los métodos HTTP que corresponda a tus acciones implementadas. Consulta [Rutas](/es/http/routing).
 
-El loader importa primero `routes/web.py` y luego `routes/api.py`; la ubicación determina el tipo de ruta. Las rutas web incorporan sesión, CSRF y resolución de identidad de sesión. Las rutas API utilizan resolución de identidad mediante token y no añaden automáticamente estado de navegador. Resolver identidad permite invitados; exige autenticación explícitamente para proteger recursos.
+## Invokable Controllers
 
-`public()` selecciona el perfil HTTP sin estado y elimina las capas de sesión, CSRF e identidad. Úsalo para endpoints que no necesitan credenciales de cookies ni la identidad actual. Las políticas globales continúan aplicándose. No lo uses como sustituto de una decisión de autorización.
+Un Invokable Controller concentra una operación en `__call__`. Es útil para un endpoint con una responsabilidad concreta, sin reunir varias acciones en la misma clase.
 
-## Asincronía, scopes y fallos
+```bash
+orionis make:http-controller UserController --invoke
+```
 
-Escribe `async def` para operaciones con I/O y espera las APIs asíncronas. El soporte para funciones síncronas no convierte una llamada bloqueante dentro de un controlador asíncrono en trabajo seguro para el event loop. Delega CPU o I/O síncrono largo a servicios adecuados.
+Alternativa local:
 
-La solicitud y su identidad viven en un scope. No conserves el `Request`, la sesión ni el contexto autenticado en singletons o variables globales. El kernel precarga y reutiliza instancias de middleware: almacena datos de cada petición en variables locales o `request.state`.
+```bash
+python -B reactor make:http-controller UserController --invoke
+```
 
-Las excepciones de validación y autenticación se convierten mediante los manejadores del framework. Una excepción después de enviar encabezados de streaming ya no puede reemplazar el estado HTTP enviado. Diseña el trabajo de preparación para fallar antes de devolver el stream.
+### Código generado
 
-## Continuar
+En esta modalidad, `app/http/controllers/usercontroller.py` contiene únicamente una acción:
 
-Consulta [rutas](/es/http/routing), [middleware](/es/http/middleware-and-security) y [fallos](/es/architecture/exception-handling).
+```python
+from orionis.http import HttpResponse
+from orionis.http.base import BaseController
+
+class UserController(BaseController):
+    """
+    Handle HTTP requests through asynchronous controller actions.
+
+    Resource actions are generated by default. Use the invokable option to
+    generate only ``__call__`` and the API option to annotate JSON responses.
+    """
+
+    async def __call__(self) -> HttpResponse:
+        """Handle the request for this controller.
+
+        Returns
+        -------
+        HttpResponse
+            Response produced when this action is implemented.
+        """
+```
+
+`__call__` es el método que el router selecciona cuando registras directamente una clase invocable. El esqueleto recibe sólo `self`; puedes añadir parámetros de ruta y dependencias como en cualquier acción.
+
+### Implementar y registrar la acción única
+
+Sustituye el esqueleto por una implementación que devuelva una respuesta:
+
+```python
+from orionis.http import HttpResponse, response
+from orionis.http.base import BaseController
+
+
+class UserController(BaseController):
+    async def __call__(self) -> HttpResponse:
+        return response.text("User endpoint ready")
+```
+
+En el archivo de rutas:
+
+```python
+from app.http.controllers.usercontroller import UserController
+from orionis.support.facades import Route
+
+Route.get("/user-summary", UserController)
+```
+
+`GET /user-summary` ejecuta `__call__()` y devuelve el texto con estado `200`. También se admite `[UserController, "__call__"]`, aunque la clase directa expresa la misma intención de forma breve. El router no acepta una instancia ni un método ligado como acción.
+
+## Controladores con --api
+
+`--api` cambia la importación de `HttpResponse` por `JSONResponse`, las anotaciones de retorno y el tipo mencionado en las docstrings. No añade código de respuesta, serialización, rutas ni persistencia.
+
+La estructura sigue dependiendo de `--invoke`: sin esa opción conserva las siete acciones Resource, incluidas `create` y `edit`; con ella genera sólo `__call__`.
+
+### Resource Controller para API
+
+```bash
+orionis make:http-controller UserController --api
+```
+
+Alternativa local:
+
+```bash
+python -B reactor make:http-controller UserController --api
+```
+
+El código generado completo es:
+
+```python
+from orionis.http import JSONResponse
+from orionis.http.base import BaseController
+
+class UserController(BaseController):
+    """
+    Handle HTTP requests through asynchronous controller actions.
+
+    Resource actions are generated by default. Use the invokable option to
+    generate only ``__call__`` and the API option to annotate JSON responses.
+    """
+
+    async def index(self) -> JSONResponse:
+        """Display a listing of the resource.
+
+        Returns
+        -------
+        JSONResponse
+            Response produced when this action is implemented.
+        """
+
+    async def create(self) -> JSONResponse:
+        """Show the form for creating a resource.
+
+        Returns
+        -------
+        JSONResponse
+            Response produced when this action is implemented.
+        """
+
+    async def store(self) -> JSONResponse:
+        """Store a newly created resource.
+
+        Returns
+        -------
+        JSONResponse
+            Response produced when this action is implemented.
+        """
+
+    async def show(self) -> JSONResponse:
+        """Display the specified resource.
+
+        Returns
+        -------
+        JSONResponse
+            Response produced when this action is implemented.
+        """
+
+    async def edit(self) -> JSONResponse:
+        """Show the form for editing the resource.
+
+        Returns
+        -------
+        JSONResponse
+            Response produced when this action is implemented.
+        """
+
+    async def update(self) -> JSONResponse:
+        """Update the specified resource.
+
+        Returns
+        -------
+        JSONResponse
+            Response produced when this action is implemented.
+        """
+
+    async def destroy(self) -> JSONResponse:
+        """Remove the specified resource.
+
+        Returns
+        -------
+        JSONResponse
+            Response produced when this action is implemented.
+        """
+```
+
+Para implementar las acciones de lectura con respuestas JSON explícitas, edita el archivo:
+
+```python
+from orionis.http import JSONResponse, response
+from orionis.http.base import BaseController
+
+
+class UserController(BaseController):
+    async def index(self) -> JSONResponse:
+        return response.json({"users": []})
+
+    async def show(self, user_id: int) -> JSONResponse:
+        return response.json({"id": user_id})
+```
+
+Regístralas en `routes/api.py` con las mismas parejas de clase y acción:
+
+```python
+from app.http.controllers.usercontroller import UserController
+from orionis.support.facades import Route
+
+Route.get("/users", [UserController, "index"])
+Route.get("/users/{user_id:int}", [UserController, "show"])
+```
+
+### Invokable Controller para API
+
+Las opciones se combinan sin restricciones entre ellas:
+
+```bash
+orionis make:http-controller UserController --invoke --api
+```
+
+Alternativa local:
+
+```bash
+python -B reactor make:http-controller UserController --invoke --api
+```
+
+El resultado completo es:
+
+```python
+from orionis.http import JSONResponse
+from orionis.http.base import BaseController
+
+class UserController(BaseController):
+    """
+    Handle HTTP requests through asynchronous controller actions.
+
+    Resource actions are generated by default. Use the invokable option to
+    generate only ``__call__`` and the API option to annotate JSON responses.
+    """
+
+    async def __call__(self) -> JSONResponse:
+        """Handle the request for this controller.
+
+        Returns
+        -------
+        JSONResponse
+            Response produced when this action is implemented.
+        """
+```
+
+Una implementación funcional de esa acción única sería:
+
+```python
+from orionis.http import JSONResponse, response
+from orionis.http.base import BaseController
+
+
+class UserController(BaseController):
+    async def __call__(self) -> JSONResponse:
+        return response.json({"status": "ready"})
+```
+
+En `routes/api.py`:
+
+```python
+from app.http.controllers.usercontroller import UserController
+from orionis.support.facades import Route
+
+Route.get("/user-summary", UserController)
+```
+
+Este endpoint devuelve JSON con estado `200`. Los ejemplos Resource e Invokable son alternativas; registra una sola acción por combinación de verbo y path.
+
+### Anotaciones, respuestas y contexto API
+
+Una anotación `JSONResponse` no convierte por sí sola el valor retornado. Los ejemplos construyen la respuesta mediante `response.json(...)`.
+
+Por separado, el kernel admite resultados `dict` o `msgspec.Struct` y los convierte en `JSONResponse` con estado `200`, independientemente de `--api` y de la anotación. No convierte cualquier tipo de valor: una respuesta textual debe construirse, por ejemplo, con `response.text(...)`. Consulta [Respuestas HTTP](/es/http/responses).
+
+El contexto API o WEB procede de la configuración de `app.withRouting(...)`, no de `--api`, del nombre del controlador ni de su anotación. Un controlador sin `--api` también puede devolver JSON, como en el primer ejemplo Resource. Consulta la [separación de rutas API y WEB](/es/http/routing#separar-rutas-api-y-web).
+
+## Comparación de modalidades
+
+La columna de argumentos se añade a `orionis make:http-controller` o a `python -B reactor make:http-controller`. El tipo indicado es el esperado al implementar la acción, no una respuesta ya creada por el esqueleto.
+
+| Estructura | Argumentos | Acciones generadas | Retorno anotado | Uso habitual | Registro en ruta |
+| --- | --- | --- | --- | --- | --- |
+| Resource | `UserController` | Las siete acciones de recurso. | `HttpResponse` | Varias operaciones del mismo recurso. | `[UserController, "index"]` |
+| Invokable | `UserController --invoke` | `__call__` | `HttpResponse` | Una operación concreta. | `UserController` |
+| Resource con API | `UserController --api` | Las mismas siete acciones. | `JSONResponse` | Varias operaciones con respuestas JSON. | `[UserController, "index"]` |
+| Invokable con API | `UserController --invoke --api` | `__call__` | `JSONResponse` | Una operación con respuesta JSON. | `UserController` |
+
+## Parámetros e inyección de dependencias
+
+Al atender una ruta, Orionis construye la clase del controlador y resuelve las dependencias anotadas de su constructor. Después invoca la acción, aportando los parámetros de ruta por nombre y resolviendo sus dependencias restantes. La preparación de metadatos durante el arranque no ejecuta el constructor ni las acciones ordinarias.
+
+Este ejemplo utiliza un servicio concreto sin dependencias, que el contenedor puede construir automáticamente. Guarda `app/services/user_label_service.py`:
+
+```python
+class UserLabelService:
+    def label(self, user_id: int) -> str:
+        return f"User {user_id}"
+```
+
+En `app/http/controllers/show_user_controller.py`:
+
+```python
+from app.services.user_label_service import UserLabelService
+from orionis.http import JSONResponse, Request, response
+from orionis.http.base import BaseController
+
+
+class ShowUserController(BaseController):
+    def __init__(self, labels: UserLabelService) -> None:
+        self.labels = labels
+
+    async def __call__(self, request: Request, user_id: int) -> JSONResponse:
+        return response.json({
+            "id": user_id,
+            "label": self.labels.label(user_id),
+            "path": request.path,
+        })
+```
+
+Registra la clase en `routes/api.py`, sustituyendo la declaración equivalente si ya utilizas ese path:
+
+```python
+from app.http.controllers.show_user_controller import ShowUserController
+from orionis.support.facades import Route
+
+Route.get("/users/{user_id:int}", ShowUserController)
+```
+
+`GET /users/42` devuelve `{"id": 42, "label": "User 42", "path": "/users/42"}`.
+
+- `labels: UserLabelService` permite construir e inyectar el servicio en el constructor. Los servicios abstractos o contratos necesitan su binding correspondiente.
+- `request: Request` obtiene la petición actual registrada en el scope HTTP; no debes construirla manualmente.
+- `user_id` llega como entero por el convertidor `{user_id:int}`. Debes aceptar ese nombre en la acción, también cuando recibes `Request`.
+- Las anotaciones identifican dependencias, pero el convertidor declarado en la ruta determina cómo se convierte el segmento. Añadir `: int` sólo en la firma no cambia el patrón de ruta.
+- `Response` es el resultado que devuelve la acción; no es una respuesta precreada que el controlador reciba automáticamente.
+
+El controlador se construye al invocarlo; la vida de sus servicios depende de la configuración del contenedor. También puedes recibir servicios anotados directamente en la acción. Amplía el tema en [Bindings e invocación](/es/architecture/service-container/bindings-and-invocation).
+
+## Organización y consideraciones
+
+Agrupa los controladores en `app/http/controllers` por responsabilidad o dominio cuando el proyecto crezca; por ejemplo, `admin/user` permite generar una clase dentro de `admin`. Utiliza nombres consistentes, Resource para acciones de un recurso e Invokable para operaciones concretas. Son recomendaciones de organización, no restricciones del router.
+
+Mantén la coordinación HTTP en el controlador y delega la lógica de negocio a servicios. La clase base no realiza operaciones de base de datos ni implementa automáticamente las acciones generadas.
+
+Los [middleware](/es/http/middleware-and-security) se ejecutan antes de la invocación y pueden impedir que ésta ocurra. Si una acción falla, las capas HTTP y el kernel delegan su tratamiento al sistema de [Excepciones](/es/architecture/exception-handling). Para formatos, encabezados, cookies o descargas consulta [Respuestas](/es/http/responses).

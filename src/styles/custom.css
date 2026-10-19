@@ -701,13 +701,20 @@ h1,
     border-radius: 4px;
 }
 
-.sl-markdown-content table {
-    display: block;
+.sl-markdown-content .orionis-table-scroll {
     max-width: 100%;
     overflow-x: auto;
+    overscroll-behavior-inline: contain;
     margin-block: 1.75rem;
     border: 1px solid var(--orionis-border);
     border-radius: var(--orionis-radius);
+}
+
+.sl-markdown-content table {
+    display: table;
+    width: 100%;
+    max-width: none;
+    margin: 0;
     border-collapse: separate;
     border-spacing: 0;
     font-size: 1rem;
@@ -719,6 +726,8 @@ h1,
     padding: 0.875rem 1rem;
     border-bottom: 1px solid var(--orionis-border);
     vertical-align: top;
+    overflow-wrap: normal;
+    word-break: normal;
 }
 
 .sl-markdown-content :is(th, td):first-child {
@@ -733,6 +742,14 @@ h1,
     color: var(--orionis-text);
     background: var(--orionis-soft);
     font-weight: 600;
+    white-space: nowrap;
+}
+
+/* Keep technical values intact; wide tables use their own horizontal scroll. */
+.sl-markdown-content :is(th, td) code {
+    white-space: nowrap;
+    overflow-wrap: normal;
+    word-break: normal;
 }
 
 .sl-markdown-content tr:last-child td {
@@ -801,12 +818,6 @@ h1,
 .pagination-links a:hover {
     background: var(--orionis-soft);
     border-color: var(--orionis-primary);
-}
-
-/* Long command and API names remain readable in narrow table cells. */
-.sl-markdown-content td code {
-    white-space: normal;
-    overflow-wrap: anywhere;
 }
 
 @media (min-width: 72rem) {
@@ -934,7 +945,6 @@ h1,
     }
 
     .sl-markdown-content :is(th, td) {
-        min-inline-size: 8rem;
         padding-block: 0.75rem;
     }
 

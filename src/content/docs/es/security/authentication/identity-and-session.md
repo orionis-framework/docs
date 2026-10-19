@@ -37,7 +37,7 @@ class LoginInput(Schema):
     password: Field[str, MinLength(1)]
 
 async def login(request: Request):
-    values = await Validator.validateAsync(await request.data(), LoginInput)
+    values = await Validator.validate(await request.data(), LoginInput)
     credentials = {"email": values.email, "password": values.password}
     if not await Auth.attempt(credentials):
         return response.json({"message": "Invalid credentials"}, 401)

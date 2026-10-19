@@ -1,75 +1,64 @@
 ---
-title: "Leer solicitudes y validar entrada"
-description: "Request separa metadatos síncronos de lectura asíncrona del cuerpo. Sus propiedades method, path, scheme, url, baseUrl, headers, queryParams, cookies, ip, port y state no…"
+title: "Validación HTTP con schemas"
+description: "Introducción a la validación asíncrona de payloads y a los schemas como respuestas de controladores; continúa con la guía completa de Validación."
 editUrl: true
 lastUpdated: false
 ---
 
-`Request` separa metadatos síncronos de lectura asíncrona del cuerpo. Sus propiedades `method`, `path`, `scheme`, `url`, `baseUrl`, `headers`, `queryParams`, `cookies`, `ip`, `port` y `state` no requieren `await`. Los parsers sí leen un stream: espera `body()`, `text()`, `json()`, `xml()`, `msgpack()`, `formUrlEncoded()`, `form()`, `payload()` o `data()`.
+Los schemas describen los campos, tipos y reglas que acepta un payload. Una acción de controlador puede recibir directamente un schema validado, en lugar de leer y validar el cuerpo manualmente mediante `Request`.
 
-## Un endpoint de preferencias
+Esta página presenta el flujo HTTP. La [guía de Validación](/es/validation) desarrolla su funcionamiento, el generador CLI, todas las reglas nativas, las reglas personalizadas y el manejo de errores.
+
+Los mismos contratos también sirven en tools MCP, métodos remotos Realtime y otros puntos de entrada. Su [guía de integraciones](/es/validation/integrations) explica cómo se reciben los datos en cada contexto; la inyección del cuerpo que se muestra aquí es específica de HTTP.
+
+## Recibir datos validados
+
+Anota el parámetro con una clase concreta de `Schema`, sin valor predeterminado:
+
+Orionis construye e inyecta ese objeto al resolver la petición. Dentro de la acción puedes utilizar sus campos directamente; no necesitas crear el schema, leer el cuerpo ni ejecutar manualmente el validador para ese parámetro.
 
 ```python
-from orionis.http import Request, response
+from orionis.http.base import BaseController
 from orionis.schemas import Schema
-from orionis.schemas.validator import Schema as Validator
+from orionis.schemas.constraints import MinLength
+from orionis.schemas.fields import Field
 
-class Preferences(Schema):
-    theme: str
-    compact: bool = False
 
-async def save_preferences(request: Request):
-    values = await request.data()
-    preferences = await Validator.validateAsync(values, Preferences)
-    return response.json({"theme": preferences.theme, "compact": preferences.compact})
+class ProfileInput(Schema):
+    name: Field[str, MinLength(2)]
+
+
+class ProfileOutput(Schema):
+    name: str
+
+
+class ProfileController(BaseController):
+    async def __call__(self, payload: ProfileInput) -> ProfileOutput:
+        return ProfileOutput(name=payload.name)
 ```
 
-Registra este handler en una ruta con la política de autenticación apropiada. El ejemplo enseña decodificación y validación explícita de un schema; añade reglas de negocio y persistencia según [schemas](/es/validation). El kernel también soporta parámetros schema tipados mediante sus planes de inyección; no necesitas duplicar lectura manual cuando eliges ese flujo.
+Al atender la ruta, el contenedor obtiene `await request.data()` y ejecuta `await Validator.validate(datos, ProfileInput)`, donde `Validator` es el alias de `Schema` de `orionis.schemas.validator`. Sólo después de validar entrega `payload` a la acción.
 
-Para una demostración local de validación, coloca las declaraciones anteriores en `routes/api.py` y añade:
+Un cuerpo JSON como `{"name": "Ada"}` permite devolver `{"name": "Ada"}`. Si el nombre no cumple `MinLength(2)`, la acción no se ejecuta. La [guía de integración con controladores](/es/validation/controllers-and-http) muestra los archivos, el registro de rutas y las respuestas completas.
 
-```python
-from orionis.support.facades import Route
+La inyección valida el **cuerpo**: no mezcla automáticamente query string, parámetros de ruta ni cabeceras. Puedes recibir también `Request` cuando necesitas esos datos o controlar la lectura. La conversión es estricta; un texto numérico no se convierte automáticamente a `int`.
 
-Route.post("/preferences", save_preferences)
-```
+## Devolver un schema
 
-Envía JSON con `Content-Type: application/json`, por ejemplo `{"theme": "dark"}`. La respuesta será `{"theme": "dark", "compact": false}`. Esta ruta lee y valida valores; no guarda preferencias. Antes de persistir preferencias por usuario, exige autenticación mediante token y autoriza la cuenta afectada.
+El ejemplo devuelve una instancia de `ProfileOutput`; el kernel la serializa como JSON con estado `200`. La anotación `-> ProfileOutput` describe el retorno, pero **no valida ni convierte automáticamente la salida**. Si necesitas comprobarla, ejecuta explícitamente `await Validator.validate(..., ProfileOutput)` antes de devolverla.
 
-## Elegir el parser
+Con el manejo predeterminado, los errores de validación producen JSON `422` en rutas API. En WEB, producen JSON `422` para solicitudes que esperan JSON o son AJAX, y una redirección `302` con errores de sesión para la navegación habitual. Consulta los [detalles de entrada, salida y errores HTTP](/es/validation/controllers-and-http).
 
-`json()` preserva cualquier valor JSON válido, incluidas listas y escalares. `payload()` selecciona el parser por `Content-Type` y mantiene la forma del resultado. `data()` ofrece un diccionario normalizado para formularios y payloads de aplicación; no lo utilices si necesitas preservar una lista JSON superior. Los helpers específicos rechazan un MIME incompatible con `UnsupportedMediaTypeException`.
+## Guía completa de Validación
 
-`headers` permite consultas sin distinguir mayúsculas y `getAll()` para valores repetidos. `queryParams.get()` y `.getAll()` distinguen acceso a un valor y a todos. Las cookies y parámetros de URL siguen siendo entrada no confiable: una cabecera `Authorization` o un `bearerToken` presente no demuestra autenticación. Utiliza el contexto de [Auth](/es/security/authentication).
+- [Funcionamiento y arquitectura](/es/validation): schemas, restricciones, reglas y ejecución asíncrona.
+- [Declaración y generador CLI](/es/validation/declaring-schemas): `make:http-schema`, campos, valores predeterminados y metadatos.
+- [Integraciones y puntos de entrada](/es/validation/integrations): HTTP, MCP, Realtime, WebSockets y servicios.
+- [Todas las restricciones y reglas nativas](/es/validation/constraints-and-reference): firmas y ejemplos de código para cada una.
+- [Reglas personalizadas](/es/validation/application-rules): contrato y comprobaciones propias, incluidas operaciones con I/O asíncrono.
+- [Errores de validación](/es/validation/validation-and-errors): mensajes y fallos por campo.
+- [Controladores y respuestas](/es/validation/controllers-and-http): ejemplo completo de inyección, validación de salida y errores API/WEB.
 
-## Un único consumidor del cuerpo
+Para las APIs HTTP complementarias, consulta [controladores](/es/http/request-lifecycle), [Request y payloads](/es/http/forms-and-uploads) y [respuestas](/es/http/responses).
 
-`stream()` entrega bytes de forma incremental. El cuerpo puede releerse solo si quedó completamente retenido dentro del límite de buffer. No combines streaming de archivos grandes con `json()` posterior ni hagas dos consumidores concurrentes sobre la misma petición. Los parsers cachean sus resultados cuando procede, pero esa caché no convierte un stream consumido sin buffer en un recurso reproducible.
-
-`HTTP_MAX_BODY_SIZE` limita el total, `HTTP_MAX_BUFFER_SIZE` la memoria de relectura y `HTTP_MAX_CONCURRENT_REQUESTS` las peticiones activas por worker. Los valores predeterminados del bootstrap son 16 MiB, 2 MiB y 128. El límite se aplica también mientras llegan los chunks; un `Content-Length` pequeño no permite superarlo. Framing duplicado o contradictorio se rechaza antes de ejecutar el handler.
-
-## Negociación y errores
-
-`wantsJson()`, `wantsHtml()`, `wantsXml()`, `accepts(mime)` e `isAjax()` ayudan a elegir representación. No validan permisos. Los fallos schema de rutas API/JSON se presentan como errores estructurados; los formularios web pueden redirigir con errores e input filtrado. Los helpers de validación comprueban que el destino de retorno sea seguro para evitar una redirección controlada por entrada ajena.
-
-Para depurar una lectura fallida revisa `Content-Type`, tamaño, consumo previo y formato antes de relajar límites. No registres cuerpos completos con credenciales.
-
-
-## Formatos y parsers propios
-
-`data()` exige un mapping superior para JSON/MessagePack y colapsa claves de formulario a valor único o lista según repetición. Su dispatch acepta los MIME exactos `application/json`, `application/msgpack`, `application/x-www-form-urlencoded` y `multipart/form-data`; a diferencia de `json()`, no reconoce automáticamente todo subtipo `+json`. `payload()` devuelve bytes si no hay parser registrado. XML usa defusedxml para rechazar entidades internas/externas.
-
-Puedes crear un registro para construir Requests de infraestructura sin modificar el singleton predeterminado:
-
-```python
-from orionis.http.payload.media_types import DEFAULT_MEDIA_TYPES
-
-registry = DEFAULT_MEDIA_TYPES.extend({"application/vnd.example.label": lambda raw: raw.decode("utf-8")})
-parser = registry.get("application/vnd.example.label")
-assert parser is not None and parser(b"ready") == "ready"
-assert DEFAULT_MEDIA_TYPES.get("application/vnd.example.label") is None
-```
-
-Pasa `registry=` al constructor de Request cuando controles esa integración. `register` modifica el registro existente y `extend` crea uno nuevo. No modifica el dispatch de `data()`. El constructor nativo del kernel utiliza el registro predeterminado; esta API no registra por sí sola un provider de parser global.
-
-El límite de buffer también acota la materialización de `body()`, JSON y parsers similares. Un cuerpo permitido por el límite total de 16 MiB puede superar el buffer de 2 MiB y no admitir lectura completa con esos helpers; usa streaming o ajusta ambos presupuestos deliberadamente.
+En servicios o handlers WebSocket simples, utiliza validación explícita con los datos ya leídos. MCP y Realtime incorporan sus propios mecanismos de validación e inyección; consulta los [ejemplos de cada integración](/es/validation/integrations).

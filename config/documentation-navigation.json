@@ -49,7 +49,8 @@
         "foundation-overview",
         "foundation-installation",
         "foundation-getting-started",
-        "foundation-architecture-and-lifecycle"
+        "foundation-architecture-and-lifecycle",
+        "http-overview"
       ]
     },
     {
@@ -61,14 +62,13 @@
         "es": "HTTP y APIs"
       },
       "pageIds": [
-        "http-overview",
         "http-routing",
+        "http-middleware-and-security",
         "http-request-lifecycle",
         "http-requests-and-validation",
         "http-forms-and-uploads",
         "http-responses",
-        "http-middleware-and-security",
-        "http-default-responses"
+        "failure-overview"
       ]
     },
     {
@@ -158,9 +158,11 @@
       "pageIds": [
         "schemas-overview",
         "schemas-declaring-schemas",
-        "schemas-validation-and-errors",
+        "schemas-integrations",
+        "schemas-constraints-and-reference",
         "schemas-application-rules",
-        "schemas-constraints-and-reference"
+        "schemas-validation-and-errors",
+        "schemas-controllers-and-http"
       ]
     },
     {
@@ -298,10 +300,10 @@
       },
       "pageIds": [
         "foundation-deployment-and-reference",
+        "http-default-responses",
         "logging-overview",
         "logging-writing-logs",
         "logging-rotation-and-lifecycle",
-        "failure-overview",
         "failure-handling-exceptions",
         "failure-policies-and-reference"
       ]

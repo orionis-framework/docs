@@ -194,7 +194,7 @@ if (process.argv.includes('--built')) {
     check(!data.sidebarPersistence, `Old expanded sidebar state must not override current-route defaults: ${slug}`);
     check(data.apiLink && supplementalPages.every((resource) => data.links.includes(resource.slug[locale])), `Permanent API/contribution links missing from rendered navigation: ${slug}`);
     if (page.id === 'foundation-overview') {
-      const capabilityIds = ['http-overview', 'realtime-overview', 'mcp-overview', 'orm-overview', 'auth-overview', 'queues-overview', 'storage-overview', 'view-overview'];
+      const capabilityIds = ['http-routing', 'realtime-overview', 'mcp-overview', 'orm-overview', 'auth-overview', 'queues-overview', 'storage-overview', 'view-overview'];
       const capabilitySlugs = capabilityIds.map((id) => sitePages.find((entry) => entry.id === id).slug[locale]);
       check(data.capabilities.length === capabilitySlugs.length && new Set(data.capabilities).size === capabilitySlugs.length && capabilitySlugs.every((href) => data.capabilities.includes(href)), `Landing capability cards must expose all eight guides in the current locale: ${slug}`);
     } else check(data.capabilities.length === 0, `Landing capability cards appear on an unrelated chapter: ${slug}`);

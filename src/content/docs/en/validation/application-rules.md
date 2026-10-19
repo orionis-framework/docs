@@ -1,79 +1,208 @@
 ---
 title: "Application rules and validation with I/O"
-description: "Constraints describe structural bounds compiled at class declaration. A Rule checks an application condition after type conversion. Combine them using Field[T, ...]; Field…"
+description: "Create custom Rule subclasses and run local or I/O checks inside the asynchronous validation pipeline."
 editUrl: true
 lastUpdated: false
 ---
 
-Constraints describe structural bounds compiled at class declaration. A `Rule` checks an application condition after type conversion. Combine them using `Field[T, ...]`; `Field` aliases `typing.Annotated`, not a function accepting `default=`.
+An application rule checks a condition on a value already converted to its declared type. Add it to a field's metadata using `Field[T, ...]`, alongside structural constraints. For checks included with Orionis, see the [complete rule and constraint reference](/en/validation/constraints-and-reference).
 
-## Choose a bundled rule
+Declare the schema as an HTTP action parameter: the container validates the request body and awaits its rules before injecting the instance. The action runs only when validation succeeds. The same pipeline combines structural constraints, local rules, and asynchronous I/O rules. Schemas do not depend on controllers: reuse their rules in [MCP, Realtime, and other entry points](/en/validation/integrations).
 
-| Need | Rules and relevant parameters |
-|---|---|
-| Text | `Alpha(ascii_only=False)`, `Ascii`, `Lowercase`, `Uppercase`, `Encoding(encoding="utf-8")`. |
-| Prefixes and suffixes | `StartsWith(*prefixes)`, `EndsWith(*suffixes)`, `DoesntStartWith(*prefixes)`, `DoesntEndWith(*suffixes)`. |
-| Formats | `Email`, `Json`, `IpAddress(version=4)`, `MacAddress`, `Uuid(version=None)`, `Ulid`. Use `IpAddress(version=None)` to permit IPv4 or IPv6. |
-| Size | `Between(minimum, maximum)`, `Size(size)`, `MaxDigits(maximum)`, `DecimalPlaces(minimum, maximum=None)`, `Integer`. |
-| Dates | `DateFormat(*formats)`, `After(reference=None)`, `AfterOrEqual`, `Before`, `BeforeOrEqual`. Temporal comparisons share normalization; check the date type declared by your schema. |
-| Related fields | `ConfirmPassword(other_field="password")`, `GreaterThanOrEqualField(other_field)`, `LessThanOrEqualField(other_field)`. Put `ConfirmPassword` on the confirmation. |
-| Values and secrets | `Accepted`, `Different(*values)`, `StrongPassword`. `Different` compares configured values, not another field. |
-| Files | `File`, `Image`, `MimeTypes(*mime_types)`, `Dimensions(...)`. They require a compatible file object; a client-provided path is not an upload. |
-| External services | `ActiveUrl`, `Unique(table, column, *, ignore=None, ignore_column="id", connection=None)`. |
+## Custom rule contract
 
-All accept the keyword option `message=`. `Between` and `Size` measure numeric magnitude, text/collection length, and upload size in kilobytes. `Dimensions` accepts `width`, `height`, `min_width`, `max_width`, `min_height`, `max_height`, `ratio`, `min_ratio`, and `max_ratio`; ratios may be numbers or strings such as `"3/2"`. Image inspection reads headers; it does not convert or sanitize a file.
+Import `Rule` from `orionis.schemas.rule` and subclass it. The executor recognizes `Rule` instances; implementing only the `IRule` contract is not sufficient to attach a rule to a schema.
 
-`StrongPassword` requires at least eight characters, an ASCII uppercase letter, an ASCII lowercase letter, and a digit. It does not require a symbol or check breached passwords. Validation does not replace [hashing](/en/security/hashing).
+| Component | Responsibility |
+| --- | --- |
+| `async def enforce(field, value, instance) -> bool` | Single check method for both local conditions and I/O: returns `True` for a valid value or `False` to report an error. |
+| `field: str` | Field path, such as `address.code`, `contacts[0].email`, or `contacts['primary'].email`. |
+| `value: object` | Contains the current field's converted value. |
+| `instance: object` | Provides access to other available fields on the same object. |
+| `__code__` | Failure identifier. Defaults to the lowercase class name when omitted. |
+| `__message__` | Default message for an invalid value. Define a useful description for the error recipient. |
+| `Rule(message=...)` | Overrides the default message for this declaration. Pass the argument by keyword. |
 
-## Combine registration and confirmation
+You do not need to override `async validate()`: the inherited implementation calls `await self.enforce(field, value, instance)`. When the check returns `False`, it constructs a `ValidationFailure` containing the field, code, and message; it returns `None` for a valid value.
 
-The complete example below validates registration with explicit acceptance and confirmation. Password policy applies to the original value, and comparison applies to its confirmation. This example neither persists passwords nor authenticates users.
+Declare `enforce()` with `async def` even when its calculation contains no `await`. A synchronous `def enforce(...)` override raises `TypeError` when the class is defined. There is no alternate `enforceAsync()` method or automatic adaptation of synchronous rules; subclasses may also inherit an existing asynchronous implementation.
+
+A rule reports an invalid value by returning `False`. Exceptions raised by its logic propagate; they are not automatically converted into validation failures.
+
+## Complete example: even quantities
+
+This rule combines with a numeric constraint. Type and bound checks happen during conversion; the parity condition is awaited afterwards. Its `async def enforce()` needs no internal `await` because it only calculates a local condition.
 
 ```python
+from orionis.http.base import BaseController
 from orionis.schemas import Schema
+from orionis.schemas.constraints import GreaterThanOrEqual
 from orionis.schemas.fields import Field
-from orionis.schemas.rules import Accepted, ConfirmPassword, Email, StrongPassword
-from orionis.schemas.validator import Schema as Validator
-
-class Registration(Schema):
-    email: Field[str, Email()]
-    password: Field[str, StrongPassword()]
-    password_confirmation: Field[str, ConfirmPassword()]
-    accepted_terms: Field[bool, Accepted()]
-
-registration = Validator.validate({
-    "email": "ada@example.com",
-    "password": "Example42",
-    "password_confirmation": "Example42",
-    "accepted_terms": True,
-}, Registration)
-assert registration.email == "ada@example.com"
-```
-
-The validated instance contains the original password, not a hash. Hash it before persistence and never return the password fields to clients. The input in this demonstration satisfies email, password, confirmation and acceptance rules.
-
-## Validation that queries other services
-
-`ActiveUrl` checks hostname DNS resolution, not whether an HTTP resource exists or is safe to download. Its synchronous variant blocks; its asynchronous variant uses loop-based resolution. In requests, use `validateAsync()` and a resource-access policy independent of format validation.
-
-`Unique` needs a ready Database service. Its async variant preserves the active connection/transaction. Its sync variant may bridge to a loop and use an isolated connection when a loop is already running: do not assume visibility into another connection's uncommitted changes. Validation does not guarantee uniqueness against races; also define a database uniqueness constraint and handle persistence conflicts. Never derive `table`, `column`, `ignore_column`, or the connection directly from untrusted input.
-
-## Write a custom rule
-
-Inherit from `Rule`, set `__code__` and `__message__`, and implement `enforce(field, value, instance) -> bool`. Returning false creates a failure; `instance` allows sibling-field checks. The base `enforceAsync` uses `enforce`, so a short CPU rule works on both paths. For native I/O, override `async enforceAsync(...)` and await the service; do not hide blocking I/O inside `enforce` in an async handler. Keep rules free from mutable per-request state: schemas and their plans are reused.
-
-```python
 from orionis.schemas.rule import Rule
 
-class Even(Rule):
-    __code__ = "even"
-    __message__ = "Value must be even."
 
-    def enforce(self, field: str, value: object, instance: object) -> bool:
+class Even(Rule):
+    __slots__ = ()
+
+    __code__ = "even"
+    __message__ = "Quantity must be even."
+
+    async def enforce(
+        self,
+        field: str,
+        value: object,
+        instance: object,
+    ) -> bool:
         return isinstance(value, int) and value % 2 == 0
+
+
+class Batch(Schema):
+    quantity: Field[int, GreaterThanOrEqual(1), Even()]
+
+
+class PreviewBatchController(BaseController):
+    async def __call__(self, payload: Batch) -> Batch:
+        return payload
 ```
 
-Combine `Even()` with `Field[int, Even()]`. Invalid options or incompatible constraints fail at schema declaration; fix the declaration instead of converting a programming error into a user failure.
+Save these classes in `app/http/controllers/preview_batch_controller.py` to follow the example. They are shown together for clarity; the rule and schema can live in separate modules. Register the controller in the configured API routes file:
+
+```python
+from app.http.controllers.preview_batch_controller import PreviewBatchController
+from orionis.support.facades import Route
+
+Route.post("/batches/preview", PreviewBatchController)
+```
+
+Send `POST /batches/preview` with `Content-Type: application/json`:
+
+- `{"quantity": 4}`: the controller receives `payload.quantity == 4` and returns the schema as JSON with status `200`.
+- `{"quantity": 3}`: `Even` returns `False`; the controller does not run, and default API handling responds with status `422` and the following body:
+
+```json
+{
+  "message": "Quantity must be even.",
+  "errors": {
+    "quantity": ["Quantity must be even."]
+  }
+}
+```
+
+You do not need to receive `Request` or call the validator manually: the `payload: Batch` annotation triggers request-body validation and injection. This response applies to API routes; see the [API and WEB handling differences](/en/validation/controllers-and-http#http-validation-errors).
+
+`__slots__ = ()` prevents adding an attribute dictionary to this subclass without its own configuration; it does not change the validation condition. If the rule accepts constructor configuration, declare its attributes and call `super().__init__(message=message)` to preserve the code and message.
+
+Another schema can change the text using `Even(message="Use an even quantity.")`. `Field` aliases `typing.Annotated`: rules are metadata, rather than arguments to a field-construction function.
+
+## Rules with asynchronous I/O
+
+Implement the same `async def enforce()` and await the actual asynchronous API. This example queries the resolver through the loop's `getaddrinfo()`; the valid input uses `localhost`, and the invalid input is rejected before querying DNS.
+
+```python
+import asyncio
+import socket
+
+from orionis.http.base import BaseController
+from orionis.schemas import Schema
+from orionis.schemas.fields import Field
+from orionis.schemas.rule import Rule
 
 
-[Index](/en/validation).
+class ResolvableHost(Rule):
+    __slots__ = ()
+
+    __code__ = "resolvable_host"
+    __message__ = "Host must resolve through DNS."
+
+    async def enforce(
+        self,
+        field: str,
+        value: object,
+        instance: object,
+    ) -> bool:
+        if not isinstance(value, str) or not value:
+            return False
+        try:
+            await asyncio.get_running_loop().getaddrinfo(
+                value,
+                None,
+                family=socket.AF_UNSPEC,
+                type=socket.SOCK_STREAM,
+            )
+        except (OSError, UnicodeError):
+            return False
+        return True
+
+
+class Server(Schema):
+    host: Field[str, ResolvableHost()]
+
+
+class CheckServerController(BaseController):
+    async def __call__(self, payload: Server) -> Server:
+        return payload
+```
+
+In `app/http/controllers/check_server_controller.py`, the controller receives `Server` in the same way as `Batch`. Register its API endpoint:
+
+```python
+from app.http.controllers.check_server_controller import CheckServerController
+from orionis.support.facades import Route
+
+Route.post("/servers/check", CheckServerController)
+```
+
+With `Content-Type: application/json`, `POST /servers/check` accepts `{"host": "localhost"}` when the local resolver resolves it; it returns `{"host": "localhost"}` with status `200`. With `{"host": ""}`, the rule rejects the value before querying DNS and the action does not run. The default API response has status `422`:
+
+```json
+{
+  "message": "Host must resolve through DNS.",
+  "errors": {
+    "host": [
+      "Host must resolve through DNS."
+    ]
+  }
+}
+```
+
+`ResolvableHost` uses the same contract as `Even`: `Rule.validate()` awaits its `enforce()`. Orionis already includes `ActiveUrl` to check a URL's hostname; this example demonstrates the contract with a field containing only a hostname.
+
+Declaring `async def` does not make a blocking operation asynchronous. **The pipeline awaits the rule on the current loop without automatically moving its method to a worker thread**. Use asynchronous I/O APIs; explicitly adapt a blocking synchronous API when needed. Brief local conditions, such as parity, are calculated directly.
+
+Fields and rules are processed in order. Each asynchronous check is awaited before starting the next; the validator does not launch every query in parallel.
+
+An unexpected rule exception interrupts that traversal and propagates. Cancellation of a suspended validation also propagates instead of becoming a field failure. Catch only errors that your rule considers invalid input, such as the resolver errors caught in this example.
+
+### Built-in rules using external services
+
+`ActiveUrl` checks hostname DNS resolution for a URL; it does not request the HTTP resource or inspect its content. Inside the pipeline, it uses the loop's resolver.
+
+`Unique` queries the database through the current loop's connection and preserves its transaction. It requires a configured connection and access to the specified table. This check does not replace a database uniqueness constraint against concurrent writes.
+
+Rules that read file contents, such as `Image`, `Dimensions`, and `Encoding`'s file check, await a helper that runs the file's synchronous `read()` in a worker thread. This specifically adapts that read; it does not mean every rule runs in a thread.
+
+See their signatures, parameters, and examples in the [native reference](/en/validation/constraints-and-reference).
+
+## Inspect other fields
+
+After successful whole-object conversion, `instance` is the schema owning the field. If another value fails conversion, the collector still executes rules on valid fields: that traversal provides an object containing successfully converted fields, which may omit missing or invalid fields and their defaults.
+
+For a cross-field rule, use a defensive read such as `getattr(instance, "other_field", None)` and explicitly decide how to handle an unavailable value. Do not rely on `instance` always having a particular class, or on an earlier rule transforming another field.
+
+Rules on a field execute in declaration order and may contribute several errors. The executor does not stop at the first `False`. A rule also receives `None` when the declared type allows it; decide whether to accept that value.
+
+## Reuse and organize rules
+
+Orionis does not require a directory for custom rules. Organize them by responsibility, for example under `app/validation/rules/`, and import each class from the schemas that need it. Creating a rule is independent from [generating a schema](/en/validation/declaring-schemas).
+
+Instances declared as metadata and their plans are reused. Store only stable configuration in a rule; do not retain the request, current value, or results from an earlier validation in shared attributes. Use local variables for invocation-specific data.
+
+The executor awaits rules in direct child schemas and elements nested in lists, dictionaries, tuples, sets, and frozen sets compatible with conversion. It also traverses compatible annotations and unions: an allowed `None` value is skipped as a child. Dictionaries traverse their values; set indices reflect iteration order rather than a stable position. See the [collection and error examples](/en/validation/validation-and-errors#schemas-in-collections).
+
+Cross-field checks on a child receive that child's fields, rather than its parent's fields or another collection element's fields. When one element fails conversion, the collector preserves that failure and continues awaiting rules on fields and elements it could convert.
+
+The [controller and HTTP integration guide](/en/validation/controllers-and-http) explains how the same pipeline is awaited when a schema is declared as an action parameter.
+
+## Use rules outside HTTP
+
+Schemas and rules also work with data received through MCP, Realtime, tasks, or services. The [integration guide](/en/validation/integrations) distinguishes injection available in each context from explicit validation. For the latter, import `Schema as Validator` from `orionis.schemas.validator` and use `await Validator.validate(data, Batch)` inside an asynchronous method. In an action with `payload: Batch`, the container already performs that work; do not repeat it. The [error guide](/en/validation/validation-and-errors) explains when to catch `ValidationException`.

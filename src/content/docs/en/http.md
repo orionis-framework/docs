@@ -15,14 +15,14 @@ Check the existing `app.withRouting(...)` call in `bootstrap/app.py`: it must re
 
 ## Recommended path
 
-1. [Request lifecycle and controllers](/en/http/request-lifecycle): services, scopes and asynchronous execution.
+1. [HTTP controllers](/en/http/request-lifecycle): generation, actions, parameters and route integration.
 2. [Routes, parameters and groups](/en/http/routing): design an API and organize access.
-3. [Input and validation](/en/http/requests-and-validation): read metadata and bodies correctly.
+3. [HTTP validation with schemas](/en/http/requests-and-validation): receive validated controller input and return schemas as JSON.
 4. [Forms and uploads](/en/http/forms-and-uploads): repeated input and temporary resources.
 5. [Responses and cookies](/en/http/responses): JSON, views, redirects and downloads.
 6. [Streaming and SSE](/en/http/streaming-and-sse): progressive delivery and cleanup.
 7. [WebSocket](/en/http/websockets): connections, messages and middleware.
-8. [Middleware and security](/en/http/middleware-and-security): CSRF, CORS, proxies and limits.
+8. [HTTP middleware](/en/http/middleware-and-security): creation, registration and request/response processing.
 9. [Default pages and routes](/en/http/default-responses): health, errors and optional authentication.
 
 Continue with [sessions](/en/http/sessions), [authentication](/en/security/authentication), [schemas](/en/validation), [views](/en/services/views) and [Realtime hubs](/en/asynchronous/realtime).

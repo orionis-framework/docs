@@ -15,14 +15,14 @@ Comprueba la llamada existente `app.withRouting(...)` en `bootstrap/app.py`: deb
 
 ## Recorrido recomendado
 
-1. [Ciclo de petición y controladores](/es/http/request-lifecycle): servicios, scopes y ejecución asíncrona.
+1. [Controladores HTTP](/es/http/request-lifecycle): generación, acciones, parámetros e integración con rutas.
 2. [Rutas, parámetros y grupos](/es/http/routing): diseña una API y organiza acceso.
-3. [Entrada y validación](/es/http/requests-and-validation): lee metadatos y cuerpos correctamente.
+3. [Validación HTTP con schemas](/es/http/requests-and-validation): recibe datos validados en controladores y devuelve schemas como JSON.
 4. [Formularios y archivos](/es/http/forms-and-uploads): entradas repetidas y recursos temporales.
 5. [Respuestas y cookies](/es/http/responses): JSON, vistas, redirecciones y descargas.
 6. [Streaming y SSE](/es/http/streaming-and-sse): entrega progresiva y limpieza.
 7. [WebSocket](/es/http/websockets): conexión, mensajes y middleware.
-8. [Middleware y seguridad](/es/http/middleware-and-security): CSRF, CORS, proxies y límites.
+8. [Middleware HTTP](/es/http/middleware-and-security): creación, registro y procesamiento de peticiones y respuestas.
 9. [Páginas y rutas predeterminadas](/es/http/default-responses): salud, errores y autenticación opcional.
 
 Continúa con [sesiones](/es/http/sessions), [autenticación](/es/security/authentication), [schemas](/es/validation), [vistas](/es/services/views) y [hubs Realtime](/es/asynchronous/realtime).

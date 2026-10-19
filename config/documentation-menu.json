@@ -251,6 +251,10 @@
       "slug": {
         "es": "/es/architecture/exception-handling",
         "en": "/en/architecture/exception-handling"
+      },
+      "label": {
+        "en": "Exceptions",
+        "es": "Excepciones"
       }
     },
     {
@@ -293,8 +297,8 @@
         "en": "HTTP: from routes to responses"
       },
       "label": {
-        "en": "HTTP",
-        "es": "HTTP"
+        "en": "Introduction to HTTP",
+        "es": "Introducción a HTTP"
       },
       "slug": {
         "es": "/es/http",
@@ -305,12 +309,12 @@
       "id": "http-request-lifecycle",
       "kind": "doc",
       "title": {
-        "es": "Ciclo de petición y controladores",
-        "en": "Request lifecycle and controllers"
+        "es": "Controladores HTTP",
+        "en": "HTTP controllers"
       },
       "label": {
-        "en": "Requests and controllers",
-        "es": "Peticiones y controladores"
+        "en": "Controllers",
+        "es": "Controladores"
       },
       "slug": {
         "es": "/es/http/request-lifecycle",
@@ -325,7 +329,7 @@
         "en": "Routes, parameters and groups"
       },
       "label": {
-        "en": "Routing",
+        "en": "Routes",
         "es": "Rutas"
       },
       "slug": {
@@ -337,12 +341,12 @@
       "id": "http-requests-and-validation",
       "kind": "doc",
       "title": {
-        "es": "Leer solicitudes y validar entrada",
-        "en": "Reading requests and validating input"
+        "es": "Validación HTTP con schemas",
+        "en": "HTTP validation with schemas"
       },
       "label": {
-        "en": "Requests and validation",
-        "es": "Peticiones y validación"
+        "en": "Validation",
+        "es": "Validación"
       },
       "slug": {
         "es": "/es/http/requests-and-validation",
@@ -357,8 +361,8 @@
         "en": "Forms and uploaded files"
       },
       "label": {
-        "en": "Forms and uploads",
-        "es": "Formularios y archivos"
+        "en": "Request (payloads)",
+        "es": "Request (payloads)"
       },
       "slug": {
         "es": "/es/http/forms-and-uploads",
@@ -375,6 +379,10 @@
       "slug": {
         "es": "/es/http/responses",
         "en": "/en/http/responses"
+      },
+      "label": {
+        "en": "Responses",
+        "es": "Respuestas"
       }
     },
     {
@@ -413,12 +421,12 @@
       "id": "http-middleware-and-security",
       "kind": "doc",
       "title": {
-        "es": "Middleware y políticas de seguridad",
-        "en": "Middleware and security policies"
+        "es": "Middleware HTTP",
+        "en": "HTTP middleware"
       },
       "label": {
-        "en": "Middleware and security",
-        "es": "Middleware y seguridad"
+        "en": "Middleware",
+        "es": "Middlewares"
       },
       "slug": {
         "es": "/es/http/middleware-and-security",
@@ -670,6 +678,22 @@
       }
     },
     {
+      "id": "schemas-integrations",
+      "kind": "doc",
+      "title": {
+        "es": "Schemas en HTTP, MCP y Realtime",
+        "en": "Schemas across HTTP, MCP, and Realtime"
+      },
+      "label": {
+        "en": "Integrations and entry points",
+        "es": "Integraciones y entradas"
+      },
+      "slug": {
+        "es": "/es/validation/integrations",
+        "en": "/en/validation/integrations"
+      }
+    },
+    {
       "id": "schemas-validation-and-errors",
       "kind": "doc",
       "title": {
@@ -709,12 +733,28 @@
         "en": "Constraints, metadata, and reference"
       },
       "label": {
-        "en": "Constraints and metadata",
-        "es": "Restricciones y metadatos"
+        "en": "Native rules",
+        "es": "Reglas nativas"
       },
       "slug": {
         "es": "/es/validation/constraints-and-reference",
         "en": "/en/validation/constraints-and-reference"
+      }
+    },
+    {
+      "id": "schemas-controllers-and-http",
+      "kind": "doc",
+      "title": {
+        "es": "Validación en controladores y respuestas",
+        "en": "Validation in controllers and responses"
+      },
+      "label": {
+        "en": "Controllers and responses",
+        "es": "Controladores y respuestas"
+      },
+      "slug": {
+        "es": "/es/validation/controllers-and-http",
+        "en": "/en/validation/controllers-and-http"
       }
     },
     {

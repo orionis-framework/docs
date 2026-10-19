@@ -49,7 +49,7 @@ flowchart TD
     I --> J["Cerrar uploads, scope y reserva"]
 ```
 
-Amplía estos contratos en [Peticiones y controladores](/es/http/request-lifecycle), [Middleware y seguridad](/es/http/middleware-and-security) y [Scopes y concurrencia](/es/architecture/service-container/scopes-and-concurrency). Los flujos específicos se explican en [WebSockets](/es/http/websockets), [Streaming y SSE](/es/http/streaming-and-sse) y [MCP](/es/protocols/mcp).
+Amplía estos contratos en [Controladores HTTP](/es/http/request-lifecycle), [Middleware y seguridad](/es/http/middleware-and-security) y [Scopes y concurrencia](/es/architecture/service-container/scopes-and-concurrency). Los flujos específicos se explican en [WebSockets](/es/http/websockets), [Streaming y SSE](/es/http/streaming-and-sse) y [MCP](/es/protocols/mcp).
 
 ## Estructura del proyecto
 

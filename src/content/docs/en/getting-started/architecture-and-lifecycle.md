@@ -49,7 +49,7 @@ flowchart TD
     I --> J["Close uploads, scope, and reservation"]
 ```
 
-Explore these contracts in [Requests and controllers](/en/http/request-lifecycle), [Middleware and security](/en/http/middleware-and-security), and [Scopes and concurrency](/en/architecture/service-container/scopes-and-concurrency). Specialized flows are covered in [WebSockets](/en/http/websockets), [Streaming and SSE](/en/http/streaming-and-sse), and [MCP](/en/protocols/mcp).
+Explore these contracts in [HTTP controllers](/en/http/request-lifecycle), [Middleware and security](/en/http/middleware-and-security), and [Scopes and concurrency](/en/architecture/service-container/scopes-and-concurrency). Specialized flows are covered in [WebSockets](/en/http/websockets), [Streaming and SSE](/en/http/streaming-and-sse), and [MCP](/en/protocols/mcp).
 
 ## Project structure
 
