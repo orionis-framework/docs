@@ -15,14 +15,14 @@ Check the existing `app.withRouting(...)` call in `bootstrap/app.py`: it must re
 
 ## Recommended path
 
-1. [HTTP controllers](/en/http/request-lifecycle): generation, actions, parameters and route integration.
-2. [Routes, parameters and groups](/en/http/routing): design an API and organize access.
-3. [HTTP validation with schemas](/en/http/requests-and-validation): receive validated controller input and return schemas as JSON.
-4. [Forms and uploads](/en/http/forms-and-uploads): repeated input and temporary resources.
-5. [Responses and cookies](/en/http/responses): JSON, views, redirects and downloads.
-6. [Streaming and SSE](/en/http/streaming-and-sse): progressive delivery and cleanup.
-7. [WebSocket](/en/http/websockets): connections, messages and middleware.
-8. [HTTP middleware](/en/http/middleware-and-security): creation, registration and request/response processing.
-9. [Default pages and routes](/en/http/default-responses): health, errors and optional authentication.
+1. [Routes](/en/http/routing): methods, parameters, groups and endpoint registration.
+2. [Middlewares](/en/http/middleware-and-security): creation, registration and request/response processing.
+3. [Controllers](/en/http/request-lifecycle): generation, actions, parameters and route integration.
+4. [Validation](/en/http/requests-and-validation): receive validated controller input and return schemas as JSON.
+5. [Request and HTTP payloads](/en/http/forms-and-uploads): request access, body formats and uploaded files.
+6. [Responses](/en/http/responses): JSON, schemas, views, redirects and downloads.
+7. [HTTP exceptions](/en/http/exceptions): error responses and the diagnostic page.
+
+For other HTTP flows and services, see [streaming and SSE](/en/http/streaming-and-sse), [WebSocket](/en/http/websockets) and [default pages and routes](/en/http/default-responses).
 
 Continue with [sessions](/en/http/sessions), [authentication](/en/security/authentication), [schemas](/en/validation), [views](/en/services/views) and [Realtime hubs](/en/asynchronous/realtime).

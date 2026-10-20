@@ -528,4 +528,4 @@ Agrupa los controladores en `app/http/controllers` por responsabilidad o dominio
 
 Mantén la coordinación HTTP en el controlador y delega la lógica de negocio a servicios. La clase base no realiza operaciones de base de datos ni implementa automáticamente las acciones generadas.
 
-Los [middleware](/es/http/middleware-and-security) se ejecutan antes de la invocación y pueden impedir que ésta ocurra. Si una acción falla, las capas HTTP y el kernel delegan su tratamiento al sistema de [Excepciones](/es/architecture/exception-handling). Para formatos, encabezados, cookies o descargas consulta [Respuestas](/es/http/responses).
+Los [middleware](/es/http/middleware-and-security) se ejecutan antes de la invocación y pueden impedir que ésta ocurra. Si una acción falla, las capas HTTP y el kernel delegan su tratamiento al sistema de [Excepciones](/es/http/exceptions). Para formatos, encabezados, cookies o descargas consulta [Respuestas](/es/http/responses).

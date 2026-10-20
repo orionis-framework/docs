@@ -528,4 +528,4 @@ Group controllers within `app/http/controllers` by responsibility or domain as t
 
 Keep HTTP coordination in controllers and delegate business logic to services. The base class does not perform database operations or automatically implement generated actions.
 
-[Middleware](/en/http/middleware-and-security) execute before invocation and may prevent it. If an action fails, HTTP layers and the kernel delegate handling to the [exception system](/en/architecture/exception-handling). For formats, headers, cookies or downloads, see [Responses](/en/http/responses).
+[Middleware](/en/http/middleware-and-security) execute before invocation and may prevent it. If an action fails, HTTP layers and the kernel delegate handling to the [exception system](/en/http/exceptions). For formats, headers, cookies or downloads, see [Responses](/en/http/responses).

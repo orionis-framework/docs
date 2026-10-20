@@ -42,15 +42,14 @@
       "band": "build",
       "icon": "getting-started",
       "title": {
-        "en": "Fundamentals",
-        "es": "Fundamentos"
+        "en": "Getting started",
+        "es": "Primeros pasos"
       },
       "pageIds": [
         "foundation-overview",
         "foundation-installation",
         "foundation-getting-started",
-        "foundation-architecture-and-lifecycle",
-        "http-overview"
+        "foundation-architecture-and-lifecycle"
       ]
     },
     {
@@ -62,13 +61,14 @@
         "es": "HTTP y APIs"
       },
       "pageIds": [
+        "http-overview",
         "http-routing",
         "http-middleware-and-security",
         "http-request-lifecycle",
         "http-requests-and-validation",
         "http-forms-and-uploads",
         "http-responses",
-        "failure-overview"
+        "http-exceptions"
       ]
     },
     {
@@ -304,6 +304,7 @@
         "logging-overview",
         "logging-writing-logs",
         "logging-rotation-and-lifecycle",
+        "failure-overview",
         "failure-handling-exceptions",
         "failure-policies-and-reference"
       ]

@@ -305,4 +305,4 @@ If B responds without continuing, C and the controller are skipped, but A receiv
 - Call `call_next()` without arguments and await it. Each continuation can only be consumed once; repeating it raises `RuntimeError`, even if the first attempt raised an exception.
 - Share custom data through `request.state`. The rest of the chain receives that same `Request` object; response methods such as `setHeader()` modify the response you will return.
 - Instances may serve several requests. Do not store the request, user, response or timing start in `self`.
-- If a subsequent layer raises an exception, ordinary statements after `await call_next()` do not run. Use `try/finally` to release resources owned by the middleware; HTTP layers and the kernel delegate failure handling to the [exception system](/en/architecture/exception-handling).
+- If a subsequent layer raises an exception, ordinary statements after `await call_next()` do not run. Use `try/finally` to release resources owned by the middleware; HTTP layers and the kernel delegate failure handling to the [exception system](/en/http/exceptions).

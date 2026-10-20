@@ -306,7 +306,7 @@ Hay **un solo fallback para todo el router**, compartido por los archivos API y 
 
 El registro devuelve `None`, por lo que no admite encadenar `.name()`, `.middleware()` ni opciones de grupo. Su manejador debe devolver una `Response` y establecer expresamente el estado deseado: Orionis no fuerza `404` ni convierte aquí un diccionario en JSON.
 
-El fallback no es un manejador general de excepciones y no resuelve un método incorrecto: un path existente con otro verbo produce `405`. Al no haber una ruta coincidente, no se construye el `Request` de esa ruta ni se ejecutan sus capas de contexto y middleware; por ello, el ejemplo no solicita `Request` como dependencia. Consulta [Excepciones](/es/architecture/exception-handling) para otros errores.
+El fallback no es un manejador general de excepciones y no resuelve un método incorrecto: un path existente con otro verbo produce `405`. Al no haber una ruta coincidente, no se construye el `Request` de esa ruta ni se ejecutan sus capas de contexto y middleware; por ello, el ejemplo no solicita `Request` como dependencia. Consulta [Excepciones](/es/http/exceptions) para otros errores.
 
 ## Consultar las rutas registradas
 

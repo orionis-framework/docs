@@ -13,8 +13,8 @@
         "en": "Orionis foundations"
       },
       "label": {
-        "en": "Foundations",
-        "es": "Fundamentos"
+        "en": "Introduction",
+        "es": "Introducción"
       },
       "slug": {
         "es": "/es/getting-started",
@@ -253,8 +253,8 @@
         "en": "/en/architecture/exception-handling"
       },
       "label": {
-        "en": "Exceptions",
-        "es": "Excepciones"
+        "en": "General exception handling",
+        "es": "Gestión general de excepciones"
       }
     },
     {
@@ -357,8 +357,8 @@
       "id": "http-forms-and-uploads",
       "kind": "doc",
       "title": {
-        "es": "Formularios y archivos subidos",
-        "en": "Forms and uploaded files"
+        "es": "Request y payloads HTTP",
+        "en": "Request and HTTP payloads"
       },
       "label": {
         "en": "Request (payloads)",
@@ -383,6 +383,22 @@
       "label": {
         "en": "Responses",
         "es": "Respuestas"
+      }
+    },
+    {
+      "id": "http-exceptions",
+      "kind": "doc",
+      "title": {
+        "es": "Excepciones HTTP y página de diagnóstico",
+        "en": "HTTP exceptions and the diagnostic page"
+      },
+      "label": {
+        "es": "Excepciones",
+        "en": "Exceptions"
+      },
+      "slug": {
+        "es": "/es/http/exceptions",
+        "en": "/en/http/exceptions"
       }
     },
     {

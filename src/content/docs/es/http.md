@@ -15,14 +15,14 @@ Comprueba la llamada existente `app.withRouting(...)` en `bootstrap/app.py`: deb
 
 ## Recorrido recomendado
 
-1. [Controladores HTTP](/es/http/request-lifecycle): generación, acciones, parámetros e integración con rutas.
-2. [Rutas, parámetros y grupos](/es/http/routing): diseña una API y organiza acceso.
-3. [Validación HTTP con schemas](/es/http/requests-and-validation): recibe datos validados en controladores y devuelve schemas como JSON.
-4. [Formularios y archivos](/es/http/forms-and-uploads): entradas repetidas y recursos temporales.
-5. [Respuestas y cookies](/es/http/responses): JSON, vistas, redirecciones y descargas.
-6. [Streaming y SSE](/es/http/streaming-and-sse): entrega progresiva y limpieza.
-7. [WebSocket](/es/http/websockets): conexión, mensajes y middleware.
-8. [Middleware HTTP](/es/http/middleware-and-security): creación, registro y procesamiento de peticiones y respuestas.
-9. [Páginas y rutas predeterminadas](/es/http/default-responses): salud, errores y autenticación opcional.
+1. [Rutas](/es/http/routing): métodos, parámetros, grupos y registro de endpoints.
+2. [Middlewares](/es/http/middleware-and-security): creación, registro y procesamiento de peticiones y respuestas.
+3. [Controladores](/es/http/request-lifecycle): generación, acciones, parámetros e integración con rutas.
+4. [Validación](/es/http/requests-and-validation): recibe datos validados en controladores y devuelve schemas como JSON.
+5. [Request y payloads HTTP](/es/http/forms-and-uploads): lectura de la petición, formatos del cuerpo y archivos subidos.
+6. [Respuestas](/es/http/responses): JSON, schemas, vistas, redirecciones y descargas.
+7. [Excepciones HTTP](/es/http/exceptions): respuestas de error y página de diagnóstico.
+
+Para otros flujos y servicios HTTP, consulta [streaming y SSE](/es/http/streaming-and-sse), [WebSocket](/es/http/websockets) y [páginas y rutas predeterminadas](/es/http/default-responses).
 
 Continúa con [sesiones](/es/http/sessions), [autenticación](/es/security/authentication), [schemas](/es/validation), [vistas](/es/services/views) y [hubs Realtime](/es/asynchronous/realtime).

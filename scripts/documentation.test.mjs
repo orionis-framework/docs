@@ -93,7 +93,7 @@ test('regrouping navigation preserves page IDs, page records, and both locale ro
 });
 test('the menu makes realtime, MCP, and application services distinct visible capabilities', () => {
   assert.deepEqual(navigationSections.slice(0, 4).map((section) => section.id), ['getting-started', 'http', 'realtime', 'mcp']);
-  assert.deepEqual(navigationSections[0].pageIds, ['foundation-overview', 'foundation-installation', 'foundation-getting-started', 'foundation-architecture-and-lifecycle', 'http-overview']);
+  assert.deepEqual(navigationSections[0].pageIds, ['foundation-overview', 'foundation-installation', 'foundation-getting-started', 'foundation-architecture-and-lifecycle']);
   const sectionFor = (pageId) => navigationSections.find((section) => section.pageIds.includes(pageId));
   for (const id of ['realtime-overview', 'realtime-protocol-and-streaming', 'http-websockets', 'http-streaming-and-sse']) assert.equal(sectionFor(id).id, 'realtime');
   for (const id of ['mcp-overview', 'mcp-transports-and-configuration', 'test-mcp-testing']) assert.equal(sectionFor(id).id, 'mcp');

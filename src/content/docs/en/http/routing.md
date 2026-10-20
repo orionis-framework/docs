@@ -306,7 +306,7 @@ There is **one fallback for the entire router**, shared by API and WEB files. It
 
 Registration returns `None`, so it does not support chaining `.name()`, `.middleware()` or group options. Its handler must return a `Response` and explicitly set the desired status: Orionis does not force `404` or convert a dictionary to JSON here.
 
-The fallback is not a general exception handler and does not handle an incorrect method: an existing path with a different verb produces `405`. Without a matching route, that route's `Request` is not constructed and its context layers and middleware do not run; this is why the example does not request `Request` as a dependency. See [Exceptions](/en/architecture/exception-handling) for other errors.
+The fallback is not a general exception handler and does not handle an incorrect method: an existing path with a different verb produces `405`. Without a matching route, that route's `Request` is not constructed and its context layers and middleware do not run; this is why the example does not request `Request` as a dependency. See [Exceptions](/en/http/exceptions) for other errors.
 
 ## Listing registered routes
 
