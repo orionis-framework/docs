@@ -51,8 +51,8 @@ export function getTranslations(pageId) {
 export function createSidebar() {
   function link(page, section, index) {
     const titles = page.label || page.title;
-    // Getting started and HTTP topics share one level instead of overview/chapter styling.
-    const itemClass = section.id === 'getting-started' || section.id === 'http' ? 'module-peer' :
+    // These guides share one level instead of overview/chapter styling.
+    const itemClass = ['getting-started', 'http', 'realtime'].includes(section.id) ? 'module-peer' :
       (index === 0 || page.id.endsWith('-overview') ? 'module-overview' : 'module-chapter');
     const attrs = { class: itemClass, 'data-page-id': page.id, 'data-nav-group': section.id };
     const item = {

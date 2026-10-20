@@ -187,7 +187,7 @@ The client sends a Realtime protocol message over that connection:
 
 The binder converts `args` or `kwargs` according to the method parameters and awaits their Schema rules, including schemas inside collections. It does not read `Request.data()`. Service dependencies belong to the container and resolve separately from client data.
 
-A valid result contains `{"type": "completion", "id": "preview-1", "result": {"email": "ada@example.com"}}`. If Email is invalid, the invocation fails with code `validation_error` and message `Invalid arguments`. The HTTP error dictionary is not exposed to the client.
+A valid result contains `{"type": "completion", "id": "preview-1", "result": {"email": "ada@example.com"}}`. If Email is invalid, the invocation fails with code `validation_error` and message `Invocation failed`. The HTTP error dictionary is not exposed to the client.
 
 A Schema result is serializable through the connection codec, but `-> ContactSchema` does not activate output validation. If you need to check data produced by the method, validate explicitly before returning them.
 

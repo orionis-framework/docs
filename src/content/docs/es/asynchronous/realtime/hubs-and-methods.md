@@ -1,46 +1,317 @@
 ---
-title: "Crear un hub con operaciones tipadas"
-description: "Usa un Hub para agrupar operaciones que comparten audiencia y protocolo. Solo métodos de instancia ordinarios marcados con @remote son invocables. Un método público sin ese…"
+title: "Hubs, rutas y métodos remotos"
+description: "Crea hubs Realtime con rutas WebSocket, argumentos tipados, schemas, inyección de dependencias y un ciclo de vida explícito."
 editUrl: true
 lastUpdated: false
 ---
 
-Usa un Hub para agrupar operaciones que comparten audiencia y protocolo. Solo métodos de instancia ordinarios marcados con `@remote` son invocables. Un método público sin ese decorador permanece fuera de la superficie remota.
+Un **Hub** agrupa operaciones que el navegador puede invocar y eventos que el servidor puede enviar a los clientes. Orionis Realtime utiliza WebSocket como transporte y añade su propio protocolo, correlación de resultados, grupos y streams.
+
+La clase hereda de `Hub`. Solo los métodos de instancia marcados con `@remote` se exponen al cliente; un método público sin el decorador permanece interno.
+
+## Generar un hub con el CLI
+
+Desde la raíz del proyecto, utiliza una de estas alternativas:
+
+```bash
+python -B reactor make:realtime-hub chat
+```
+
+```bash
+orionis make:realtime-hub chat
+```
+
+El único argumento es `name`, obligatorio. Con `chat` y las rutas predeterminadas se crea `app/realtime/hubs/chat_hub.py`, con este contenido exacto:
 
 ```python
 from orionis.realtime import Hub, remote
 
+class ChatHub(Hub):
+    """Group explicitly exposed realtime operations."""
+
+    @remote
+    async def echo(self, message: str) -> str:
+        """
+        Return the message supplied by the client.
+
+        Parameters
+        ----------
+        message : str
+            Validated text supplied by the realtime client.
+
+        Returns
+        -------
+        str
+            Original client message.
+        """
+        return message
+```
+
+`ChatHub` hereda de `Hub`. Su única operación remota es `echo`: recibe un `str` validado y devuelve el mismo texto en una `completion`. La aceptación y el ciclo de conexión corresponden al runtime Realtime.
+
+El generador crea los directorios que falten. Si el archivo ya existe, informa un error y lo conserva; no dispone de `--force` ni otros flags propios. Consulta `python -B reactor make:realtime-hub --help` o `orionis make:realtime-hub --help`. El capítulo de [rutas y ciclo de vida](/es/asynchronous/realtime/routing-and-lifecycle) detalla nombres, subdirectorios y rutas de salida configurables.
+
+Llamar `chat` al componente no genera un chat completo: el stub no añade salas, difusión ni historial. El [chat con salas](/es/asynchronous/realtime/chat) amplía esta clase para implementar esas operaciones.
+
+### Registrar la clase generada
+
+Generar el archivo no publica un endpoint ni inicia conexiones. Añade el registro a `routes/websocket.py`:
+
+```python
+from app.realtime.hubs.chat_hub import ChatHub
+from orionis.support.facades import Route
+
+Route.hub("/realtime/echo", ChatHub).name("realtime.echo")
+```
+
+Se registra la **clase**, sin construir una instancia. La URL `/realtime/echo` permite probar el stub sin utilizar la ruta del chat completo.
+
+Incluye el archivo en la llamada existente `app.withRouting(websocket="routes/websocket.py", ...)` de `bootstrap/app.py`, antes de `app.create()`. Conserva sus demás argumentos. [Rutas y ciclo de vida](/es/asynchronous/realtime/routing-and-lifecycle) explica los archivos, prefijos, parámetros y middleware de conexión.
+
+| Argumento de `Route.hub` | Uso |
+|---|---|
+| `path` | URL WebSocket, con los convertidores habituales del router. |
+| `hub` | Clase que hereda de `Hub`. |
+| `protocol` | Argumento opcional y solo por nombre: `"json"` por defecto o `"msgpack"` para MessagePack binario. |
+
+El protocolo se fija para toda la ruta; no se negocia por mensaje ni equivale al argumento `protocols` del constructor WebSocket del navegador. Orionis prepara los métodos del hub al cargar los handlers del kernel.
+
+Con el servidor iniciado, conecta un cliente a `/realtime/echo`. Después de recibir `ready`, envía:
+
+```json
+{"type":"invoke","id":"echo-1","target":"echo","args":["Hola"]}
+```
+
+El resultado es:
+
+```json
+{"type":"completion","id":"echo-1","result":"Hola"}
+```
+
+El [cliente JavaScript](/es/asynchronous/realtime/protocol-and-streaming) muestra cómo esperar `ready` y correlacionar la respuesta.
+
+### Personalizar un hub: aliases y valores predeterminados
+
+Para reproducir el siguiente ejemplo, genera otro componente:
+
+```bash
+python -B reactor make:realtime-hub math
+```
+
+Su equivalente es `orionis make:realtime-hub math`. Sustituye el contenido generado en `app/realtime/hubs/math_hub.py` por:
+
+```python
+from orionis.realtime import Hub, remote
+
+
 class MathHub(Hub):
+
+    __slots__ = ()
+
     @remote(name="sum")
     async def add(self, first: int, second: int = 2) -> int:
         return first + second
 ```
 
-Guarda la clase en `app/realtime/math_hub.py` (crea el paquete importable si hace falta). Regístrala en `routes/websocket.py`:
+Añade su ruta a `routes/websocket.py`:
 
 ```python
-from app.realtime.math_hub import MathHub
+from app.realtime.hubs.math_hub import MathHub
 from orionis.support.facades import Route
 
-Route.hub("/realtime/math", MathHub)
+Route.hub("/realtime/math", MathHub).name("realtime.math")
 ```
 
-Comprueba que la llamada existente `app.withRouting(...)` de `bootstrap/app.py` incluya `websocket="routes/websocket.py"`, conservando sus demás argumentos de rutas. Inicia la aplicación con soporte WebSocket. El cliente invoca el alias público `sum`, no el nombre Python `add`; con argumentos `[3]`, el segundo argumento predeterminado es `2` y el resultado es `5`. El capítulo siguiente muestra el intercambio completo desde un navegador. `protocol="msgpack"` selecciona MessagePack binario para toda la conexión; el default es JSON texto. La selección no se negocia por cada mensaje.
+Aquí el nombre remoto es `sum` y el nombre Python es `add`. Tras recibir `ready`, el cliente envía:
 
-## Datos y servicios
+```json
+{"type":"invoke","id":"sum-1","target":"sum","args":[3]}
+```
 
-Anota cada argumento remoto. Tipos de datos compatibles con msgspec se convierten desde argumentos del cliente; tipos de servicios se resuelven con el contenedor y no pueden ser suplantados por un valor del payload. Los schemas Orionis anidados ejecutan además sus reglas. Se admiten defaults y parámetros keyword-only.
+La respuesta es `{"type":"completion","id":"sum-1","result":5}`: `second` conserva su valor predeterminado. Los ejemplos posteriores del cliente utilizan este `MathHub`.
 
-Para un servicio de aplicación importable `Calculator`, un método puede declarar `async def add(self, first: int, calculator: Calculator, second: int = 2) -> int`. Registra/resuelve Calculator normalmente en el contenedor. Mantén el import disponible en runtime cuando la reflexión lo requiera; no escondas todas las anotaciones de inyección en `TYPE_CHECKING` sin una estrategia de resolución.
+## Argumentos y valores permitidos
 
-La compilación rechaza nombres privados, aliases duplicados, classmethods/staticmethods, posicionales exclusivos, variádicos y anotaciones ambiguas. Un alias debe ser identificador público Python de hasta 128 caracteres. Un fallo en registro es preferible a exponer una firma cuya propiedad de datos no está clara.
+Anota todos los parámetros remotos. Orionis separa los datos enviados por el cliente de los servicios del contenedor.
 
-## Contexto y ciclo de vida
+Los datos admiten tipos compatibles con `msgspec`: escalares como `str`, `int`, `float` y `bool`; colecciones tipadas; enums; schemas/estructuras; y otros tipos soportados como fechas, `UUID` o `Decimal`. La conversión y validación ocurren antes del método. No se lee un body HTTP para resolver la invocación.
 
-Cada invocación recibe una instancia fresca con `context`, `clients` y `groups`. `context.connection_id` identifica conexión, `.socket` da acceso a WebSocket y `.user` contiene la identidad establecida por el pipeline. No uses atributos de la instancia para conservar estado entre invocaciones. Usa servicios de dominio o el registro adecuado.
+Los valores predeterminados hacen opcional un argumento. Los parámetros después de `*` solo pueden enviarse mediante `kwargs`:
 
-`onConnect()` corre tras registrar conexión y antes de anunciar disponibilidad; puede unirse a grupos o rechazar preparación. `onDisconnect(code, reason)` corre después de cancelar trabajo propio y retirar el registro. Libera recursos de aplicación de forma idempotente. El decorador controla exposición, no permisos; comprueba autorización de operaciones además de proteger handshake cuando corresponda.
+```python
+from orionis.realtime import Hub, remote
 
-## Fallos deliberados
 
-Para una condición de negocio visible al cliente importa `RPCError` desde `orionis.realtime.errors` y lanza `RPCError("conflict", "Operation is no longer available")`. El runtime sanea fallos internos, validación, autorización, timeout y cancelación a códigos estables. No envíes tracebacks o errores del proveedor como mensajes públicos.
+class SearchHub(Hub):
+
+    __slots__ = ()
+
+    @remote
+    async def search(
+        self,
+        term: str,
+        *,
+        limit: int = 10,
+    ) -> dict[str, object]:
+        return {"term": term, "limit": limit}
+```
+
+Con `Route.hub("/realtime/search", SearchHub)`, una llamada válida es:
+
+```json
+{"type":"invoke","id":"search-1","target":"search","args":["Orionis"],"kwargs":{"limit":5}}
+```
+
+No se permite repetir un argumento en `args` y `kwargs`, omitir uno obligatorio ni enviar nombres desconocidos. Los errores de vinculación producen `invalid_arguments`; los tipos o reglas inválidos producen `validation_error`.
+
+## Validación con schemas
+
+Usa schemas para validar un objeto completo, incluidas sus reglas asíncronas. Guarda, por ejemplo, `app/realtime/profile_hub.py`:
+
+```python
+from orionis.realtime import Hub, remote
+from orionis.schemas import Schema
+from orionis.schemas.constraints import MaxLength, MinLength
+from orionis.schemas.fields import Field
+
+
+class ProfileInput(Schema, forbid_unknown_fields=True):
+
+    display_name: Field[str, MinLength(2), MaxLength(40)]
+
+
+class ProfileHub(Hub):
+
+    __slots__ = ()
+
+    @remote
+    async def preview(self, profile: ProfileInput) -> dict[str, str]:
+        return {"display_name": profile.display_name}
+```
+
+Tras registrar `Route.hub("/realtime/profile", ProfileHub)`, el objeto se envía dentro de `args`:
+
+```json
+{"type":"invoke","id":"profile-1","target":"preview","args":[{"display_name":"Ada"}]}
+```
+
+Orionis convierte los datos y ejecuta también las reglas de los schemas anidados. Un fallo termina la invocación con `validation_error`; no genera el JSON HTTP 422 ni la página HTML de excepciones. El mensaje público se sanea y no incluye el detalle de cada campo. Consulta [Validación](/es/validation) para crear reglas propias.
+
+## Inyección de dependencias
+
+Los parámetros anotados con clases de servicios se resuelven desde el contenedor y se excluyen de los argumentos del cliente. También se admite inyección en el constructor del hub.
+
+```python
+from orionis.realtime import Hub, remote
+
+
+class MessageFormatter:
+
+    def format(self, text: str) -> str:
+        return text.strip()
+
+
+class PreviewHub(Hub):
+
+    __slots__ = ()
+
+    @remote
+    async def preview(
+        self,
+        text: str,
+        formatter: MessageFormatter,
+    ) -> str:
+        return formatter.format(text)
+```
+
+Para `Route.hub("/realtime/preview", PreviewHub)`, el cliente solo envía `args: ["  Hola  "]`. No debe proporcionar `formatter`: Orionis construye el servicio. Las interfaces requieren sus bindings habituales.
+
+Mantén las clases de las anotaciones importadas y disponibles al cargar el módulo: Orionis las resuelve durante la compilación. Importarlas exclusivamente dentro de `TYPE_CHECKING` puede impedirlo.
+
+Se rechazan parámetros sin anotación, posicionales exclusivos, `*args`, `**kwargs` y uniones ambiguas entre datos y servicios. Los métodos remotos deben ser métodos de instancia ordinarios, no `staticmethod`, `classmethod` ni propiedades. Nombres y aliases deben ser identificadores Python públicos de hasta 128 caracteres, sin comenzar con `_` ni duplicarse.
+
+## Contexto y parámetros de ruta
+
+| Atributo | Contenido |
+|---|---|
+| `self.context.connection_id` | Identificador generado para esa conexión. Cambia al reconectar. |
+| `self.context.socket` | Objeto `WebSocket` de la conexión. |
+| `self.context.user` | Identidad del contexto de autenticación al iniciar el hub, o `None`. |
+| `self.clients` | Selección de destinatarios para eventos o invocaciones. |
+| `self.groups` | Operaciones `join` y `leave` de la conexión actual. |
+
+Una ruta `Route.hub("/realtime/projects/{project_id:int}", ProjectHub)` permite consultar el parámetro así:
+
+```python
+from orionis.realtime import Hub, remote
+
+
+class ProjectHub(Hub):
+
+    __slots__ = ()
+
+    @remote
+    async def current(self) -> dict[str, int]:
+        project_id = self.context.socket.routeParams()["project_id"]
+        return {"project_id": project_id}
+```
+
+`project_id` ya es `int`. No se inyecta automáticamente como argumento remoto: declarar `current(self, project_id: int)` lo convertiría en un dato de la invocación del cliente.
+
+El handshake WebSocket no aplica automáticamente las capas HTTP de sesión, CSRF o resolución de identidad. Para usuarios autenticados configura middleware WebSocket que resuelva y autorice el acceso. Compartir cookies o usar `@remote` no autentica por sí mismo; los grupos tampoco sustituyen permisos.
+
+## Ciclo de vida e instancias
+
+Orionis crea una instancia para `onConnect()`, una nueva para **cada invocación** y otra para `onDisconnect()`. No guardes estado compartido entre llamadas en atributos del hub. Usa `self.context.socket.state` para datos de la conexión y servicios/almacenamiento para datos persistentes.
+
+```mermaid
+flowchart TD
+    A["Handshake validado y ruta Hub resuelta"] --> B["Registrar conexión en su scope activo"]
+    B --> C["Nueva instancia: onConnect()"]
+    C --> D{"¿La conexión sigue abierta?"}
+    D -- No --> K["Cancelar y liberar trabajo de la conexión"]
+    D -- Sí --> E["Aceptar si hace falta y enviar ready"]
+    E --> F["Leer mensajes del protocolo"]
+    F --> G["invoke: programar tarea independiente"]
+    G --> F
+    G --> H["Tarea: abrir nuevo scope"]
+    H --> P["Convertir argumentos, validar schemas y resolver servicios"]
+    P --> Q["Construir nueva instancia de hub"]
+    Q --> I["Ejecutar método y enviar elementos del stream si existen"]
+    I --> O["Liberar scope y enviar terminación"]
+    F --> J["Desconexión, cierre o fallo"]
+    J --> K
+    K --> L["Retirar conexión y membresías de grupos"]
+    L --> M["Nueva instancia: onDisconnect(code, reason)"]
+    M --> N["Cerrar socket y liberar scope"]
+```
+
+`onConnect()` corre antes de `ready`. Puede incorporar la conexión a grupos o rechazar el handshake mediante `await self.context.socket.reject(403)`. No necesita llamar `accept()`: el runtime lo hace después si sigue pendiente. Los destinatarios de eventos solo incluyen conexiones listas; aquí todavía no puedes esperar un resultado con `self.clients.caller.invoke(...)`.
+
+`onDisconnect(code, reason)` corre después de retirar la conexión del registro y sus grupos. Tiene un límite de cinco segundos; sus fallos se registran sin impedir el intento de cierre. Úsalo para liberar recursos propios de forma idempotente, sin enviar un último evento al cliente desconectado.
+
+Las invocaciones pueden ejecutarse concurrentemente, cada una con su scope y una copia del contexto de autenticación de la conexión. No presupongas que terminan en orden de llegada.
+
+## Respuestas y errores de negocio
+
+Un método devuelve un valor serializable por el protocolo, no una respuesta HTTP como `JSONResponse`. Un schema/estructura compatible, escalar, colección o `None` viaja en `completion`. Un iterable asíncrono produce un stream.
+
+Para un rechazo de negocio:
+
+```python
+from orionis.realtime import Hub, remote
+from orionis.realtime.errors import RPCError
+
+
+class OrderHub(Hub):
+
+    __slots__ = ()
+
+    @remote
+    async def cancel(self, order_id: int) -> dict[str, int]:
+        if order_id == 42:
+            raise RPCError("order_closed", "This order is already closed")
+        return {"cancelled": order_id}
+```
+
+Con `Route.hub("/realtime/orders", OrderHub)`, cancelar `42` devuelve código `order_closed`. El runtime conserva el código y sustituye el texto por `"Invocation failed"`; no transmite automáticamente el mensaje de `RPCError` ni el traceback. El cliente puede traducir los códigos a mensajes propios. Los fallos inesperados producen `internal_error`. Consulta la [referencia del protocolo](/es/asynchronous/realtime/protocol-and-streaming) para los demás códigos.

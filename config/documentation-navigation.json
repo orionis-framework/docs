@@ -76,12 +76,15 @@
       "band": "build",
       "icon": "realtime",
       "title": {
-        "en": "Realtime and WebSockets",
-        "es": "Realtime y WebSockets"
+        "en": "Realtime, WebSocket and SSE",
+        "es": "Realtime, WebSocket y SSE"
       },
       "pageIds": [
         "realtime-overview",
+        "realtime-routing-and-lifecycle",
         "realtime-hubs-and-methods",
+        "realtime-javascript-client",
+        "realtime-chat",
         "realtime-protocol-and-streaming",
         "realtime-groups-and-deployment",
         "http-websockets",

@@ -425,8 +425,8 @@
         "en": "WebSocket connections"
       },
       "label": {
-        "en": "WebSockets",
-        "es": "WebSockets"
+        "en": "WebSocket",
+        "es": "WebSocket"
       },
       "slug": {
         "es": "/es/http/websockets",
@@ -1413,12 +1413,12 @@
       "id": "realtime-overview",
       "kind": "doc",
       "title": {
-        "es": "Realtime: hubs sobre WebSocket",
-        "en": "Realtime: hubs over WebSocket"
+        "es": "Realtime, WebSocket y SSE",
+        "en": "Realtime, WebSocket and SSE"
       },
       "label": {
-        "en": "Realtime hubs",
-        "es": "Realtime y hubs"
+        "en": "Introduction",
+        "es": "Introducción"
       },
       "slug": {
         "es": "/es/asynchronous/realtime",
@@ -1426,15 +1426,31 @@
       }
     },
     {
+      "id": "realtime-routing-and-lifecycle",
+      "kind": "doc",
+      "title": {
+        "es": "Rutas y ciclo de vida de conexiones",
+        "en": "Routing and connection lifecycle"
+      },
+      "label": {
+        "es": "Rutas y ciclo de vida",
+        "en": "Routes and lifecycle"
+      },
+      "slug": {
+        "es": "/es/asynchronous/realtime/routing-and-lifecycle",
+        "en": "/en/asynchronous/realtime/routing-and-lifecycle"
+      }
+    },
+    {
       "id": "realtime-hubs-and-methods",
       "kind": "doc",
       "title": {
-        "es": "Crear un hub con operaciones tipadas",
-        "en": "Building a hub with typed operations"
+        "es": "Hubs, rutas y métodos remotos",
+        "en": "Hubs, routes, and remote methods"
       },
       "label": {
-        "en": "Hubs and typed RPC",
-        "es": "Hubs y RPC tipado"
+        "en": "Hubs and remote methods",
+        "es": "Hubs y métodos remotos"
       },
       "slug": {
         "es": "/es/asynchronous/realtime/hubs-and-methods",
@@ -1442,15 +1458,47 @@
       }
     },
     {
+      "id": "realtime-chat",
+      "kind": "doc",
+      "title": {
+        "es": "Chat con salas en Realtime",
+        "en": "Realtime chat with rooms"
+      },
+      "label": {
+        "es": "Chat con salas",
+        "en": "Chat with rooms"
+      },
+      "slug": {
+        "es": "/es/asynchronous/realtime/chat",
+        "en": "/en/asynchronous/realtime/chat"
+      }
+    },
+    {
+      "id": "realtime-javascript-client",
+      "kind": "doc",
+      "title": {
+        "es": "Cliente JavaScript con npm",
+        "en": "JavaScript client with npm"
+      },
+      "label": {
+        "es": "Cliente JavaScript",
+        "en": "JavaScript client"
+      },
+      "slug": {
+        "es": "/es/asynchronous/realtime/javascript-client",
+        "en": "/en/asynchronous/realtime/javascript-client"
+      }
+    },
+    {
       "id": "realtime-protocol-and-streaming",
       "kind": "doc",
       "title": {
-        "es": "Protocolo, streams y resultados bidireccionales",
-        "en": "Protocol, streams and bidirectional results"
+        "es": "Cliente JavaScript, protocolo y streams",
+        "en": "JavaScript client, protocol, and streams"
       },
       "label": {
-        "en": "Realtime protocol and streams",
-        "es": "Protocolo realtime y streams"
+        "en": "Protocol and streams",
+        "es": "Protocolo y streams"
       },
       "slug": {
         "es": "/es/asynchronous/realtime/protocol-and-streaming",
@@ -1461,8 +1509,12 @@
       "id": "realtime-groups-and-deployment",
       "kind": "doc",
       "title": {
-        "es": "Grupos, broadcasts y despliegue",
-        "en": "Groups, broadcasts and deployment"
+        "es": "Grupos, difusión y despliegue",
+        "en": "Groups, broadcasts, and deployment"
+      },
+      "label": {
+        "es": "Grupos y despliegue",
+        "en": "Groups and deployment"
       },
       "slug": {
         "es": "/es/asynchronous/realtime/groups-and-deployment",

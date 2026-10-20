@@ -1,66 +1,408 @@
 ---
 title: "Streaming and server-sent events"
-description: "Streaming avoids assembling an entire body in memory and delivers results as they become available. Use it for exports or progress. It does not remove data-production costs,…"
+description: "Publish SSE events and chunked responses with routes, controllers, JavaScript clients, reconnection, and resource cleanup."
 editUrl: true
 lastUpdated: false
 ---
 
-Streaming avoids assembling an entire body in memory and delivers results as they become available. Use it for exports or progress. It does not remove data-production costs, connection capacity requirements or upstream limits.
+**Server-Sent Events (SSE)** keeps an HTTP response open to send text events from Orionis to the browser. Use it for job progress, notifications, and dashboards. The client opens the connection with `EventSource`; sending data to the server uses another HTTP request.
 
-## Delivering bytes progressively
+`StreamingResponse` delivers bytes progressively, such as a CSV. `EventStreamResponse` adds SSE formatting and connection management. For bidirectional communication over one connection, see [WebSocket](/en/http/websockets) or [Realtime Hubs](/en/asynchronous/realtime). [Realtime streaming](/en/asynchronous/realtime/protocol-and-streaming) uses the Hub protocol rather than SSE.
 
-Place this local demonstration in `routes/api.py`. `GET /exports/users` returns a CSV body containing the header `id,name` and the row `1,Ada`:
+## Routes and preparation
+
+SSE uses an ordinary HTTP `GET` route. It does not require `Route.websocket()` or `Route.hub()`. Import `Route` from `orionis.support.facades`.
+
+These examples use `routes/api.py`. Confirm that file appears in the existing `bootstrap/app.py` call, before `app.create()`:
 
 ```python
-from orionis.http import response
+app.withRouting(
+    ai="routes/ai.py",
+    api="routes/api.py",
+    console="routes/console.py",
+    web="routes/web.py",
+    websocket="routes/websocket.py",
+    health="/up",
+)
+```
+
+Keep the other arguments your application uses. The API context selects the HTTP flow without WEB sessions; it does not add an `/api` prefix. Global, context, and route [HTTP middleware](/en/http/middleware-and-security) apply as with other HTTP routes. A WEB route can also return SSE if you need its session context.
+
+`{report_id:int}` converts the segment to `int` and passes it to the controller by name. You can also use `str`, `slug`, and `uuid`; see [HTTP routes](/en/http/routing). The [routes and lifecycles](/en/asynchronous/realtime/routing-and-lifecycle) guide compares this registration with WebSocket and Realtime.
+
+## Complete example: report progress
+
+This demonstration generates four states separated by an asynchronous wait. It lets you check events and reconnection without adding queues. In a real application, the producer should read the existing job's state; opening or reconnecting the stream must not start that job again.
+
+### Controller and producer
+
+Create `app/http/controllers/report_progress_controller.py`:
+
+```python
+import asyncio
+import json
+from collections.abc import AsyncIterator
+
+from orionis.http import EventStreamResponse, JSONResponse, Request, ServerSentEvent, response
+from orionis.http.base import BaseController
+
+
+class ReportProgressController(BaseController):
+
+    async def events(
+        self,
+        request: Request,
+        report_id: int,
+    ) -> EventStreamResponse | JSONResponse:
+        cursor = request.headers.get("last-event-id", "0")
+
+        # Validate before returning the response, while its status can change.
+        if (
+            not cursor.isascii()
+            or not cursor.isdecimal()
+            or len(cursor) > 1
+            or int(cursor) > 4
+        ):
+            return response.json(
+                {"message": "Last-Event-ID must be an integer from 0 to 4."},
+                status_code=400,
+            )
+
+        last_step = int(cursor)
+
+        async def progress() -> AsyncIterator[ServerSentEvent]:
+            # This controls browser reconnection, not server-side retries.
+            yield ServerSentEvent(retry=1500)
+
+            for step in range(last_step + 1, 5):
+                await asyncio.sleep(0.5)
+                yield ServerSentEvent(
+                    event="progress",
+                    id=str(step),
+                    data=json.dumps({
+                        "report_id": report_id,
+                        "percent": step * 25,
+                    }),
+                )
+
+            yield ServerSentEvent(
+                event="done",
+                data=json.dumps({"report_id": report_id, "percent": 100}),
+            )
+
+        return response.eventStream(progress())
+```
+
+`Request` is injected from the HTTP scope, while `report_id` comes from the route. `progress()` returns an asynchronous generator: calling it does not consume events. The adapter requests them during delivery. Do not use `asyncio.run()` inside the controller.
+
+Validate before returning the response: checks inside the generator can fail after headers have been sent. Identifiers `1…4` belong to this example; they are not an Orionis restriction.
+
+### Registering the endpoints
+
+Add to `routes/api.py`:
+
+```python
+from app.http.controllers.report_progress_controller import ReportProgressController
 from orionis.support.facades import Route
 
-async def export_rows():
-    yield b"id,name\n"
-    yield b"1,Ada\n"
-
-async def export():
-    return response.stream(export_rows(), media_type="text/csv")
-
-Route.get("/exports/users", export)
+Route.group(
+    prefix="/reports",
+    routes=[
+        Route.view("/{report_id:int}", "reports.progress"),
+        Route.get(
+            "/{report_id:int}/events",
+            [ReportProgressController, "events"],
+        ).name("reports.events"),
+    ],
+)
 ```
 
-`stream()` accepts synchronous and asynchronous byte iterables. A generator yielding `str` is invalid for this API. Encode chunks using your selected encoding. Synchronous generators may need delegated execution during delivery: keep the location of blocking work explicit.
+`GET /reports/7` displays the client, and `GET /reports/7/events` opens the stream. The optional `reports.events` name does not change the URL.
 
-## Publishing progress with SSE
+### HTML and JavaScript client
+
+Create `resources/views/reports/progress.html`:
+
+```html
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Report progress</title>
+</head>
+<body>
+    <h1>Report progress</h1>
+    <progress id="progress" max="100" value="0"></progress>
+    <p id="status" role="status">Connecting…</p>
+    <button id="stop" type="button">Stop tracking</button>
+
+    <script type="module">
+        const bar = document.querySelector("#progress");
+        const status = document.querySelector("#status");
+        const stop = document.querySelector("#stop");
+        const url = new URL(location.href);
+        url.pathname = url.pathname.replace(/\/$/, "") + "/events";
+        url.search = "";
+
+        const events = new EventSource(url);
+
+        events.onopen = () => {
+            status.textContent = "Connected";
+        };
+
+        events.addEventListener("progress", (event) => {
+            const payload = JSON.parse(event.data);
+            bar.value = payload.percent;
+            status.textContent = "Report " + payload.report_id + ": " + payload.percent + "%";
+        });
+
+        events.addEventListener("done", (event) => {
+            const payload = JSON.parse(event.data);
+            bar.value = payload.percent;
+            status.textContent = "Report " + payload.report_id + " complete";
+            events.close();
+            stop.disabled = true;
+        });
+
+        events.onerror = () => {
+            status.textContent = events.readyState === EventSource.CLOSED
+                ? "Connection closed"
+                : "Connection interrupted; waiting to reconnect…";
+        };
+
+        stop.addEventListener("click", () => {
+            events.close();
+            stop.disabled = true;
+            status.textContent = "Tracking stopped";
+        });
+
+        window.addEventListener("pagehide", () => events.close(), { once: true });
+    </script>
+</body>
+</html>
+```
+
+With the development server running, open `http://localhost:8000/reports/7` —or the address printed in your console—. You will see `25%`, `50%`, `75%`, and `100%`. `done` closes the client to prevent another connection.
+
+To inspect the format from a terminal, `-N` disables curl's output buffering:
+
+```bash
+curl -N http://localhost:8000/reports/7/events
+curl -N -H "Last-Event-ID: 2" http://localhost:8000/reports/7/events
+```
+
+The second request emits only steps `3` and `4`, followed by `done`. An invalid cursor receives JSON `400` before opening the stream.
+
+## Events, data, and headers
+
+Both public SSE response construction forms are equivalent:
 
 ```python
-from orionis.http import ServerSentEvent, response
+from orionis.http import EventStreamResponse, ServerSentEvent, response
 
-async def progress_events():
-    for step in range(3):
-        yield ServerSentEvent(event="progress", id=str(step), data=str(step))
+events = [
+    ServerSentEvent(event="notice", data="Report ready"),
+    "A plain text message",
+]
 
-async def progress():
-    return response.eventStream(progress_events())
-
-frame = ServerSentEvent(event="progress", id="7", retry=1500, data="ready").encode()
-assert b"event: progress\n" in frame
-assert frame.endswith(b"\n\n")
+result = response.eventStream(events)
+direct = EventStreamResponse(events)
 ```
 
-Register `Route.get("/progress", progress)` in the same route file. A browser client can listen with:
+A generator is single-use: create a new one per request. A string yielded by the source becomes a `data:` event; it is not interpreted as handwritten SSE framing. Explicitly serialize structured data with `json.dumps()` and use `JSON.parse(event.data)` in the client.
+
+| Field | Type and default | Purpose |
+| --- | --- | --- |
+| `data` | `str \| None = None` | Text content; each line is encoded as `data:`. |
+| `event` | `str \| None = None` | Event name; no newlines. |
+| `id` | `str \| None = None` | Cursor; no newlines or NUL. |
+| `retry` | `int \| None = None` | Reconnection wait in milliseconds; nonnegative integer, not `bool`. |
+| `comment` | `str \| None = None` | Comment or heartbeat; may contain several lines. |
+
+`ServerSentEvent` arguments are keyword-only, and instances are immutable:
+
+```python
+import json
+
+from orionis.http import ServerSentEvent
+
+event = ServerSentEvent(
+    event="notice",
+    id="42",
+    retry=3000,
+    comment="connection active",
+    data=json.dumps({"message": "Report ready"}),
+)
+
+encoded = event.encode()
+assert b"event: notice\n" in encoded
+assert b"id: 42\n" in encoded
+assert encoded.endswith(b"\n\n")
+
+multiline = ServerSentEvent(data="First line\nSecond line")
+assert multiline.encode() == b"data: First line\ndata: Second line\n\n"
+
+heartbeat = ServerSentEvent(comment="ping")
+assert heartbeat.encode() == b": ping\n\n"
+```
+
+The browser delivers unnamed events to `onmessage` and named events to `addEventListener("name", ...)`. Comments do not produce JavaScript messages. Orionis does not create periodic heartbeats automatically. [HTML SSE format and processing](https://html.spec.whatwg.org/multipage/server-sent-events.html#interpreting-an-event-stream).
+
+`response.eventStream(content, status_code=200, headers=None, background=None)` configures:
+
+| Header | Behavior |
+| --- | --- |
+| `Content-Type` | `text/event-stream; charset=utf-8` unless you supply your own. Keep the SSE type for `EventSource`. |
+| `Cache-Control` | `no-cache` unless supplied. |
+| `X-Accel-Buffering` | `no` unless supplied; proxy configuration is still necessary. |
+| `Content-Length` | Removed when headers are created and serialized. |
+
+`content` accepts synchronous or asynchronous iterables of `str` or `ServerSentEvent`. `status_code` accepts an integer or `HTTPStatus`; use `200` for `EventSource`. `headers` accepts other headers. `background` receives `BackgroundTask` and runs after complete delivery and successful cleanup; it does not run on client disconnection.
+
+## Reconnection and authentication
+
+`EventSource` reconnects when an SSE response ends or the connection breaks. `events.close()` stops it. After receiving an `id`, the browser sends it as `Last-Event-ID` when reconnecting; read it with `request.headers.get("last-event-id")`. `retry` adjusts the client's wait. [HTML reconnection model](https://html.spec.whatwg.org/multipage/server-sent-events.html#processing-model).
+
+**Orionis does not store or replay events automatically.** The example reconstructs a deterministic sequence. For a real history, decide how to retain events or states, validate cursors, authorize the resource, and handle expired cursors. The client can receive duplicate data; avoid irreversible consumer effects.
+
+Native `EventSource` accepts a URL and `withCredentials`; it does not offer a body, another method, or custom `Authorization` headers. Cross-origin cookies use `new EventSource(url, { withCredentials: true })` with matching CORS and credential settings. Validate access before returning `EventStreamResponse`. [EventSource interface](https://html.spec.whatwg.org/multipage/server-sent-events.html#the-eventsource-interface).
+
+## SSE lifecycle
+
+`EventStreamResponse` traverses its route's HTTP kernel and middleware. Logic after `await call_next()` receives the response object before producer consumption; it does not run per event.
+
+```mermaid
+flowchart TD
+    A["EventSource: GET /reports/7/events"] --> B["HTTP capacity and request scope"]
+    B --> C["Global middleware and route resolution"]
+    C --> D["API or WEB context and route middleware"]
+    D --> E["Controller: validate access, parameters, and cursor"]
+    E --> F["Return EventStreamResponse without consuming source"]
+    F --> G["Return through middleware"]
+    G --> H["ASGI or RSGI adapter sends headers"]
+    H --> I["Request and encode one event"]
+    I --> J["await chunk delivery"]
+    J --> K{"Source exhausted?"}
+    K -->|No| I
+    K -->|Yes| L["Close producer and finalize response"]
+    H -.-> M["Disconnect watcher"]
+    M -->|Client disconnected| N["Cancel and await sender"]
+    N --> O["Close producer and await cleanup"]
+    L --> P["BackgroundTask, if configured"]
+    P --> Q["Close Request and scope; release HTTP capacity"]
+    O --> Q
+```
+
+The diagram represents a route returning SSE; a middleware can respond earlier. The sender and watcher coordinate: when one finishes, they cancel and join the remaining task. Delivery, watcher, and cleanup failures propagate. A disconnect is not successful completion.
+
+The adapter awaits each send before requesting another event, without prefetching or its own queue. This follows transport pace (*backpressure*); it does not limit queues or buffers maintained by your application.
+
+### Resources, heartbeats, and cancellation
+
+ASGI and RSGI observe disconnects during SSE delivery. On completion, failure, or cancellation, they close the owned iterator through `aclose()` or `close()` as applicable and await asynchronous cleanup. The scope and HTTP slot remain active until it finishes.
+
+Release resources opened by a producer with `try/finally` or an asynchronous context manager. This pattern consumes a queue supplied by your application and sends a comment after 15 seconds without messages:
+
+```python
+import asyncio
+from collections.abc import AsyncIterator
+
+from orionis.http import ServerSentEvent
+
+
+async def queue_events(queue: asyncio.Queue[str]) -> AsyncIterator[ServerSentEvent]:
+    while True:
+        try:
+            async with asyncio.timeout(15):
+                message = await queue.get()
+        except TimeoutError:
+            yield ServerSentEvent(comment="ping")
+        else:
+            yield ServerSentEvent(event="notice", data=message)
+```
+
+The queue should belong to an individual subscription: sharing one queue distributes items among consumers rather than broadcasting to everyone. If the subscription comes from a broker, create and release it inside the generator with `try/finally` and bound its capacity. Do not catch `CancelledError` to keep producing.
+
+- Consume required request body data **before returning SSE**. On ASGI, delivery uses `receive` to observe disconnects and drains pending request body messages.
+- `HEAD` sends metadata only and closes the SSE source without starting iteration.
+- `HTTP_MONITOR_DISCONNECTS` adds monitoring during HTTP execution. SSE already observes disconnects during delivery; enabling this setting is not required to close an idle producer.
+- Synchronous iterables run directly on the event loop. Avoid blocking reads or `time.sleep()`; use asynchronous I/O or explicitly delegate the work.
+- Every SSE occupies a `http.body_limits.max_concurrent_requests` slot until completion. The default is `128` per kernel. Excess requests receive `503` and `Retry-After: 1`; size that limit alongside other requests.
+
+## Byte streaming: exporting CSV
+
+For a progressive download without events, create `app/http/controllers/report_export_controller.py`:
+
+```python
+import asyncio
+from collections.abc import AsyncIterator
+
+from orionis.http import StreamingResponse, response
+from orionis.http.base import BaseController
+
+
+class ReportExportController(BaseController):
+
+    async def __call__(self, report_id: int) -> StreamingResponse:
+        async def rows() -> AsyncIterator[bytes]:
+            yield b"id,name\n"
+            for number in range(1, 4):
+                await asyncio.sleep(0.1)
+                yield f"{number},Report {report_id} row {number}\n".encode("utf-8")
+
+        return response.stream(
+            rows(),
+            media_type="text/csv",
+            headers={
+                "Content-Disposition": f'attachment; filename="report-{report_id}.csv"',
+            },
+        )
+```
+
+Add this route to `routes/api.py`:
+
+```python
+from app.http.controllers.report_export_controller import ReportExportController
+from orionis.support.facades import Route
+
+Route.get("/reports/{report_id:int}/export", ReportExportController)
+```
+
+`response.stream(content, status_code=200, headers=None, media_type=None, background=None)` constructs a `StreamingResponse`. Yield `bytes` chunks. The synchronous iterable adapter also converts `bytearray` and `memoryview`; an asynchronous producer must yield bytes. It does not convert strings or add delimiters. The network may split or combine your chunks.
+
+Run this JavaScript from a browser console on a page served by the same Orionis origin. It consumes the body progressively and retains UTF-8 characters split across chunks:
 
 ```javascript
-const events = new EventSource("/progress");
-events.addEventListener("progress", (event) => console.log(event.data));
+const download = await fetch("/reports/7/export");
+if (!download.ok || !download.body) {
+    throw new Error("Export failed: HTTP " + download.status);
+}
+
+const reader = download.body.getReader();
+const decoder = new TextDecoder();
+try {
+    while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        console.log(decoder.decode(value, { stream: true }));
+    }
+    const tail = decoder.decode();
+    if (tail) console.log(tail);
+} finally {
+    reader.releaseLock();
+}
 ```
 
-The example emits `0`, `1` and `2`, then ends the response. Close the client with `events.close()` when finished; EventSource normally reconnects after a closed response, so this finite demonstration would start again. Add your application access policy when exposing real work progress.
+Generic streaming does not install SSE's own disconnect watcher: it depends on transport failures, server cancellation, or configured HTTP monitoring. Adapters close the asynchronous sending iterator. Do not assume `EventStreamResponse` ownership and cleanup guarantees for an arbitrary synchronous iterable wrapped in `StreamingResponse`. For existing files, see [file and download responses](/en/http/responses).
 
-`eventStream()` accepts strings and `ServerSentEvent` values. It configures `text/event-stream` and headers to discourage incompatible buffering; manual framing is unnecessary. Multiline `data` produces one `data:` line per line. `event` and `id` reject newlines; `retry` requires a nonnegative integer. `comment` supports comments and keepalives.
+## Errors and verification
 
-An `id` identifies an event; this module neither stores events nor automatically reconstructs history on reconnect. For resumption, maintain a sequence in a durable service and validate incoming cursors. `retry` does not retry the producer on the server.
+After headers are sent, a producer or transport error cannot replace the response with an HTML page or JSON `500`. If you need error events, define them in the producer without hiding cancellation; they do not change HTTP status. See [HTTP exceptions](/en/http/exceptions).
 
-## Cancellation and closing
+Verify the integration:
 
-Consumption is lazy and follows delivery pace. Use `try/finally` in producers that open cursors, files or subscriptions. The adapters close iterators when delivery ends or a client disconnects. Do not suppress `CancelledError` while leaving a producer running. Cleanup through `aclose()`, when provided, must finish before releasing the scope.
-
-`HTTP_MONITOR_DISCONNECTS` controls additional monitoring for ordinary HTTP requests; SSE/WebSocket and endpoint policies may use their own mechanisms. Verify your adapter and deployment settings. A proxy can still buffer output even when the application yields chunks; test the entire path.
-
-Failures before delivery can become an ordinary response. After headers are sent, signal errors through the stream's protocol or end the connection; do not promise to switch to a JSON 500. Background work must not depend on retaining request objects after cleanup.
+1. Open `/reports/7` and check four percentages and closure on `done`.
+2. Inspect `/reports/7/events` with `curl -N`.
+3. Test `Last-Event-ID: 2` and an invalid cursor.
+4. Close the client during a wait and check resources opened by your producer.
+5. Test through the actual proxy: headers alone do not disable every external buffer, timeout, and limit.

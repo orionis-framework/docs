@@ -187,7 +187,7 @@ El cliente envía por esa conexión un mensaje del protocolo Realtime:
 
 El binder convierte `args` o `kwargs` según los parámetros del método y espera las reglas de sus schemas, incluso cuando aparecen dentro de colecciones. No lee `Request.data()`. Las dependencias de servicio pertenecen al contenedor y se resuelven aparte de los datos del cliente.
 
-Un resultado válido contiene `{"type": "completion", "id": "preview-1", "result": {"email": "ada@example.com"}}`. Si el Email es inválido, la invocación falla con código `validation_error` y mensaje `Invalid arguments`. No se entrega al cliente el diccionario de errores HTTP.
+Un resultado válido contiene `{"type": "completion", "id": "preview-1", "result": {"email": "ada@example.com"}}`. Si el Email es inválido, la invocación falla con código `validation_error` y mensaje `Invocation failed`. No se entrega al cliente el diccionario de errores HTTP.
 
 El retorno Schema es serializable mediante el codec de la conexión, pero `-> ContactSchema` no activa validación de salida. Si necesitas comprobar datos producidos por el método, valida explícitamente antes de devolverlos.
 
