@@ -1,89 +1,239 @@
 ---
-title: "Construir layouts y utilizar helpers"
-description: "Combina la sintaxis Jinja con los servicios Orionis sin mezclar lógica de negocio y presentación."
+title: "Plantillas y herencia"
+description: "Construye páginas con layouts, bloques, includes y macros, manteniendo el contexto y el escape de HTML."
 editUrl: true
 lastUpdated: false
 ---
 
-Combina la sintaxis Jinja con los servicios Orionis sin mezclar lógica de negocio y presentación.
+Orionis utiliza la sintaxis de Jinja2 dentro de archivos de texto, normalmente `.html`. Las expresiones `{{ ... }}` producen contenido; las sentencias `{% ... %}` organizan la página y los comentarios `{# ... #}` no aparecen en el resultado. Los datos proceden del controlador y de los [globals del entorno](/es/services/views/globals).
 
-## Componer layouts reutilizables
+## Componer una página completa
 
-Las plantillas usan Jinja2, con expresiones `{{ value }}` y sentencias `{% ... %}`. Prepara datos en tu controlador o servicio; no introduzcas consultas costosas dentro de cada iteración. Los callables async se esperan automáticamente por el entorno async: escribe `{{ route("users.edit", id=user.id) }}`. La palabra Python `await` no forma parte de una expresión de plantilla.
+El siguiente ejemplo muestra una página de informes con navegación, un layout compartido, una tarjeta reutilizable y una macro. Todos los archivos de plantilla se crean dentro de `resources/views`:
+
+```text
+resources/views/
+├── layouts/base.html
+├── macros/ui.html
+├── partials/navigation.html
+├── partials/report-card.html
+└── reports/index.html
+```
+
+Los nombres usados en `extends`, `include`, `import` y `from` son rutas de Jinja relativas a los directorios de búsqueda: escribe `layouts/base.html`, incluyendo la extensión. La notación de puntos de `View.make("reports.index")` corresponde al punto de entrada de Orionis; no se aplica dentro de las instrucciones de Jinja.
+
+### Layout base y bloques
 
 Crea `resources/views/layouts/base.html`:
 
 ```html
 <!doctype html>
 <html lang="en">
-<head><title>{% block title %}Reports{% endblock %}</title></head>
-<body>
-  {% include "partials/navigation.html" %}
-  <main>{% block content %}{% endblock %}</main>
-</body>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Reports · {{ site_name }}{% endblock %}</title>
+    {% block head %}{% endblock %}
+  </head>
+  <body>
+    {% include "partials/navigation.html" %}
+    <main>
+      {% block content %}{% endblock %}
+    </main>
+    <footer>{% block footer %}{{ site_name }}{% endblock %}</footer>
+  </body>
 </html>
 ```
 
-Crea `resources/views/partials/navigation.html` con tu navegación y `resources/views/reports/index.html` con:
+El layout define la estructura común. Cada `block` establece una zona que una plantilla hija puede reemplazar; su contenido original se usa si la hija no lo redefine. Puedes tener varios niveles de herencia: otra plantilla puede extender este layout y una tercera extender la segunda.
+
+### Fragmentos con include
+
+Crea `resources/views/partials/navigation.html`:
+
+```html
+<nav aria-label="Main navigation">
+  <a href="{{ route('reports.index') }}">{{ site_name }}</a>
+</nav>
+```
+
+`include` renderiza otro archivo en ese punto y recibe el contexto actual por defecto. Por eso la navegación puede leer `site_name`. El helper async `route()` se espera automáticamente y utilizará la ruta que registraremos más abajo.
+
+Crea `resources/views/partials/report-card.html`:
+
+```html
+<article>
+  <h2>{{ report.title }}</h2>
+  <p>{{ report.summary }}</p>
+  <p>{{ ui.badge(report.status) }}</p>
+</article>
+```
+
+La tarjeta lee `report` y `ui` del lugar donde se incluye. Un `include` sirve para un fragmento completo; no define un componente Python ni crea un controlador independiente.
+
+### Macros con argumentos
+
+Crea `resources/views/macros/ui.html`:
+
+```html
+{% macro badge(label, variant="neutral") -%}
+  <span class="badge badge--{{ variant }}">{{ label }}</span>
+{%- endmacro %}
+```
+
+Una macro es un fragmento parametrizable. `label` recibe el texto y `variant` tiene un valor predeterminado. Los guiones en `{%-` y `-%}` controlan el espacio alrededor del bloque; no son necesarios para que funcione.
+
+### Plantilla hija y super
+
+Crea `resources/views/reports/index.html`:
 
 ```html
 {% extends "layouts/base.html" %}
-{% block title %}Recent reports{% endblock %}
+{% import "macros/ui.html" as ui %}
+
+{% block title %}Recent reports · {{ super() }}{% endblock %}
+
+{% block head %}
+  <meta name="description" content="Recent application reports">
+{% endblock %}
+
 {% block content %}
-  <ul>
+  <h1>Recent reports</h1>
+  <p>{{ reports|length }} reports</p>
   {% for report in reports %}
-    <li>{{ report.title }}</li>
+    {% include "partials/report-card.html" %}
   {% else %}
-    <li>No reports yet.</li>
+    <p>No reports yet.</p>
   {% endfor %}
-  </ul>
+{% endblock %}
+
+{% block footer %}
+  {{ super() }} · Internal reports
 {% endblock %}
 ```
 
-Devuelve `await View.make("reports.index", reports=reports)`. `extends` reutiliza el layout y `block` reemplaza una zona; `include` inserta otra plantilla. Un bucle con `{% else %}` cubre colecciones vacías. Para bloques con parámetros puedes utilizar macros de Jinja; Orionis no añade una sintaxis propia de componentes ni directivas Blade.
+`extends` selecciona el padre y debe aparecer antes de producir contenido de página. `super()` incorpora el contenido del mismo bloque en el padre; aquí conserva el título y el footer comunes. `import ... as ui` expone las macros mediante un nombre y `ui.badge(...)` devuelve el fragmento. El `else` del bucle muestra un estado vacío cuando no hay informes.
 
-Para una demostración local completa, coloca este handler y su registro en `routes/web.py`:
+### Controlador, contexto y ruta
+
+Guarda el controlador en `app/http/controllers/report_page_controller.py`:
 
 ```python
-from orionis.support.facades import Route, View
+from orionis.http import HTMLResponse
+from orionis.http.base import BaseController
+from orionis.support.facades import View
 
-async def reports_index():
-    reports = [{"title": "October report"}]
-    return await View.make("reports.index", reports=reports)
 
-Route.get("/reports", reports_index)
+class ReportPageController(BaseController):
+    async def index(self) -> HTMLResponse:
+        reports = [
+            {
+                "title": "Monthly summary",
+                "summary": "The report is ready for review.",
+                "status": "Ready",
+            },
+            {
+                "title": "Usage overview",
+                "summary": "The report is being prepared.",
+                "status": "Processing",
+            },
+        ]
+        return await View.make(
+            "reports.index",
+            site_name="Orionis Reports",
+            reports=reports,
+        )
 ```
 
-`GET /reports` renderiza el layout con un reporte. Sustituir la lista de ejemplo por `[]` muestra `No reports yet.`. El archivo de navegación incluido por el layout debe existir; omitirlo produce un error de plantilla.
+Registra la ruta en `routes/web.py`:
 
-## Helpers de aplicación
+```python
+from app.http.controllers.report_page_controller import ReportPageController
+from orionis.support.facades import Route
 
-Los siguientes nombres se registran durante `ViewServiceProvider.boot()`. Los helpers que resuelven request, sesión o servicios necesitan esos componentes activos; no basta crear una instancia aislada de `Jinja2Engine`.
+Route.get("/reports", [ReportPageController, "index"]).name("reports.index")
+```
 
-| Tarea | Helpers disponibles |
+`GET /reports` renderiza las dos tarjetas dentro del layout y genera el enlace de navegación. Si cambias `reports` por `[]`, aparece `No reports yet.`. No es necesario registrar cada layout, macro o partial como una ruta: el motor los carga al procesar la vista principal.
+
+## Decidir qué contexto recibe un fragmento
+
+Las tres formas de composición tienen propósitos distintos:
+
+| Instrucción | Uso y contexto |
 |---|---|
-| Rutas y enlaces | `route(name, **params)`, `url(path="/", **query)`, `secure_url(path="/", **query)` |
-| Assets | `asset(path, disk=None)`, `secure_asset(path, disk=None)`; disco `public` si se omite. |
-| Autenticación | `auth()` devuelve la facade; `auth().user()`, `.check()`, `.guest()`. |
-| Solicitud / sesión | `request()`, `session()`; pueden devolver `None` fuera de scope. |
-| Formularios | `old(key, default=None)`, `errors.any/has/get/first/all`, `flash(key, default=None)` |
-| CSRF | `csrf_token()`, `csrf_field()`, `{% csrf %}`; el campo oculto se llama `_csrf`. |
-| Traducción | `trans(key, locale=None, **replace)`, `__(...)`, `choice(key, count, locale=None, **replace)`, `locale()`, `locales()` |
-| Estado global | `app()`, `config(key, default=None)`, `cache(key, default=None)` |
-| Datos y diagnóstico | `collect(value=None)`, `stringable(value="")`, `dump(*values)` |
-| Fecha/versiones | `now()`, `today()`, `framework_version()`, `python_version()` |
-| Cifrado | `encrypt(plaintext)`, `decrypt(payload)` |
+| `extends "layouts/base.html"` | Reutiliza una estructura y redefine sus bloques con el contexto de la página. |
+| `include "partials/report-card.html"` | Inserta un archivo con el contexto actual, incluido el elemento del bucle. |
+| `import "macros/ui.html" as ui` | Importa macros; pasa sus datos mediante argumentos explícitos. |
 
-Los parámetros de `route` usados en el path se codifican; los restantes forman query string. Una ruta inexistente o un argumento obligatorio ausente produce `ViewRouteException`. Las URLs usan el origen de la solicitud cuando existe y pueden ser relativas fuera de scope. `secure_url` cambia el esquema a HTTPS si hay host; no descubre uno para una ruta relativa. `asset` pide `file.url()` al disco: no comprueba existencia ni publica el archivo.
+Si solo necesitas una macro, puedes importar su nombre:
 
-`cache(key, default)` considera `None` como ausencia. `errors` es una bolsa con métodos, no un dict. `old` devuelve texto vacío para un valor `None`. `auth()` no cachea identidad: conserva el scope de la solicitud; comprueba `auth().check()` antes de acceder a atributos del usuario. Para locales concurrentes pasa `locale=` explícitamente, porque `locale()` refleja el valor global compartido.
+```html
+{% from "macros/ui.html" import badge %}
+{{ badge("Ready", variant="success") }}
+```
 
-## Escape y contenido confiable
+Las macros importadas no reciben las variables locales de la página por defecto. Si una macro necesita ese contexto, `with context` lo incorpora:
 
-El autoescape está habilitado para la aplicación por defecto. Conserva `{{ user.name }}` con escape; `|safe` y `Markup` solo deben utilizarse con HTML que controles. El filtro `markdown` devuelve un `str` HTML sin sanitización de contenido arbitrario. Marcarlo como seguro puede permitir HTML introducido por usuarios; incorpora una política de sanitización si tu producto acepta Markdown externo.
+```html
+{% import "macros/ui.html" as ui with context %}
+{{ ui.badge("Ready") }}
+```
 
-`json` serializa con msgspec, opcionalmente `|json(indent=2)`, pero devuelve `str(value)` si no puede serializar. Es un filtro de presentación, no una garantía de JSON válido para todos los objetos ni un escape específico para `<script>`. Evita interpolarlo como código ejecutable. `dump()` expone datos como HTML y debe reservarse para diagnóstico controlado; no vuelques secretos. Los helpers de cifrado no reemplazan la autorización.
+Prefiere argumentos explícitos cuando el fragmento debe ser reutilizable. Un `include ... without context` sirve cuando quieres aislarlo del contexto local; los globals del entorno siguen estando disponibles. Un archivo requerido que no existe causa un error. Para un fragmento deliberadamente opcional, Jinja permite:
 
----
+```html
+{% include "partials/announcement.html" ignore missing %}
+```
 
-[Índice](/es/services/views) · [auth](/es/security/authentication) · [localization](/es/services/localization) · [storage](/es/services/storage) · [session](/es/http/sessions)
+## Variables, condiciones y colecciones
+
+Utiliza expresiones de presentación sobre datos ya preparados. Este fragmento puede colocarse dentro de una página que reciba `reports`:
+
+```html
+{% if reports %}
+  <ol>
+    {% for report in reports %}
+      <li>
+        {{ loop.index }}. {{ report.title }}
+        {% if loop.first %}<strong>Latest</strong>{% endif %}
+      </li>
+    {% endfor %}
+  </ol>
+{% else %}
+  <p>No reports available.</p>
+{% endif %}
+
+<p>{{ subtitle|default("Report dashboard") }}</p>
+```
+
+`loop.index` empieza en uno; `loop.index0` empieza en cero. `default(...)` cubre un valor indefinido; utiliza `default("Fallback", true)` si también quieres sustituir valores vacíos o falsos. Para comprobar explícitamente un valor nulo puedes escribir `{% if value is none %}`. Una variable no definida no sustituye la preparación del contexto: ciertas expresiones más complejas pueden producir errores.
+
+No hagas consultas de negocio por cada tarjeta desde la plantilla. Resuelve las dependencias y carga los datos en el controlador o servicio, y deja en la vista las decisiones necesarias para mostrarlos.
+
+## Funciones asíncronas en las plantillas
+
+El entorno siempre tiene `enable_async=True` y el motor utiliza `render_async()`. Jinja espera las funciones async que invoca; en una plantilla escribe:
+
+```html
+<a href="{{ route('reports.index', page=2) }}">Next page</a>
+<p>{{ config('app.name', 'Application') }}</p>
+```
+
+No escribas `await` ni uses `asyncio.run()` en las expresiones. El primer enlace utiliza la ruta registrada y agrega `page=2` como query string. Una función async propia también puede registrarse en un [provider](/es/services/views/providers-and-extensions). Los helpers que acceden a request o sesión necesitan que exista su contexto de ejecución.
+
+## Escape de HTML y texto literal
+
+El autoescape de la aplicación está activado por defecto: si un título contiene `<script>`, `{{ report.title }}` lo representa como texto escapado. Se aplica también dentro de layouts, includes y macros. La configuración se explica en [configuración y caché](/es/services/views/configuration-and-extensions).
+
+`|safe` declara que una cadena ya es HTML confiable; no la limpia ni la valida. Úsalo solo con contenido controlado o sanitizado por tu aplicación. El filtro `markdown` tampoco sanitiza HTML externo; consulta sus [ejemplos y límites](/es/services/views/filters).
+
+Para mostrar la sintaxis de otra herramienta sin que Jinja la evalúe, utiliza un bloque `raw`:
+
+```html
+{% raw %}
+<code>{{ client_side_expression }}</code>
+{% endraw %}
+```
+
+Los archivos son plantillas de servidor, no un entorno aislado para ejecutar código no confiable. Conserva las plantillas en el código de la aplicación y pasa el contenido de los usuarios como datos.

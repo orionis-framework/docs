@@ -244,15 +244,13 @@ File methods are synchronous. `filename` is already sanitized, but `content_type
 
 `read()` and `chunks()` return to the beginning before reading. `save()` copies the file by opening the destination with `wb`: it overwrites an existing file and does not create parent directories. It does not move the temporary file or choose a unique name. `replace()` preserves the attachment's name and extension.
 
-This handler saves one file under an application-generated identifier:
+This handler saves one file through the `Storage` facade under an application-generated identifier:
 
 ```python
-import asyncio
-from pathlib import Path
 from uuid import uuid4
 
 from orionis.http import JSONResponse, Request, response
-from orionis.support.facades import Route
+from orionis.support.facades import Route, Storage
 
 
 async def save_attachment(request: Request) -> JSONResponse:
@@ -265,10 +263,9 @@ async def save_attachment(request: Request) -> JSONResponse:
             )
         upload = uploads[0]
         storage_name = uuid4().hex
-        directory = Path("storage/app/uploads")
-        await asyncio.to_thread(directory.mkdir, parents=True, exist_ok=True)
-        destination = directory / storage_name
-        await asyncio.to_thread(upload.save, destination)
+        await Storage.uploaded(upload).storeAs(
+            "uploads", storage_name, disk="local",
+        )
         return response.json({
             "id": storage_name,
             "original_name": upload.filename,
@@ -283,9 +280,11 @@ Route.post("/payloads/attachments/save", save_attachment)
 curl -X POST http://localhost:8000/payloads/attachments/save -F "attachment=@./notes.txt"
 ```
 
+`Storage.uploaded(upload)` adapts the multipart file to the asynchronous storage API. `storeAs()` streams its chunks to the `local` disk; `uploads` is a directory relative to the configured disk root. You do not need physical paths or manual parent-directory creation.
+
 The write finishes before the form is closed. The storage name does not depend on the client, and the file is not published automatically. For the storage API and file rules, see [storage](/en/services/storage) and [file validation](/en/validation/constraints-and-reference#files-and-images).
 
-If you need to transform the content before saving it, within the same `with` block you can await `asyncio.to_thread(upload.read)` and then `asyncio.to_thread(upload.replace, nuevos_bytes)`. The streaming parser uses the configured threshold; a manually created `UploadedFile(...)` has a different default of 1 MiB.
+To transform content before saving it, within the same `with` block read it with `await Storage.uploaded(upload).read()`, apply the transformation, and save the resulting bytes with `await Storage.disk("local").put(f"uploads/{storage_name}", transformed_bytes)` instead of `storeAs()`. This variant reads the entire file into memory. The streaming parser uses the configured threshold; a manually created `UploadedFile(...)` has a different default of 1 MiB.
 
 ## MessagePack: maps and other values
 

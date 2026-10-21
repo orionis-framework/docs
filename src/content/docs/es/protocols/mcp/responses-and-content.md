@@ -118,9 +118,9 @@ Proporciona bytes originales y el MIME de su formato. Los builders aplican Base6
 
 ```python
 import asyncio
-from pathlib import Path
 
 from orionis.mcp import McpResponse, Tool
+from orionis.support.facades import Storage
 
 
 class BrandAssetsTool(Tool):
@@ -128,9 +128,10 @@ class BrandAssetsTool(Tool):
     description = "Return the bundled logo and welcome audio."
 
     async def handle(self) -> list[McpResponse]:
+        disk = Storage.disk("local")
         logo, audio = await asyncio.gather(
-            asyncio.to_thread(Path("storage/app/brand/logo.png").read_bytes),
-            asyncio.to_thread(Path("storage/app/brand/welcome.wav").read_bytes),
+            disk.file("brand/logo.png").read(),
+            disk.file("brand/welcome.wav").read(),
         )
         return [
             McpResponse.image(logo, "image/png"),
@@ -138,7 +139,9 @@ class BrandAssetsTool(Tool):
         ]
 ```
 
-El ejemplo requiere esos archivos en tu proyecto y delega su lectura a hilos para no bloquear el bucle asíncrono. Las rutas las elige la aplicación: el builder MCP no busca archivos ni descarga URLs. Para almacenamiento remoto, obtén los bytes con tu servicio de almacenamiento. Esta API no fragmenta automáticamente archivos grandes; respeta el límite de respuesta configurado.
+El ejemplo se ejecuta en la aplicación iniciada y requiere `brand/logo.png` y `brand/welcome.wav` en el disco `local`. Las rutas son relativas a la raíz configurada para ese disco, sin anteponer `storage/app`. Las lecturas utilizan la API asíncrona de `Storage` y se ejecutan en paralelo. Para otro disco configurado, cambia el nombre pasado a `disk()`; consulta [Storage](/es/services/storage).
+
+`McpResponse.image()` y `audio()` reciben los bytes leídos; no buscan archivos ni descargan URLs. Estas lecturas reúnen cada archivo completo en memoria, por lo que debes respetar el límite de respuesta MCP.
 
 ## Recursos de texto, JSON y binarios
 

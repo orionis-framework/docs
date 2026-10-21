@@ -117,16 +117,32 @@
       "band": "build",
       "icon": "views",
       "title": {
-        "en": "Views and localization",
-        "es": "Vistas y traducciones"
+        "en": "Views",
+        "es": "Vistas"
       },
       "pageIds": [
         "view-overview",
         "view-rendering-templates",
         "view-template-language",
+        "view-filters",
+        "view-globals",
         "view-configuration-and-extensions",
+        "view-providers-and-extensions"
+      ]
+    },
+    {
+      "id": "localization",
+      "band": "build",
+      "icon": "localization",
+      "title": {
+        "en": "Localization",
+        "es": "Localización"
+      },
+      "pageIds": [
         "localization-overview",
-        "localization-translating-content"
+        "localization-messages-and-locales",
+        "localization-translating-content",
+        "localization-application-and-views"
       ]
     },
     {

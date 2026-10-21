@@ -117,3 +117,21 @@ test('MCP component guides are peers under a distinct introduction', () => {
     assert.notEqual(group.translations[locale], group.items[0].translations[locale]);
   }
 });
+
+test('view guides are peers and translations have their own category', () => {
+  const sidebar = createSidebar();
+  const views = sidebar.find((item) => item.items?.some((child) => child.attrs?.['data-page-id'] === 'view-overview'));
+  const localization = sidebar.find((item) => item.items?.some((child) => child.attrs?.['data-page-id'] === 'localization-overview'));
+  assert.ok(views && localization && views !== localization);
+  for (const group of [views, localization]) {
+    for (const item of group.items) assert.equal(item.attrs.class, 'module-peer');
+    for (const locale of documentationCatalog.locales) assert.notEqual(group.translations[locale], group.items[0].translations[locale]);
+  }
+  for (const id of ['view-filters', 'view-globals', 'view-providers-and-extensions']) {
+    assert.ok(views.items.some((item) => item.attrs['data-page-id'] === id), id);
+  }
+  assert.deepEqual(localization.items.map((item) => item.attrs['data-page-id']), [
+    'localization-overview', 'localization-messages-and-locales',
+    'localization-translating-content', 'localization-application-and-views',
+  ]);
+});

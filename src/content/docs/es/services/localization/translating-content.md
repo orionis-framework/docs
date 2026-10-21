@@ -1,288 +1,270 @@
 ---
-title: "Publicar y traducir contenido por idioma"
-description: "Organiza los recursos por idioma, decide un fallback y pasa el idioma explícitamente cuando depende de una solicitud. Las traducciones, el fallback y los plurales son…"
+title: "Traducir mensajes y plurales"
+description: "Usa Lang para resolver mensajes, comprobar traducciones, sustituir variables y seleccionar plurales con recursos JSON reales."
 editUrl: true
 lastUpdated: false
 ---
 
-Organiza los recursos por idioma, decide un fallback y pasa el idioma explícitamente cuando depende de una solicitud. Las traducciones, el fallback y los plurales son operaciones síncronas con una caché por proceso.
+La fachada `Lang` permite traducir desde los controladores, servicios y demás componentes de una aplicación Orionis iniciada. Importa siempre `from orionis.support.facades import Lang`. Sus métodos `get()`, `has()` y `choice()` son **síncronos**: se pueden llamar dentro de un método asíncrono sin `await`.
 
-## Requisitos
+Esta página se centra en resolver mensajes. Para crear los archivos y configurar el idioma predeterminado, consulta [Mensajes e idiomas](/es/services/localization/messages-and-locales); para inyectar el traductor o usarlo en Jinja, consulta [Aplicación y vistas](/es/services/localization/application-and-views).
 
-- Python 3.14 o posterior.
-- Archivos JSON UTF-8 cuyo valor raíz sea un objeto.
-- Una ruta de idiomas válida para traducciones basadas en archivos.
-- Una aplicación Orionis iniciada al usar `orionis.support.facades.Lang`.
-## Inicio rápido
+## Recursos para los ejemplos
 
-Crea primero estos archivos UTF-8, combinando sus claves si la aplicación ya los tiene:
+Crea estos archivos JSON UTF-8. Si ya existen, combina las claves con sus traducciones. Los ejemplos utilizan `en` como fallback.
 
-`resources/lang/en.json`:
+`resources/lang/en/messages.json`:
 
 ```json
-{"Welcome": "Welcome"}
+{
+  "greeting": "Hello :name",
+  "welcome": "Welcome to Orionis",
+  "names": ":name | :Name | :NAME",
+  "contacts": ":name (:name_full)",
+  "reports": "{0} No reports|{1} One report|[2,*] :count reports",
+  "items": "One item|:count items",
+  "stock": "[*,0] Out of stock|[1,5] Low stock: :count|[6,*] In stock: :count",
+  "universal": "{0} No messages|{*} :count messages",
+  "only_in_english": "Available in English"
+}
 ```
 
-`resources/lang/es.json`:
+`resources/lang/es/messages.json`:
 
 ```json
-{"Welcome": "Bienvenido"}
+{
+  "greeting": "Hola :name",
+  "welcome": "Bienvenido a Orionis",
+  "names": ":name | :Name | :NAME",
+  "contacts": ":name (:name_full)",
+  "reports": "{0} No hay informes|{1} Un informe|[2,*] :count informes",
+  "items": "Un artículo|:count artículos",
+  "stock": "[*,0] Sin existencias|[1,5] Pocas existencias: :count|[6,*] Existencias: :count",
+  "universal": "{0} No hay mensajes|{*} :count mensajes"
+}
 ```
 
-Guarda el programa siguiente en `check_translations.py`, en la raíz de la aplicación, y ejecuta `uv run python check_translations.py`. La ruta relativa de idiomas parte de ese directorio de trabajo. Las comprobaciones muestran inglés, español e idiomas descubiertos; imprime `en`:
+El nombre del archivo aporta el prefijo: `messages.greeting` identifica `greeting` dentro de `messages.json`. La clave `messages.only_in_english` se omite intencionadamente en español para mostrar el fallback.
 
-```python
-from pathlib import Path
-from orionis.localization import TranslationLoader, TranslationRepository, Translator
+## Obtener un mensaje con get()
 
-loader = TranslationLoader(Path("resources/lang"))
-repository = TranslationRepository(loader)
-translator = Translator(locale="en", fallback="en", loader=loader, repository=repository)
-assert translator.get("Welcome") == "Welcome"
-assert translator.get("Welcome", locale="es") == "Bienvenido"
-assert {"en", "es"}.issubset(translator.availableLocales())
-print(translator.getLocale())
-```
+`Lang.get(key, locale=None, **replace)` devuelve un `str`. `key` identifica el mensaje; `locale` permite elegir el idioma para esa llamada; los demás argumentos con nombre aportan valores para sus placeholders.
 
-## Crear recursos que puedas mantener
-
-Crea `resources/lang/en/cart.json` con:
-
-```json
-{"items": "{0} Empty|{1} One item|[2,*] :count items"}
-```
-
-Crea `resources/lang/es/cart.json` con:
-
-```json
-{"items": "{0} Vacío|{1} Un artículo|[2,*] :count artículos"}
-```
-
-La clave es `cart.items`; `Lang.choice("cart.items", 3, locale="es")` devuelve `3 artículos` dentro de una aplicación iniciada. Las carpetas de grupo no se recorren recursivamente: el loader busca archivos `*.json` directamente bajo el directorio del idioma.
-
-Para una clave literal de interfaz puedes usar `resources/lang/es.json`. Este archivo se carga después de los grupos y gana en una colisión; evita definir la misma clave en ambos lugares para que la procedencia resulte clara. Un idioma inexistente devuelve un mapa vacío y puede llegar al fallback. El descubrimiento informa qué recursos existen, no que cada traducción esté completa.
-
-El código del idioma distingue mayúsculas y separadores: `es-CO`, `es_CO` y `es` son nombres distintos. No existe fallback jerárquico automático `es-CO` → `es`: solo se prueba el fallback configurado. Valida el valor solicitado contra los idiomas admitidos por tu aplicación antes de usarlo, además de la validación sintáctica que ya proporciona el translator.
-
-### Idioma por solicitud y actualizaciones
-
-Usa `Lang.get("cart.items", locale=requested_locale)` o `Lang.choice("cart.items", quantity, locale=requested_locale)`. No cambies `setLocale()` para una solicitud concurrente: el provider entrega un singleton mutable. En una plantilla Jinja pasa igualmente `locale=` a `trans`, `__` o `choice`; Jinja espera helpers async automáticamente.
-
-La caché no vigila cambios de archivos. Tras publicar recursos actualizados, reinicia cada worker o invalida los idiomas en cada proceso. `reload("es")` descarta el mapa; la lectura siguiente vuelve a cargarlo. No cambia la configuración, no actualiza otros procesos y no valida el JSON inmediatamente. Los métodos de traducción son síncronos: precalentar idiomas durante boot evita I/O de archivos en la primera solicitud.
-
-Los contratos `ITranslationLoader` y `ITranslationRepository` permiten fuentes distintas a archivos y políticas de caché propias. Inyéctalos al construir `Translator`; el manager estándar construye sus implementaciones concretas y no dispone de un registro de drivers. No hay reglas ICU/CLDR automáticas: escribe selectores explícitos cuando dos formas no basten.
-
-## Conceptos principales
-
-### Fuentes y claves
-
-`{locale}.json` sirve para claves de texto fuente literal. `{locale}/{group}.json` se aplana recursivamente bajo el nombre del grupo. Los archivos agrupados se cargan ordenados; luego el archivo raíz se combina al final y gana las colisiones. Las hojas no string se convierten con `str()`.
-
-### Resolución y fallback
-
-`get(key, locale=None, **replace)` consulta el locale explícito o activo y después el fallback configurado si es diferente. Si ninguno contiene la clave, un handler de claves ausentes puede devolver una línea; de lo contrario se devuelve la propia clave. `has(..., fallback=False)` limita la comprobación al locale solicitado.
-
-### Reemplazo
-
-Los placeholders usan `:name`. El traductor también reemplaza `:Name` por valor capitalizado y `:NAME` por valor en mayúsculas. Los nombres más largos se procesan primero para impedir que un nombre corto consuma un prefijo largo.
-
-### Selección plural
-
-`choice(key, count, ...)` divide la línea por `|`. Admite selectores exactos como `{0}` o `{1}`, rangos inclusivos como `[2,10]` y `*` como extremo abierto. Sin selector explícito coincidente, un único segmento se usa siempre; con varios, count `1` elige el primero y los demás el segundo. `:count` se inyecta automáticamente.
-
-## Flujos de trabajo comunes
-
-### Traducir texto de aplicación
-
-Use `Lang.get("Welcome")` en código de aplicación iniciado. Prefiera claves dotted estables para validación y mensajes de dominio; las claves literales son prácticas para copy de UI ya existente. Pase reemplazos como argumentos keyword.
-
-### Elegir locale por solicitud
-
-Pase `locale=` a `get`, `has` o `choice`. Evite `setLocale()` por solicitud porque el provider comparte un traductor en todo el proceso y las solicitudes concurrentes observarían la mutación.
-
-### Actualizar traducciones durante desarrollo
-
-Llame `Lang.reload("es")` después de modificar un archivo, o `Lang.reload()` / `Lang.flush()` para descartar todos los locales. El siguiente lookup carga de nuevo. Cada worker de producción tiene caché independiente y debe invalidarse o reiniciarse.
-
-### Reportar claves ausentes
-
-Registre `missing(lambda key, locale: ...)` para telemetría o sustitución controlada. Mantenga el handler rápido y no recursivo. Devolver `None` conserva el comportamiento de devolver la clave.
-
-## Ejemplos
-
-### Aplicar fallback y reemplazos
-
-```python
-from orionis.localization import TranslationRepository, Translator
-
-
-class MemoryLoader:
-    data = {
-        "en": {"greeting": "Hello :name"},
-        "es": {},
-    }
-
-    def load(self, locale: str) -> dict[str, str]:
-        return dict(self.data.get(locale, {}))
-
-    def availableLocales(self) -> tuple[str, ...]:
-        return tuple(sorted(self.data))
-
-
-loader = MemoryLoader()
-repository = TranslationRepository(loader)
-translator = Translator(locale="es", fallback="en", loader=loader, repository=repository)
-assert translator.get("greeting", name="Ada") == "Hello Ada"
-assert translator.has("greeting")
-assert not translator.has("greeting", fallback=False)
-print(translator.get("missing.key"))
-```
-
-
-### Seleccionar formas plurales
-
-```python
-from orionis.localization import TranslationRepository, Translator
-
-
-class MemoryLoader:
-    def load(self, locale: str) -> dict[str, str]:
-        return {"apples": "{0} No apples|{1} One apple|[2,*] :count apples"}
-
-    def availableLocales(self) -> tuple[str, ...]:
-        return ("en",)
-
-
-loader = MemoryLoader()
-translator = Translator(
-    locale="en",
-    fallback="en",
-    loader=loader,
-    repository=TranslationRepository(loader),
-)
-assert translator.choice("apples", 0) == "No apples"
-assert translator.choice("apples", 1) == "One apple"
-assert translator.choice("apples", 7) == "7 apples"
-print(translator.choice("apples", 2))
-```
-
-
-### Manejar claves ausentes
-
-```python
-from orionis.localization import TranslationRepository, Translator
-
-
-class EmptyLoader:
-    def load(self, locale: str) -> dict[str, str]:
-        return {}
-
-    def availableLocales(self) -> tuple[str, ...]:
-        return ()
-
-
-loader = EmptyLoader()
-translator = Translator(
-    locale="en",
-    fallback="en",
-    loader=loader,
-    repository=TranslationRepository(loader),
-)
-translator.missing(lambda key, locale: f"[{locale}] {key}")
-assert translator.get("unknown") == "[en] unknown"
-translator.missing(None)
-assert translator.get("unknown") == "unknown"
-print("missing handler removed")
-```
-
-
-### Inspeccionar e invalidar la caché
-
-```python
-from pathlib import Path
-from orionis.localization import TranslationLoader, TranslationRepository
-
-repository = TranslationRepository(TranslationLoader(Path("resources/lang")))
-assert repository.loadedLocales() == ()
-assert repository.get("en")["Welcome"] == "Welcome"
-assert repository.loadedLocales() == ("en",)
-assert repository.forget("en")
-assert repository.loadedLocales() == ()
-print("cache cleared")
-```
-
-
-### Usar la facade de aplicación
+Un servicio puede preparar los textos que un controlador, un correo o una tarea necesiten:
 
 ```python
 from orionis.support.facades import Lang
 
-title = Lang.get("Welcome", locale="es")
-message = Lang.choice("cart.items", 3, locale="es")
-available = Lang.availableLocales()
+
+class WelcomeMessages:
+
+    def for_user(self, name: str, locale: str) -> dict[str, str]:
+        return {
+            "title": Lang.get("messages.welcome", locale=locale),
+            "greeting": Lang.get(
+                "messages.greeting",
+                locale=locale,
+                name=name,
+            ),
+        }
 ```
 
-## Configuración
+`WelcomeMessages().for_user("Ada", "es")` devuelve `{"title": "Bienvenido a Orionis", "greeting": "Hola Ada"}`. Con `"en"` devuelve `{"title": "Welcome to Orionis", "greeting": "Hello Ada"}`.
 
-Localización usa campos de `config/app.py`:
+Cuando omites `locale` o pasas `None`, se utiliza el idioma activo del traductor. Para una petición o trabajo con idioma propio, pasa `locale=` en **cada llamada**. El traductor es compartido en el proceso: `Lang.setLocale()` cambia su estado global y no constituye una selección de idioma aislada por petición.
 
-| Ajuste | Entorno | Predeterminado | Significado |
-|---|---|---|---|
-| `app.locale` | `APP_LOCALE` | `en` | Locale activo compartido. |
-| `app.fallback_locale` | `APP_FALLBACK_LOCALE` | `en` | Locale secundario para claves ausentes. |
-| `app.language_path` | `APP_LANGUAGE_PATH` | `resources/lang/` | Ruta absoluta o relativa a la raíz. |
+### Placeholders y capitalización
 
-Los códigos deben contener grupos alfanuméricos separados solo por `-` o `_`, por ejemplo `en`, `es-CO` o `pt_BR`. Se conservan exactamente; normalizar mayúsculas y separadores corresponde a la aplicación.
+Con un argumento `name="ada lovelace"`, el mismo mensaje puede usar tres variantes:
 
-## Integración con Orionis
+| Placeholder | Resultado |
+|---|---|
+| `:name` | `ada lovelace` |
+| `:Name` | `Ada lovelace` |
+| `:NAME` | `ADA LOVELACE` |
 
-`LocalizationProvider` enlaza `ILocalizationManager` a `LocalizationManager` como singleton. Al iniciar, materializa el traductor, enlaza `ITranslator` y fija la facade `Lang`. Las plantillas reciben helpers/globales de localización y las respuestas predeterminadas usan traducciones para páginas visibles.
+`:Name` utiliza `str.capitalize()`: pone el primer carácter en mayúscula y el resto en minúsculas; no capitaliza cada palabra. Los valores se convierten con `str()`, por lo que también puedes reemplazar números y otros objetos.
 
-La construcción directa es útil para bibliotecas y pruebas. El código de aplicación debería inyectar `ITranslator` o usar `Lang`; ambos apuntan al mismo singleton configurado.
-
-## Errores y casos límite
-
-- Códigos malformados o similares a rutas producen `InvalidLocaleException` antes de tocar el filesystem.
-- UTF-8 inválido, JSON malformado o raíz no objeto produce `TranslationSyntaxException`.
-- Un archivo eliminado entre descubrimiento y lectura produce `TranslationFileNotFoundException`.
-- Directorios/locales ausentes no son errores: descubrimiento devuelve `()` y carga `{}`.
-- Las claves ausentes se devuelven a sí mismas salvo que un handler entregue un string.
-- El reemplazo es sustitución literal, no parsing MessageFormat; placeholders no usados permanecen.
-- Los rangos plurales son numéricos e inclusivos. Condiciones malformadas no coinciden; cantidades no numéricas pueden propagar `TypeError` de comparación.
-- Los archivos raíz prevalecen sobre claves agrupadas en colisión. Los grupos se combinan determinísticamente por nombre.
-- `reload()` invalida mapas; no lee ni valida proactivamente archivos cambiados.
-
-## Rendimiento y concurrencia
-
-JSON se decodifica con `msgspec`; los diccionarios anidados se aplanan una vez al primer acceso al locale. Los lookups posteriores son O(1). Descubrimiento y carga son síncronos; precargue locales requeridos durante bootstrap si importa la latencia inicial.
-
-El provider comparte un traductor mutable sin lock. Las lecturas concurrentes son apropiadas después de calentar cachés, pero `setLocale`, `missing`, `reload`, `forget` y `flush` son mutaciones globales y pueden competir. Prefiera `locale=` explícito por solicitud y coordine operacionalmente la invalidación.
-
-## API pública
-
-El paquete exporta `TranslationLoader`, `TranslationRepository`, `Translator`, `LocalizationManager`, `TranslationException`, `InvalidLocaleException`, `TranslationFileNotFoundException` y `TranslationSyntaxException`.
-
-### `TranslationLoader(path)`
-
-`load(locale)` devuelve un `dict[str, str]` plano; un locale desconocido produce un diccionario vacío. `availableLocales()` devuelve una tupla ordenada tomada de archivos `.json` raíz y directorios con archivos de grupo. El loader no mantiene caché deliberadamente.
-
-### `TranslationRepository(loader)`
-
-`get(locale)` carga una vez y devuelve el mapa en caché. `has(locale)`, `forget(locale)`, `flush()` y `loadedLocales()` inspeccionan o invalidan esa caché local al proceso. El orden de locales cargados sigue el de inserción.
-
-### `Translator`
-
-- `get`, `has` y `choice` realizan traducciones por llamada.
-- `setLocale` y `getLocale` controlan el locale activo compartido.
-- `availableLocales` delega descubrimiento al loader.
-- `reload(locale=None)`, `forget(locale)` y `flush()` invalidan entradas.
-- `missing(handler)` instala o retira un callback de claves ausentes en ese traductor.
-
-### `LocalizationManager(app)`
-
-`translator()` crea perezosamente un traductor con `app.locale`, `app.fallback_locale` y `app.language_path`. Las rutas relativas se resuelven contra `app.basePath`.
+```python
+from orionis.support.facades import Lang
 
 
----
+class ContactMessages:
 
-[Índice](/es/services/localization) · [view](/es/services/views) · [foundation](/es/getting-started)
+    def preview(self, locale: str) -> dict[str, str]:
+        return {
+            "variants": Lang.get(
+                "messages.names",
+                locale=locale,
+                name="ada lovelace",
+            ),
+            "contact": Lang.get(
+                "messages.contacts",
+                locale=locale,
+                name="Ada",
+                name_full="Ada Lovelace",
+            ),
+            "pending": Lang.get("messages.greeting", locale=locale),
+        }
+```
+
+Con `locale="es"`:
+
+- `variants` es `ada lovelace | Ada lovelace | ADA LOVELACE`.
+- `contact` es `Ada (Ada Lovelace)`.
+- `pending` es `Hola :name`, porque no se proporcionó `name`.
+
+Los nombres largos se reemplazan antes que los cortos: `name_full` se procesa antes que `name`. La sustitución es literal, sin expresiones ni formateadores de fechas, números o HTML. Si un placeholder no recibe valor, permanece en el mensaje. El traductor devuelve texto; el escape HTML corresponde al contexto que lo presenta, como el autoescape de las vistas.
+
+## Fallback y claves ausentes
+
+Para cada `get()`, Orionis consulta:
+
+1. El idioma indicado en `locale`, o el activo si no se indicó.
+2. El fallback configurado, si es diferente.
+3. El callback de claves ausentes, cuando existe.
+4. La propia clave, si el callback no devuelve un `str`.
+
+Una traducción vacía (`""`) cuenta como existente y no provoca fallback. No se recorren idiomas regionales de forma automática: solicitar `es-CO` no prueba `es` antes del fallback. El locale tampoco se normaliza: `es-CO` y `es_CO` son identificadores diferentes.
+
+### Comprobar si existe una traducción con has()
+
+Usa `Lang.has(key, locale=None, *, fallback=True)` para consultar la existencia. Por defecto incluye el fallback; con `fallback=False` comprueba únicamente el idioma solicitado.
+
+```python
+from orionis.support.facades import Lang
+
+
+class TranslationStatus:
+
+    def inspect(self, locale: str) -> dict[str, str | bool]:
+        return {
+            "text": Lang.get("messages.only_in_english", locale=locale),
+            "available": Lang.has("messages.only_in_english", locale=locale),
+            "translated_here": Lang.has(
+                "messages.only_in_english",
+                locale=locale,
+                fallback=False,
+            ),
+            "missing": Lang.get("messages.unknown", locale=locale),
+            "missing_exists": Lang.has("messages.unknown", locale=locale),
+        }
+```
+
+Con `locale="es"`, fallback `en` y sin callback personalizado, el resultado es:
+
+```json
+{
+  "text": "Available in English",
+  "available": true,
+  "translated_here": false,
+  "missing": "messages.unknown",
+  "missing_exists": false
+}
+```
+
+`has()` no ejecuta el callback de claves ausentes. Es preferible a comparar `get(key) != key`: una traducción válida puede tener exactamente el mismo texto que su clave.
+
+### Personalizar las claves ausentes
+
+`Lang.missing(handler)` registra un callback síncrono con firma `(key: str, locale: str) -> str | None`. Recibe el idioma solicitado, aunque se haya consultado el fallback. Devuelve un `str` para reemplazar el mensaje o `None` para conservar la clave; los placeholders se aplican después sobre el texto resultante.
+
+Configura este comportamiento una vez durante el arranque de la aplicación. `Lang.missing(None)` retira el callback. El registro es compartido: evita instalar y retirar callbacks por petición, llamar recursivamente al traductor desde el callback o pasar una función `async`.
+
+## Seleccionar plurales con choice()
+
+`Lang.choice(key, count, locale=None, **replace)` obtiene el mensaje con el mismo fallback que `get()`, selecciona un segmento y sustituye sus placeholders. `count` representa la cantidad y está disponible como `:count` sin tener que repetirlo en los argumentos de reemplazo.
+
+```python
+from orionis.support.facades import Lang
+
+
+class ReportMessages:
+
+    def summary(self, count: int, locale: str) -> str:
+        return Lang.choice("messages.reports", count, locale=locale)
+```
+
+Para `locale="es"`:
+
+| Cantidad | Resultado |
+|---|---|
+| `0` | `No hay informes` |
+| `1` | `Un informe` |
+| `2` | `2 informes` |
+| `15` | `15 informes` |
+
+Utiliza `choice()` para los mensajes con alternativas separadas por `|`. `get("messages.reports")` devuelve la línea completa, incluidos los selectores y separadores; no selecciona automáticamente una forma.
+
+### Selectores exactos, rangos y comodines
+
+| Sintaxis | Coincidencia |
+|---|---|
+| `{0}`, `{1}`, `{5}` | Cantidad numéricamente igual al valor indicado. |
+| `[1,5]` | Desde `1` hasta `5`, ambos incluidos. |
+| `[6,*]` | Desde `6`, sin límite superior. |
+| `[*,0]` | Hasta `0`, sin límite inferior. |
+| `{*}` | Cualquier cantidad; útil como último caso. |
+
+Los segmentos se separan con `|`. El selector debe comenzar al inicio del segmento, por ejemplo `{0} Ninguno|[1,*] :count`. Puedes dejar espacios después de `}` o `]`; no insertes espacios antes del selector, tampoco después de `|`.
+
+Un servicio puede usar las reglas de existencias y el caso universal definidos en los recursos:
+
+```python
+from orionis.support.facades import Lang
+
+
+class InventoryMessages:
+
+    def stock(self, quantity: int, locale: str) -> str:
+        return Lang.choice("messages.stock", quantity, locale=locale)
+
+    def notifications(self, quantity: int, locale: str) -> str:
+        return Lang.choice("messages.universal", quantity, locale=locale)
+```
+
+Con español, `stock(0, "es")` devuelve `Sin existencias`; `stock(5, "es")` devuelve `Pocas existencias: 5`; `stock(6, "es")` devuelve `Existencias: 6`. `notifications(0, "es")` devuelve `No hay mensajes` y `notifications(8, "es")` devuelve `8 mensajes`.
+
+Orionis recorre **todos los selectores explícitos en el orden escrito** y elige el primero que coincide. No existe una prioridad adicional de `{n}` sobre `[a,b]`. Coloca los casos específicos antes de un rango amplio y deja `{*}` al final para no ocultar los siguientes segmentos.
+
+### Regla posicional sin coincidencia explícita
+
+Si ningún selector explícito coincide:
+
+- Con un único segmento se utiliza ese texto para cualquier cantidad.
+- Con varios segmentos, `count == 1` selecciona el primero.
+- Cualquier otra cantidad selecciona el segundo.
+
+Los marcadores de condición se retiran del segmento seleccionado. Un tercer segmento sin condición no se selecciona mediante esta regla; añade selectores explícitos cuando necesites más casos.
+
+```python
+from orionis.support.facades import Lang
+
+
+class ItemMessages:
+
+    def summary(self, count: int, locale: str) -> str:
+        return Lang.choice("messages.items", count, locale=locale)
+```
+
+En español, `summary(1, "es")` devuelve `Un artículo`; `summary(0, "es")` y `summary(7, "es")` devuelven `0 artículos` y `7 artículos`. La misma regla posicional se aplica en todos los idiomas: el framework no incorpora selección plural automática ICU/CLDR por locale.
+
+### Límites de la selección plural
+
+El argumento está anotado como `int`. Orionis no lo convierte ni valida internamente: valida cantidades provenientes de payloads antes de usarlas. Un valor no numérico puede producir un `TypeError` al compararse con los límites de un rango.
+
+Los límites numéricos de las condiciones se interpretan con `float()`. Las condiciones malformadas no coinciden y pueden terminar en la regla posicional; no producen por sí solas un error de configuración. Cubre todas las cantidades que tu aplicación admite, especialmente `0` y valores negativos si los aceptas.
+
+El carácter `|` siempre separa segmentos al usar `choice()`; no existe un mecanismo de escape para incluirlo como texto literal en una de las alternativas. Los espacios al principio y al final del texto seleccionado se eliminan.
+
+## Referencia de consulta rápida
+
+| Método | Uso |
+|---|---|
+| `Lang.get(key, locale=None, **replace)` | Devuelve el mensaje resuelto y reemplazado como `str`. |
+| `Lang.has(key, locale=None, *, fallback=True)` | Devuelve `bool` e incluye el fallback salvo que se desactive. |
+| `Lang.choice(key, count, locale=None, **replace)` | Selecciona un segmento plural y sustituye `:count` y los demás placeholders. |
+| `Lang.getLocale()` | Devuelve el locale activo compartido; no identifica por sí solo el idioma de la petición. |
+| `Lang.availableLocales()` | Devuelve una tupla ordenada de idiomas con fuentes descubiertas; no garantiza que cada clave esté traducida. |
+
+La configuración inicial y la organización de los archivos se explican en [Configuración y recursos](/es/services/localization/messages-and-locales). El uso del mismo servicio mediante `ITranslator` y los helpers `trans`, `__` y `choice` se explica en [Aplicación y vistas](/es/services/localization/application-and-views).

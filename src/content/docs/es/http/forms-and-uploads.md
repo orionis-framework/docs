@@ -244,15 +244,13 @@ Los métodos de archivo son síncronos. `filename` ya está saneado, pero `conte
 
 `read()` y `chunks()` vuelven al inicio antes de leer. `save()` copia el archivo abriendo el destino con `wb`: sobrescribe si existe y no crea los directorios padre. No mueve su temporal ni decide un nombre único. `replace()` conserva el nombre y la extensión del adjunto.
 
-Este handler guarda un único archivo bajo un identificador generado por la aplicación:
+Este handler guarda un único archivo mediante la fachada `Storage`, bajo un identificador generado por la aplicación:
 
 ```python
-import asyncio
-from pathlib import Path
 from uuid import uuid4
 
 from orionis.http import JSONResponse, Request, response
-from orionis.support.facades import Route
+from orionis.support.facades import Route, Storage
 
 
 async def save_attachment(request: Request) -> JSONResponse:
@@ -265,10 +263,9 @@ async def save_attachment(request: Request) -> JSONResponse:
             )
         upload = uploads[0]
         storage_name = uuid4().hex
-        directory = Path("storage/app/uploads")
-        await asyncio.to_thread(directory.mkdir, parents=True, exist_ok=True)
-        destination = directory / storage_name
-        await asyncio.to_thread(upload.save, destination)
+        await Storage.uploaded(upload).storeAs(
+            "uploads", storage_name, disk="local",
+        )
         return response.json({
             "id": storage_name,
             "original_name": upload.filename,
@@ -283,9 +280,11 @@ Route.post("/payloads/attachments/save", save_attachment)
 curl -X POST http://localhost:8000/payloads/attachments/save -F "attachment=@./notes.txt"
 ```
 
+`Storage.uploaded(upload)` adapta el archivo multipart a la API asíncrona de almacenamiento. `storeAs()` transmite sus bloques al disco `local`; `uploads` es un directorio relativo a la raíz configurada del disco. No necesitas construir rutas físicas ni crear los directorios padre manualmente.
+
 La escritura termina antes de cerrar el formulario. El nombre de almacenamiento no depende del cliente y el archivo no se publica automáticamente. Para la API de almacenamiento y las reglas de archivos, consulta [storage](/es/services/storage) y [validación de archivos](/es/validation/constraints-and-reference#archivos-e-imágenes).
 
-Si necesitas transformar el contenido antes de guardarlo, dentro del mismo `with` puedes esperar `asyncio.to_thread(upload.read)` y después `asyncio.to_thread(upload.replace, nuevos_bytes)`. El streaming del parser usa el umbral configurado; un `UploadedFile(...)` creado manualmente tiene un valor predeterminado distinto, de 1 MiB.
+Si necesitas transformar el contenido antes de guardarlo, dentro del mismo `with` puedes leerlo con `await Storage.uploaded(upload).read()`, aplicar la transformación y guardar los bytes resultantes con `await Storage.disk("local").put(f"uploads/{storage_name}", transformed_bytes)` en lugar de `storeAs()`. Esta variante lee el archivo completo en memoria. El streaming del parser usa el umbral configurado; un `UploadedFile(...)` creado manualmente tiene un valor predeterminado distinto, de 1 MiB.
 
 ## MessagePack: mapas y otros valores
 

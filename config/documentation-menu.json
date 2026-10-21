@@ -1205,24 +1205,28 @@
       "id": "view-overview",
       "kind": "doc",
       "title": {
-        "es": "Vistas",
-        "en": "Views"
+        "es": "Introducción a las vistas",
+        "en": "Introduction to views"
       },
       "slug": {
         "es": "/es/services/views",
         "en": "/en/services/views"
+      },
+      "label": {
+        "es": "Introducción",
+        "en": "Introduction"
       }
     },
     {
       "id": "view-rendering-templates",
       "kind": "doc",
       "title": {
-        "es": "Renderizar páginas y respuestas HTML",
-        "en": "Rendering pages and HTML responses"
+        "es": "Controladores y HTML",
+        "en": "Controllers and HTML"
       },
       "label": {
-        "en": "Rendering templates",
-        "es": "Renderizar plantillas"
+        "es": "Controladores y HTML",
+        "en": "Controllers and HTML"
       },
       "slug": {
         "es": "/es/services/views/rendering-templates",
@@ -1233,12 +1237,12 @@
       "id": "view-template-language",
       "kind": "doc",
       "title": {
-        "es": "Construir layouts y utilizar helpers",
-        "en": "Building layouts and using helpers"
+        "es": "Plantillas y herencia",
+        "en": "Templates and inheritance"
       },
       "label": {
-        "en": "Layouts and helpers",
-        "es": "Layouts y helpers"
+        "es": "Plantillas y herencia",
+        "en": "Templates and inheritance"
       },
       "slug": {
         "es": "/es/services/views/template-language",
@@ -1246,15 +1250,47 @@
       }
     },
     {
+      "id": "view-filters",
+      "kind": "doc",
+      "title": {
+        "es": "Filtros de las plantillas",
+        "en": "Template filters"
+      },
+      "label": {
+        "es": "Filtros",
+        "en": "Filters"
+      },
+      "slug": {
+        "es": "/es/services/views/filters",
+        "en": "/en/services/views/filters"
+      }
+    },
+    {
+      "id": "view-globals",
+      "kind": "doc",
+      "title": {
+        "es": "Globals y contexto de las vistas",
+        "en": "View globals and context"
+      },
+      "label": {
+        "es": "Globals y contexto",
+        "en": "Globals and context"
+      },
+      "slug": {
+        "es": "/es/services/views/globals",
+        "en": "/en/services/views/globals"
+      }
+    },
+    {
       "id": "view-configuration-and-extensions",
       "kind": "doc",
       "title": {
-        "es": "Configurar, extender y diagnosticar vistas",
-        "en": "Configuring, extending, and diagnosing views"
+        "es": "Configuración y caché de vistas",
+        "en": "View configuration and cache"
       },
       "label": {
-        "en": "View configuration and extensions",
-        "es": "Configuración y extensión de vistas"
+        "es": "Configuración y caché",
+        "en": "Configuration and cache"
       },
       "slug": {
         "es": "/es/services/views/configuration-and-extensions",
@@ -1262,31 +1298,83 @@
       }
     },
     {
+      "id": "view-providers-and-extensions",
+      "kind": "doc",
+      "title": {
+        "es": "Providers y extensiones de vistas",
+        "en": "View providers and extensions"
+      },
+      "label": {
+        "es": "Providers y extensiones",
+        "en": "Providers and extensions"
+      },
+      "slug": {
+        "es": "/es/services/views/providers-and-extensions",
+        "en": "/en/services/views/providers-and-extensions"
+      }
+    },
+    {
       "id": "localization-overview",
       "kind": "doc",
       "title": {
-        "es": "Localización",
-        "en": "Localization"
+        "es": "Introducción a la localización",
+        "en": "Introduction to localization"
       },
       "slug": {
         "es": "/es/services/localization",
         "en": "/en/services/localization"
+      },
+      "label": {
+        "es": "Introducción",
+        "en": "Introduction"
+      }
+    },
+    {
+      "id": "localization-messages-and-locales",
+      "kind": "doc",
+      "title": {
+        "es": "Archivos, idiomas y configuración",
+        "en": "Files, locales, and configuration"
+      },
+      "label": {
+        "es": "Archivos e idiomas",
+        "en": "Files and locales"
+      },
+      "slug": {
+        "es": "/es/services/localization/messages-and-locales",
+        "en": "/en/services/localization/messages-and-locales"
       }
     },
     {
       "id": "localization-translating-content",
       "kind": "doc",
       "title": {
-        "es": "Publicar y traducir contenido por idioma",
-        "en": "Publishing and translating localized content"
+        "es": "Traducir mensajes y plurales",
+        "en": "Translate messages and plurals"
       },
       "label": {
-        "en": "Content and translations",
-        "es": "Contenido y traducciones"
+        "en": "Messages and plurals",
+        "es": "Mensajes y plurales"
       },
       "slug": {
         "es": "/es/services/localization/translating-content",
         "en": "/en/services/localization/translating-content"
+      }
+    },
+    {
+      "id": "localization-application-and-views",
+      "kind": "doc",
+      "title": {
+        "es": "Fachada, inyección y vistas",
+        "en": "Facade, injection, and views"
+      },
+      "label": {
+        "es": "Fachada, inyección y vistas",
+        "en": "Facade, injection, and views"
+      },
+      "slug": {
+        "es": "/es/services/localization/application-and-views",
+        "en": "/en/services/localization/application-and-views"
       }
     },
     {

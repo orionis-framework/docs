@@ -1,126 +1,146 @@
 ---
-title: "Configurar, extender y diagnosticar vistas"
-description: "View renderiza HTML en el servidor mediante Jinja2 async y lo entrega como una respuesta Orionis."
+title: "Configuración y caché de vistas"
+description: "Configura directorios, escape, recarga y las dos cachés del motor de vistas de Orionis."
 editUrl: true
 lastUpdated: false
 ---
 
-View renderiza HTML en el servidor mediante Jinja2 async y lo entrega como una respuesta Orionis.
+`config/view.py` define dónde se buscan las plantillas y cómo se conserva su compilación. Orionis crea un entorno Jinja compartido por proceso a partir de esta configuración. El renderizado siempre es asíncrono.
 
-## Configurar carga y caché
+## El archivo config/view.py
 
-Las rutas se buscan por orden: una plantilla del primer directorio oculta otra del mismo nombre en los siguientes. El prefijo `__orionis__/default/` está reservado para las páginas empaquetadas y se resuelve antes que los paths de aplicación. Los paths relativos de búsqueda y caché se anclan a `app.basePath`.
-
-La caché de plantillas de Jinja y la de bytecode son distintas: `cache_size` limita objetos compilados en memoria; `cache_path` conserva bytecode en disco. Poner `cache_path=None` desactiva solo la segunda. Si desactivas `auto_reload`, reinicia o reconstruye el entorno al publicar cambios: modificar una plantilla no fuerza la actualización de un proceso caliente. La caché no guarda respuestas HTML completas ni decide cache headers.
-
-`Undefined` es permisivo: una variable ausente puede renderizar texto vacío. Eso facilita vistas opcionales pero también oculta errores de nombres. Prepara contexto explícito y verifica páginas con datos completos, vacíos y usuarios invitados. Los templates son código de aplicación confiable: el entorno no es un sandbox para aceptar plantillas arbitrarias de usuarios.
-
-## Registrar filtros, tests y globals
-
-El provider propio debe ejecutarse después de registrar los servicios de View. Añade su clase al registro de providers de tu aplicación según la configuración de Foundation. Este ejemplo muestra el cuerpo de la extensión; no registra la clase automáticamente:
+La estructura predeterminada es una dataclass inmutable que hereda de la configuración de Orionis. Modifica los campos de la clase existente; no crees una segunda configuración de vistas en otro archivo:
 
 ```python
-from orionis.container.providers.service_provider import ServiceProvider
-from orionis.view.contracts.environment import IViewEnvironment
+from dataclasses import dataclass, field
 
-
-class ViewHelpersProvider(ServiceProvider):
-    async def boot(self) -> None:
-        environment: IViewEnvironment = await self.app.make(IViewEnvironment)
-        environment.addFilter("money", lambda value: f"${value:,.2f}")
-        environment.addTest("positive", lambda value: value > 0)
-        environment.addGlobal("support_email", "help@example.com")
-```
-
-Guarda este provider en `app/providers/view_helpers_provider.py`. Importa `ViewHelpersProvider` en `bootstrap/app.py` y añádelo a la llamada existente `app.withProviders(...)` antes de `app.create()`. Conserva los providers ya registrados; añadir un archivo de clase por sí solo no ejecuta su método `boot`.
-
-Úsalos con `{{ total | money }}`, `{% if total is positive %}` y `{{ support_email }}`. `addGlobal`/`addFilter`/`addTest` sustituyen un nombre existente; evita sobrescribir helpers fundamentales accidentalmente. `addExtension` admite extensiones Jinja y envuelve errores de registro en `ViewException`.
-
-Para un motor alternativo implementa `IViewEngine.render(template, context) -> str` como método async y sustituye ese binding antes de resolver `IViewFactory`. La fábrica y el engine se cachean como singletons: cambiar un binding después de resolverlos no reconstruye automáticamente referencias existentes. Personaliza el entorno en boot y trátalo como compartido de solo lectura durante requests. No guardes un usuario ni un tenant en un global mutable.
-
-
-## Configuración
-
-| Variable de entorno | Predeterminado | Significado |
-| --- | --- | --- |
-| `VIEW_PATHS` | `["resources/views"]` | Directorios ordenados de búsqueda. |
-| `VIEW_CACHE_SIZE` | `400` | Caché de plantillas compiladas; `0` desactiva, `-1` es ilimitado. |
-| `VIEW_CACHE_PATH` | `storage/framework/views` | Directorio de bytecode; usa `None` en configuración para desactivarlo. |
-| `APP_DEBUG` | `True` | Proporciona `auto_reload`; normalmente se desactiva en producción. |
-| `VIEW_AUTOESCAPE` | `True` | Escape HTML automático para plantillas de aplicación. |
-
-Las rutas y el directorio de caché pueden ser absolutos; los valores relativos parten de la base de la aplicación. `paths` debe ser una lista o tupla no vacía de cadenas y `cache_size` debe ser al menos `-1`.
-
-
-Aplica estas opciones en `config/view.py` de tu aplicación o en las variables de entorno que lea. El objeto de configuración siguiente solo valida sus valores; asignarlo a una variable local de Python no reconfigura la aplicación.
-
-### Validar la configuración
-
-```python
+from orionis.environment import Env
 from orionis.foundation.config.view import View
 
-config = View(
-    paths=["resources/views", "packages/admin/views"],
-    cache_size=400,
-    cache_path="storage/framework/views",
-    auto_reload=False,
-    autoescape=True,
-)
 
-assert config.paths[0] == "resources/views"
-assert config.autoescape is True
+@dataclass(frozen=True, kw_only=True)
+class BootstrapView(View):
+    paths: list[str] | tuple[str, ...] = field(
+        default_factory=lambda: Env.get("VIEW_PATHS", ["resources/views"]),
+    )
+    cache_size: int = field(
+        default_factory=lambda: Env.get("VIEW_CACHE_SIZE", 400),
+    )
+    cache_path: str | None = field(
+        default_factory=lambda: Env.get("VIEW_CACHE_PATH", "storage/framework/views"),
+    )
+    auto_reload: bool = field(
+        default_factory=lambda: Env.get("APP_DEBUG", True),
+    )
+    autoescape: bool = field(
+        default_factory=lambda: Env.get("VIEW_AUTOESCAPE", True),
+    )
 ```
 
-### Personalización del entorno
+Foundation descubre esta clase al cargar la configuración y publica sus valores en la sección `view`. Las llamadas `Env.get()` se evalúan al construir la configuración; las variables de entorno influyen porque el archivo las lee. Instanciar `View(...)` en un controlador no reconfigura el motor.
 
-- `ViewEnvironment.addGlobal(name, value)` registra un valor o callable global.
-- `addFilter(name, callback)` registra una operación `value | filter`.
-- `addTest(name, callback)` registra un predicado `value is test`.
-- `addExtension(extension)` registra una extensión Jinja2 y envuelve fallos en `ViewException`.
-- `getJinjaEnvironment()` devuelve el entorno compartido; el código externo debe tratarlo como solo lectura.
+| Campo | Tipo y valor predeterminado | Comportamiento |
+| --- | --- | --- |
+| `paths` | `list[str]` o `tuple[str, ...]`; `["resources/views"]` | Directorios de búsqueda, en orden de prioridad. Lee `VIEW_PATHS`. |
+| `cache_size` | `int`; `400` | Número máximo de plantillas en memoria por entorno. Lee `VIEW_CACHE_SIZE`. |
+| `cache_path` | `str` o `None`; `"storage/framework/views"` | Directorio de bytecode en disco; `None` lo desactiva. Lee `VIEW_CACHE_PATH`. |
+| `auto_reload` | `bool`; `True` | Comprueba si cambió el archivo fuente al recuperar una plantilla cacheada. Lee `APP_DEBUG`. |
+| `autoescape` | `bool`; `True` | Escapa los valores insertados en las plantillas de aplicación. Lee `VIEW_AUTOESCAPE`. |
 
-## Errores y casos límite
+No existe un campo `enable_async`: Orionis crea Jinja con `enable_async=True` y utiliza `render_async()`.
 
-- Las plantillas ausentes conservan `ViewTemplateNotFoundException`; los demás fallos del render pendiente se envuelven en `ViewRenderException` preservando su causa.
-- El motor envuelve los errores de plantilla Jinja en `ViewRenderException`.
-- Atributos encadenados desconocidos de `PendingView` lanzan `AttributeError`; solo pueden ponerse en cola atributos invocables de `HTMLResponse`.
-- Las operaciones flash no hacen nada si no está disponible el servicio de sesión.
-- `errors.first()` devuelve el primer mensaje disponible y la bolsa normaliza mensajes escalares a listas.
-- El filtro JSON devuelve `str(value)` cuando msgspec no puede codificarlo.
-- El filtro Markdown emite HTML; las reglas de autoescape determinan si la cadena se trata como markup al insertarla.
-- La extensión `{% csrf %}` lanza `ViewRenderException` si `csrf_field` no está registrado.
-- Una ruta con nombre desconocida o un parámetro faltante lanza `ViewRouteException`.
-- El `Undefined` predeterminado de Jinja es permisivo; una variable ausente suele renderizarse vacía en vez de lanzar.
+### Configurar mediante el entorno
 
+Con el archivo anterior, este ejemplo conserva el escape y la recarga durante el desarrollo y añade un segundo directorio:
 
-## Rendimiento y concurrencia
-
-El entorno, el motor y la fábrica son singletons. Jinja conserva hasta `cache_size` plantillas compiladas en memoria y opcionalmente persiste bytecode en disco. Los nombres de caché incluyen el nombre aplanado y legible más un digest SHA-1 de ocho caracteres para evitar colisiones de extensiones o rutas.
-
-La normalización de nombres usa una caché LRU protegida por bloqueo y limitada a 1.024 entradas. Los planes de interpolación de rutas con nombre se memoizan; hilos en carrera solo pueden calcular y almacenar el mismo valor determinista. El renderizado es asíncrono, mientras el entorno compartido solo se modifica durante el arranque. Registra globals, filtros, tests y extensiones personalizados al arrancar proveedores, no durante peticiones concurrentes.
-
-
-## Compatibilidad
-
-El módulo requiere Python 3.14+ y renderizado asíncrono de Jinja2. Las plantillas usan sintaxis Jinja2, no cadenas de formato Python. `PendingView` devuelve el `HTMLResponse` nativo de Orionis, por lo que cabeceras, cookies, trabajo en segundo plano y transportes posteriores siguen los contratos del módulo HTTP.
-
-`orionis.view` no posee reexportaciones raíz; usa `orionis.support.facades.View` en código de aplicación o importa clases concretas desde sus módulos de definición para extensiones y pruebas aisladas.
-
-## Inspeccionar nombres de bytecode
-
-`OrionisBytecodeCache` utiliza nombres legibles más un digest de ocho caracteres para distinguir rutas y extensiones. Es una caché compilada regenerable; no la uses como almacén de datos de negocio. Puedes comprobar la clave sin abrir archivos:
-
-```python
-from orionis.view.cache import OrionisBytecodeCache
-
-cache = OrionisBytecodeCache("storage/framework/views")
-key = cache.getCacheKey("users/profile.html")
-assert key.startswith("users.profile.")
-assert len(key.rsplit(".", 1)[-1]) == 8
-assert key != cache.getCacheKey("users/profile.j2")
+```dotenv
+VIEW_PATHS=list:["resources/views", "packages/admin/views"]
+VIEW_CACHE_SIZE=int:400
+VIEW_CACHE_PATH=storage/framework/views
+APP_DEBUG=bool:true
+VIEW_AUTOESCAPE=bool:true
 ```
 
+Para desactivar únicamente la caché en disco, utiliza `VIEW_CACHE_PATH=null`. Para desactivar únicamente la caché en memoria, utiliza `VIEW_CACHE_SIZE=int:0`. `int:-1` elimina el límite de la caché en memoria. Un valor positivo mantiene una caché LRU con ese máximo de plantillas.
 
----
+`paths` debe ser una lista o tupla no vacía de cadenas no vacías. `cache_size` debe ser un entero mayor o igual a `-1`; un booleano no es válido. `cache_path` admite una cadena no vacía o `None`. Los dos campos booleanos requieren valores booleanos reales: la configuración no convierte tipos incorrectos silenciosamente.
 
-[Índice](/es/services/views) · [foundation](/es/getting-started) · [container](/es/architecture/service-container) · [failure](/es/architecture/exception-handling)
+## Cómo se resuelven los directorios
+
+Las rutas relativas se resuelven desde `app.basePath`, normalmente la raíz del proyecto. También se admiten rutas absolutas. Por ejemplo:
+
+```text
+project/
+├── resources/views/dashboard.html
+├── packages/admin/views/dashboard.html
+└── storage/framework/views/
+```
+
+Con `paths=["resources/views", "packages/admin/views"]`, `View.make("dashboard")` carga `resources/views/dashboard.html`. Si ese archivo no existe, busca en el segundo directorio. Cambiar el orden cambia qué plantilla se selecciona cuando los nombres coinciden.
+
+Los archivos no necesitan un módulo Python ni archivos de inicialización: son plantillas del loader. Su ubicación y los nombres que se pasan a `View.make()` se explican en [renderizar vistas](/es/services/views/rendering-templates).
+
+El prefijo `__orionis__/default/` está reservado para páginas incluidas en el framework. Un loader propio del framework las busca antes de los directorios de aplicación. Estas páginas conservan el escape HTML aunque `autoescape=False` para las vistas de aplicación.
+
+## Caché en memoria y bytecode en disco
+
+Son dos mecanismos distintos:
+
+1. **Memoria:** Jinja conserva los objetos de plantilla compilados dentro del entorno del proceso. `cache_size` establece su límite. Cada worker tiene su propia memoria.
+2. **Disco:** Jinja guarda bytecode Python compilado para evitar volver a compilar la plantilla cuando otro entorno la carga. `cache_path` determina su directorio.
+
+Estas cachés conservan la compilación de la plantilla, **no el HTML de una petición**. Las variables se aplican en cada renderizado: dos usuarios pueden recibir resultados distintos a partir del mismo bytecode. Tampoco establecen cabeceras de caché HTTP.
+
+### Cuándo aparecen los archivos
+
+Si `cache_path` no es `None`, Orionis crea el directorio y sus padres al construir el entorno, normalmente durante el arranque de los providers. Los archivos `.cache` se escriben cuando una plantilla se carga y compila por primera vez; arrancar la aplicación no precompila todas las vistas.
+
+La ubicación predeterminada es:
+
+```text
+<raíz del proyecto>/storage/framework/views/
+```
+
+El nombre contiene la ruta de la plantilla aplanada, un digest SHA-1 de ocho caracteres del nombre original y la extensión `.cache`:
+
+```text
+users/profile.html → users.profile.<digest de 8 caracteres>.cache
+```
+
+El digest distingue, por ejemplo, `users/profile.html` de `users/profile.j2`. Jinja conserva también una comprobación del contenido fuente para descartar bytecode que ya no corresponde a la plantilla.
+
+La escritura utiliza un archivo temporal y un reemplazo al terminar, para evitar que otro proceso lea bytecode parcialmente escrito. El directorio debe permitir creación y escritura al proceso de la aplicación: Orionis no cambia automáticamente a una caché desactivada si falla su creación. Aunque parte de los fallos de lectura o reemplazo se toleran, los errores de apertura y escritura pueden propagarse; prepara el directorio antes del despliegue.
+
+### Recarga durante desarrollo y despliegue
+
+Con `auto_reload=True`, Jinja comprueba si la plantilla en memoria sigue actualizada y vuelve a cargarla cuando cambia el archivo. Con `False`, un proceso que ya tiene una plantilla en memoria puede seguir utilizándola aunque se edite el archivo.
+
+Por eso, al desplegar cambios con `auto_reload=False`, reinicia los workers para reconstruir sus entornos. Borrar archivos de disco no vacía la caché en memoria de procesos que ya están atendiendo peticiones. Modificar `app.config("view...")` después de resolver el entorno tampoco reconstruye ese singleton.
+
+## Limpiar el bytecode
+
+Desde la raíz del proyecto, utiliza cualquiera de estas alternativas:
+
+```bash
+orionis clear:views
+```
+
+```bash
+python -B reactor clear:views
+```
+
+El comando lee `view.cache_path`, resuelve la ruta relativa desde la base de la aplicación y elimina recursivamente archivos terminados en `.cache`. Conserva el directorio y los demás archivos. Si la caché en disco está desactivada, informa de ello y termina correctamente.
+
+El código de salida es `0` si no hubo errores y `1` si falló la eliminación de algún archivo o la ruta configurada no es válida. Los errores se muestran en consola. Una plantilla utilizada después de la limpieza puede volver a generar su bytecode.
+
+Dedica `cache_path` al bytecode de vistas, ya que la limpieza se aplica a todos los archivos `.cache` de ese directorio y sus subdirectorios. Para una limpieza estable durante un despliegue, coordina la operación con el reinicio de los workers.
+
+## Escape, variables ausentes y diagnóstico
+
+Mantén `autoescape=True` para páginas HTML. Escapa el contenido insertado, sin impedir que los layouts, bloques y archivos HTML de la aplicación funcionen. Los helpers que devuelven markup seguro tienen contratos específicos, descritos en [globals de vistas](/es/services/views/globals).
+
+El entorno utiliza `jinja2.Undefined`: una variable ausente puede imprimirse vacía, mientras otras operaciones sobre ella sí pueden fallar. Pasa un contexto explícito y comprueba las páginas con datos completos y vacíos. Las plantillas son código confiable de tu aplicación; este entorno no utiliza el sandbox de Jinja.
+
+Una plantilla ausente produce `ViewTemplateNotFoundException`. Los errores del renderizado pendiente se presentan como `ViewRenderException`, conservando la causa. Revisa el nombre solicitado, los directorios de búsqueda y la excepción original antes de limpiar cachés. Consulta [excepciones HTTP](/es/http/exceptions) para entender su presentación durante una petición.
+
+Para añadir filtros, globals, tests o etiquetas, utiliza un [provider de vistas](/es/services/views/providers-and-extensions). La configuración anterior controla carga y caché; el provider amplía el entorno compartido antes de atender peticiones.
