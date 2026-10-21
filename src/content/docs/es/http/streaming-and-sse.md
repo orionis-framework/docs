@@ -30,6 +30,79 @@ Conserva los demás argumentos de tu aplicación. El contexto API selecciona el 
 
 `{report_id:int}` convierte el segmento a `int` y lo entrega al controlador por nombre. También puedes utilizar `str`, `slug` y `uuid`; consulta [Rutas HTTP](/es/http/routing). La guía de [rutas y ciclos de vida](/es/asynchronous/realtime/routing-and-lifecycle) compara este registro con WebSocket y Realtime.
 
+## Inyección por constructor y por acción
+
+Un endpoint SSE utiliza la misma inyección que cualquier [controlador HTTP](/es/http/request-lifecycle). El constructor puede recibir servicios compartidos por sus acciones y el método puede solicitar los que necesita ese endpoint.
+
+Guarda estos servicios concretos en `app/services/report_events.py`. La fuente simula progreso; en una aplicación real, sustituye su implementación por la consulta del estado de un trabajo existente:
+
+```python
+import asyncio
+import json
+from collections.abc import AsyncIterator
+
+
+class ReportEventFormatter:
+    def format(self, report_id: int, percent: int) -> str:
+        return json.dumps({"report_id": report_id, "percent": percent})
+
+
+class ReportProgressSource:
+    async def percentages(self) -> AsyncIterator[int]:
+        for percent in (25, 50, 75, 100):
+            await asyncio.sleep(0.5)
+            yield percent
+```
+
+En `app/http/controllers/injected_report_controller.py`:
+
+```python
+from collections.abc import AsyncIterator
+
+from app.services.report_events import ReportEventFormatter, ReportProgressSource
+from orionis.http import EventStreamResponse, ServerSentEvent, response
+from orionis.http.base import BaseController
+
+
+class InjectedReportController(BaseController):
+    def __init__(self, formatter: ReportEventFormatter) -> None:
+        self._formatter = formatter
+
+    async def events(
+        self,
+        report_id: int,
+        source: ReportProgressSource,
+    ) -> EventStreamResponse:
+        async def progress() -> AsyncIterator[ServerSentEvent]:
+            async for percent in source.percentages():
+                yield ServerSentEvent(
+                    event="progress",
+                    data=self._formatter.format(report_id, percent),
+                )
+            yield ServerSentEvent(event="done", data="complete")
+
+        return response.eventStream(progress())
+```
+
+Registra esta acción en `routes/api.py`:
+
+```python
+from app.http.controllers.injected_report_controller import InjectedReportController
+from orionis.support.facades import Route
+
+
+Route.get(
+    "/reports/{report_id:int}/dependency-events",
+    [InjectedReportController, "events"],
+)
+```
+
+Orionis construye `ReportEventFormatter` para el constructor y resuelve `ReportProgressSource` al invocar `events()`. El cliente sólo proporciona `report_id` en la ruta; los servicios se resuelven en el servidor. No necesitas registrar estos concretos sin dependencias. Los contratos abstractos y la reutilización de instancias se configuran en el [contenedor](/es/architecture/service-container/bindings-and-invocation).
+
+Puedes abrir esta ruta con el cliente `EventSource` mostrado más adelante: recibe cuatro eventos `progress` y uno `done`; cierra la conexión al recibir `done`. Este ejemplo aislado no implementa reanudación por `Last-Event-ID`; el siguiente ejemplo sí muestra esa validación.
+
+La función interna `progress()` captura los servicios ya resueltos. Añadirle parámetros anotados no activa inyección: el productor se ejecuta como un generador Python, después de devolver la respuesta. El scope HTTP permanece abierto durante el envío del stream y se cierra al terminar su procesamiento; no conserves sus servicios para utilizarlos después de ese cierre.
+
 ## Ejemplo completo: progreso de un informe
 
 Esta demostración genera cuatro estados separados por una espera asíncrona. Permite comprobar eventos y reconexión sin añadir colas. En una aplicación real, el productor debe leer el estado del trabajo existente; abrir o reconectar el stream no debe iniciar otra vez ese trabajo.

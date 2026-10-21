@@ -1597,12 +1597,12 @@
       "id": "mcp-overview",
       "kind": "doc",
       "title": {
-        "es": "Servidores MCP nativos",
-        "en": "Native MCP servers"
+        "es": "Introducción a MCP",
+        "en": "Introduction to MCP"
       },
       "label": {
-        "en": "MCP servers",
-        "es": "Servidores MCP"
+        "es": "Introducción",
+        "en": "Introduction"
       },
       "slug": {
         "es": "/es/protocols/mcp",
@@ -1613,12 +1613,12 @@
       "id": "mcp-servers-and-tools",
       "kind": "doc",
       "title": {
-        "es": "Crear un servidor con herramientas tipadas",
-        "en": "Building a server with typed tools"
+        "es": "Servidores y rutas",
+        "en": "Servers and routes"
       },
       "label": {
-        "en": "Typed tools",
-        "es": "Herramientas tipadas"
+        "es": "Servidores y rutas",
+        "en": "Servers and routes"
       },
       "slug": {
         "es": "/es/protocols/mcp/servers-and-tools",
@@ -1626,15 +1626,31 @@
       }
     },
     {
+      "id": "mcp-tools",
+      "kind": "doc",
+      "title": {
+        "es": "Herramientas MCP",
+        "en": "MCP tools"
+      },
+      "label": {
+        "es": "Herramientas (Tools)",
+        "en": "Tools"
+      },
+      "slug": {
+        "es": "/es/protocols/mcp/tools",
+        "en": "/en/protocols/mcp/tools"
+      }
+    },
+    {
       "id": "mcp-resources-and-prompts",
       "kind": "doc",
       "title": {
-        "es": "Recursos, plantillas URI y prompts",
-        "en": "Resources, URI templates and prompts"
+        "es": "Recursos y plantillas URI",
+        "en": "Resources and URI templates"
       },
       "label": {
-        "en": "Resources and prompts",
-        "es": "Recursos y prompts"
+        "es": "Recursos (Resources)",
+        "en": "Resources"
       },
       "slug": {
         "es": "/es/protocols/mcp/resources-and-prompts",
@@ -1642,15 +1658,31 @@
       }
     },
     {
+      "id": "mcp-prompts",
+      "kind": "doc",
+      "title": {
+        "es": "Prompts MCP",
+        "en": "MCP prompts"
+      },
+      "label": {
+        "es": "Prompts",
+        "en": "Prompts"
+      },
+      "slug": {
+        "es": "/es/protocols/mcp/prompts",
+        "en": "/en/protocols/mcp/prompts"
+      }
+    },
+    {
       "id": "mcp-responses-and-content",
       "kind": "doc",
       "title": {
-        "es": "Contenido, serialización y metadata",
-        "en": "Content, serialization and metadata"
+        "es": "Respuestas y contenido MCP",
+        "en": "MCP responses and content"
       },
       "label": {
-        "en": "Content and serialization",
-        "es": "Contenido y serialización"
+        "es": "Respuestas y contenido",
+        "en": "Responses and content"
       },
       "slug": {
         "es": "/es/protocols/mcp/responses-and-content",
@@ -1658,15 +1690,31 @@
       }
     },
     {
+      "id": "mcp-http-and-clients",
+      "kind": "doc",
+      "title": {
+        "es": "Consultas HTTP y clientes MCP",
+        "en": "HTTP requests and MCP clients"
+      },
+      "label": {
+        "es": "HTTP y clientes",
+        "en": "HTTP and clients"
+      },
+      "slug": {
+        "es": "/es/protocols/mcp/http-and-clients",
+        "en": "/en/protocols/mcp/http-and-clients"
+      }
+    },
+    {
       "id": "mcp-transports-and-configuration",
       "kind": "doc",
       "title": {
-        "es": "Transportes HTTP, STDIO y configuración",
-        "en": "HTTP, STDIO and configuration"
+        "es": "STDIO y configuración MCP",
+        "en": "STDIO and MCP configuration"
       },
       "label": {
-        "en": "HTTP, STDIO and configuration",
-        "es": "HTTP, STDIO y configuración"
+        "es": "STDIO y configuración",
+        "en": "STDIO and configuration"
       },
       "slug": {
         "es": "/es/protocols/mcp/transports-and-configuration",
@@ -1677,12 +1725,12 @@
       "id": "mcp-advanced-workflows",
       "kind": "doc",
       "title": {
-        "es": "Progreso, continuación, suscripciones y extensiones",
-        "en": "Progress, continuation, subscriptions and extensions"
+        "es": "Flujos avanzados de MCP",
+        "en": "Advanced MCP workflows"
       },
       "label": {
-        "en": "Progress and subscriptions",
-        "es": "Progreso y suscripciones"
+        "es": "Flujos avanzados",
+        "en": "Advanced workflows"
       },
       "slug": {
         "es": "/es/protocols/mcp/advanced-workflows",

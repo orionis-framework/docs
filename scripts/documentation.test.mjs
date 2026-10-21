@@ -105,3 +105,15 @@ test('retained contribution pages switch languages through their stable IDs', ()
   assert.equal(page.id, 'community-contributors');
   assert.deepEqual(getTranslations(page.id).map((item) => item.slug), ['/en/contribute/contributors', '/es/contribute/contributors']);
 });
+
+test('MCP component guides are peers under a distinct introduction', () => {
+  const group = createSidebar().find((item) => item.items?.some((child) => child.attrs?.['data-nav-group'] === 'mcp'));
+  assert.ok(group);
+  for (const item of group.items) assert.equal(item.attrs.class, 'module-peer');
+  for (const id of ['mcp-tools', 'mcp-resources-and-prompts', 'mcp-prompts', 'mcp-http-and-clients']) {
+    assert.ok(group.items.some((item) => item.attrs['data-page-id'] === id), id);
+  }
+  for (const locale of documentationCatalog.locales) {
+    assert.notEqual(group.translations[locale], group.items[0].translations[locale]);
+  }
+});

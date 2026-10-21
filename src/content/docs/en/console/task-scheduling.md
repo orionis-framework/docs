@@ -38,6 +38,45 @@ Keep the skeleton's scheduler registration in `bootstrap/app.py`. If you introdu
 
 Trigger methods (`dailyAt`, `everySeconds`, `cron`, and others) are terminal and return `bool`. Configure `purpose`, `coalesce`, `misfireGraceTime`, `maxInstances`, `randomDelay`, dates, and listeners **before** the trigger. Do not chain methods after `dailyAt`.
 
+## Dependencies in the scheduler and commands
+
+The scheduler supports constructor and `tasks()` injection too. For example, this complete module can replace `app/console/scheduler.py`:
+
+```python
+from orionis.console.base import BaseScheduler
+from orionis.console.contracts import ISchedule
+
+
+class ReportSchedulePolicy:
+    def hour(self) -> int:
+        return 2
+
+
+class ReportScheduleLabel:
+    def purpose(self) -> str:
+        return "Daily reports"
+
+
+class Scheduler(BaseScheduler):
+    def __init__(self, policy: ReportSchedulePolicy) -> None:
+        self.policy = policy
+
+    def tasks(
+        self,
+        schedule: ISchedule,
+        labels: ReportScheduleLabel,
+    ) -> None:
+        (
+            schedule.command("reports:build", purpose=labels.purpose())
+            .maxInstances(1)
+            .dailyAt(self.policy.hour(), 30)
+        )
+```
+
+The application builds `Scheduler` through the container and resolves `ReportSchedulePolicy`. When loading the agenda, `schedule:list` and `schedule:work` supply `schedule` explicitly, while the container resolves `ReportScheduleLabel` for `tasks()`. Both concrete classes are constructed without additional bindings. This method configures the agenda when it is loaded; it does not run again to inject services at every scheduled execution.
+
+When a trigger fires, Reactor dispatches the command signature. The command receives its own constructor and `handle()` dependencies as shown in [commands](/en/console/commands-and-arguments#constructor-and-method-injection). Scheduler event callbacks receive their event arguments through a direct call: do not add service parameters expecting the same injection as `tasks()`; use collaborators prepared in the constructor.
+
 ## Choose a trigger
 
 | Requirement | Terminal |

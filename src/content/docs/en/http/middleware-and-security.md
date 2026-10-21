@@ -179,6 +179,66 @@ The clock starts before continuing; the calculation and header are added when co
 
 `started_at` is a local variable. The kernel may reuse a middleware instance across requests: keep request-specific data in local variables or `request.state`, even when using `__slots__`.
 
+## Dependency injection in middleware
+
+Orionis constructs middleware through the container, so you can receive annotated services in `__init__`. In `app/services/duration_formatter.py`, define a service without request state:
+
+```python
+class DurationFormatter:
+    def milliseconds(self, seconds: float) -> str:
+        return f"{seconds * 1000:.3f}"
+```
+
+In `app/http/middleware/timed_response_middleware.py`, request that service in the constructor:
+
+```python
+from time import perf_counter
+
+from app.services.duration_formatter import DurationFormatter
+from orionis.http import BaseMiddleware, NextCallable, Request, Response
+
+
+class TimedResponseMiddleware(BaseMiddleware):
+    __slots__ = ("_formatter",)
+
+    def __init__(self, formatter: DurationFormatter) -> None:
+        self._formatter = formatter
+
+    async def handle(
+        self,
+        request: Request,
+        call_next: NextCallable,
+    ) -> Response:
+        started_at = perf_counter()
+        response = await call_next()
+        response.setHeader(
+            "X-Process-Time-Ms",
+            self._formatter.milliseconds(perf_counter() - started_at),
+        )
+        return response
+```
+
+For example, in `routes/api.py`:
+
+```python
+from app.http.middleware.timed_response_middleware import TimedResponseMiddleware
+from orionis.http import JSONResponse, response
+from orionis.support.facades import Route
+
+
+async def timed_status() -> JSONResponse:
+    return response.json({"status": "ok"})
+
+
+Route.get("/timed-status", timed_status).middleware(TimedResponseMiddleware)
+```
+
+`GET /timed-status` returns the status and the header calculated with the injected service. `DurationFormatter` is concrete and auto-constructible; abstract contracts need a [container binding](/en/architecture/service-container/bindings-and-invocation).
+
+**`handle()` keeps the `handle(request, call_next)` signature**. The kernel calls it directly; adding a third service parameter does not enable injection. Use the constructor for those services and the `request` parameter for current request data.
+
+Instances are prepared during startup and reused. Their dependencies must be resolvable at that point and safe to share across requests. Do not request `Request` or services requiring an active HTTP scope in this constructor. Keep timers, users, and other request data in local variables or `request.state`.
+
 ## Registering global middleware
 
 In `bootstrap/app.py`, use the bootstrap's `app` instance and add the registration before `app.create()`:

@@ -46,7 +46,53 @@ La primera invocación imprime `Hello, Ada!` dos veces y termina con código 0. 
 
 El loader escanea módulos importables y solo registra clases definidas en ese módulo que hereden `BaseCommand`. No basta con importar una clase ajena en otro archivo para descubrirla de nuevo. Las firmas usan minúsculas, dígitos y, opcionalmente, un namespace separado por `:`; un nombre como `reports:build-daily` es válido. Asigna identidades únicas para evitar colisiones entre las fuentes de registro.
 
-`handle()` puede solicitar dependencias tipadas al contenedor. Los valores CLI se consultan con `getArgument()` o se reciben según el despacho del reactor. Si sobrescribes `__init__` para inyectar servicios, llama a `super().__init__()` para inicializar el estado de `BaseCommand`.
+`handle()` puede solicitar dependencias tipadas al contenedor. En una clase que hereda `BaseCommand`, los valores CLI se consultan con `getArgument()`; no se pasan automáticamente como argumentos de `handle()`. Si sobrescribes `__init__` para inyectar servicios, llama a `super().__init__()` para inicializar el estado de `BaseCommand`.
+
+### Inyección por constructor y por método
+
+Guarda este módulo completo en `app/console/commands/build_report_command.py`:
+
+```python
+from typing import ClassVar
+from orionis.console import Argument
+from orionis.console.base import BaseCommand
+
+
+class ReportBuilder:
+    def build(self, report_id: str) -> str:
+        return f"Report {report_id}"
+
+
+class ReportPresenter:
+    def format(self, report: str) -> str:
+        return f"Ready: {report}"
+
+
+class BuildReportCommand(BaseCommand):
+    signature = "reports:build-one"
+    description = "Build a report."
+    arguments: ClassVar[list[Argument]] = [
+        Argument(name_or_flags="report_id", help="Report identifier."),
+    ]
+
+    def __init__(self, builder: ReportBuilder) -> None:
+        super().__init__()
+        self.builder = builder
+
+    async def handle(self, presenter: ReportPresenter) -> int:
+        report = self.builder.build(self.getArgument("report_id"))
+        self.writeLine(presenter.format(report))
+        return 0
+```
+
+```shell
+orionis reports:build-one report-42
+python -B reactor reports:build-one report-42
+```
+
+Ambos comandos imprimen `Ready: Report report-42` y devuelven 0, además de la salida de ejecución normal de Reactor. El contenedor construye `ReportBuilder` antes del comando y resuelve `ReportPresenter` antes de ejecutar `handle()`. Estas clases concretas no requieren registro adicional. `report_id` procede del parser CLI, no es una dependencia del contenedor.
+
+En handlers fluidos que **no** heredan `BaseCommand`, Reactor sí entrega los argumentos CLI por nombre al método y resuelve sus demás dependencias tipadas. Añadir anotaciones a una llamada Python directa no activa inyección: esta ocurre al despachar mediante Reactor.
 
 ## Describir argumentos correctamente
 

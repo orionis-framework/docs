@@ -50,6 +50,79 @@ asyncio.run(main())
 
 `WelcomeService` se autoconstruye y su dependencia `Greeter` resuelve el singleton.
 
+## Inyección en una aplicación Orionis
+
+La aplicación existente es también el contenedor. En el código de aplicación utiliza el `IApplication` que Orionis ya resuelve para el componente actual y conserva los bindings de sus proveedores.
+
+Guarda este ejemplo en `app/services/di_examples.py`. `demo()` recibe esa aplicación; no crea ni arranca otra:
+
+```python
+from orionis.foundation.contracts.application import IApplication
+
+
+class TextFormatter:
+
+    __slots__ = ()
+
+    def format(self, text: str) -> str:
+        return text.strip()
+
+
+class MessagePresenter:
+
+    __slots__ = ("_formatter",)
+
+    def __init__(self, formatter: TextFormatter) -> None:
+        self._formatter = formatter
+
+    def from_constructor(self, text: str) -> str:
+        return self._formatter.format(text)
+
+    def from_method(self, text: str, formatter: TextFormatter) -> str:
+        return formatter.format(text)
+
+
+def format_message(text: str, formatter: TextFormatter) -> str:
+    return formatter.format(text)
+
+
+async def demo(app: IApplication) -> dict[str, str]:
+    presenter = await app.build(MessagePresenter)
+    return {
+        "constructor": presenter.from_constructor("  Orionis  "),
+        "method": await app.call(presenter, "from_method", text="  Orionis  "),
+        "function": await app.invoke(format_message, text="  Orionis  "),
+    }
+```
+
+Las tres entradas devuelven `"Orionis"`. `build()` construye `MessagePresenter` e inyecta `TextFormatter` en su constructor. `call()` recibe una instancia y el nombre del método; `invoke()` recibe una función. Estos últimos conservan el `text` que proporcionas y resuelven el parámetro `formatter` que falta.
+
+Puedes ejecutar `await demo(app)` desde un componente que ya reciba `app: IApplication`, como un comando. No hace falta registrar estas clases concretas: son autoconstruibles. Un contrato abstracto necesita un binding a una implementación; registra esos bindings en `ServiceProvider.register()` mediante `self.app.transient(...)`, `singleton(...)` o `scoped(...)` según el ciclo de vida necesario. Consulta [proveedores y fachadas](/es/architecture/service-container/providers-and-facades).
+
+La anotación describe qué resolver; **la llamada a través del contenedor o del punto de ejecución del framework activa la inyección**. Una llamada Python directa a `presenter.from_method(...)` o `format_message(...)` exige que tú pases `formatter`. `from_constructor()` sí puede llamarse directamente porque su objeto ya recibió esa dependencia durante `build()`.
+
+Utiliza el constructor cuando varias acciones necesiten un servicio y el parámetro del método cuando la dependencia corresponda a una acción concreta. La identidad del servicio depende de su registro: dos resoluciones de una clase concreta sin binding no tienen por qué devolver el mismo objeto. No conviertas esa coincidencia en una condición de funcionamiento; elige un binding `singleton` o `scoped` cuando corresponda compartirlo.
+
+### Dónde aplica la inyección automática
+
+Estos son los puntos de entrada que utilizan los distintos flujos de Orionis. Cada capítulo contiene ejemplos adaptados a su API:
+
+| Punto de ejecución | Constructor | Método o función |
+|---|---|---|
+| [Controlador HTTP](/es/http/request-lifecycle) | Sí. | Acción resuelta por el router; también las funciones de ruta. |
+| [Streaming y SSE](/es/http/streaming-and-sse) | Sí, en el controlador HTTP. | La acción recibe servicios. El iterador o generador del stream se consume directamente; no inyecta sus propios parámetros. |
+| [WebSocket](/es/http/websockets) | Sí, en el controlador. | Acción o función de ruta; incluye los valores de parámetros de ruta. |
+| [Hub Realtime](/es/asynchronous/realtime/hubs-and-methods) | Sí, al construir cada hub. | Métodos `@remote`. Los hooks `onConnect` y `onDisconnect` tienen argumentos fijos y no añaden DI por método. |
+| [MCP](/es/protocols/mcp/servers-and-tools) | Sí, en la definición de la primitiva. | `handle()` recibe servicios y los datos/contexto declarados para esa primitiva. |
+| [Comando CLI](/es/console/commands-and-arguments) | Sí. | `handle()` recibe servicios. Con `BaseCommand`, lee los argumentos CLI mediante `getArgument()`. |
+| [Scheduler](/es/console/task-scheduling) | Sí. | `tasks(schedule: ISchedule, ...)` recibe la agenda y puede solicitar servicios adicionales. |
+| [Job de cola](/es/asynchronous/queues/jobs-and-dispatch) | El constructor corresponde a los datos serializados del job; no es un punto de DI. | El worker inyecta los servicios de `handle()`. |
+| [Middleware HTTP](/es/http/middleware-and-security) | Sí; las instancias de los stacks pueden reutilizarse entre peticiones. | `handle(request, call_next)` se llama directamente, sin DI de parámetros adicionales. |
+| [Middleware WebSocket](/es/http/websockets#middleware-de-conexión-y-grupos) | Sí; los middleware de ruta se construyen para la conexión. | `handle(socket, call_next)` tiene argumentos fijos; no recibe DI adicional por método. |
+| [BackgroundTask](/es/asynchronous/background-tasks/response-tasks) | Pasa los valores al crear la tarea. | El callback se ejecuta con los argumentos que entregaste; sus anotaciones no activan DI automática. |
+
+Los objetos de la petición, conexión o ejecución actual solo están disponibles cuando su flujo los ha registrado en el scope activo. No presupongas que un `Request` HTTP existe en un comando, un job o una conexión Realtime. Tampoco guardes esos objetos en servicios globales ni en middleware HTTP reutilizados entre peticiones; solicita el contexto en el punto que lo proporciona. [Scopes y concurrencia](/es/architecture/service-container/scopes-and-concurrency) explica el aislamiento.
+
 ## Conceptos principales
 
 ### Contrato, concreto, alias y binding

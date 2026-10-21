@@ -35,6 +35,44 @@ print(response.background is task)    # True
 
 El fragmento construye la respuesta sin ejecutar la tarea. El adaptador ASGI/RSGI activo la llama después de completar el cuerpo.
 
+## Preparar dependencias antes de diferir la tarea
+
+`BackgroundTask` llama directamente al callable con los argumentos guardados: no construye su clase mediante el contenedor ni inyecta parámetros por sus anotaciones. Resuelve los servicios en un punto que sí usa inyección, como un controlador HTTP, y entrega a la tarea un método ya vinculado:
+
+```python
+from orionis.background import BackgroundTask
+from orionis.http import Response
+from orionis.support.facades import Route
+
+
+class DeliveryRecorder:
+    async def record(self, message_id: int) -> None:
+        print(f"delivered:{message_id}")
+
+
+class ReceiptFormatter:
+    def accepted(self, message_id: int) -> str:
+        return f"Accepted message {message_id}"
+
+
+class DeliveryController:
+    def __init__(self, recorder: DeliveryRecorder) -> None:
+        self.recorder = recorder
+
+    async def store(self, formatter: ReceiptFormatter) -> Response:
+        message_id = 42
+        return Response(
+            formatter.accepted(message_id),
+            status_code=202,
+            background=BackgroundTask(self.recorder.record, message_id),
+        )
+
+
+Route.post("/deliveries", [DeliveryController, "store"])
+```
+
+El módulo reúne servicios, controlador y ruta para mostrar el ejemplo completo; puedes separar sus clases y registrar la ruta en `routes/api.py`. Orionis inyecta `DeliveryRecorder` en el constructor del controlador y `ReceiptFormatter` en su acción. El método `record()` recibe únicamente el `message_id` que se pasó explícitamente a `BackgroundTask`. El contenedor no vuelve a resolverlo al ejecutar la tarea. En trabajo real, evita capturar servicios con recursos que ya estarán cerrados cuando se ejecute el callback.
+
 ## Diseñar un efecto secundario fiable
 
 Adjunta el trabajo con `Response(..., background=BackgroundTask(...))`. El adaptador espera `runBackground()` después de enviar el cuerpo. El cliente puede haber recibido un `202` cuando tu callback falla; ese estado no se puede convertir retroactivamente en un error HTTP. El callback necesita su propio registro y una política de recuperación.

@@ -475,18 +475,26 @@ Arguments in the table follow `orionis make:http-controller` or `python -B react
 
 When handling a route, Orionis constructs the controller class and resolves its constructor's annotated dependencies. It then invokes the action, supplying route parameters by name and resolving its remaining dependencies. Preparing metadata during startup does not execute ordinary constructors or actions.
 
-This example uses a concrete service without dependencies, which the container can construct automatically. Save `app/services/user_label_service.py`:
+This example uses two concrete services without dependencies, which the container can construct automatically. Save `app/services/user_label_service.py`:
 
 ```python
+import logging
+
+
 class UserLabelService:
     def label(self, user_id: int) -> str:
         return f"User {user_id}"
+
+
+class UserAuditService:
+    def record_view(self, user_id: int, path: str) -> None:
+        logging.getLogger(__name__).info("Viewing user %s at %s", user_id, path)
 ```
 
 In `app/http/controllers/show_user_controller.py`:
 
 ```python
-from app.services.user_label_service import UserLabelService
+from app.services.user_label_service import UserAuditService, UserLabelService
 from orionis.http import JSONResponse, Request, response
 from orionis.http.base import BaseController
 
@@ -495,7 +503,13 @@ class ShowUserController(BaseController):
     def __init__(self, labels: UserLabelService) -> None:
         self.labels = labels
 
-    async def __call__(self, request: Request, user_id: int) -> JSONResponse:
+    async def __call__(
+        self,
+        request: Request,
+        user_id: int,
+        audit: UserAuditService,
+    ) -> JSONResponse:
+        audit.record_view(user_id, request.path)
         return response.json({
             "id": user_id,
             "label": self.labels.label(user_id),
@@ -515,12 +529,15 @@ Route.get("/users/{user_id:int}", ShowUserController)
 `GET /users/42` returns `{"id": 42, "label": "User 42", "path": "/users/42"}`.
 
 - `labels: UserLabelService` lets the container construct and inject the service into the constructor. Abstract services or contracts need their corresponding binding.
+- `audit: UserAuditService` resolves when invoking this action. The client does not send it in the URL or payload: it is a server dependency.
 - `request: Request` obtains the current request registered in the HTTP scope; you do not construct it manually.
 - `user_id` arrives as an integer through the `{user_id:int}` converter. Accept that name in the action, including when receiving `Request`.
 - Annotations identify dependencies, while the converter declared in the route determines segment conversion. Adding `: int` only to the signature does not change the route pattern.
 - `Response` is the action's return value; the controller does not automatically receive a pre-created response.
 
-The controller is constructed when invoked; service lifetimes depend on container configuration. Annotated services can also be received directly by actions. Continue with [Bindings and invocation](/en/architecture/service-container/bindings-and-invocation).
+Use the constructor for services shared by several actions of a class and method parameters for services needed by one action. The same mechanism applies to Resource actions: if you rename `__call__` to `show`, register `[ShowUserController, "show"]`. Constructor dependencies resolve first, followed by action arguments; route values are supplied to the action, rather than the constructor.
+
+This example needs no bindings because both services are concrete and auto-constructible. To share the same instance between resolutions, configure its [lifetime](/en/architecture/service-container/bindings-and-invocation). Injection happens when Orionis constructs and invokes the controller; a direct Python call such as `controller.show(...)` requires you to supply its arguments.
 
 ## Organization and considerations
 

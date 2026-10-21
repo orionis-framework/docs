@@ -46,7 +46,53 @@ The first invocation prints `Hello, Ada!` twice and returns exit code 0. `--time
 
 The loader scans importable modules and registers only `BaseCommand` subclasses defined in that module. Importing another module's class does not rediscover it locally. Signatures use lowercase letters, digits, and an optional `:` namespace; `reports:build-daily` is valid. Give commands unique identities to avoid registration collisions.
 
-`handle()` may request typed container dependencies. Read CLI values through `getArgument()` or receive them through Reactor dispatch. When overriding `__init__` for service injection, call `super().__init__()` to initialize `BaseCommand` state.
+`handle()` may request typed container dependencies. In a `BaseCommand` subclass, read CLI values through `getArgument()`; they are not automatically passed as `handle()` arguments. When overriding `__init__` for service injection, call `super().__init__()` to initialize `BaseCommand` state.
+
+### Constructor and method injection
+
+Save this complete module as `app/console/commands/build_report_command.py`:
+
+```python
+from typing import ClassVar
+from orionis.console import Argument
+from orionis.console.base import BaseCommand
+
+
+class ReportBuilder:
+    def build(self, report_id: str) -> str:
+        return f"Report {report_id}"
+
+
+class ReportPresenter:
+    def format(self, report: str) -> str:
+        return f"Ready: {report}"
+
+
+class BuildReportCommand(BaseCommand):
+    signature = "reports:build-one"
+    description = "Build a report."
+    arguments: ClassVar[list[Argument]] = [
+        Argument(name_or_flags="report_id", help="Report identifier."),
+    ]
+
+    def __init__(self, builder: ReportBuilder) -> None:
+        super().__init__()
+        self.builder = builder
+
+    async def handle(self, presenter: ReportPresenter) -> int:
+        report = self.builder.build(self.getArgument("report_id"))
+        self.writeLine(presenter.format(report))
+        return 0
+```
+
+```shell
+orionis reports:build-one report-42
+python -B reactor reports:build-one report-42
+```
+
+Both commands print `Ready: Report report-42` and return 0, alongside Reactor's normal execution output. The container constructs `ReportBuilder` before the command and resolves `ReportPresenter` before calling `handle()`. These concrete classes need no additional registration. `report_id` comes from CLI parsing and is not a container dependency.
+
+For fluent handlers that **do not** inherit `BaseCommand`, Reactor does pass CLI arguments by name to the method and resolves its other typed dependencies. Annotations do not enable injection on a direct Python call; dispatching through Reactor does.
 
 ## Describe arguments correctly
 

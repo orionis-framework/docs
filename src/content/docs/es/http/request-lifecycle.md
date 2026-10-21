@@ -475,18 +475,26 @@ La columna de argumentos se añade a `orionis make:http-controller` o a `python 
 
 Al atender una ruta, Orionis construye la clase del controlador y resuelve las dependencias anotadas de su constructor. Después invoca la acción, aportando los parámetros de ruta por nombre y resolviendo sus dependencias restantes. La preparación de metadatos durante el arranque no ejecuta el constructor ni las acciones ordinarias.
 
-Este ejemplo utiliza un servicio concreto sin dependencias, que el contenedor puede construir automáticamente. Guarda `app/services/user_label_service.py`:
+Este ejemplo utiliza dos servicios concretos sin dependencias, que el contenedor puede construir automáticamente. Guarda `app/services/user_label_service.py`:
 
 ```python
+import logging
+
+
 class UserLabelService:
     def label(self, user_id: int) -> str:
         return f"User {user_id}"
+
+
+class UserAuditService:
+    def record_view(self, user_id: int, path: str) -> None:
+        logging.getLogger(__name__).info("Viewing user %s at %s", user_id, path)
 ```
 
 En `app/http/controllers/show_user_controller.py`:
 
 ```python
-from app.services.user_label_service import UserLabelService
+from app.services.user_label_service import UserAuditService, UserLabelService
 from orionis.http import JSONResponse, Request, response
 from orionis.http.base import BaseController
 
@@ -495,7 +503,13 @@ class ShowUserController(BaseController):
     def __init__(self, labels: UserLabelService) -> None:
         self.labels = labels
 
-    async def __call__(self, request: Request, user_id: int) -> JSONResponse:
+    async def __call__(
+        self,
+        request: Request,
+        user_id: int,
+        audit: UserAuditService,
+    ) -> JSONResponse:
+        audit.record_view(user_id, request.path)
         return response.json({
             "id": user_id,
             "label": self.labels.label(user_id),
@@ -515,12 +529,15 @@ Route.get("/users/{user_id:int}", ShowUserController)
 `GET /users/42` devuelve `{"id": 42, "label": "User 42", "path": "/users/42"}`.
 
 - `labels: UserLabelService` permite construir e inyectar el servicio en el constructor. Los servicios abstractos o contratos necesitan su binding correspondiente.
+- `audit: UserAuditService` se resuelve al invocar esta acción. El cliente no lo envía en la URL ni en el payload: es una dependencia del servidor.
 - `request: Request` obtiene la petición actual registrada en el scope HTTP; no debes construirla manualmente.
 - `user_id` llega como entero por el convertidor `{user_id:int}`. Debes aceptar ese nombre en la acción, también cuando recibes `Request`.
 - Las anotaciones identifican dependencias, pero el convertidor declarado en la ruta determina cómo se convierte el segmento. Añadir `: int` sólo en la firma no cambia el patrón de ruta.
 - `Response` es el resultado que devuelve la acción; no es una respuesta precreada que el controlador reciba automáticamente.
 
-El controlador se construye al invocarlo; la vida de sus servicios depende de la configuración del contenedor. También puedes recibir servicios anotados directamente en la acción. Amplía el tema en [Bindings e invocación](/es/architecture/service-container/bindings-and-invocation).
+Usa el constructor para servicios utilizados por varias acciones de la clase y los parámetros de método para servicios que sólo necesita una acción. Este mecanismo también se aplica a acciones Resource: si renombras `__call__` como `show`, registra `[ShowUserController, "show"]`. El constructor se resuelve primero y después los argumentos de la acción; los valores de ruta se proporcionan a la acción, no al constructor.
+
+El ejemplo no necesita bindings porque ambos servicios son concretos y autoconstruibles. Si necesitas compartir la misma instancia entre resoluciones, configura su [ciclo de vida](/es/architecture/service-container/bindings-and-invocation). La inyección ocurre cuando Orionis construye e invoca el controlador; una llamada Python directa como `controller.show(...)` requiere que proporciones tú sus argumentos.
 
 ## Organización y consideraciones
 

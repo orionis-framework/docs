@@ -199,24 +199,43 @@ Orionis converts the data and runs nested schema rules too. A failure terminates
 
 ## Dependency injection
 
-Parameters annotated with service classes are resolved from the container and excluded from client arguments. Constructor injection is also supported.
+Orionis supports injection into the **hub constructor** and **`@remote` methods**. Use the constructor for a dependency shared by several operations; a method parameter declares a dependency needed by that action.
+
+First create a concrete service in `app/services/message_formatter.py`:
 
 ```python
-from orionis.realtime import Hub, remote
-
-
 class MessageFormatter:
+
+    __slots__ = ()
 
     def format(self, text: str) -> str:
         return text.strip()
+```
+
+This service can be built without additional configuration: it has no required dependencies that you need to register. Abstract contracts require a container binding to an implementation.
+
+### Constructor and remote methods
+
+Save the following hub in `app/realtime/hubs/preview_hub.py`. The two actions demonstrate each injection form separately:
+
+```python
+from app.services.message_formatter import MessageFormatter
+from orionis.realtime import Hub, remote
 
 
 class PreviewHub(Hub):
 
-    __slots__ = ()
+    __slots__ = ("_formatter",)
+
+    def __init__(self, formatter: MessageFormatter) -> None:
+        self._formatter = formatter
 
     @remote
-    async def preview(
+    async def preview(self, text: str) -> str:
+        return self._formatter.format(text)
+
+    @remote
+    async def preview_once(
         self,
         text: str,
         formatter: MessageFormatter,
@@ -224,7 +243,44 @@ class PreviewHub(Hub):
         return formatter.format(text)
 ```
 
-For `Route.hub("/realtime/preview", PreviewHub)`, the client sends only `args: ["  Hola  "]`. It must not supply `formatter`: Orionis builds that service. Interfaces need their usual container bindings.
+In `__init__()`, Orionis resolves `MessageFormatter` and supplies it when constructing the hub. `preview()` uses that dependency stored in `self._formatter`; its slot allows this subclass to store the attribute.
+
+In `preview_once()`, Orionis identifies `text: str` as client data and `formatter: MessageFormatter` as a service. It converts and validates the text, resolves the service from the container, and executes the method with both arguments. You do not need to instantiate or pass the service when registering the route.
+
+Add this to `routes/websocket.py`:
+
+```python
+from app.realtime.hubs.preview_hub import PreviewHub
+from orionis.support.facades import Route
+
+Route.hub("/realtime/preview", PreviewHub)
+```
+
+With the [JavaScript client installed](/en/asynchronous/realtime/javascript-client), both calls send only the text:
+
+```javascript
+import { RealtimeClient } from "@orionis-framework/realtime-client";
+
+const client = new RealtimeClient("/realtime/preview");
+
+try {
+    await client.connect();
+    console.log(await client.invoke("preview", ["  Hola  "])); // Hola
+    console.log(await client.invoke("preview_once", ["  Hola  "])); // Hola
+} finally {
+    await client.dispose();
+}
+```
+
+The client **does not send `formatter`**, through either `args` or `kwargs`: it is excluded from remote parameters. Attempting to send it produces `invalid_arguments`.
+
+### Instances, context, and hooks
+
+The runtime constructs a new hub for each invocation. Service lifetime and reuse depend on their bindings: an unregistered concrete class is automatically built, but constructor and method injection are not guaranteed to receive the same object. A `scoped` binding shares one instance within that invocation's scope; another invocation has an independent scope.
+
+`WebSocket` and `HubContext` can also be injected by type into constructors and remote methods. They are already registered in the active scope. However, `self.context`, `self.clients`, and `self.groups` are assigned **after** the constructor executes: use these attributes inside methods and hooks, rather than in `__init__()`.
+
+The `onConnect(self)` and `onDisconnect(self, code, reason)` hooks are called directly with their lifecycle arguments; they do not receive additional dependencies through parameters. If they need a service, inject it through the constructor and use the corresponding attribute. Each hook receives a new hub instance; an attribute stored in `onConnect()` does not automatically survive into invocations or `onDisconnect()`.
 
 Keep annotation classes imported and available when loading the module: Orionis resolves them during compilation. Importing them exclusively inside `TYPE_CHECKING` can prevent this.
 

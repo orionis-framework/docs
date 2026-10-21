@@ -179,6 +179,66 @@ El inicio del reloj ocurre antes de continuar; el cálculo y el encabezado se a�
 
 `started_at` es una variable local. El kernel puede reutilizar una instancia de middleware entre peticiones: conserva los datos de cada petición en variables locales o en `request.state`, incluso si utilizas `__slots__`.
 
+## Inyección de dependencias en middleware
+
+Orionis construye los middleware mediante el contenedor, por lo que puedes recibir servicios anotados en `__init__`. En `app/services/duration_formatter.py`, define un servicio sin estado de petición:
+
+```python
+class DurationFormatter:
+    def milliseconds(self, seconds: float) -> str:
+        return f"{seconds * 1000:.3f}"
+```
+
+En `app/http/middleware/timed_response_middleware.py`, solicita ese servicio en el constructor:
+
+```python
+from time import perf_counter
+
+from app.services.duration_formatter import DurationFormatter
+from orionis.http import BaseMiddleware, NextCallable, Request, Response
+
+
+class TimedResponseMiddleware(BaseMiddleware):
+    __slots__ = ("_formatter",)
+
+    def __init__(self, formatter: DurationFormatter) -> None:
+        self._formatter = formatter
+
+    async def handle(
+        self,
+        request: Request,
+        call_next: NextCallable,
+    ) -> Response:
+        started_at = perf_counter()
+        response = await call_next()
+        response.setHeader(
+            "X-Process-Time-Ms",
+            self._formatter.milliseconds(perf_counter() - started_at),
+        )
+        return response
+```
+
+Por ejemplo, en `routes/api.py`:
+
+```python
+from app.http.middleware.timed_response_middleware import TimedResponseMiddleware
+from orionis.http import JSONResponse, response
+from orionis.support.facades import Route
+
+
+async def timed_status() -> JSONResponse:
+    return response.json({"status": "ok"})
+
+
+Route.get("/timed-status", timed_status).middleware(TimedResponseMiddleware)
+```
+
+`GET /timed-status` devuelve el estado y el encabezado calculado con el servicio inyectado. `DurationFormatter` es concreto y autoconstruible; los contratos abstractos requieren su registro en el [contenedor](/es/architecture/service-container/bindings-and-invocation).
+
+**`handle()` mantiene la firma `handle(request, call_next)`**. El kernel lo llama directamente; añadir un tercer parámetro de servicio no activa inyección. Usa el constructor para esos servicios y el parámetro `request` para los datos de la petición actual.
+
+Las instancias se preparan durante el arranque y se reutilizan. Sus dependencias deben poder resolverse entonces y ser seguras para compartir entre peticiones. No solicites `Request` ni servicios que necesiten un scope HTTP activo en este constructor. Conserva temporizadores, usuarios y otros datos de cada petición en variables locales o en `request.state`.
+
 ## Registrar middleware globales
 
 En `bootstrap/app.py`, utiliza la instancia `app` del bootstrap y añade el registro antes de `app.create()`:

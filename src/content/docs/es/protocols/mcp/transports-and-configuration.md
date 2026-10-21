@@ -1,91 +1,142 @@
 ---
-title: "Transportes HTTP, STDIO y configuración"
-description: "Registra una clase Server durante el boot con la facade Mcp. web(path, server) crea una ruta POST API nativa y devuelve su builder; admite paths fijos sin parámetros, query ni…"
+title: "STDIO y configuración MCP"
+description: "Publica servidores MCP locales con mcp:start, utiliza mensajes JSON por línea y configura los límites, orígenes y presupuestos reales de Orionis."
 editUrl: true
 lastUpdated: false
 ---
 
-Registra una clase Server durante el boot con la facade `Mcp`. `web(path, server)` crea una ruta POST API nativa y devuelve su builder; admite paths fijos sin parámetros, query ni fragmento. `local(name, server)` registra un handle explícito con letras, dígitos, punto, guion o underscore. No permite iniciar módulos arbitrarios por nombre proporcionado por un cliente.
+STDIO conecta un cliente con un proceso local de Orionis: el cliente escribe peticiones en stdin y lee las respuestas en stdout. Utiliza el mismo servidor compilado, schemas, hooks y contenedor que [HTTP](/es/protocols/mcp/http-and-clients), sin abrir un puerto HTTP.
 
-Utiliza `DemoServer` de [servidores y herramientas](/es/protocols/mcp/servers-and-tools). Crea `routes/ai.py` con estos registros y añade `ai="routes/ai.py"` a la llamada existente `app.withRouting(...)` de `bootstrap/app.py`, conservando sus demás argumentos. Este archivo se carga tanto para HTTP como para los comandos Reactor:
+## Registrar un servidor local
+
+En el archivo AI configurado de tu aplicación, normalmente `routes/ai.py`, registra un handle explícito:
 
 ```python
 from app.mcp.servers.demo_server import DemoServer
 from orionis.support.facades import Mcp
 
-Mcp.web("/mcp/application", DemoServer)
-Mcp.local("application", DemoServer)
+Mcp.local("demo", DemoServer)
 ```
 
-Este bloque necesita una aplicación inicializada. Añade middleware API de autenticación al builder web cuando todo el servidor deba estar protegido. La resolución de identidad no exige automáticamente credenciales; los hooks `authorize` siguen protegiendo operaciones.
+Si ya añadiste este registro en [Servidores y rutas](/es/protocols/mcp/servers-and-tools), consérvalo una sola vez. El archivo se carga con `ai="routes/ai.py"` en la llamada existente `app.withRouting(...)` de `bootstrap/app.py`, antes de `app.create()`; conserva sus demás argumentos.
 
-Para un servidor HTTP privado, adjunta autenticación mediante token al registro:
+`Mcp.local()` recibe el handle y una **clase** que hereda `Server`. No acepta una instancia ni una ruta de módulo recibida desde el cliente. El handle debe ser único y cumplir `[A-Za-z0-9][A-Za-z0-9_.-]{0,127}`: entre 1 y 128 caracteres, primero letra o dígito. `demo` y `support.internal` son válidos; un nombre con espacios no lo es.
 
-```python
-from orionis.auth.middleware import AuthenticateTokenMiddleware
+El handle local es independiente de `Server.name` y de la dirección HTTP. Puedes registrar la misma clase con `Mcp.web("/mcp/demo", DemoServer)` y `Mcp.local("demo", DemoServer)`. Cada registro publica su propio transporte; crear uno no crea automáticamente el otro.
 
-Mcp.web("/mcp/private", DemoServer).middleware(AuthenticateTokenMiddleware)
+## Inventario y ejecución
+
+Desde la raíz del proyecto, cualquiera de estas alternativas lista los servidores HTTP y STDIO registrados:
+
+```shell
+orionis mcp:list
+python -B reactor mcp:list
 ```
 
-Esto crea un endpoint protegido distinto. El cliente debe enviar `Authorization: Bearer <token>` con una credencial válida; la autorización de cada herramienta sigue decidiendo qué registros o acciones puede acceder esa identidad. STDIO no recibe por defecto una petición de navegador con token: define una política confiable de ejecución local para esa integración.
+La tabla muestra transporte, endpoint o handle y clase del servidor. No abre puertos ni inicia el transporte. Para ejecutar el servidor local, utiliza **una** de estas alternativas:
 
-## Contrato HTTP real
-
-El transporte exige POST, un único `Content-Type: application/json` y Accept que incluya explícitamente `application/json` y `text/event-stream` con calidad positiva. Una respuesta finita utiliza JSON; progreso/suscripción puede usar SSE. El protocolo refleja metadata del envelope en cabeceras:
-
-```http
-POST /mcp/application HTTP/1.1
-Content-Type: application/json
-Accept: application/json, text/event-stream
-MCP-Protocol-Version: 2026-07-28
-MCP-Method: tools/call
-MCP-Name: greet
+```shell
+orionis mcp:start demo
 ```
 
-El cuerpo correspondiente reutiliza la herramienta del [primer capítulo](/es/protocols/mcp/servers-and-tools):
+```shell
+python -B reactor mcp:start demo
+```
+
+| Comando | Argumentos propios | Resultado |
+| --- | --- | --- |
+| `mcp:list` | Ninguno. | Muestra el inventario registrado. |
+| `mcp:start name` | `name` obligatorio: handle local. | Ejecuta STDIO hasta que se cierre la entrada o finalice el transporte. |
+| `mcp:start --help` | `--help`. | Describe el argumento local; no inicia un servidor. |
+
+Un handle desconocido escribe el diagnóstico en stderr y termina con código 1. `mcp:start` no descubre clases a partir de nombres arbitrarios. Los [generadores de componentes](/es/protocols/mcp/servers-and-tools) crean archivos; no sustituyen el registro `Mcp.local()`.
+
+## Contrato de los mensajes STDIO
+
+Cada mensaje es **un objeto JSON-RPC UTF-8 en una sola línea**, terminado con un salto de línea. No envíes un documento JSON con formato en varias líneas ni un array de llamadas. Este mensaje consulta el servidor:
 
 ```json
-{
-  "jsonrpc": "2.0",
-  "id": 1,
-  "method": "tools/call",
-  "params": {
-    "name": "greet",
-    "arguments": {
-      "name": "Ada"
-    },
-    "_meta": {
-      "io.modelcontextprotocol/protocolVersion": "2026-07-28",
-      "io.modelcontextprotocol/clientCapabilities": {}
-    }
-  }
-}
+{"jsonrpc":"2.0","id":"discover-1","method":"server/discover","params":{"_meta":{"io.modelcontextprotocol/protocolVersion":"2026-07-28","io.modelcontextprotocol/clientCapabilities":{}}}}
 ```
 
-En esta llamada de saludo, la respuesta JSON-RPC conserva `id: 1` e incluye el resultado de la herramienta con el valor estructurado `"Hello, Ada!"`. El cliente debe admitir esta versión del protocolo y su contrato de cabeceras; un POST JSON genérico que las omita no basta.
+La respuesta usa el mismo `id` y devuelve el mismo contrato de `server/discover` que HTTP. No se envían cabeceras HTTP por stdin: la versión y las capacidades están en `params._meta`. Tampoco necesitas `initialize`; se admite exclusivamente [MCP `2026-07-28`](/es/protocols/mcp#revisión-del-protocolo-admitida).
 
-El protocolo exige coincidencia entre cabeceras y cuerpo para versión, método y nombre/URI de primitivas. Los parámetros anotados `x-mcp-header` requieren además cabeceras `MCP-Param-<name>` compatibles; solo se permiten propiedades primitivas alcanzables estáticamente. Datos binarios/MIME de un recurso no cambian el Content-Type JSON del envelope.
+El lector continúa atendiendo entrada mientras se ejecutan solicitudes dentro del presupuesto configurado. Cada solicitud tiene su scope; las respuestas concurrentes se correlacionan mediante `id` y no debes depender de su orden. Una notificación `notifications/cancelled` con `params.requestId` permite cancelar una solicitud STDIO activa. Al recibir EOF o fallar la E/S del transporte, se cancelan las solicitudes activas y se espera su limpieza; no se garantiza la entrega de respuestas pendientes. Un error JSON-RPC ordinario devuelve su error sin terminar las demás solicitudes.
 
-Una cabecera Origin ausente está permitida. Si aparece debe coincidir exactamente con `allowed_origins`, lista de orígenes HTTP(S) validados. No hay wildcard ni excepción implícita de mismo origen. Bootstrap utiliza `CORS_ALLOW_ORIGINS`; CORS HTTP o WebSocket pueden tener reglas diferentes. Se rechaza origen, método o media type antes de leer un cuerpo grande.
+**stdout está reservado para mensajes del protocolo.** Orionis separa su salida de consola del canal MCP, pero tus componentes también deben evitar escribir diagnósticos o datos ajenos a JSON-RPC allí. Utiliza logging o stderr para diagnósticos. Esto es especialmente relevante al convertir un ejemplo que utiliza `print()` en una herramienta MCP.
 
-## STDIO y consola
+```mermaid
+sequenceDiagram
+    participant C as Cliente local
+    participant S as Proceso mcp:start
+    participant D as Dispatcher MCP
+    C->>S: JSON-RPC + salto de línea por stdin
+    S->>S: Lectura acotada y admisión
+    S->>D: Petición dentro de su scope
+    D-->>S: Resultado o mensajes de progreso
+    S-->>C: JSON-RPC por línea en stdout
+    C->>S: Otra petición o cancelación
+    C->>S: EOF al cerrar la entrada
+    S->>S: Finalizar tareas y liberar el transporte
+```
 
-Inicia un handle registrado con `python -B reactor mcp:start application`; `python -B reactor mcp:list` muestra servidores. Los generadores son `make:mcp-server`, `make:mcp-tool`, `make:mcp-resource` y `make:mcp-prompt`. Los comandos se ejecutan en el contexto de la aplicación configurada.
+## Contexto y acceso
 
-STDIO usa mensajes JSON por línea; stdout se reserva exclusivamente para frames y diagnósticos van a stderr. El transporte acota lectura y concurrencia, admite cancelación por notificación y usa el mismo dispatcher que HTTP. No imprimas logging convencional en stdout dentro de handlers.
+Usa `McpRequest` para consultar método, argumentos y metadata de la llamada. Los servicios se inyectan en constructores y métodos como en los [ejemplos de herramientas](/es/protocols/mcp/tools#servicios-en-el-constructor-y-en-el-método). Un objeto HTTP `Request` solo existe en el transporte HTTP; no lo solicites para una herramienta que también deba funcionar por STDIO.
 
-## Presupuestos
+Los middleware HTTP y una cabecera `Authorization` no se ejecutan por stdin. Los hooks `shouldRegister` y `authorize` de las primitivas siguen aplicándose. Define la política de confianza del proceso local y no interpretes la metadata enviada por el cliente como una identidad autenticada.
 
-| Variable | Predeterminado |
-|---|---:|
-| `MCP_MAX_REQUEST_SIZE` | `HTTP_MAX_BODY_SIZE` o 1 MiB |
-| `MCP_MAX_CONCURRENT_REQUESTS` | `HTTP_MAX_CONCURRENT_REQUESTS` o 32 |
-| `MCP_DEFAULT_PAGE_SIZE`, `MCP_MAX_PAGE_SIZE` | 50, 100 |
-| `MCP_MAX_RESPONSE_SIZE`, `MCP_MAX_METADATA_SIZE` | 4 MiB, 64 KiB |
-| `MCP_SUBSCRIPTION_BUFFER_SIZE`, `MCP_MAX_SUBSCRIPTIONS` | 64, 1024 |
-| `MCP_MAX_RESOURCE_SUBSCRIPTIONS` | 64 |
-| `MCP_SUBSCRIPTION_KEEPALIVE` | 15 segundos |
-| `MCP_TOOL_SEARCH_MAX_RESULTS`, `MCP_TOOL_SEARCH_MAX_CALLS` | 20, 5 |
-| `MCP_TOOL_SEARCH_MAX_OUTPUT_BYTES` | 256 KiB |
+## Configuración en la aplicación
 
-Todos los presupuestos numéricos son positivos y página default no puede superar máximo. La admisión del transporte incluye streams hasta cerrarlos. El manager ofrece `getWebServer`, `getLocalServer`, `servers`, `dispatchHttp`, `startLocal` y `shutdown`; normalmente la integración administra dispatch/cierre. Sobrecarga, request inválido y respuesta demasiado grande fallan de forma explícita, sin cola ilimitada.
+La entidad `McpConfig` valida las opciones. Puedes configurarlas desde `bootstrap/app.py` con la instancia `app` existente, **antes de `app.create()`**:
+
+```python
+app.withConfigMcp(
+    max_request_size=1024 * 1024,
+    max_concurrent_requests=32,
+    default_page_size=50,
+    max_page_size=100,
+    allowed_origins=["https://agent.example.com"],
+)
+```
+
+Solo necesitas especificar las opciones que cambies. Los campos restantes utilizan los valores predeterminados de la entidad y sus variables de entorno. Si ya tienes configuración MCP del proyecto, integra los valores allí en lugar de mantener dos fuentes distintas. Si utilizas bootstrap compilado, sigue el procedimiento de [caché y reinicio](/es/getting-started/paths-and-caching) al cambiarlo.
+
+### Peticiones, respuestas y paginación
+
+| Campo | Variable de entorno | Predeterminado |
+| --- | --- | --- |
+| `max_request_size` | `MCP_MAX_REQUEST_SIZE` | `HTTP_MAX_BODY_SIZE` o 1 MiB; bytes máximos de entrada. |
+| `max_concurrent_requests` | `MCP_MAX_CONCURRENT_REQUESTS` | `HTTP_MAX_CONCURRENT_REQUESTS` o 32 solicitudes activas. |
+| `max_response_size` | `MCP_MAX_RESPONSE_SIZE` | 4 MiB; presupuesto de respuesta serializada. |
+| `max_metadata_size` | `MCP_MAX_METADATA_SIZE` | 64 KiB de metadata serializada. |
+| `default_page_size` | `MCP_DEFAULT_PAGE_SIZE` | 50 entradas por página. |
+| `max_page_size` | `MCP_MAX_PAGE_SIZE` | 100; límite de validación de `default_page_size`. |
+
+La paginación MCP acepta un cursor opaco, no un tamaño de página proporcionado por el cliente. `max_page_size` no habilita un argumento RPC `limit`. El límite de concurrencia se aplica a cada instancia de transporte; cada endpoint HTTP tiene la suya. El kernel HTTP puede imponer además su propio límite de peticiones.
+
+### Suscripciones y catálogos de herramientas
+
+| Campo | Variable de entorno | Predeterminado |
+| --- | --- | --- |
+| `subscription_buffer_size` | `MCP_SUBSCRIPTION_BUFFER_SIZE` | 64 eventos en el buffer de cada suscripción. |
+| `max_subscriptions` | `MCP_MAX_SUBSCRIPTIONS` | 1024 listeners en el bus de eventos. |
+| `max_resource_subscriptions` | `MCP_MAX_RESOURCE_SUBSCRIPTIONS` | 64 URI de recurso por escucha. |
+| `subscription_keepalive` | `MCP_SUBSCRIPTION_KEEPALIVE` | 15 segundos entre keepalives. |
+| `tool_search_max_results` | `MCP_TOOL_SEARCH_MAX_RESULTS` | 20 resultados por búsqueda de catálogo. |
+| `tool_search_max_calls` | `MCP_TOOL_SEARCH_MAX_CALLS` | 5 llamadas por ejecución de catálogo. |
+| `tool_search_max_output_bytes` | `MCP_TOOL_SEARCH_MAX_OUTPUT_BYTES` | 256 KiB de salida de catálogo. |
+
+Los streams abiertos conservan una plaza de admisión hasta terminar. Los límites y el bus en memoria pertenecen al proceso, no son una cuota distribuida entre workers. Consulta [Flujos avanzados](/es/protocols/mcp/advanced-workflows) para suscripciones, herramientas agrupadas y sus requisitos.
+
+### Orígenes HTTP permitidos
+
+| Campo | Variable de entorno | Predeterminado |
+| --- | --- | --- |
+| `allowed_origins` | `CORS_ALLOW_ORIGINS` | Lista vacía. |
+
+Una petición **sin `Origin`** está permitida. Si la cabecera está presente, su valor debe coincidir exactamente con un origen HTTP(S) configurado, como `https://agent.example.com`. No se aceptan comodines, rutas ni una excepción implícita para el mismo origen. Una lista vacía rechaza cualquier `Origin` presente.
+
+Esta opción valida el origen para MCP; si conectas desde un navegador, configura también el CORS del [flujo HTTP](/es/http/routing). Un agente que se ejecuta como proceso remoto no es necesariamente un navegador ni tiene por qué enviar `Origin`.
+
+Los presupuestos enteros deben ser positivos; `subscription_keepalive` debe ser finito y mayor que cero, y `default_page_size` no puede superar `max_page_size`. La configuración incorrecta se rechaza al crear la entidad, antes de servir las peticiones.

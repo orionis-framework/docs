@@ -38,6 +38,45 @@ Conserva el registro del scheduler del esqueleto en `bootstrap/app.py`. Si intro
 
 La selección temporal (`dailyAt`, `everySeconds`, `cron`, etc.) es terminal y devuelve `bool`. Configura `purpose`, `coalesce`, `misfireGraceTime`, `maxInstances`, `randomDelay`, fechas y listeners **antes** del trigger. No encadenes otro método después de `dailyAt`.
 
+## Dependencias en el scheduler y en los comandos
+
+El scheduler también admite inyección en el constructor y en `tasks()`. Por ejemplo, este módulo completo puede reemplazar `app/console/scheduler.py`:
+
+```python
+from orionis.console.base import BaseScheduler
+from orionis.console.contracts import ISchedule
+
+
+class ReportSchedulePolicy:
+    def hour(self) -> int:
+        return 2
+
+
+class ReportScheduleLabel:
+    def purpose(self) -> str:
+        return "Daily reports"
+
+
+class Scheduler(BaseScheduler):
+    def __init__(self, policy: ReportSchedulePolicy) -> None:
+        self.policy = policy
+
+    def tasks(
+        self,
+        schedule: ISchedule,
+        labels: ReportScheduleLabel,
+    ) -> None:
+        (
+            schedule.command("reports:build", purpose=labels.purpose())
+            .maxInstances(1)
+            .dailyAt(self.policy.hour(), 30)
+        )
+```
+
+La aplicación construye `Scheduler` mediante el contenedor y resuelve `ReportSchedulePolicy`. Al cargar la agenda, `schedule:list` y `schedule:work` proporcionan `schedule` explícitamente y el contenedor resuelve `ReportScheduleLabel` para `tasks()`. Las dos clases concretas se construyen sin bindings adicionales. Este método configura la agenda al cargarla; no se invoca nuevamente para inyectar servicios en cada ejecución programada.
+
+Cuando vence un horario, se despacha la firma mediante Reactor. El comando obtiene sus propias dependencias de constructor y `handle()` como se muestra en [comandos](/es/console/commands-and-arguments#inyección-por-constructor-y-por-método). Los callbacks de eventos del scheduler reciben sus argumentos de evento mediante una llamada directa: no añadas parámetros de servicios esperando la misma inyección de `tasks()`; usa colaboradores preparados en el constructor.
+
 ## Elegir un trigger
 
 | Necesidad | Terminal |

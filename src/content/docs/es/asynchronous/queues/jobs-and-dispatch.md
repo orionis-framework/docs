@@ -35,6 +35,42 @@ assert job.report_id == "report-42"
 
 Este programa solo construye un job. En una aplicación real reemplaza la salida por el servicio de generación. `handle` puede solicitar servicios mediante parámetros tipados: el worker abre un scope, registra `JobContext` e invoca el método mediante el contenedor. Pasa identidades primitivas en el constructor y resuelve servicios/modelos al ejecutar; no serialices un cliente HTTP, conexión, request ni modelo activo.
 
+## Inyectar servicios al ejecutar el job
+
+En un job, el constructor recibe **datos para serializar**, no servicios inyectados. El worker reconstruye sus campos sin ejecutar `__init__()` y después invoca `handle()` mediante el contenedor. Para ampliar el ejemplo, reemplaza el módulo `app/jobs/generate_report.py` por:
+
+```python
+from orionis.queues import BaseJob, JobContext
+
+
+class ReportService:
+    async def generate(self, report_id: str) -> str:
+        return f"Report {report_id} ready"
+
+
+class GenerateReport(BaseJob):
+    __slots__ = ("report_id",)
+    report_id: str
+    tries = 3
+    timeout = 30.0
+    backoff = (1.0, 5.0)
+
+    def __init__(self, report_id: str) -> None:
+        self.report_id = report_id
+
+    async def handle(
+        self,
+        reports: ReportService,
+        context: JobContext,
+    ) -> None:
+        result = await reports.generate(self.report_id)
+        print(f"{context.id}: {result} (attempt {context.attempts})")
+```
+
+El envío sigue siendo `await Queue.dispatch(GenerateReport("report-42"))`. Solo `report_id` se guarda en el mensaje; el worker resuelve `ReportService` en el scope de ejecución y entrega el `JobContext` de esa reserva. Esta clase de servicio concreta no necesita un binding adicional. Para acceder a una base de datos o API externa, incorpora el trabajo real en el servicio y resuelve sus dependencias tipadas allí.
+
+No añadas un cliente de red o una conexión como parámetro inyectable del constructor del job: el productor lo llama explícitamente y ese objeto no es estado serializable. El constructor de `ReportService` sí puede recibir otros servicios mediante el contenedor. La inyección de métodos ocurre en `handle()` cuando lo ejecuta el worker, no al llamar directamente a `job.handle()` desde Python.
+
 ## Estado persistido y seguridad
 
 El serializer recoge slots públicos y anotaciones que no sean `ClassVar` a lo largo de la jerarquía. `tries`, `timeout` y `backoff` son política de clase, no estado. Se admiten strings, bytes, enteros, floats finitos, booleanos, `None` y listas/tuplas/diccionarios anidados con claves string. Objetos arbitrarios, atributos privados o estado de instancia no declarado son rechazados.

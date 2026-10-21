@@ -102,8 +102,11 @@
       "pageIds": [
         "mcp-overview",
         "mcp-servers-and-tools",
+        "mcp-tools",
         "mcp-resources-and-prompts",
+        "mcp-prompts",
         "mcp-responses-and-content",
+        "mcp-http-and-clients",
         "mcp-transports-and-configuration",
         "mcp-advanced-workflows",
         "test-mcp-testing"

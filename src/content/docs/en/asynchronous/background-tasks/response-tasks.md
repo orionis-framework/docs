@@ -35,6 +35,44 @@ print(response.background is task)    # True
 
 The snippet constructs the response without executing the task. The active ASGI/RSGI adapter calls it after completing the response body.
 
+## Prepare dependencies before deferring work
+
+`BackgroundTask` calls its callable directly with the stored arguments: it neither constructs the class through the container nor injects parameters from annotations. Resolve services at an entry point that supports injection, such as an HTTP controller, then give the task an already bound method:
+
+```python
+from orionis.background import BackgroundTask
+from orionis.http import Response
+from orionis.support.facades import Route
+
+
+class DeliveryRecorder:
+    async def record(self, message_id: int) -> None:
+        print(f"delivered:{message_id}")
+
+
+class ReceiptFormatter:
+    def accepted(self, message_id: int) -> str:
+        return f"Accepted message {message_id}"
+
+
+class DeliveryController:
+    def __init__(self, recorder: DeliveryRecorder) -> None:
+        self.recorder = recorder
+
+    async def store(self, formatter: ReceiptFormatter) -> Response:
+        message_id = 42
+        return Response(
+            formatter.accepted(message_id),
+            status_code=202,
+            background=BackgroundTask(self.recorder.record, message_id),
+        )
+
+
+Route.post("/deliveries", [DeliveryController, "store"])
+```
+
+The module keeps services, controller and route together for a complete example; you can split its classes and register the route in `routes/api.py`. Orionis injects `DeliveryRecorder` into the controller constructor and `ReceiptFormatter` into its action. `record()` receives only the `message_id` explicitly passed to `BackgroundTask`. The container does not resolve it again when the task runs. In real work, avoid capturing services whose resources will already be closed when the callback executes.
+
 ## Design a reliable side effect
 
 Attach work with `Response(..., background=BackgroundTask(...))`. The adapter awaits `runBackground()` after sending the body. A client may already have received `202` when the callback fails; that status cannot be retroactively turned into an HTTP error. The callback needs its own diagnostics and recovery policy.

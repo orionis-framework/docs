@@ -160,6 +160,120 @@ El nombre del argumento del manejador coincide con el del parámetro de ruta. De
 
 Además de una función importable, se admiten `[Controller, "method"]` y una clase invocable con `__call__`. No pases una instancia, un método ya enlazado ni una lambda. Mantén las funciones y clases en el nivel del módulo para que puedan importarse durante el arranque.
 
+### Inyección en el constructor y en la acción
+
+Puedes recibir servicios tanto en `__init__` como en la acción que atiende la conexión. Crea `app/services/socket_dependencies.py` con dos servicios concretos:
+
+```python
+from time import perf_counter
+
+
+class MessageFormatter:
+    def format(self, room: str, text: str) -> str:
+        return f"[{room}] {text.strip()}"
+
+
+class ConnectionTimer:
+    def __init__(self) -> None:
+        self._started = perf_counter()
+
+    def elapsedMs(self) -> float:
+        return round((perf_counter() - self._started) * 1000, 2)
+```
+
+En `app/http/controllers/dependency_socket_controller.py`, el formateador se recibe por constructor y el temporizador por método:
+
+```python
+from app.services.socket_dependencies import ConnectionTimer, MessageFormatter
+from orionis.http import WebSocket, WebSocketDisconnected
+
+
+class DependencySocketController:
+    def __init__(self, formatter: MessageFormatter) -> None:
+        self._formatter = formatter
+
+    async def __call__(
+        self,
+        socket: WebSocket,
+        room: str,
+        timer: ConnectionTimer,
+    ) -> None:
+        await socket.accept()
+        try:
+            while True:
+                text = await socket.receiveText()
+                await socket.sendJson({
+                    "room": room,
+                    "text": self._formatter.format(room, text),
+                    "elapsed_ms": timer.elapsedMs(),
+                })
+        except WebSocketDisconnected:
+            return
+        finally:
+            await socket.close()
+```
+
+Registra el controlador en `routes/websocket.py`:
+
+```python
+from app.http.controllers.dependency_socket_controller import DependencySocketController
+from orionis.support.facades import Route
+
+Route.websocket("/ws/dependencies/{room:slug}", DependencySocketController)
+```
+
+La forma explícita equivalente es `Route.websocket("/ws/dependencies/{room:slug}", [DependencySocketController, "__call__"])`. Si llamas `listen` a la acción en lugar de `__call__`, registra `[DependencySocketController, "listen"]`. El contenedor resuelve los parámetros de ese método de la misma manera; el registro mediante la clase sola requiere `__call__`.
+
+Desde una página servida por la misma aplicación, puedes comprobar el intercambio con:
+
+```javascript
+const url = new URL("/ws/dependencies/general", window.location.href);
+url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
+const socket = new WebSocket(url);
+
+socket.addEventListener("open", () => socket.send("  Hola  "));
+socket.addEventListener("message", (event) => {
+  console.log(JSON.parse(event.data));
+  // { room: "general", text: "[general] Hola", elapsed_ms: ... }
+  socket.close(1000);
+});
+socket.addEventListener("error", () => console.error("No se pudo conectar"));
+```
+
+El framework construye el controlador al despachar la conexión y después invoca su acción mediante el contenedor. `MessageFormatter` y `ConnectionTimer` son clases concretas sin configuración externa: sus anotaciones permiten construirlas automáticamente sin registrar un provider. Los contratos abstractos o servicios que necesitan configuración deben tener su registro correspondiente en el [contenedor](/es/architecture/service-container).
+
+`socket` procede del scope activo y `room` de los parámetros convertidos de la URL, por su nombre. Los parámetros de ruta se proporcionan a la acción, **no al constructor**. El método se invoca una sola vez por conexión; el temporizador conserva su valor inicial durante todo el bucle. Una clase autoconstruida no se convierte en un servicio compartido por anotarla: la reutilización depende del lifetime registrado en el contenedor.
+
+### Inyección en una función
+
+Una función de ruta también puede recibir servicios por sus parámetros. Por ejemplo, crea `app/realtime/socket_status.py`:
+
+```python
+from app.services.socket_dependencies import ConnectionTimer
+from orionis.http import WebSocket
+
+
+async def dependency_status(socket: WebSocket, timer: ConnectionTimer) -> None:
+    await socket.accept()
+    try:
+        await socket.sendJson({"elapsed_ms": timer.elapsedMs()})
+    finally:
+        await socket.close()
+```
+
+Añádela a `routes/websocket.py`:
+
+```python
+from app.realtime.socket_status import dependency_status
+from orionis.support.facades import Route
+
+Route.websocket("/ws/dependency-status", dependency_status)
+```
+
+Al conectar a `/ws/dependency-status`, el cliente recibe un objeto JSON con `elapsed_ms` y la conexión termina. La función no tiene constructor; sus parámetros se resuelven cuando Orionis la invoca.
+
+### Parámetros y validación de mensajes
+
 El siguiente ejemplo utiliza un controlador invocable. Primero crea `app/http/schemas/socket_message.py`:
 
 ```python
@@ -374,6 +488,47 @@ Solo puede haber un `receive` activo; dos lecturas simultáneas producen `Runtim
 ## Middleware de conexión y grupos
 
 Un middleware WebSocket deriva de `WebSocketMiddleware` y devuelve `None`. Su continuación, `WebSocketNext`, se llama sin argumentos y como máximo una vez. El código anterior a `await call_next()` se ejecuta antes del manejador; el posterior retorna cuando este termina, normalmente al finalizar la conexión, no después de cada mensaje.
+
+Los middleware también admiten **inyección por constructor**. El kernel los construye mediante el contenedor dentro del scope de conexión, pero llama a `handle(socket, call_next)` directamente: no añadas parámetros de servicios a `handle()`. Por ejemplo, crea `app/http/middleware/connection_duration_middleware.py` con el servicio anterior:
+
+```python
+import logging
+
+from app.services.socket_dependencies import ConnectionTimer
+from orionis.http import WebSocket, WebSocketMiddleware, WebSocketNext
+
+logger = logging.getLogger(__name__)
+
+
+class ConnectionDurationMiddleware(WebSocketMiddleware):
+    def __init__(self, timer: ConnectionTimer) -> None:
+        self._timer = timer
+
+    async def handle(
+        self,
+        socket: WebSocket,
+        call_next: WebSocketNext,
+    ) -> None:
+        try:
+            await call_next()
+        finally:
+            logger.info("WebSocket duration: %s ms", self._timer.elapsedMs())
+```
+
+Para utilizarlo, sustituye el registro del ejemplo de dependencias por:
+
+```python
+from app.http.controllers.dependency_socket_controller import DependencySocketController
+from app.http.middleware.connection_duration_middleware import ConnectionDurationMiddleware
+from orionis.support.facades import Route
+
+Route.websocket(
+    "/ws/dependencies/{room:slug}",
+    DependencySocketController,
+).middleware(ConnectionDurationMiddleware)
+```
+
+El temporizador de este middleware se crea al construir la capa; el del método del controlador es otra resolución. Si necesitas compartir una misma instancia entre ambos, registra expresamente ese servicio con lifetime scoped en el contenedor. El bloque `finally` registra la duración aunque el siguiente componente termine con una excepción o cancelación.
 
 Por ejemplo, crea `app/http/middleware/room_socket_middleware.py` para limitar la longitud de los nombres de sala antes de aceptar:
 
