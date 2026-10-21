@@ -52,7 +52,7 @@ export function createSidebar() {
   function link(page, section, index) {
     const titles = page.label || page.title;
     // These guides share one level instead of overview/chapter styling.
-    const itemClass = ['getting-started', 'http', 'realtime', 'mcp', 'views', 'localization'].includes(section.id) ? 'module-peer' :
+    const itemClass = ['getting-started', 'http', 'realtime', 'mcp', 'views', 'localization', 'authentication', 'sessions', 'cryptography'].includes(section.id) ? 'module-peer' :
       (index === 0 || page.id.endsWith('-overview') ? 'module-overview' : 'module-chapter');
     const attrs = { class: itemClass, 'data-page-id': page.id, 'data-nav-group': section.id };
     const item = {

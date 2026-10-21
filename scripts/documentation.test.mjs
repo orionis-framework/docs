@@ -135,3 +135,32 @@ test('view guides are peers and translations have their own category', () => {
     'localization-translating-content', 'localization-application-and-views',
   ]);
 });
+
+test('authentication guides are peers with sessions and cryptography in separate categories', () => {
+  const sidebar = createSidebar();
+  const group = (id) => sidebar.find((item) => item.items?.some((child) => child.attrs?.['data-nav-group'] === id));
+  const authentication = group('authentication');
+  const sessions = group('sessions');
+  const cryptography = group('cryptography');
+  assert.ok(authentication && sessions && cryptography);
+  assert.deepEqual(authentication.items.map((item) => item.attrs['data-page-id']), [
+    'auth-overview', 'auth-configuration-and-guards', 'auth-identity-and-session',
+    'auth-personal-access-tokens', 'auth-middleware', 'auth-authorization',
+    'auth-policies', 'auth-account-recovery',
+  ]);
+  assert.deepEqual(sessions.items.map((item) => item.attrs['data-page-id']), [
+    'session-overview', 'session-state-and-flash',
+    'session-stores-and-concurrency', 'session-configuration-and-security',
+  ]);
+  assert.deepEqual(cryptography.items.map((item) => item.attrs['data-page-id']), [
+    'hashing-overview', 'hashing-password-storage',
+    'encrypter-overview', 'encrypter-encrypting-values',
+  ]);
+  for (const section of [authentication, sessions, cryptography]) {
+    for (const item of section.items) assert.equal(item.attrs.class, 'module-peer');
+  }
+  for (const locale of documentationCatalog.locales) {
+    assert.notEqual(authentication.translations[locale], authentication.items[0].translations[locale]);
+    assert.notEqual(sessions.translations[locale], sessions.items[0].translations[locale]);
+  }
+});

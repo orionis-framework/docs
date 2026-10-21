@@ -1,221 +1,271 @@
 ---
 title: "Protecting and recovering application values"
-description: "Encryption lets you recover sensitive text using a stable application key. Choose a format and plan key custody before storing the first tokens."
+description: "Configure keys and ciphers, use Crypt or IEncrypter, and encrypt text from controllers with error handling."
 editUrl: true
 lastUpdated: false
 ---
 
-Encryption lets you recover sensitive text using a stable application key. Choose a format and plan key custody before storing the first tokens.
+The encryption service lets you store a value and later recover its original text with the same key. Use [hashing](/en/security/hashing) for passwords that should only be verified; use encryption when your application needs to read the content again.
 
-## Requirements
+## Configure the key and cipher
 
-- Python 3.14 or newer.
-- `cryptography>=50.0.1,<51.0` and `msgspec>=0.21.1`, installed by Orionis.
-- An exact 16-byte key for AES-128 or 32-byte key for AES-256.
-- A booted Orionis container when using the `Crypt` facade.
-## Quick start
+These settings belong to `config/app.py`. `config/hashing.py` configures password hashing and does not control this service.
 
-```python
-import os
-from orionis.encrypter import Encrypter
+| Setting | Environment variable | Behavior |
+| --- | --- | --- |
+| `app.cipher` | `APP_CIPHER` | Cipher identifier. Default: `AES-256-CBC`. |
+| `app.key` | `APP_KEY` | Key shared by the processes that must decrypt the same values. |
 
+Write the identifiers exactly as shown:
 
-class App:
-    key = os.urandom(32)
+| Cipher | Key | IV per operation | Content authentication |
+| --- | --- | --- | --- |
+| `AES-128-CBC` | 16 bytes | 16 bytes | Adds no MAC or tag; uses PKCS7 padding. |
+| `AES-256-CBC` | 32 bytes | 16 bytes | Adds no MAC or tag; uses PKCS7 padding. |
+| `AES-128-GCM` | 16 bytes | 12 bytes | Creates and verifies a 16-byte tag. |
+| `AES-256-GCM` | 32 bytes | 12 bytes | Creates and verifies a 16-byte tag. |
 
-    def config(self, name: str):
-        return {
-            "app.key": self.key,
-            "app.cipher": "AES-256-GCM",
-        }[name]
+To use GCM in a workflow that needs to verify content authenticity, configure, for example:
 
-
-crypt = Encrypter(App())
-token = crypt.encrypt("private value")
-assert token != "private value"
-assert crypt.decrypt(token) == "private value"
-print("round trip ok")
+```dotenv
+APP_CIPHER=AES-256-GCM
 ```
 
-Save this standalone program as `check_encryption.py` at the application root and run `uv run python check_encryption.py`. It prints `round trip ok`. Its random key exists only in that process: restarting it cannot decrypt earlier tokens. In application code use the configured `Crypt` facade and a stable `APP_KEY`; do not generate a new key for each request.
+Configuration accepts a `bytes` key, raw text converted to UTF-8, or text prefixed with `base64:` that is decoded before use. The required length applies to the **key bytes**, not the characters in its Base64 representation. An unsupported cipher, invalid Base64 key, or incompatible length prevents configuration validation.
 
-## Prepare secret storage
+If `app.key` is `None`, configuration generates a random key of the appropriate size and attempts to save it through `Env.set("APP_KEY", ...)`. Retain that value for subsequent starts and deployments.
 
-The API encrypts non-empty text. Serialize structured documents first and store the complete opaque token in a sufficiently wide column. IV, tag, JSON, and two Base64 layers increase its size; a field sized for the original text may be too small. The library adds no expiration, associated context, key identifier, or replay protection.
+### Generate a key through the CLI
 
-Explicitly select `AES-256-GCM` for a new workflow requiring authenticity. Current configuration defaults to `AES-256-CBC`; CBC checks padding but includes no MAC. Successful CBC decryption does not prove that content was never modified. Encryption also does not decide which user may recover a value: authorize access before calling `decrypt()`.
+From the project root, these alternatives are equivalent:
 
-The `b"k" * 32` keys in examples are test fixtures. In production retain the random key in your secret management system and share a stable value across workers and deployments that must read the same tokens. Do not replace `APP_KEY` without a migration: there is no key ring or automatic lookup of previous keys.
-
-### Controlled rotation
-
-Retain access to the original key and cipher during migration. Decrypt with the previous configuration, encrypt with the new one, and replace a record only after both operations succeed. An interrupted migration must resume without confusing versions; version markers and key custody belong to the application. Include backups in the same plan. Never indiscriminately try keys in a public endpoint.
-
-For a new application flow using authenticated encryption, set `APP_CIPHER=AES-256-GCM` before storing values and retain the corresponding 32-byte `APP_KEY`. If the project already contains encrypted values, follow the rotation process instead of switching the cipher directly. `Crypt.encrypt` and `Crypt.decrypt` are synchronous; do not add `await`.
-
-## Core concepts
-
-### Cipher selection
-
-One `Encrypter` instance is fixed to the configured cipher and key. Supported identifiers are `AES-128-CBC`, `AES-256-CBC`, `AES-128-GCM`, and `AES-256-GCM`. A payload can only be decrypted by an instance configured with the same cipher and key.
-
-### Envelope format
-
-`encrypt()` UTF-8 encodes the text, creates a fresh random IV, encrypts it, serializes `iv`, `value`, `tag`, and `cipher` as JSON, then Base64-encodes the JSON. Binary fields are themselves Base64 strings. The format is transportable text, not a hash.
-
-### Authentication
-
-GCM authenticates the ciphertext and rejects modification through its 16-byte tag. CBC uses PKCS7 padding but this implementation does not add a MAC; prefer GCM for new security-sensitive data. Never expose, log, or commit the application key.
-
-## Common workflows
-
-### Encrypt application values
-
-Use `Crypt.encrypt(value)` after application boot, persist the returned token as opaque text, and call `Crypt.decrypt(token)` only at the trust boundary that needs plaintext.
-
-### Rotate a key or cipher
-
-Old tokens do not decrypt under a new key or a different configured cipher. A safe rotation therefore needs a versioned key strategy or a controlled read-old/write-new migration before configuration changes.
-
-### Test a service directly
-
-Supply a small app double whose `config()` returns normalized bytes and a cipher string. This avoids global facade state and makes round-trip and failure cases deterministic except for token bytes.
-
-## Examples
-
-### Exercise every supported cipher
-
-```python
-from orionis.encrypter import Encrypter
-
-
-class App:
-    def __init__(self, cipher: str) -> None:
-        size = 16 if cipher.startswith("AES-128") else 32
-        self.values = {"app.key": b"k" * size, "app.cipher": cipher}
-
-    def config(self, name: str):
-        return self.values[name]
-
-
-for cipher in sorted(Encrypter.SUPPORTED_CIPHERS):
-    service = Encrypter(App(cipher))
-    assert service.decrypt(service.encrypt("Orionis")) == "Orionis"
-
-print("four ciphers ok")
+```bash
+orionis key:generate
 ```
 
-
-### Inspect envelope metadata
-
-```python
-import base64
-import json
-from orionis.encrypter import Encrypter
-
-
-class App:
-    def config(self, name: str):
-        return {"app.key": b"k" * 32, "app.cipher": "AES-256-GCM"}[name]
-
-
-token = Encrypter(App()).encrypt("inspect me")
-envelope = json.loads(base64.b64decode(token))
-assert envelope["cipher"] == "AES-256-GCM"
-assert envelope["tag"] is not None
-print(sorted(envelope))
+```bash
+python -B reactor key:generate
 ```
 
+The command reads `app.cipher`, generates random bytes, represents them as `base64:...`, and saves `APP_KEY` in the project environment. If a non-empty key already exists, it preserves the key and exits successfully.
 
-### Reject a modified GCM value
+| Option | Default | Effect |
+| --- | --- | --- |
+| `--force` | `False` | Replaces the existing key. |
+| `-h`, `--help` | — | Displays command help. |
 
-```python
-import base64
-import json
-from orionis.encrypter import Encrypter
+To explicitly replace the key:
 
-
-class App:
-    def config(self, name: str):
-        return {"app.key": b"k" * 32, "app.cipher": "AES-256-GCM"}[name]
-
-
-crypt = Encrypter(App())
-envelope = json.loads(base64.b64decode(crypt.encrypt("sealed")))
-changed = bytearray(base64.b64decode(envelope["value"]))
-changed[0] ^= 1
-envelope["value"] = base64.b64encode(changed).decode()
-tampered = base64.b64encode(json.dumps(envelope).encode()).decode()
-
-try:
-    crypt.decrypt(tampered)
-except RuntimeError:
-    print("tampering rejected")
+```bash
+orionis key:generate --force
 ```
 
+```bash
+python -B reactor key:generate --force
+```
 
-### Use the application facade
+**Replacing the key does not re-encrypt existing data.** Retain the previous key if you need to recover it. Restart application processes after changing the key or cipher: the resolved service retains the configuration used to construct it.
+
+## Available API
+
+The public `IEncrypter` contract declares two **synchronous** methods:
+
+| Method | Input | Result |
+| --- | --- | --- |
+| `encrypt(plaintext: str) -> str` | Non-empty, UTF-8-encodable text. | Complete encrypted token as a `str`. |
+| `decrypt(payload: str) -> str` | Complete token produced by `encrypt()`. | Original text as a `str`. |
+
+Do not add `await` to these calls, even inside an `async` controller. The API does not directly accept `bytes`, dictionaries, models, or files; later examples show how to represent other data as text.
+
+## Use dependency injection in controllers
+
+Request `IEncrypter` from `orionis.encrypter.contracts`. Orionis registers the service as a singleton; the container can inject it into a constructor or an action.
+
+Create `app/http/controllers/encryption_controller.py`:
 
 ```python
+from orionis.encrypter.contracts import IEncrypter
+from orionis.http import JSONResponse
+from orionis.http.base import BaseController
+from orionis.schemas import Schema
+
+
+class PlaintextPayload(Schema):
+    value: str
+
+
+class EncryptedPayload(Schema):
+    token: str
+
+
+class EncryptionController(BaseController):
+
+    def __init__(self, crypt: IEncrypter) -> None:
+        self._crypt = crypt
+
+    async def encrypt(self, payload: PlaintextPayload) -> JSONResponse:
+        if not payload.value:
+            return JSONResponse(
+                {"message": "The value must not be empty."},
+                status_code=422,
+            )
+
+        token = self._crypt.encrypt(payload.value)
+        return JSONResponse({"token": token})
+
+    async def decrypt(
+        self,
+        payload: EncryptedPayload,
+        crypt: IEncrypter,
+    ) -> JSONResponse:
+        try:
+            plaintext = crypt.decrypt(payload.token)
+        except (ValueError, RuntimeError):
+            return JSONResponse(
+                {"message": "The encrypted value is invalid."},
+                status_code=422,
+            )
+
+        return JSONResponse({"value": plaintext})
+```
+
+The `encrypt` action uses the dependency received in `__init__`; `decrypt` demonstrates receiving it directly as an action argument. Both resolve the same configured service. The [schemas](/en/validation) receive and validate the JSON body before the action executes.
+
+In `routes/api.py`, register the actions with the [route facade](/en/http/routing):
+
+```python
+from app.http.controllers.encryption_controller import EncryptionController
+from orionis.support.facades import Route
+
+
+Route.post("/secrets/encrypt", [EncryptionController, "encrypt"])
+Route.post("/secrets/decrypt", [EncryptionController, "decrypt"])
+```
+
+Send a JSON body `{"value": "private note"}` to the first route and use its returned `token` as `{"token": "..."}` in the second. This example demonstrates data exchange; an application workflow can persist that token and decrypt it when retrieving the record. Apply the appropriate [authentication and authorization](/en/security/authentication) before allowing access to the content.
+
+## Use the Crypt facade
+
+The facade uses the same container service and is available after application boot. Import it from the public module:
+
+```python
+from orionis.http import JSONResponse
+from orionis.http.base import BaseController
 from orionis.support.facades import Crypt
 
-token = Crypt.encrypt("private value")
-plaintext = Crypt.decrypt(token)
-assert plaintext == "private value"
+
+class EncryptionPreviewController(BaseController):
+
+    async def __call__(self) -> JSONResponse:
+        token = Crypt.encrypt("private note")
+        restored = Crypt.decrypt(token)
+
+        return JSONResponse({
+            "token": token,
+            "restored": restored,
+        })
 ```
 
-## Configuration
+You can also use `Crypt` or inject `IEncrypter` into services, commands, and other components resolved by the container. No additional provider registration is needed for the native service.
 
-`config/app.py` supplies the settings:
+## Encrypt structured data
 
-| Setting | Environment | Meaning |
-|---|---|---|
-| `app.cipher` | `APP_CIPHER` | One of the four supported AES identifiers; default is `AES-256-CBC`. |
-| `app.key` | `APP_KEY` | Raw text or `base64:`-prefixed key with exactly the cipher's required byte length. |
+Serialize a JSON-compatible object before encryption and decode the recovered text afterward. `decrypt()` returns text; it does not automatically reconstruct objects.
 
-The validated application config converts the key to bytes. If no key is configured, `SecureKeyGenerator` creates a random Laravel-compatible `base64:` value, persists it through `Env.set`, and normalizes it. Persist a stable production key: losing it makes existing ciphertext unrecoverable.
+```python
+import json
 
-## Integration with Orionis
+from orionis.encrypter.contracts import IEncrypter
+from orionis.http import JSONResponse
+from orionis.http.base import BaseController
 
-`EncrypterProvider` is a core, non-deferred provider. It binds `IEncrypter` to `Encrypter` as a singleton, then pins `Crypt` during async boot so synchronous calls do not return a deferred dispatcher.
 
-`Stringable.encrypt/decrypt`, registration flows, view globals, and MCP state use the service or facade. Dependency-injected code can request `IEncrypter`; ordinary application code can import `Crypt` from `orionis.support.facades`.
+class PreferencesPreviewController(BaseController):
 
-## Errors and edge cases
+    async def __call__(self, crypt: IEncrypter) -> JSONResponse:
+        preferences = {
+            "language": "es",
+            "notifications": True,
+        }
 
-- Empty plaintext and payload strings raise `ValueError`; non-strings raise `TypeError`.
-- Unsupported ciphers and wrong key sizes fail at construction.
-- Invalid outer Base64/JSON or typed fields raise `ValueError`.
-- Payload cipher mismatch and invalid IV size raise `ValueError` before decryption.
-- GCM requires a 16-byte tag; authentication failures surface as wrapped `RuntimeError`.
-- CBC rejects empty ciphertext and invalid PKCS7 padding, but it does not authenticate metadata or ciphertext.
-- The plaintext must be valid UTF-8 text; this API is not a raw-byte encryption interface.
+        token = crypt.encrypt(json.dumps(preferences, ensure_ascii=False))
+        restored = json.loads(crypt.decrypt(token))
 
-## Performance and concurrency
+        return JSONResponse({
+            "token": token,
+            "preferences": restored,
+        })
+```
 
-The implementation is synchronous and CPU-bound. GCM caches one immutable `AESGCM` object per service; CBC creates a cipher context per call. Payload encoding uses reusable `msgspec` structures/decoder. Each call keeps data local and obtains a fresh IV from `os.urandom`, so the singleton can serve concurrent callers without mutable per-operation state.
+To represent bytes, perform an explicit round-trip conversion. Here Base64 represents the original bytes as text **before** encryption; it does not replace the cryptographic operation.
 
-Token size includes JSON and two Base64 layers plus IV/tag overhead. Avoid using encryption as a streaming format for large files; use a purpose-built streaming scheme and authenticated mode instead.
+```python
+import base64
 
-## Public API
+from orionis.encrypter.contracts import IEncrypter
+from orionis.http import JSONResponse
+from orionis.http.base import BaseController
 
-### `Encrypter(app)`
 
-Reads `app.key` as bytes and `app.cipher` as a supported string. Construction raises `ValueError` for an unsupported cipher or an incorrect key length. Constants such as `SUPPORTED_CIPHERS`, key sizes, IV sizes, and tag size describe the accepted wire format.
+class BinaryPreviewController(BaseController):
 
-### `encrypt(plaintext: str) -> str`
+    async def __call__(self, crypt: IEncrypter) -> JSONResponse:
+        original = b"\x00\xff\x10"
+        text = base64.b64encode(original).decode("ascii")
 
-Accepts a non-empty string and returns a new Base64 envelope. A random IV means encrypting the same plaintext twice should produce different tokens. Invalid input raises `TypeError` or `ValueError`; cryptographic failures are wrapped in `RuntimeError`.
+        token = crypt.encrypt(text)
+        restored = base64.b64decode(crypt.decrypt(token), validate=True)
 
-### `decrypt(payload: str) -> str`
+        return JSONResponse({"matches": restored == original})
+```
 
-Decodes and validates the envelope, requires its cipher to match configuration, checks IV/tag sizes, decrypts, and UTF-8 decodes the result. It rejects empty/non-string input, malformed envelopes, mismatched ciphers, bad padding, invalid tags, and authentication failures.
+The service processes the entire content in memory; it does not provide streaming file encryption.
 
-### `IEncrypter`
+## What the token contains
 
-The contract declares only synchronous `encrypt` and `decrypt`. Import it from `orionis.encrypter.contracts` when typing a container-resolved dependency.
+Each call generates a new random IV. Encrypting the same value twice produces different tokens that recover the same text.
 
+```mermaid
+flowchart TD
+    A["Non-empty text"] --> B["UTF-8 encoding"]
+    B --> C["Encryption with the configured key and a new IV"]
+    C --> D["JSON envelope: iv, value, tag, cipher"]
+    D --> E["Base64 encoding of the envelope"]
+    E --> F["Text token for storage or transport"]
+```
+
+The binary `iv`, `value`, and `tag` fields are also represented in Base64. In CBC, `tag` is `None`; in GCM, it contains the authentication tag. Store the **complete token**: ciphertext alone does not include all the information needed for decryption.
+
+The token takes more space than the original text because of the IV, tag where applicable, JSON, and Base64. It contains no key, key identifier, expiration date, or list of previous keys. Its `cipher` field must match the decrypting instance; it does not automatically change that instance's configuration.
+
+GCM checks its tag during decryption and rejects altered content. CBC checks padding, but this implementation adds no MAC: successful CBC decryption does not prove integrity.
+
+## Input and decryption errors
+
+| Situation | Public exception |
+| --- | --- |
+| Input that is not a `str`. | `TypeError`. |
+| Empty text or token; text that cannot be encoded as UTF-8. | `ValueError`. |
+| Invalid Base64/JSON envelope, incompatible fields, different cipher, or incorrect IV size. | `ValueError`. |
+| Encryption failure. | `RuntimeError`. |
+| Missing or incorrectly sized GCM tag, authentication failure, invalid CBC padding, or failure to recover UTF-8. | `RuntimeError`, with the original cause chained. |
+
+The example's `decrypt` action converts expected token errors into an HTTP response without exposing the exception's internal details. Other failures follow the [HTTP exception flow](/en/http/exceptions). Catching `TypeError` is unnecessary there because the schema already requires a `str`.
+
+## Retain and change keys
+
+All processes reading the same tokens need the same key and cipher. Keep `APP_KEY` out of published code and retain its value across restarts and deployments.
+
+The service provides no key ring or parameter for trying previous keys. To change the key or cipher for existing data:
+
+1. Retain access to its original configuration.
+2. Recover each value with that configuration.
+3. Encrypt it with the new configuration.
+4. Replace the token only when both operations have completed successfully.
+5. Change the reading configuration after the corresponding records have been migrated.
+
+The application must identify which configuration applies to each record during the migration. `key:generate --force` only replaces `APP_KEY`; it does not perform these steps.
 
 ---
 
-[Index](/en/security/encryption) · [foundation](/en/getting-started) · [hashing](/en/security/hashing)
+[Encryption index](/en/security/encryption) · [Password hashing](/en/security/hashing) · [Controllers](/en/http/default-responses)

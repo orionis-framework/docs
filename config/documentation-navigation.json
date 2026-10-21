@@ -150,19 +150,44 @@
       "band": "build",
       "icon": "security",
       "title": {
-        "en": "Authentication and security",
-        "es": "Autenticación y seguridad"
+        "en": "Authentication and authorization",
+        "es": "Autenticación y autorización"
       },
       "pageIds": [
         "auth-overview",
+        "auth-configuration-and-guards",
         "auth-identity-and-session",
-        "auth-authorization",
         "auth-personal-access-tokens",
-        "auth-account-recovery",
+        "auth-middleware",
+        "auth-authorization",
+        "auth-policies",
+        "auth-account-recovery"
+      ]
+    },
+    {
+      "id": "sessions",
+      "band": "build",
+      "icon": "sessions",
+      "title": {
+        "en": "HTTP sessions",
+        "es": "Sesiones HTTP"
+      },
+      "pageIds": [
         "session-overview",
         "session-state-and-flash",
         "session-stores-and-concurrency",
-        "session-configuration-and-security",
+        "session-configuration-and-security"
+      ]
+    },
+    {
+      "id": "cryptography",
+      "band": "build",
+      "icon": "cryptography",
+      "title": {
+        "en": "Hashing and encryption",
+        "es": "Hashing y cifrado"
+      },
+      "pageIds": [
         "hashing-overview",
         "hashing-password-storage",
         "encrypter-overview",

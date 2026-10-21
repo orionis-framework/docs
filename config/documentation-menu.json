@@ -472,6 +472,10 @@
         "es": "Sesiones HTTP",
         "en": "HTTP sessions"
       },
+      "label": {
+        "es": "Introducción",
+        "en": "Introduction"
+      },
       "slug": {
         "es": "/es/http/sessions",
         "en": "/en/http/sessions"
@@ -485,8 +489,8 @@
         "en": "User state and form flash data"
       },
       "label": {
-        "en": "State and flash data",
-        "es": "Estado y datos flash"
+        "en": "Data and form flash",
+        "es": "Datos y formularios flash"
       },
       "slug": {
         "es": "/es/http/sessions/state-and-flash",
@@ -501,8 +505,8 @@
         "en": "Choosing storage and understanding concurrency"
       },
       "label": {
-        "en": "Session stores and concurrency",
-        "es": "Almacenes y concurrencia"
+        "en": "Storage",
+        "es": "Almacenamiento"
       },
       "slug": {
         "es": "/es/http/sessions/stores-and-concurrency",
@@ -517,8 +521,8 @@
         "en": "Cookies, renewal and secure lifecycle"
       },
       "label": {
-        "en": "Session security",
-        "es": "Seguridad de sesiones"
+        "en": "Configuration and lifecycle",
+        "es": "Configuración y ciclo de vida"
       },
       "slug": {
         "es": "/es/http/sessions/configuration-and-security",
@@ -529,8 +533,12 @@
       "id": "auth-overview",
       "kind": "doc",
       "title": {
-        "es": "Autenticación y autorización",
-        "en": "Authentication and authorization"
+        "es": "Introducción a la autenticación",
+        "en": "Introduction to authentication"
+      },
+      "label": {
+        "es": "Introducción",
+        "en": "Introduction"
       },
       "slug": {
         "es": "/es/security/authentication",
@@ -538,15 +546,31 @@
       }
     },
     {
+      "id": "auth-configuration-and-guards",
+      "kind": "doc",
+      "title": {
+        "es": "Configuración y guards",
+        "en": "Configuration and guards"
+      },
+      "label": {
+        "es": "Configuración y guards",
+        "en": "Configuration and guards"
+      },
+      "slug": {
+        "es": "/es/security/authentication/configuration-and-guards",
+        "en": "/en/security/authentication/configuration-and-guards"
+      }
+    },
+    {
       "id": "auth-identity-and-session",
       "kind": "doc",
       "title": {
-        "es": "Identidades y autenticación de navegador",
-        "en": "Identities and browser authentication"
+        "es": "Autenticación con sesiones",
+        "en": "Session authentication"
       },
       "label": {
-        "en": "Browser authentication",
-        "es": "Autenticación en navegador"
+        "en": "Session authentication",
+        "es": "Autenticación con sesiones"
       },
       "slug": {
         "es": "/es/security/authentication/identity-and-session",
@@ -557,12 +581,12 @@
       "id": "auth-authorization",
       "kind": "doc",
       "title": {
-        "es": "Permisos, roles y políticas de recursos",
-        "en": "Permissions, roles and resource policies"
+        "es": "Roles y permisos",
+        "en": "Roles and permissions"
       },
       "label": {
-        "en": "Permissions and roles",
-        "es": "Permisos y roles"
+        "en": "Roles and permissions",
+        "es": "Roles y permisos"
       },
       "slug": {
         "es": "/es/security/authentication/authorization",
@@ -573,12 +597,12 @@
       "id": "auth-personal-access-tokens",
       "kind": "doc",
       "title": {
-        "es": "Tokens personales para APIs",
-        "en": "Personal access tokens for APIs"
+        "es": "Autenticación con tokens",
+        "en": "Token authentication"
       },
       "label": {
-        "en": "API access tokens",
-        "es": "Tokens de API"
+        "en": "Token authentication",
+        "es": "Autenticación con tokens"
       },
       "slug": {
         "es": "/es/security/authentication/personal-access-tokens",
@@ -586,11 +610,43 @@
       }
     },
     {
+      "id": "auth-middleware",
+      "kind": "doc",
+      "title": {
+        "es": "Middleware de autenticación y acceso",
+        "en": "Authentication and access middleware"
+      },
+      "label": {
+        "es": "Middleware de acceso",
+        "en": "Access middleware"
+      },
+      "slug": {
+        "es": "/es/security/authentication/middleware",
+        "en": "/en/security/authentication/middleware"
+      }
+    },
+    {
+      "id": "auth-policies",
+      "kind": "doc",
+      "title": {
+        "es": "Policies y autorización de recursos",
+        "en": "Policies and resource authorization"
+      },
+      "label": {
+        "es": "Policies de recursos",
+        "en": "Resource policies"
+      },
+      "slug": {
+        "es": "/es/security/authentication/policies",
+        "en": "/en/security/authentication/policies"
+      }
+    },
+    {
       "id": "auth-account-recovery",
       "kind": "doc",
       "title": {
-        "es": "Recordarme, recuperación y verificación de cuentas",
-        "en": "Remember-me, recovery and email verification"
+        "es": "Recuperación y verificación de cuentas",
+        "en": "Account recovery and verification"
       },
       "label": {
         "en": "Recovery and verification",
@@ -605,8 +661,8 @@
       "id": "hashing-overview",
       "kind": "doc",
       "title": {
-        "es": "Contraseñas",
-        "en": "Passwords"
+        "es": "Hashing de contraseñas",
+        "en": "Password hashing"
       },
       "slug": {
         "es": "/es/security/hashing",
@@ -621,8 +677,8 @@
         "en": "Storing, verifying, and upgrading passwords"
       },
       "label": {
-        "en": "Password storage and verification",
-        "es": "Almacenamiento y verificación"
+        "en": "Generate and verify hashes",
+        "es": "Generar y verificar hashes"
       },
       "slug": {
         "es": "/es/security/hashing/password-storage",
@@ -637,8 +693,8 @@
         "en": "Data encryption"
       },
       "label": {
-        "en": "Encryption",
-        "es": "Cifrado"
+        "en": "Data encryption",
+        "es": "Cifrado de datos"
       },
       "slug": {
         "es": "/es/security/encryption",
@@ -653,8 +709,8 @@
         "en": "Protecting and recovering application values"
       },
       "label": {
-        "en": "Encrypting and recovering values",
-        "es": "Cifrar y recuperar valores"
+        "en": "Encrypt and decrypt values",
+        "es": "Cifrar y descifrar valores"
       },
       "slug": {
         "es": "/es/security/encryption/encrypting-values",
