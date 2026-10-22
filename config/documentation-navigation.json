@@ -794,9 +794,50 @@
       },
       "pageIds": [
         "storage-overview",
+        "storage-disks-and-drivers",
+        "storage-configuration",
         "storage-files-and-directories",
         "storage-streaming-and-uploads",
-        "storage-disks-and-drivers"
+        "storage-temporary-files-and-contexts",
+        "storage-manager-and-injection",
+        "storage-api-reference"
+      ],
+      "groups": [
+        {
+          "id": "storage-setup",
+          "title": {
+            "es": "Discos y configuración",
+            "en": "Disks and configuration"
+          },
+          "pageIds": [
+            "storage-overview",
+            "storage-disks-and-drivers",
+            "storage-configuration"
+          ]
+        },
+        {
+          "id": "storage-operations",
+          "title": {
+            "es": "Operaciones y recursos",
+            "en": "Operations and resources"
+          },
+          "pageIds": [
+            "storage-files-and-directories",
+            "storage-streaming-and-uploads",
+            "storage-temporary-files-and-contexts"
+          ]
+        },
+        {
+          "id": "storage-reference",
+          "title": {
+            "es": "Servicios y referencia",
+            "en": "Services and reference"
+          },
+          "pageIds": [
+            "storage-manager-and-injection",
+            "storage-api-reference"
+          ]
+        }
       ]
     },
     {

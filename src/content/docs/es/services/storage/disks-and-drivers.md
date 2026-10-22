@@ -1,138 +1,241 @@
 ---
-title: "Configurar discos, publicación y drivers"
-description: "Storage permite guardar contenido y trabajar con archivos mediante el mismo contrato async en discos locales, efímeros o cloud."
+title: "Discos, drivers y dependencias"
+description: "Elige almacenamiento local, en memoria, S3, Azure Blob o Google Cloud y conoce sus capacidades y requisitos reales."
 editUrl: true
 lastUpdated: false
 ---
 
-Storage permite guardar contenido y trabajar con archivos mediante el mismo contrato async en discos locales, efímeros o cloud.
+Un **disco** es una entrada de `config/filesystems.py`: identifica la configuración que seleccionas con `Storage.disk("s3")`. Un **driver** implementa sus operaciones: decide dónde viven los archivos y cómo se leen, escriben o publican. Varios discos pueden utilizar el mismo driver; `local` y `public` usan `local` con raíces diferentes.
 
-## Configurar discos y credenciales
+## Drivers disponibles
 
-La configuración incluida admite nombres `local`, `public`, `s3`, `azure` y `gcs`. Un nombre de disco selecciona una entrada; su atributo `driver` selecciona la implementación. `local` y `public` usan el mismo driver local con distintas raíces. También puedes asignar el driver `memory` a una entrada existente para un entorno aislado.
-
-`Filesystems` y `Disks` validan los campos conocidos: añadir arbitrariamente `private` o `archive` a un dict no crea automáticamente un disco. El manager puede leer atributos de un objeto de configuración extendido, pero si necesitas nuevos nombres debes diseñar entidades/configuración compatibles y su validación. Para una integración pequeña es más sencillo cambiar el driver de una entrada existente.
-
-| Proveedor | Extra de Orionis | Datos consumidos / predeterminados |
+| Driver en la configuración | Implementación | Dependencia adicional |
 |---|---|---|
-| Local | ninguno | `LOCAL_PATH=storage/app/private`; public usa `PUBLIC_PATH=storage/app/public`, `PUBLIC_URL=/static`. |
-| S3 | `s3` (`boto3>=1.43.99`) | `S3_KEY`, `S3_SECRET`, `S3_REGION=us-east-1`, `S3_BUCKET`, URL/endpoint opcionales, path style desactivado. |
-| Azure Blob | `azure` (`azure-storage-blob>=12.30.2`) | connection string o cuenta/clave; `AZURE_CONTAINER`; URL opcional. |
-| GCS | `gcs` (`google-cloud-storage>=3.14.1`) | proyecto, bucket, archivo de clave opcional o credenciales por defecto del SDK. |
+| `local` | `LocalStorageDriver`: archivos del sistema operativo. | Ninguna. |
+| `memory` | `MemoryStorageDriver`: contenido en memoria de la instancia. | Ninguna. |
+| `aws` o `s3` | `S3StorageDriver`: Amazon S3 y servicios compatibles con su API. | Extra `s3`: `boto3`. |
+| `azure` | `AzureStorageDriver`: Azure Blob Storage. | Extra `azure`: `azure-storage-blob`. |
+| `gcs` o `google` | `GoogleStorageDriver`: Google Cloud Storage. | Extra `gcs`: `google-cloud-storage`. |
 
-Desde la raíz de tu aplicación, instala el SDK que necesitas: `uv add 'orionis[s3]'`, `uv add 'orionis[azure]'` o `uv add 'orionis[gcs]'`. Después configura sus credenciales y el disco antes del arranque. El extra agregado `storage` instala los tres SDK. La construcción del driver es lazy y no valida una conexión de red; el primer I/O puede lanzar `MissingStorageDependencyException` con indicación de instalación o una excepción del SDK. Las credenciales y permisos siguen las políticas del proveedor. No existe failover ni política de reintentos común en `StorageManager`.
+Los aliases pertenecen al **driver**: el disco para S3 se llama `s3`, aunque su entidad utiliza `driver="aws"`. `Storage.disk("aws")` no selecciona automáticamente ese disco. Los drivers se comparan literalmente: utiliza los valores en minúsculas.
 
-### Visibilidad y publicación
+Las entradas incluidas son `local`, `public`, `s3`, `azure` y `gcs`. `memory` es un driver que puedes asignar a una de ellas, no un disco predefinido. La [configuración de filesystems](/es/services/storage/configuration) detalla todos sus campos, variables de entorno y validación.
 
-`url()` construye una ubicación: no concede permisos ni crea una ruta estática del servidor. En local/memory requiere `base_url`; en cloud se puede derivar del proveedor o de la URL configurada. Mantén el disco privado como fuente de archivos confidenciales y autoriza cada descarga.
+<a id="packages"></a>
 
-`temporaryUrl(expires_in=3600)` admite firmas en S3, Azure y GCS, según credenciales. Local y memory lanzan `UnsupportedStorageOperationException`. Azure requiere la clave de cuenta para SAS y no implementa ACL por blob: el parámetro visibility se ignora al escribir, y `setVisibility()` falla explícitamente; configura el contenedor. S3/GCS dependen de que las políticas del bucket permitan las ACL solicitadas. Una URL válida no demuestra existencia, autorización del usuario de tu aplicación ni alcance público.
+## Instalar dependencias con Reactor
 
-### Registrar un driver
+Desde la raíz de tu aplicación, con el Python de su entorno:
 
-Implementa `IStorageDriver` y registra una factory síncrona `factory(config)` durante boot antes del primer acceso. `extend()` acepta también reemplazar nombres integrados y limpia la caché de discos; las referencias antiguas que ya guardaste siguen usando el driver anterior. No cambies el registro mientras hay solicitudes concurrentes. La factory no recibe la aplicación ni se espera como corrutina: captura dependencias explícitamente si las necesitas.
-
-Este ejemplo registra un driver de memoria con nombre propio sobre la entrada `local`, sin crear archivos:
-
-```python
-import asyncio
-from pathlib import Path
-from orionis.storage import MemoryStorageDriver, StorageManager
-
-
-class App:
-    basePath = Path.cwd()
-
-    def config(self, name: str) -> dict:
-        return {
-            "default": "local",
-            "disks": {"local": {"driver": "scratch", "path": "unused"}},
-        }
-
-
-async def main() -> None:
-    manager = StorageManager(App())
-    manager.extend("scratch", lambda config: MemoryStorageDriver())
-    file = await manager.disk().put("check.txt", "ok")
-    assert await file.read() == b"ok"
-
-
-asyncio.run(main())
+```bash
+python -B reactor packages
 ```
 
-## Configuración
+Su alternativa directa es:
 
-`config/filesystems.py` selecciona `FILESYSTEM_DISK` (`local`) y define:
+```bash
+orionis packages
+```
 
-- Local: `LOCAL_PATH` (`storage/app/private`).
-- Public: `PUBLIC_PATH` (`storage/app/public`) y `PUBLIC_URL` (`/static`).
-- S3: `S3_KEY`, `S3_SECRET`, `S3_REGION`, `S3_BUCKET`, `S3_URL`, `S3_ENDPOINT`, `S3_USE_PATH_STYLE_ENDPOINT`.
-- Azure: `AZURE_CONNECTION_STRING` o `AZURE_ACCOUNT_NAME`/`AZURE_ACCOUNT_KEY`, `AZURE_CONTAINER`, `AZURE_URL`.
-- GCS: `GCS_PROJECT_ID`, `GCS_KEY_FILE`, `GCS_BUCKET`, `GCS_URL`.
+El comando lee los extras y grupos de dependencias del manifiesto de Orionis, muestra un catálogo numerado y permite seleccionar nombres o números separados por espacios o comas. Después solicita confirmación; `0` cancela. Prioriza el manifiesto incluido con el framework o su repositorio y utiliza el `pyproject.toml` de la aplicación como alternativa si aquellos no existen.
 
-Las rutas locales relativas se resuelven desde la raíz de la aplicación. Las credenciales vacías son valores de ejemplo, no despliegues utilizables: las entidades validan la estructura de configuración y el SDK del proveedor comprueba las credenciales al usarlas.
+```text
+packages [options ...] [--list] [--yes | -y]
+```
 
+| Argumento u opción | Predeterminado | Uso |
+|---|---|---|
+| `options` | Sin selección. | Cero o más nombres, números o claves `extra:NAME` / `group:NAME`. Un nombre simple debe identificar una única opción. |
+| `--list` | `False` | Muestra el catálogo y termina sin instalar. |
+| `--yes`, `-y` | `False` | Confirma las opciones seleccionadas sin preguntar. |
+| `-h`, `--help` | — | Muestra la ayuda del comando. |
 
+```bash
+python -B reactor packages --list
+python -B reactor packages s3 --yes
+python -B reactor packages azure --yes
+python -B reactor packages gcs --yes
+```
 
-## Integración con Orionis
+Puedes instalar varios extras juntos. `storage` reúne los tres SDK cloud:
 
-`StorageProvider` registra `IStorageManager` como singleton y prepara la fachada `Storage` cuando se necesita el servicio. La capa HTTP mantiene los archivos multipart en buffers o temporales; `Storage.uploaded()` los adapta sin acoplar los drivers a la petición. Aplica las reglas Schema de archivo/imagen al archivo HTTP original antes de guardarlo.
+```bash
+python -B reactor packages extra:s3 extra:gcs -y
+python -B reactor packages storage --yes
+orionis packages storage --yes
+```
 
-El disco `public` suele usar `PUBLIC_URL=/static`, pero tu aplicación y despliegue deben exponer expresamente el directorio mediante una ruta estática. Configurar esa URL no crea la ruta ni concede acceso al contenido.
+En una terminal no interactiva debes indicar las opciones y `--yes`. Sin selección, el comando solo muestra el catálogo; con opciones pero sin confirmación termina con error. También rechaza nombres desconocidos, números fuera del catálogo y nombres ambiguos. Para automatizar, utiliza nombres en vez de posiciones numéricas.
 
+`uv` debe estar disponible en `PATH`. Reactor ejecuta `uv pip install --python <intérprete de Reactor> -- <dependencias>`: instala en el entorno del Python que ejecuta el comando y elimina requisitos duplicados. No modifica las dependencias declaradas de la aplicación ni actualiza `uv.lock`. Para declarar el extra en un proyecto administrado con uv, utiliza la alternativa correspondiente:
 
+```bash
+uv add "orionis[s3]"
+uv add "orionis[azure]"
+uv add "orionis[gcs]"
+uv add "orionis[storage]"
+```
 
-### Usar fachada
+Instalar un extra no cambia `FILESYSTEM_DISK`, no configura credenciales ni crea buckets o contenedores.
+
+<a id="driver-local"></a>
+
+## Almacenamiento local
+
+`local` resuelve raíces relativas desde la raíz de la aplicación y conserva las absolutas. El driver crea su directorio raíz al construirse por primera vez. Las entidades de configuración no crean directorios.
+
+```dotenv
+FILESYSTEM_DISK=local
+LOCAL_PATH=storage/app/private
+PUBLIC_PATH=storage/app/public
+PUBLIC_URL=/static
+```
 
 ```python
+from orionis.http import JSONResponse
 from orionis.support.facades import Storage
 
 
-async def publish_manifest() -> str:
-    file = await Storage.disk("public").put(
-        "build/manifest.json", '{"version": 1}', visibility="public",
-    )
-    return await file.url()
+class ManifestController:
+    async def publish(self) -> JSONResponse:
+        manifest = await Storage.disk("public").put(
+            "build/manifest.json",
+            '{"ready": true}',
+            visibility="public",
+        )
+        return JSONResponse({"url": await manifest.url()})
 ```
 
-## Errores y casos límite
+`url()` une `PUBLIC_URL` y la ruta codificada; no registra una ruta estática ni comprueba la existencia del archivo. Tu aplicación o servidor debe exponer el directorio correspondiente. La entrada `local` incluida no tiene URL base: `file.url()` lanza `UnsupportedStorageOperationException`.
 
-- Una ruta inválida o que escapa de la raíz produce `StoragePathException`; una operación que necesita un archivo inexistente produce `StorageFileNotFoundException`.
-- Una función no soportada, como una URL firmada en un disco local, produce `UnsupportedStorageOperationException` en lugar de devolver una URL engañosa.
-- Un disco desconocido produce `DiskNotFoundException`; un driver desconocido, `DriverNotSupportedException`. Comprueba nombre y definición en `config/filesystems.py`.
-- Copiar o mover normaliza el destino. Si ya existe, la sustitución del contenido depende del contrato de la operación y del proveedor; no la interpretes como creación condicional.
-- `mimeType()` devuelve metadatos o una inferencia, no valida el contenido. El significado de ETag y la disponibilidad de hashes cambian entre proveedores.
-- Los listados cloud dependen de permisos, paginación del SDK, consistencia y errores de red. Limita el tamaño del árbol que recorres.
-- Cierra los handles abiertos mediante `async with`; cerrar o vaciar un handle de escritura puede publicar los datos incluso después de un error.
+La visibilidad aplica permisos POSIX al archivo: `public` utiliza `0644` y `private`, `0600`. Los directorios se crean con los permisos predeterminados del sistema; la visibilidad del archivo no cambia los de sus padres. El efecto depende del sistema operativo y no sustituye la configuración HTTP. No admite URL firmadas.
 
+<a id="driver-memory"></a>
 
+## Almacenamiento en memoria
 
-## Concurrencia y límites
+Puedes asignar `memory` a una entrada existente en la fábrica de `disks`:
 
-Los wrappers son ligeros; cada disco se construye y cachea en el manager. Local publica `write()` y `writeStream()` con temporales únicos y reemplazo: lectores no observan bytes mezclados, pero escritores concurrentes tienen semántica de último reemplazo. Un flujo `exists()` seguido de `write()` no garantiza crear solo si falta. Memory es efímero y no sincroniza threads ni procesos. Los drivers cloud dependen de SDK, red y consistencia del servicio.
-
-No hay transacciones entre múltiples archivos, lock de negocio ni compare-and-swap común. Coordina operaciones sobre la misma clave desde la aplicación. Mantén límites de tamaño, disco temporal y concurrencia: spooling protege RAM a costa de I/O local y no hace el trabajo ilimitado.
+```python
+from orionis.foundation.config.filesystems import Disks, Local
 
 
-## Compatibilidad
+def memory_disks() -> Disks:
+    return Disks(local=Local(driver="memory", path="storage/app/private"))
+```
 
-Todos los drivers incluidos implementan `IStorageDriver`, pero sus capacidades no son equivalentes: permisos públicos, URL firmadas, fechas, ETags, checksums y directorios dependen del proveedor. La API de Orionis utiliza rutas relativas con `/`, también en Windows.
+Utiliza `memory_disks` como `default_factory` del campo `disks` de `BootstrapFilesystems`. `path` sigue siendo validado por `Local`, aunque este driver no lo utiliza.
 
-`normalizePath` y `normalizeFilePath` conservan compatibilidad como alias. En código nuevo importa `normalize_path` y `normalize_file_path` desde `orionis.storage.paths`.
+Cada instancia mantiene sus propios archivos: no comparte datos entre procesos ni persiste al reiniciar. Los flujos de escritura se reúnen en memoria. La visibilidad es metadato, sin permisos de sistema. Solo genera URL si la entrada expone `url`, como `public`; esa dirección no publica los bytes. No admite URL firmadas.
 
-## Referencia de implementación para extensiones
+<a id="driver-s3"></a>
 
-| Ruta | Responsabilidad |
+## Amazon S3 y servicios compatibles
+
+Instala el extra `s3` y configura:
+
+```dotenv
+FILESYSTEM_DISK=s3
+S3_BUCKET=example-media
+S3_REGION=us-east-1
+S3_KEY=replace-with-access-key
+S3_SECRET=replace-with-secret
+```
+
+El driver entrega credenciales explícitas a boto3 únicamente cuando **ambas** están presentes; en caso contrario utiliza la cadena de credenciales del SDK. Para un endpoint compatible puedes añadir:
+
+```dotenv
+S3_ENDPOINT=http://localhost:9000
+S3_USE_PATH_STYLE_ENDPOINT=true
+```
+
+`endpoint` configura la API; `url` cambia únicamente la dirección pública generada. `url()` prioriza `S3_URL`, después compone `<endpoint>/<bucket>/<archivo>` y, sin ambos, `https://<bucket>.s3.<region>.amazonaws.com/<archivo>`. Construirla no utiliza el SDK.
+
+La visibilidad explícita se traduce a ACL `public-read` o `private`; con `None` la escritura omite la ACL. Las políticas del bucket deben admitirlas. `visibility()` inspecciona los permisos ACL del objeto, no todas las políticas de acceso posibles. `temporaryUrl()` firma una operación `get_object`.
+
+<a id="driver-azure"></a>
+
+## Azure Blob Storage
+
+Instala el extra `azure` y utiliza una cadena de conexión:
+
+```dotenv
+FILESYSTEM_DISK=azure
+AZURE_CONNECTION_STRING="DefaultEndpointsProtocol=https;AccountName=exampleaccount;AccountKey=replace-with-key;EndpointSuffix=core.windows.net"
+AZURE_CONTAINER=documents
+```
+
+También puedes dejar vacía `AZURE_CONNECTION_STRING` y configurar `AZURE_ACCOUNT_NAME`, `AZURE_ACCOUNT_KEY` y `AZURE_CONTAINER`. La cadena tiene prioridad para crear el cliente. El driver extrae su nombre y clave de cuenta si los campos correspondientes están vacíos.
+
+`url()` prioriza `AZURE_URL`; sin ella compone `https://<cuenta>.blob.core.windows.net/<contenedor>/<archivo>`. Sin cadena de conexión el cliente utiliza el endpoint de cuenta y la clave indicada, o `None` si falta.
+
+La escritura ignora `visibility`: Azure no tiene visibilidad por blob en esta implementación. `visibility()` consulta el acceso del contenedor y `setVisibility()` lanza `UnsupportedStorageOperationException`. Configura el contenedor en Azure. `temporaryUrl()` genera un SAS de lectura y exige una clave de cuenta, incluida la que se extraiga de la cadena de conexión.
+
+<a id="driver-gcs"></a>
+
+## Google Cloud Storage
+
+Instala el extra `gcs` y configura:
+
+```dotenv
+FILESYSTEM_DISK=gcs
+GCS_PROJECT_ID=example-project
+GCS_BUCKET=example-media
+GCS_KEY_FILE=/secure/service-account.json
+```
+
+Con `GCS_KEY_FILE`, el SDK crea el cliente desde el archivo de cuenta de servicio. Sin él, utiliza `storage.Client(project=...)` y Application Default Credentials. El driver entrega la ruta directamente al SDK; no la resuelve contra la raíz de Storage. El constructor con archivo toma la información del proyecto desde ese archivo, en lugar de recibir `project_id` como argumento.
+
+`url()` prioriza `GCS_URL` y, en su ausencia, compone `https://storage.googleapis.com/<bucket>/<archivo>`. La escritura con visibilidad explícita utiliza las ACL predefinidas `publicRead` o `private`; `setVisibility()` llama a `make_public()` o `make_private()`. `visibility()` revisa la ACL `allUsers`. Las políticas y credenciales del bucket deben permitir estas operaciones. `temporaryUrl()` solicita una firma V4 de lectura: las credenciales deben poder firmar.
+
+## Diferencias entre backends
+
+| Capacidad | Comportamiento |
 |---|---|
-| `manager.py`, `provider.py` | Config, discos lazy, drivers custom y fachada. |
-| `disk.py`, `file.py`, `directory.py` | API neutral. |
-| `stream.py`, `uploaded_file.py` | Handles async y uploads HTTP. |
-| `paths.py` | Normalización y rechazo de traversal. |
-| `drivers/local.py`, `drivers/memory.py` | Implementaciones local/efímera. |
-| `drivers/s3.py`, `drivers/azure.py`, `drivers/gcs.py` | Cloud opcional. |
-| `entities/file_info.py`, `enums/visibility.py` | Metadata y visibilidad. |
-| `contracts/`, `exceptions.py` | Interfaces y fallos tipados. |
+| Directorios | Local usa directorios físicos. Memory mantiene entradas y padres implícitos. Cloud usa prefijos y objetos vacíos terminados en `/` como directorios explícitos. |
+| URL pública | Local y memory necesitan una URL base; cloud deriva una dirección del proveedor. No comprueba acceso ni existencia. |
+| URL temporal | Solo S3, Azure y GCS. El método del archivo recibe `expires_in=3600`, en segundos. |
+| Metadatos | Fechas, ETags y checksums varían por backend. Un ETag no es necesariamente un hash del contenido; `hash()` lee los bytes para calcularlo. |
+| I/O cloud | Los SDK se importan al primer uso que los necesita y sus llamadas bloqueantes se ejecutan en threads. Pueden propagarse errores del SDK de red, credenciales o permisos. |
 
----
+Los constructores cloud no se conectan ni aprovisionan recursos. Resolver un disco puede funcionar y su primer I/O fallar por falta del SDK (`MissingStorageDependencyException`), configuración incompleta o permisos. Orionis no añade una política común de reintentos, failover ni transacciones entre archivos; los SDK conservan su comportamiento propio.
 
-[Índice](/es/services/storage) · [http](/es/http) · [container](/es/architecture/service-container) · [mail](/es/services/mail)
+<a id="custom-drivers"></a>
+
+## Registrar un driver desde un provider
+
+`Storage.extend(driver, factory)` registra una fábrica síncrona que recibe la entidad de configuración y devuelve un `IStorageDriver`. Para una implementación nueva, implementa el [contrato completo de drivers](/es/services/storage/api-reference). También puedes registrar un alias de una implementación existente.
+
+Cambia el `driver` de la entrada `local` usando esta fábrica para el campo `disks` de `BootstrapFilesystems`:
+
+```python
+from orionis.foundation.config.filesystems import Disks, Local
+
+
+def scratch_disks() -> Disks:
+    return Disks(local=Local(driver="scratch", path="storage/app/private"))
+```
+
+Asigna `default_factory=scratch_disks` al definir ese campo. La entidad acepta `scratch` como nombre de driver; el provider siguiente registra su implementación.
+
+Registra la fábrica en un provider de la aplicación:
+
+```python
+from orionis.container.providers import ServiceProvider
+from orionis.storage import MemoryStorageDriver
+from orionis.storage.contracts import IStorageManager
+
+
+class StorageDriversProvider(ServiceProvider):
+    async def boot(self) -> None:
+        storage: IStorageManager = await self.app.make(IStorageManager)
+        storage.extend("scratch", lambda config: MemoryStorageDriver())
+```
+
+Añade `StorageDriversProvider` a la llamada existente a `app.withProviders(...)` en `bootstrap/app.py`. Después, `Storage.disk("local")` utiliza memoria con ese alias; registrar `scratch` no crea un disco llamado `scratch`.
+
+La fábrica no es una corrutina ni recibe la aplicación; puede capturar dependencias resueltas en `boot()`. Los providers reciben `boot(self)` sin inyección de argumentos: utiliza `await self.app.make(...)`.
+
+La fábrica tiene prioridad sobre los drivers incorporados, incluso si reutiliza un nombre existente. `extend()` vacía la caché para resoluciones posteriores; referencias a discos o archivos ya conservadas mantienen el driver anterior. Registra extensiones durante el arranque, antes de atender peticiones.
+
+Continúa con la [configuración completa](/es/services/storage/configuration) y las [operaciones sobre archivos y directorios](/es/services/storage/files-and-directories).

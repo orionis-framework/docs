@@ -1601,8 +1601,8 @@
         "en": "Storage"
       },
       "label": {
-        "en": "Storage",
-        "es": "Almacenamiento"
+        "en": "Introduction",
+        "es": "Introducción"
       },
       "slug": {
         "es": "/es/services/storage",
@@ -1645,8 +1645,8 @@
       "id": "storage-disks-and-drivers",
       "kind": "doc",
       "title": {
-        "es": "Configurar discos, publicación y drivers",
-        "en": "Configuring disks, publication, and drivers"
+        "es": "Discos, drivers y dependencias",
+        "en": "Disks, drivers, and dependencies"
       },
       "label": {
         "en": "Disks and drivers",
@@ -1655,6 +1655,70 @@
       "slug": {
         "es": "/es/services/storage/disks-and-drivers",
         "en": "/en/services/storage/disks-and-drivers"
+      }
+    },
+    {
+      "id": "storage-configuration",
+      "kind": "doc",
+      "title": {
+        "es": "Configuración de filesystems",
+        "en": "Filesystem configuration"
+      },
+      "label": {
+        "es": "Configuración",
+        "en": "Configuration"
+      },
+      "slug": {
+        "es": "/es/services/storage/configuration",
+        "en": "/en/services/storage/configuration"
+      }
+    },
+    {
+      "id": "storage-temporary-files-and-contexts",
+      "kind": "doc",
+      "title": {
+        "es": "Archivos temporales y contextos",
+        "en": "Temporary files and contexts"
+      },
+      "label": {
+        "es": "Temporales y contextos",
+        "en": "Temporary files and contexts"
+      },
+      "slug": {
+        "es": "/es/services/storage/temporary-files-and-contexts",
+        "en": "/en/services/storage/temporary-files-and-contexts"
+      }
+    },
+    {
+      "id": "storage-manager-and-injection",
+      "kind": "doc",
+      "title": {
+        "es": "Fachada e inyección de Storage",
+        "en": "Storage facade and injection"
+      },
+      "label": {
+        "es": "Fachada e inyección",
+        "en": "Facade and injection"
+      },
+      "slug": {
+        "es": "/es/services/storage/manager-and-injection",
+        "en": "/en/services/storage/manager-and-injection"
+      }
+    },
+    {
+      "id": "storage-api-reference",
+      "kind": "doc",
+      "title": {
+        "es": "Referencia técnica de Storage",
+        "en": "Storage technical reference"
+      },
+      "label": {
+        "es": "Referencia técnica",
+        "en": "Technical reference"
+      },
+      "slug": {
+        "es": "/es/services/storage/api-reference",
+        "en": "/en/services/storage/api-reference"
       }
     },
     {
