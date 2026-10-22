@@ -32,6 +32,8 @@ class DefaultFlagsSeeder(Seeder):
 
 ## Ejecutar pendientes
 
+[Referencia de comandos de Database](/es/database/commands): sintaxis, argumentos y opciones de los 14 comandos, incluida inspección y borrado.
+
 ```shell
 orionis seed
 python -B reactor seed

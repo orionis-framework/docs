@@ -545,6 +545,99 @@ site-search button[data-open-modal]:hover {
     padding-block-start: 0;
 }
 
+.sidebar-content .sidebar-subgroups {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar-content .sidebar-subgroups > li + li {
+    margin-block-start: 0.25rem;
+}
+
+.sidebar-content .sidebar-subgroup {
+    min-inline-size: 0;
+    border-radius: 0.5rem;
+}
+
+.sidebar-content .sidebar-subgroup > summary {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-block-size: 2.75rem;
+    padding: 0.5rem 0.625rem;
+    border-radius: 0.5rem;
+    color: var(--orionis-text);
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.4;
+    list-style: none;
+    cursor: pointer;
+    user-select: none;
+}
+
+.sidebar-content .sidebar-subgroup > summary::marker,
+.sidebar-content .sidebar-subgroup > summary::-webkit-details-marker {
+    display: none;
+}
+
+.sidebar-content .sidebar-subgroup > summary::before {
+    content: '';
+    flex-shrink: 0;
+    inline-size: 0.3rem;
+    block-size: 0.3rem;
+    border-radius: 50%;
+    background: var(--orionis-muted);
+}
+
+.sidebar-content .sidebar-subgroup > summary:hover {
+    color: var(--section-accent);
+    background: var(--orionis-soft);
+}
+
+.sidebar-content .sidebar-subgroup > summary:focus-visible {
+    outline: 2px solid var(--orionis-primary);
+    outline-offset: 2px;
+}
+
+.sidebar-content .subgroup-label {
+    flex: 1;
+    min-inline-size: 0;
+    overflow-wrap: break-word;
+}
+
+.sidebar-content .sidebar-subgroup > summary .caret {
+    flex-shrink: 0;
+    inline-size: 0.875rem;
+    block-size: 0.875rem;
+    color: var(--orionis-muted);
+}
+
+.sidebar-content .sidebar-subgroup[open] > summary .caret {
+    transform: rotate(90deg);
+}
+
+.sidebar-content .sidebar-subgroup.is-active > summary {
+    color: var(--section-accent);
+    background: color-mix(in srgb, var(--section-accent) 7%, transparent);
+}
+
+.sidebar-content .sidebar-subgroup.is-active > summary::before {
+    background: var(--section-accent);
+}
+
+.sidebar-content .sidebar-subgroup > ul {
+    margin-block: 0.125rem 0.5rem;
+    margin-inline: 0.75rem 0.375rem;
+    padding: 0;
+    padding-inline-start: 0.5rem;
+    border-inline-start: 1px solid var(--orionis-border);
+    list-style: none;
+}
+
+.sidebar-content .sidebar-subgroup > ul > li + li {
+    margin-block-start: 0.125rem;
+}
+
 .sidebar-content ul ul li {
     margin-inline-start: 0;
     padding-inline-start: 0;

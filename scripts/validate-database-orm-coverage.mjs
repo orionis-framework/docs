@@ -34,6 +34,9 @@ for (const [scope, entries] of [['declaration', mapped], ['supplement', inventor
   }
 }
 const typed = inventory.fakerProviders.filter((entry) => entry.kind === 'provider method');
+const cli = inventory.supplemental.filter((entry) => entry.kind === 'CLI command');
+const expectedCommands = ['db:seed', 'db:show', 'db:table', 'db:wipe', 'make:database-migration', 'make:database-schema', 'make:database-seeder', 'make:factory', 'migrate', 'migrate:fresh', 'migrate:refresh', 'migrate:reset', 'migrate:rollback', 'migrate:status'];
+if (JSON.stringify(cli.map((entry) => entry.symbol).sort()) !== JSON.stringify(expectedCommands.sort()) || cli.length !== inventory.statistics.databaseCliCommands) errors.push('The Database CLI reference must cover all 14 audited commands.');
 if (typed.length !== inventory.statistics.typedFakerProviders) errors.push('Provider count differs from the audited source.');
 if (inventory.declarations.length !== inventory.statistics.lexicalDeclarations || mapped.length !== inventory.statistics.mappedDeclarations) errors.push('Declaration counts differ from the inventory.');
 if (inventory.statistics.additionalApiEntries !== inventory.supplemental.length ||

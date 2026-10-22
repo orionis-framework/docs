@@ -6,16 +6,25 @@
       "orionis/orm"
     ],
     "definition": "Lexically public classes, own methods/properties/fields/constants, type aliases, and selected Python protocols; inherited methods link to their declaring class. Public contracts map to implementation references. Generated dataclass constructors, configuration, CLI, collections and typed/dynamic Faker providers are supplemental entries.",
-    "exclusions": "Private helpers/modules and TYPE_CHECKING-only implementation aliases are individually justified. Underscore implementation details are not promoted to supported APIs."
+    "exclusions": "Private helpers/modules and TYPE_CHECKING-only implementation aliases are individually justified. Underscore implementation details are not promoted to supported APIs.",
+    "cliSourceRoots": [
+      "orionis/console/commands/db",
+      "orionis/console/commands/migrate"
+    ],
+    "cliGeneratorPatterns": [
+      "orionis/console/commands/make/database_*.py",
+      "orionis/console/commands/make/factory.py"
+    ]
   },
   "statistics": {
     "lexicalDeclarations": 978,
     "mappedDeclarations": 971,
     "justifiedInternalExclusions": 7,
-    "additionalApiEntries": 423,
+    "additionalApiEntries": 437,
     "typedFakerProviders": 675,
     "dynamicFakerHelpers": 7,
-    "auditedSourceFiles": 183
+    "auditedSourceFiles": 190,
+    "databaseCliCommands": 14
   },
   "pending": [],
   "declarations": [
@@ -11774,6 +11783,129 @@
       "signature": "db:seed [--database NAME|-d NAME]"
     },
     {
+      "source": "orionis/console/commands/db/seed.py",
+      "symbol": "db:seed",
+      "kind": "CLI command",
+      "line": 3,
+      "signature": "db:seed [--database NAME]",
+      "docs": {
+        "es": "/es/database/commands#db-seed",
+        "en": "/en/database/commands#db-seed"
+      },
+      "arguments": [
+        {
+          "name": "--database, -d",
+          "type": "str",
+          "effectiveDefault": null,
+          "required": false
+        },
+        {
+          "name": "--help, -h",
+          "type": "help",
+          "effectiveDefault": false,
+          "required": false
+        }
+      ]
+    },
+    {
+      "source": "orionis/console/commands/db/show.py",
+      "symbol": "db:show",
+      "kind": "CLI command",
+      "line": 32,
+      "signature": "db:show [--database NAME] [--counts] [--views]",
+      "docs": {
+        "es": "/es/database/commands#db-show",
+        "en": "/en/database/commands#db-show"
+      },
+      "arguments": [
+        {
+          "name": "--database, -d",
+          "type": "str",
+          "effectiveDefault": null,
+          "required": false
+        },
+        {
+          "name": "--counts",
+          "type": "bool",
+          "effectiveDefault": false,
+          "required": false
+        },
+        {
+          "name": "--views",
+          "type": "bool",
+          "effectiveDefault": false,
+          "required": false
+        },
+        {
+          "name": "--help, -h",
+          "type": "help",
+          "effectiveDefault": false,
+          "required": false
+        }
+      ]
+    },
+    {
+      "source": "orionis/console/commands/db/table.py",
+      "symbol": "db:table",
+      "kind": "CLI command",
+      "line": 8,
+      "signature": "db:table table [--database NAME]",
+      "docs": {
+        "es": "/es/database/commands#db-table",
+        "en": "/en/database/commands#db-table"
+      },
+      "arguments": [
+        {
+          "name": "--database, -d",
+          "type": "str",
+          "effectiveDefault": null,
+          "required": false
+        },
+        {
+          "name": "table",
+          "type": "str",
+          "required": true
+        },
+        {
+          "name": "--help, -h",
+          "type": "help",
+          "effectiveDefault": false,
+          "required": false
+        }
+      ]
+    },
+    {
+      "source": "orionis/console/commands/db/wipe.py",
+      "symbol": "db:wipe",
+      "kind": "CLI command",
+      "line": 583,
+      "signature": "db:wipe [--database NAME] [--force]",
+      "docs": {
+        "es": "/es/database/commands#db-wipe",
+        "en": "/en/database/commands#db-wipe"
+      },
+      "arguments": [
+        {
+          "name": "--database, -d",
+          "type": "str",
+          "effectiveDefault": null,
+          "required": false
+        },
+        {
+          "name": "--force",
+          "type": "bool",
+          "effectiveDefault": false,
+          "required": false
+        },
+        {
+          "name": "--help, -h",
+          "type": "help",
+          "effectiveDefault": false,
+          "required": false
+        }
+      ]
+    },
+    {
       "source": "orionis/console/commands/make/database_migration.py",
       "symbol": "MakeDatabaseMigration",
       "kind": "command",
@@ -11783,6 +11915,30 @@
       },
       "line": 7,
       "signature": "make:database-migration name"
+    },
+    {
+      "source": "orionis/console/commands/make/database_migration.py",
+      "symbol": "make:database-migration",
+      "kind": "CLI command",
+      "line": 7,
+      "signature": "make:database-migration name",
+      "docs": {
+        "es": "/es/database/commands#make-database-migration",
+        "en": "/en/database/commands#make-database-migration"
+      },
+      "arguments": [
+        {
+          "name": "name",
+          "type": "str",
+          "required": true
+        },
+        {
+          "name": "--help, -h",
+          "type": "help",
+          "effectiveDefault": false,
+          "required": false
+        }
+      ]
     },
     {
       "source": "orionis/console/commands/make/database_schema.py",
@@ -11796,6 +11952,30 @@
       "signature": "make:database-schema name"
     },
     {
+      "source": "orionis/console/commands/make/database_schema.py",
+      "symbol": "make:database-schema",
+      "kind": "CLI command",
+      "line": 3,
+      "signature": "make:database-schema name",
+      "docs": {
+        "es": "/es/database/commands#make-database-schema",
+        "en": "/en/database/commands#make-database-schema"
+      },
+      "arguments": [
+        {
+          "name": "name",
+          "type": "str",
+          "required": true
+        },
+        {
+          "name": "--help, -h",
+          "type": "help",
+          "effectiveDefault": false,
+          "required": false
+        }
+      ]
+    },
+    {
       "source": "orionis/console/commands/make/database_seeder.py",
       "symbol": "MakeDatabaseSeeder",
       "kind": "command",
@@ -11805,6 +11985,60 @@
       },
       "line": 3,
       "signature": "make:database-seeder name"
+    },
+    {
+      "source": "orionis/console/commands/make/database_seeder.py",
+      "symbol": "make:database-seeder",
+      "kind": "CLI command",
+      "line": 3,
+      "signature": "make:database-seeder name",
+      "docs": {
+        "es": "/es/database/commands#make-database-seeder",
+        "en": "/en/database/commands#make-database-seeder"
+      },
+      "arguments": [
+        {
+          "name": "name",
+          "type": "str",
+          "required": true
+        },
+        {
+          "name": "--help, -h",
+          "type": "help",
+          "effectiveDefault": false,
+          "required": false
+        }
+      ]
+    },
+    {
+      "source": "orionis/console/commands/make/factory.py",
+      "symbol": "make:factory",
+      "kind": "CLI command",
+      "line": 56,
+      "signature": "make:factory name [--model MODEL]",
+      "docs": {
+        "es": "/es/database/commands#make-factory",
+        "en": "/en/database/commands#make-factory"
+      },
+      "arguments": [
+        {
+          "name": "name",
+          "type": "str",
+          "required": true
+        },
+        {
+          "name": "--model, -m",
+          "type": "str",
+          "effectiveDefault": null,
+          "required": false
+        },
+        {
+          "name": "--help, -h",
+          "type": "help",
+          "effectiveDefault": false,
+          "required": false
+        }
+      ]
     },
     {
       "source": "orionis/console/commands/make/test.py",
@@ -11828,6 +12062,31 @@
       "signature": "migrate:fresh [--database NAME|-d NAME]"
     },
     {
+      "source": "orionis/console/commands/migrate/fresh.py",
+      "symbol": "migrate:fresh",
+      "kind": "CLI command",
+      "line": 4,
+      "signature": "migrate:fresh [--database NAME]",
+      "docs": {
+        "es": "/es/database/commands#migrate-fresh",
+        "en": "/en/database/commands#migrate-fresh"
+      },
+      "arguments": [
+        {
+          "name": "--database, -d",
+          "type": "str",
+          "effectiveDefault": null,
+          "required": false
+        },
+        {
+          "name": "--help, -h",
+          "type": "help",
+          "effectiveDefault": false,
+          "required": false
+        }
+      ]
+    },
+    {
       "source": "orionis/console/commands/migrate/migrate.py",
       "symbol": "MigrateCommand",
       "kind": "command",
@@ -11837,6 +12096,37 @@
       },
       "line": 7,
       "signature": "migrate [--database NAME|-d NAME] [--seed]"
+    },
+    {
+      "source": "orionis/console/commands/migrate/migrate.py",
+      "symbol": "migrate",
+      "kind": "CLI command",
+      "line": 7,
+      "signature": "migrate [--database NAME] [--seed]",
+      "docs": {
+        "es": "/es/database/commands#migrate",
+        "en": "/en/database/commands#migrate"
+      },
+      "arguments": [
+        {
+          "name": "--database, -d",
+          "type": "str",
+          "effectiveDefault": null,
+          "required": false
+        },
+        {
+          "name": "--seed",
+          "type": "bool",
+          "effectiveDefault": false,
+          "required": false
+        },
+        {
+          "name": "--help, -h",
+          "type": "help",
+          "effectiveDefault": false,
+          "required": false
+        }
+      ]
     },
     {
       "source": "orionis/console/commands/migrate/refresh.py",
@@ -11850,6 +12140,37 @@
       "signature": "migrate:refresh [--database NAME|-d NAME] [--step N|-s N]"
     },
     {
+      "source": "orionis/console/commands/migrate/refresh.py",
+      "symbol": "migrate:refresh",
+      "kind": "CLI command",
+      "line": 6,
+      "signature": "migrate:refresh [--database NAME] [--step N]",
+      "docs": {
+        "es": "/es/database/commands#migrate-refresh",
+        "en": "/en/database/commands#migrate-refresh"
+      },
+      "arguments": [
+        {
+          "name": "--database, -d",
+          "type": "str",
+          "effectiveDefault": null,
+          "required": false
+        },
+        {
+          "name": "--step, -s",
+          "type": "int",
+          "effectiveDefault": null,
+          "required": false
+        },
+        {
+          "name": "--help, -h",
+          "type": "help",
+          "effectiveDefault": false,
+          "required": false
+        }
+      ]
+    },
+    {
       "source": "orionis/console/commands/migrate/reset.py",
       "symbol": "MigrateResetCommand",
       "kind": "command",
@@ -11859,6 +12180,31 @@
       },
       "line": 4,
       "signature": "migrate:reset [--database NAME|-d NAME]"
+    },
+    {
+      "source": "orionis/console/commands/migrate/reset.py",
+      "symbol": "migrate:reset",
+      "kind": "CLI command",
+      "line": 4,
+      "signature": "migrate:reset [--database NAME]",
+      "docs": {
+        "es": "/es/database/commands#migrate-reset",
+        "en": "/en/database/commands#migrate-reset"
+      },
+      "arguments": [
+        {
+          "name": "--database, -d",
+          "type": "str",
+          "effectiveDefault": null,
+          "required": false
+        },
+        {
+          "name": "--help, -h",
+          "type": "help",
+          "effectiveDefault": false,
+          "required": false
+        }
+      ]
     },
     {
       "source": "orionis/console/commands/migrate/rollback.py",
@@ -11872,6 +12218,37 @@
       "signature": "migrate:rollback [--database NAME|-d NAME] [--step N|-s N]"
     },
     {
+      "source": "orionis/console/commands/migrate/rollback.py",
+      "symbol": "migrate:rollback",
+      "kind": "CLI command",
+      "line": 6,
+      "signature": "migrate:rollback [--database NAME] [--step N]",
+      "docs": {
+        "es": "/es/database/commands#migrate-rollback",
+        "en": "/en/database/commands#migrate-rollback"
+      },
+      "arguments": [
+        {
+          "name": "--database, -d",
+          "type": "str",
+          "effectiveDefault": null,
+          "required": false
+        },
+        {
+          "name": "--step, -s",
+          "type": "int",
+          "effectiveDefault": 1,
+          "required": false
+        },
+        {
+          "name": "--help, -h",
+          "type": "help",
+          "effectiveDefault": false,
+          "required": false
+        }
+      ]
+    },
+    {
       "source": "orionis/console/commands/migrate/status.py",
       "symbol": "MigrateStatusCommand",
       "kind": "command",
@@ -11881,6 +12258,31 @@
       },
       "line": 4,
       "signature": "migrate:status [--database NAME|-d NAME]"
+    },
+    {
+      "source": "orionis/console/commands/migrate/status.py",
+      "symbol": "migrate:status",
+      "kind": "CLI command",
+      "line": 4,
+      "signature": "migrate:status [--database NAME]",
+      "docs": {
+        "es": "/es/database/commands#migrate-status",
+        "en": "/en/database/commands#migrate-status"
+      },
+      "arguments": [
+        {
+          "name": "--database, -d",
+          "type": "str",
+          "effectiveDefault": null,
+          "required": false
+        },
+        {
+          "name": "--help, -h",
+          "type": "help",
+          "effectiveDefault": false,
+          "required": false
+        }
+      ]
     },
     {
       "source": "orionis/console/commands/seed/seed.py",
@@ -30069,11 +30471,18 @@
   ],
   "sourceFiles": {
     "config/database.py": "a7957ee747cf58cec4e62d478e2ce00ebee1bd431e9a4ae071243d8680161612",
+    "orionis/console/commands/db/_inspection.py": "c4938bbbeb06146aaff0ff7f91a55d852c26b7a44e9b5e25b4b91f1026e76583",
     "orionis/console/commands/db/seed.py": "00e12eb21c1037222dbd9816a114dc9f69b2c6e5a43570bda9d9bf765c83ee54",
+    "orionis/console/commands/db/show.py": "3fd730211ce31a14bbb0a27740452501be1258e59d378a817a72d3464d870898",
+    "orionis/console/commands/db/table.py": "23ef6beb8042b72584af71ad953254951253adbd011e5ac718f34399afb3094e",
+    "orionis/console/commands/db/wipe.py": "86f3bc87240c45a782b781870207b9fb1f1cbde9a65fd9101542cab97d4fcbfa",
+    "orionis/console/commands/make/_base.py": "07dc423faf190de692e773607ad00f0f10550c4c4aafabd9e7afc31e9c6463b1",
     "orionis/console/commands/make/database_migration.py": "687a748eeb7fd719d79126413db6a9a938d51e393f67f3238ead6b8af15b94b9",
     "orionis/console/commands/make/database_schema.py": "1b8cbb7576bcfb6a85f5837e1b5074732cc2709e2ae8223b3a28dd03dc3cc454",
     "orionis/console/commands/make/database_seeder.py": "ef6af72ec255643ffee958d5799e008bde436406bc121e7fcc1133ef25d77d12",
+    "orionis/console/commands/make/factory.py": "d65cd794afa6bcb9371e722d147380b199f04a266081d344c12fc7ad57bf434f",
     "orionis/console/commands/make/test.py": "f5b723496550ad375ac592aa70c2f29e21aec72edfe0ab0bf1d7658bab9fb565",
+    "orionis/console/commands/migrate/base.py": "07063299222d6ef3877160417c543e02ceb92e3ede2118858daf1fd65fa99eb8",
     "orionis/console/commands/migrate/fresh.py": "2bb9e4fd034dec18d0973439eb85cb31ddeca606f7e1fc285a9e9624c0f755e3",
     "orionis/console/commands/migrate/migrate.py": "c3eb83f7c512e50d69cbebe790061c856968b140d618063c62d37d297a7d8e85",
     "orionis/console/commands/migrate/refresh.py": "94680ba375cc14a6464b3c9f636e110467f18d49611586900065f71beacdadc7",

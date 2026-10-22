@@ -15,10 +15,11 @@ El inventario permite comprobar qué implementación respalda cada sección. Inc
 | --- | ---: |
 | Declaraciones públicas de Database y ORM con destino documental | 971 |
 | Exclusiones de implementación justificadas individualmente | 7 |
-| Entradas adicionales: constructores generados, configuración, comandos y colecciones | 423 |
+| Entradas adicionales: constructores generados, configuración, comandos y colecciones | 437 |
+| Comandos CLI de Database con referencia individual | 14 |
 | Proveedores Faker tipados | 675 |
 | Utilidades dinámicas adicionales de Faker | 7 |
-| Archivos fuente contrastados | 183 |
+| Archivos fuente contrastados | 190 |
 
 La extracción AST identifica 978 declaraciones léxicas en los dos módulos; 971 tienen referencia y las otras 7 son detalles internos identificados expresamente. No hay declaraciones pendientes dentro de ese alcance. Las entradas adicionales no se suman como “métodos nuevos”: también incluyen propiedades, enum, parámetros de comandos, tipos y contratos. El catálogo Faker contrasta sus 675 nombres tipados, incluidas sus sobrecargas, con proveedores disponibles en 110 locales.
 
@@ -29,17 +30,21 @@ La tabla agrupa las declaraciones por archivo; el JSON contiene el destino indiv
 | Componente fuente | Entradas | Referencias |
 | --- | ---: | --- |
 | `config/database.py` | 3 | [configuration](/es/database/configuration) |
-| `orionis/console/commands/db/seed.py` | 1 | [seeders](/es/database/seeders) |
-| `orionis/console/commands/make/database_migration.py` | 1 | [migrations-and-seeders](/es/database/migrations-and-seeders) |
-| `orionis/console/commands/make/database_schema.py` | 1 | [schema](/es/database/schema) |
-| `orionis/console/commands/make/database_seeder.py` | 1 | [seeders](/es/database/seeders) |
+| `orionis/console/commands/db/seed.py` | 2 | [commands](/es/database/commands) · [seeders](/es/database/seeders) |
+| `orionis/console/commands/db/show.py` | 1 | [commands](/es/database/commands) |
+| `orionis/console/commands/db/table.py` | 1 | [commands](/es/database/commands) |
+| `orionis/console/commands/db/wipe.py` | 1 | [commands](/es/database/commands) |
+| `orionis/console/commands/make/database_migration.py` | 2 | [commands](/es/database/commands) · [migrations-and-seeders](/es/database/migrations-and-seeders) |
+| `orionis/console/commands/make/database_schema.py` | 2 | [commands](/es/database/commands) · [schema](/es/database/schema) |
+| `orionis/console/commands/make/database_seeder.py` | 2 | [commands](/es/database/commands) · [seeders](/es/database/seeders) |
+| `orionis/console/commands/make/factory.py` | 1 | [commands](/es/database/commands) |
 | `orionis/console/commands/make/test.py` | 1 | [testing](/es/database/orm/testing) |
-| `orionis/console/commands/migrate/fresh.py` | 1 | [migrations-and-seeders](/es/database/migrations-and-seeders) |
-| `orionis/console/commands/migrate/migrate.py` | 1 | [migrations-and-seeders](/es/database/migrations-and-seeders) |
-| `orionis/console/commands/migrate/refresh.py` | 1 | [migrations-and-seeders](/es/database/migrations-and-seeders) |
-| `orionis/console/commands/migrate/reset.py` | 1 | [migrations-and-seeders](/es/database/migrations-and-seeders) |
-| `orionis/console/commands/migrate/rollback.py` | 1 | [migrations-and-seeders](/es/database/migrations-and-seeders) |
-| `orionis/console/commands/migrate/status.py` | 1 | [migrations-and-seeders](/es/database/migrations-and-seeders) |
+| `orionis/console/commands/migrate/fresh.py` | 2 | [commands](/es/database/commands) · [migrations-and-seeders](/es/database/migrations-and-seeders) |
+| `orionis/console/commands/migrate/migrate.py` | 2 | [commands](/es/database/commands) · [migrations-and-seeders](/es/database/migrations-and-seeders) |
+| `orionis/console/commands/migrate/refresh.py` | 2 | [commands](/es/database/commands) · [migrations-and-seeders](/es/database/migrations-and-seeders) |
+| `orionis/console/commands/migrate/reset.py` | 2 | [commands](/es/database/commands) · [migrations-and-seeders](/es/database/migrations-and-seeders) |
+| `orionis/console/commands/migrate/rollback.py` | 2 | [commands](/es/database/commands) · [migrations-and-seeders](/es/database/migrations-and-seeders) |
+| `orionis/console/commands/migrate/status.py` | 2 | [commands](/es/database/commands) · [migrations-and-seeders](/es/database/migrations-and-seeders) |
 | `orionis/console/commands/seed/seed.py` | 1 | [seeders](/es/database/seeders) |
 | `orionis/console/commands/support/install.py` | 7 | [drivers](/es/database/drivers) |
 | `orionis/console/commands/test/test.py` | 1 | [testing](/es/database/orm/testing) |

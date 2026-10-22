@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { parse } from 'parse5';
 import { root, within, validateCatalog, contentPath, filesUnder, sha256, stripFrontmatter, markdownLinks, headingIds, parser, walk } from './documentation-lib.mjs';
-import { createSidebar, createRedirects, getTranslations, supplementalPages, documentationPages, sitePages, documentationCatalog, documentationNavigation, navigationSections } from '../src/utils/documentation-menu.mjs';
+import { createSidebar, flattenSidebar, createRedirects, getTranslations, supplementalPages, documentationPages, sitePages, documentationCatalog, documentationNavigation, navigationSections } from '../src/utils/documentation-menu.mjs';
 import './validate-database-orm-coverage.mjs';
 
 const catalog = documentationCatalog;
@@ -12,6 +12,9 @@ const fontAssets = JSON.parse(await fs.readFile(path.join(root, 'config/font-ass
 const errors = [], routeMap = new Map();
 const normalize = (pathname) => decodeURI(pathname).replace(/\/+$/, '') || '/';
 function check(condition, message) { if (!condition) errors.push(message); }
+const groupedBuildSectionIds = ['getting-started', 'http', 'realtime', 'mcp', 'views', 'localization', 'authentication', 'sessions', 'cryptography', 'validation'];
+const groupedSectionIds = new Set([...groupedBuildSectionIds, 'database', 'orm', 'faker']);
+const flatSectionIds = ['storage', 'cache', 'mail', 'queues', 'console', 'application', 'deployment', 'testing', 'utilities', 'contribute'];
 
 const robots = (await fs.readFile(path.join(root, 'public/robots.txt'), 'utf8')).replaceAll('\r\n', '\n');
 const robotsGroups = robots.trim().split(/\n\s*\n/);
@@ -61,24 +64,45 @@ for (const page of pages) for (const locale of catalog.locales) {
 for (const file of await filesUnder(path.join(root, 'src/content/docs'))) check(expected.has(file), `Content outside catalog: ${path.relative(root, file)}`);
 
 const sidebar = createSidebar();
-const menuLinks = sidebar.flatMap((group) => group.items || [group]).filter((item) => item.attrs?.['data-page-id']);
+const menuLinks = flattenSidebar(sidebar).filter((item) => item.attrs?.['data-page-id']);
 const menuIds = menuLinks.map((item) => item.attrs['data-page-id']);
 const expectedMenuIds = navigationSections.flatMap((section) => section.pageIds);
 const pageSections = new Map(navigationSections.flatMap((section) => section.pageIds.map((id) => [id, section])));
 check(JSON.stringify(menuIds) === JSON.stringify(expectedMenuIds), 'Sidebar misses pages or changes the capability navigation order.');
 check(menuIds.length === sitePages.length && new Set(menuIds).size === sitePages.length && sitePages.every((page) => menuIds.includes(page.id)), 'Every published page must occur exactly once in primary navigation.');
+check(JSON.stringify(navigationSections.filter((section) => section.band === 'build').map((section) => section.id)) === JSON.stringify(groupedBuildSectionIds), 'The ten application-build categories must retain their identities and order.');
+check(JSON.stringify(navigationSections.filter((section) => section.groups).map((section) => section.id)) === JSON.stringify([...groupedSectionIds]), 'All ten application-build categories and Database, ORM and Faker must use subgroups.');
+check(JSON.stringify(navigationSections.filter((section) => !section.groups).map((section) => section.id)) === JSON.stringify(flatSectionIds), 'Unrelated navigation categories must retain their flat structure and order.');
 for (const section of navigationSections) {
-  const group = sidebar.find((item) => item.items?.some((child) => child.attrs?.['data-nav-group'] === section.id));
+  const group = sidebar.find((item) => item.items && flattenSidebar(item.items).some((child) => child.attrs?.['data-nav-group'] === section.id));
   check(group?.label === section.title.en && catalog.locales.every((locale) => group?.translations?.[locale] === section.title[locale]), `Incorrect navigation category titles: ${section.id}`);
-  check(group?.items.every((item) => item.attrs?.['data-nav-group'] === section.id), `Mixed navigation groups: ${section.id}`);
+  const links = group ? flattenSidebar(group.items) : [];
+  check(links.every((item) => item.attrs?.['data-nav-group'] === section.id), `Mixed navigation groups: ${section.id}`);
+  if (groupedSectionIds.has(section.id)) {
+    check(section.groups?.length > 0 && group?.items.length === section.groups?.length, `Missing navigation subgroups: ${section.id}`);
+    check(JSON.stringify(section.groups?.flatMap((entry) => entry.pageIds)) === JSON.stringify(section.pageIds), `Navigation subgroups lose or reorder pages: ${section.id}`);
+    for (const [index, subgroup] of (section.groups || []).entries()) {
+      const item = group?.items[index];
+      check(item?.label === subgroup.title.en && catalog.locales.every((locale) => item?.translations?.[locale] === subgroup.title[locale]), `Incorrect navigation subgroup titles: ${section.id}/${subgroup.id}`);
+      check(item?.items?.length > 0 && item.items.every((leaf) => !leaf.items), `Navigation exceeds three levels: ${section.id}/${subgroup.id}`);
+      check(JSON.stringify(item?.items?.map((leaf) => leaf.attrs?.['data-page-id'])) === JSON.stringify(subgroup.pageIds), `Sidebar loses or reorders subgroup pages: ${section.id}/${subgroup.id}`);
+      check(item?.items?.every((leaf) => leaf.attrs?.['data-nav-group'] === section.id && leaf.attrs?.['data-nav-subgroup'] === subgroup.id), `Incorrect navigation subgroup metadata: ${section.id}/${subgroup.id}`);
+    }
+  } else {
+    check(!section.groups && group?.items.every((item) => !item.items), `This capability must retain its flat navigation structure: ${section.id}`);
+    check(links.every((item) => !item.attrs?.['data-nav-subgroup']), `Unexpected subgroup on a flat section: ${section.id}`);
+  }
   for (const page of section.pages) {
-    const item = group?.items.find((child) => child.attrs?.['data-page-id'] === page.id);
+    const item = links.find((child) => child.attrs?.['data-page-id'] === page.id);
     check(page.kind === 'astro' ? item?.link === page.slug.en.slice(3) : item?.slug === page.slug.en.slice(4), `Navigation changes the canonical route: ${page.id}`);
   }
 }
-check(!sidebar.some((group) => group.items?.some((item) => item.items)), 'Sidebar exceeds two navigation levels.');
 check(sidebar.some((item) => item.link === 'https://api.orionis-framework.com/'), 'External API reference is missing.');
-check(sidebar.some((group) => group.items?.some((item) => item.link === '/contribute/contributors')), 'Contributor navigation is missing.');
+check(flattenSidebar(sidebar).some((item) => item.link === '/contribute/contributors'), 'Contributor navigation is missing.');
+const databaseIndex = navigationSections.findIndex((section) => section.id === 'database');
+check(JSON.stringify(navigationSections.slice(databaseIndex, databaseIndex + 3).map((section) => section.id)) === JSON.stringify(['database', 'orm', 'faker']), 'Database, ORM and Faker must remain separate consecutive categories in that order.');
+const fakerPageIds = ['orm-faker', 'orm-faker-reference-a-d', 'orm-faker-reference-e-h', 'orm-faker-reference-i-l', 'orm-faker-reference-m-p', 'orm-faker-reference-q-t', 'orm-faker-reference-u-z'];
+check(fakerPageIds.every((id) => pageSections.get(id)?.id === 'faker') && navigationSections.find((section) => section.id === 'faker')?.pageIds.length === fakerPageIds.length, 'The seven Faker pages must appear only in the Faker category, with their stable IDs and routes.');
 check(pageSections.get('mcp-overview')?.id === 'mcp' && pageSections.get('test-mcp-testing')?.id === 'mcp', 'MCP must have its own category, including protocol testing.');
 check(pageSections.get('realtime-overview')?.id === 'realtime' && pageSections.get('realtime-protocol-and-streaming')?.id === 'realtime', 'Realtime and its protocol must have their own category.');
 for (const page of sitePages) check(getTranslations(page.id).length === catalog.locales.length, `Missing translations: ${page.id}`);
@@ -124,6 +148,25 @@ if (process.argv.includes('--built')) {
   function textContent(node) {
     return (node.nodeName === '#text' ? node.value : (node.childNodes || []).map(textContent).join('')).replace(/\s+/g, ' ').trim();
   }
+  const attributes = (node) => Object.fromEntries((node.attrs || []).map((attr) => [attr.name, attr.value]));
+  const hasClass = (attrs, name) => (attrs.class || '').split(/\s+/).includes(name);
+  function navigationAncestors(node, sectionNode) {
+    const result = [];
+    for (let ancestor = node.parentNode; ancestor && ancestor !== sectionNode.parentNode; ancestor = ancestor.parentNode) {
+      if (ancestor.tagName !== 'details') continue;
+      const attrs = attributes(ancestor);
+      result.unshift(hasClass(attrs, 'sidebar-section') ? `section:${attrs['data-section-id']}` : hasClass(attrs, 'sidebar-subgroup') ? `subgroup:${attrs['data-subgroup-id']}` : 'unknown');
+    }
+    return result;
+  }
+  function detailSummary(node, className) {
+    let title = '';
+    const summary = node.childNodes?.find((child) => child.tagName === 'summary');
+    if (summary) elements(summary, (child, attrs) => {
+      if (hasClass(attrs, className)) title = textContent(child);
+    });
+    return title;
+  }
   async function htmlAt(slug) {
     for (const candidate of [path.join(output, slug.slice(1), 'index.html'), path.join(output, `${slug.slice(1)}.html`)]) {
       try { return await fs.readFile(candidate, 'utf8'); }
@@ -157,10 +200,19 @@ if (process.argv.includes('--built')) {
       if (node.tagName === 'p' && (attrs.class || '').split(/\s+/).includes('sidebar-band')) data.sidebarBands.push({ id: attrs['data-band-id'], title: textContent(node) });
       if (node.tagName === 'a' && (attrs.class || '').split(/\s+/).includes('capability-card')) data.capabilities.push(attrs.href);
       if (node.tagName === 'details' && (attrs.class || '').split(/\s+/).includes('sidebar-section')) {
-        const section = { id: attrs['data-section-id'], title: '', open: 'open' in attrs, current: false, icon: false, pages: [] };
+        const section = { id: attrs['data-section-id'], title: detailSummary(node, 'section-label'), open: 'open' in attrs, current: false, icon: false, pages: [], groups: [], nestedDetails: 0 };
         elements(node, (child, childAttrs) => {
           if (child.tagName === 'a' && childAttrs['aria-current'] === 'page') section.current = true;
-          if (child.tagName === 'a' && childAttrs['data-page-id']) section.pages.push({ id: childAttrs['data-page-id'], group: childAttrs['data-nav-group'], href: childAttrs.href });
+          if (child.tagName === 'a' && childAttrs['data-page-id']) section.pages.push({ id: childAttrs['data-page-id'], group: childAttrs['data-nav-group'], subgroup: childAttrs['data-nav-subgroup'], href: childAttrs.href, current: childAttrs['aria-current'] === 'page', ancestors: navigationAncestors(child, node) });
+          if (child.tagName === 'details' && child !== node) section.nestedDetails++;
+          if (child.tagName === 'details' && hasClass(childAttrs, 'sidebar-subgroup')) {
+            const subgroup = { id: childAttrs['data-subgroup-id'], section: childAttrs['data-section-id'], title: detailSummary(child, 'subgroup-label'), open: 'open' in childAttrs, current: false, pages: [] };
+            elements(child, (leaf, leafAttrs) => {
+              if (leaf.tagName === 'a' && leafAttrs['aria-current'] === 'page') subgroup.current = true;
+              if (leaf.tagName === 'a' && leafAttrs['data-page-id']) subgroup.pages.push(leafAttrs['data-page-id']);
+            });
+            section.groups.push(subgroup);
+          }
         });
         const summary = node.childNodes.find((child) => child.tagName === 'summary');
         if (summary) elements(summary, (child, childAttrs) => {
@@ -185,13 +237,31 @@ if (process.argv.includes('--built')) {
       const expectedSection = navigationSections.find((entry) => entry.id === section.id);
       check(expectedSection && section.title === expectedSection.title[locale], `Incorrect rendered category title: ${slug}/${section.id}`);
       check(JSON.stringify(section.pages.map((item) => item.id)) === JSON.stringify(expectedSection?.pageIds), `Rendered category loses, duplicates, or reorders pages: ${slug}/${section.id}`);
+      const expectedGroups = expectedSection?.groups || [];
+      check(JSON.stringify(section.groups.map((group) => group.id)) === JSON.stringify(expectedGroups.map((group) => group.id)), `Rendered subgroups are missing, duplicated, or out of order: ${slug}/${section.id}`);
+      check(section.nestedDetails === expectedGroups.length && (groupedSectionIds.has(section.id) || section.nestedDetails === 0), `Unexpected navigation nesting: ${slug}/${section.id}`);
+      for (const subgroup of section.groups) {
+        const expectedGroup = expectedGroups.find((entry) => entry.id === subgroup.id);
+        check(subgroup.section === section.id && subgroup.title === expectedGroup?.title[locale], `Incorrect rendered subgroup metadata/title: ${slug}/${section.id}/${subgroup.id}`);
+        check(JSON.stringify(subgroup.pages) === JSON.stringify(expectedGroup?.pageIds), `Rendered subgroup loses, duplicates, or reorders pages: ${slug}/${section.id}/${subgroup.id}`);
+        check(subgroup.open === subgroup.current, `Only the current sidebar subgroup should start open: ${slug}/${section.id}/${subgroup.id}`);
+      }
       for (const item of section.pages) {
         const expectedPage = sitePages.find((entry) => entry.id === item.id);
-        check(item.group === section.id && item.href === expectedPage?.slug[locale], `Incorrect rendered navigation destination/group: ${slug}/${item.id}`);
+        const expectedGroup = expectedGroups.find((entry) => entry.pageIds.includes(item.id));
+        check(item.group === section.id && item.subgroup === expectedGroup?.id && item.href === expectedPage?.slug[locale], `Incorrect rendered navigation destination/group: ${slug}/${item.id}`);
+        const expectedAncestors = [`section:${section.id}`, ...(expectedGroup ? [`subgroup:${expectedGroup.id}`] : [])];
+        check(JSON.stringify(item.ancestors) === JSON.stringify(expectedAncestors), `Navigation link has incorrect ancestors or exceeds the permitted depth: ${slug}/${item.id}`);
       }
     }
     check(data.sidebarSections.filter((section) => section.open).length === 1 && data.sidebarSections.every((section) => section.open === section.current), `Only the current sidebar section should start open: ${slug}`);
     check(data.sidebarSections.find((section) => section.current)?.id === pageSections.get(page.id)?.id, `Current page opens the wrong capability category: ${slug}`);
+    const currentLinks = data.sidebarSections.flatMap((section) => section.pages).filter((item) => item.current);
+    check(currentLinks.length === 1 && currentLinks[0].id === page.id, `Sidebar must mark the current canonical page exactly once: ${slug}`);
+    const openSubgroups = data.sidebarSections.flatMap((section) => section.groups).filter((group) => group.open);
+    const currentSection = pageSections.get(page.id);
+    const currentGroup = currentSection?.groups?.find((group) => group.pageIds.includes(page.id));
+    check(currentGroup ? openSubgroups.length === 1 && openSubgroups[0].id === currentGroup.id && openSubgroups[0].section === currentSection.id : openSubgroups.length === 0, `Only ancestors of the active route may start expanded: ${slug}`);
     check(!data.sidebarPersistence, `Old expanded sidebar state must not override current-route defaults: ${slug}`);
     check(data.apiLink && supplementalPages.every((resource) => data.links.includes(resource.slug[locale])), `Permanent API/contribution links missing from rendered navigation: ${slug}`);
     if (page.id === 'foundation-overview') {

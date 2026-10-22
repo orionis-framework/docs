@@ -74,6 +74,8 @@ Importa la fachada desde `orionis.support.facades`. La aplicación registra sus 
 
 ## Guías y referencia
 
+[Referencia de comandos de Database](/es/database/commands): sintaxis, argumentos y opciones de los 14 comandos, incluida inspección y borrado.
+
 - [Drivers y dependencias](/es/database/drivers): motores y `reactor packages`.
 - [Configuración](/es/database/configuration): propiedades y variables de entorno.
 - [Gestión de conexiones](/es/database/connections): nombres, inyección y registro.

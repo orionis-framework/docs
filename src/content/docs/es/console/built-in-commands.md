@@ -36,6 +36,8 @@ Generar un modelo no migra su tabla; generar un job no inicia workers. Revisa lo
 
 ## Evolucionar datos
 
+Consulta la [Referencia de comandos de Database](/es/database/commands) para todos los argumentos, defaults y ejemplos de inspección, generadores, migraciones, seeders y borrado.
+
 `migrate`, `migrate:status`, `migrate:rollback`, `migrate:reset`, `migrate:refresh`, `migrate:fresh`, `seed` y `db:seed` se explican en [migraciones y seeders](/es/database/migrations-and-seeders). Comparten `--database`/`-d` para seleccionar conexión. Rollback `--step` cuenta lotes. `db:show` muestra información de la base; `db:table` inspecciona tablas; `db:wipe` elimina datos estructurales según su flujo y exige cuidado operativo.
 
 ```shell

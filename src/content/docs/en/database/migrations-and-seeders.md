@@ -9,6 +9,8 @@ Migrations are asynchronous classes describing ordered physical changes. up appl
 
 ## Generating a migration
 
+[Database command reference](/en/database/commands): syntax, arguments and options for all 14 commands, including inspection and wiping.
+
 ```shell
 orionis make:database-migration create_flags
 python -B reactor make:database-migration create_flags

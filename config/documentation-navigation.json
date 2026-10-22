@@ -50,6 +50,30 @@
         "foundation-installation",
         "foundation-getting-started",
         "foundation-architecture-and-lifecycle"
+      ],
+      "groups": [
+        {
+          "id": "getting-started-setup",
+          "title": {
+            "es": "Preparar el proyecto",
+            "en": "Project setup"
+          },
+          "pageIds": [
+            "foundation-overview",
+            "foundation-installation"
+          ]
+        },
+        {
+          "id": "getting-started-application",
+          "title": {
+            "es": "Aplicación y ciclo de vida",
+            "en": "Application and lifecycle"
+          },
+          "pageIds": [
+            "foundation-getting-started",
+            "foundation-architecture-and-lifecycle"
+          ]
+        }
       ]
     },
     {
@@ -69,6 +93,52 @@
         "http-forms-and-uploads",
         "http-responses",
         "http-exceptions"
+      ],
+      "groups": [
+        {
+          "id": "http-routing",
+          "title": {
+            "es": "Inicio y rutas",
+            "en": "Introduction and routes"
+          },
+          "pageIds": [
+            "http-overview",
+            "http-routing"
+          ]
+        },
+        {
+          "id": "http-processing",
+          "title": {
+            "es": "Middleware y controladores",
+            "en": "Middleware and controllers"
+          },
+          "pageIds": [
+            "http-middleware-and-security",
+            "http-request-lifecycle"
+          ]
+        },
+        {
+          "id": "http-input",
+          "title": {
+            "es": "Datos de entrada",
+            "en": "Request data"
+          },
+          "pageIds": [
+            "http-requests-and-validation",
+            "http-forms-and-uploads"
+          ]
+        },
+        {
+          "id": "http-output",
+          "title": {
+            "es": "Respuestas y errores",
+            "en": "Responses and errors"
+          },
+          "pageIds": [
+            "http-responses",
+            "http-exceptions"
+          ]
+        }
       ]
     },
     {
@@ -89,6 +159,44 @@
         "realtime-groups-and-deployment",
         "http-websockets",
         "http-streaming-and-sse"
+      ],
+      "groups": [
+        {
+          "id": "realtime-connections",
+          "title": {
+            "es": "Conexiones y hubs",
+            "en": "Connections and hubs"
+          },
+          "pageIds": [
+            "realtime-overview",
+            "realtime-routing-and-lifecycle",
+            "realtime-hubs-and-methods"
+          ]
+        },
+        {
+          "id": "realtime-communication",
+          "title": {
+            "es": "Clientes y comunicación",
+            "en": "Clients and communication"
+          },
+          "pageIds": [
+            "realtime-javascript-client",
+            "realtime-chat",
+            "realtime-protocol-and-streaming",
+            "realtime-groups-and-deployment"
+          ]
+        },
+        {
+          "id": "realtime-transports",
+          "title": {
+            "es": "WebSocket y SSE",
+            "en": "WebSocket and SSE"
+          },
+          "pageIds": [
+            "http-websockets",
+            "http-streaming-and-sse"
+          ]
+        }
       ]
     },
     {
@@ -110,6 +218,54 @@
         "mcp-transports-and-configuration",
         "mcp-advanced-workflows",
         "test-mcp-testing"
+      ],
+      "groups": [
+        {
+          "id": "mcp-servers",
+          "title": {
+            "es": "Definición de servidores",
+            "en": "Server setup"
+          },
+          "pageIds": [
+            "mcp-overview",
+            "mcp-servers-and-tools"
+          ]
+        },
+        {
+          "id": "mcp-components",
+          "title": {
+            "es": "Componentes y respuestas",
+            "en": "Components and responses"
+          },
+          "pageIds": [
+            "mcp-tools",
+            "mcp-resources-and-prompts",
+            "mcp-prompts",
+            "mcp-responses-and-content"
+          ]
+        },
+        {
+          "id": "mcp-transports",
+          "title": {
+            "es": "Transportes y clientes",
+            "en": "Transports and clients"
+          },
+          "pageIds": [
+            "mcp-http-and-clients",
+            "mcp-transports-and-configuration"
+          ]
+        },
+        {
+          "id": "mcp-workflows",
+          "title": {
+            "es": "Flujos avanzados y pruebas",
+            "en": "Advanced workflows and testing"
+          },
+          "pageIds": [
+            "mcp-advanced-workflows",
+            "test-mcp-testing"
+          ]
+        }
       ]
     },
     {
@@ -128,6 +284,42 @@
         "view-globals",
         "view-configuration-and-extensions",
         "view-providers-and-extensions"
+      ],
+      "groups": [
+        {
+          "id": "views-rendering",
+          "title": {
+            "es": "Renderizado y plantillas",
+            "en": "Rendering and templates"
+          },
+          "pageIds": [
+            "view-overview",
+            "view-rendering-templates",
+            "view-template-language"
+          ]
+        },
+        {
+          "id": "views-helpers",
+          "title": {
+            "es": "Filtros y contexto",
+            "en": "Filters and context"
+          },
+          "pageIds": [
+            "view-filters",
+            "view-globals"
+          ]
+        },
+        {
+          "id": "views-configuration",
+          "title": {
+            "es": "Configuración y extensiones",
+            "en": "Configuration and extensions"
+          },
+          "pageIds": [
+            "view-configuration-and-extensions",
+            "view-providers-and-extensions"
+          ]
+        }
       ]
     },
     {
@@ -143,6 +335,30 @@
         "localization-messages-and-locales",
         "localization-translating-content",
         "localization-application-and-views"
+      ],
+      "groups": [
+        {
+          "id": "localization-locales",
+          "title": {
+            "es": "Idiomas y archivos",
+            "en": "Locales and files"
+          },
+          "pageIds": [
+            "localization-overview",
+            "localization-messages-and-locales"
+          ]
+        },
+        {
+          "id": "localization-translation",
+          "title": {
+            "es": "Traducción y uso",
+            "en": "Translation and usage"
+          },
+          "pageIds": [
+            "localization-translating-content",
+            "localization-application-and-views"
+          ]
+        }
       ]
     },
     {
@@ -162,6 +378,43 @@
         "auth-authorization",
         "auth-policies",
         "auth-account-recovery"
+      ],
+      "groups": [
+        {
+          "id": "authentication-setup",
+          "title": {
+            "es": "Configuración inicial",
+            "en": "Initial configuration"
+          },
+          "pageIds": [
+            "auth-overview",
+            "auth-configuration-and-guards"
+          ]
+        },
+        {
+          "id": "authentication-methods",
+          "title": {
+            "es": "Métodos de autenticación",
+            "en": "Authentication methods"
+          },
+          "pageIds": [
+            "auth-identity-and-session",
+            "auth-personal-access-tokens"
+          ]
+        },
+        {
+          "id": "authentication-access",
+          "title": {
+            "es": "Acceso y cuentas",
+            "en": "Access and accounts"
+          },
+          "pageIds": [
+            "auth-middleware",
+            "auth-authorization",
+            "auth-policies",
+            "auth-account-recovery"
+          ]
+        }
       ]
     },
     {
@@ -177,6 +430,30 @@
         "session-state-and-flash",
         "session-stores-and-concurrency",
         "session-configuration-and-security"
+      ],
+      "groups": [
+        {
+          "id": "sessions-usage",
+          "title": {
+            "es": "Uso de sesiones",
+            "en": "Using sessions"
+          },
+          "pageIds": [
+            "session-overview",
+            "session-state-and-flash"
+          ]
+        },
+        {
+          "id": "sessions-storage",
+          "title": {
+            "es": "Almacenamiento y ciclo de vida",
+            "en": "Storage and lifecycle"
+          },
+          "pageIds": [
+            "session-stores-and-concurrency",
+            "session-configuration-and-security"
+          ]
+        }
       ]
     },
     {
@@ -192,6 +469,30 @@
         "hashing-password-storage",
         "encrypter-overview",
         "encrypter-encrypting-values"
+      ],
+      "groups": [
+        {
+          "id": "cryptography-passwords",
+          "title": {
+            "es": "Contraseñas",
+            "en": "Passwords"
+          },
+          "pageIds": [
+            "hashing-overview",
+            "hashing-password-storage"
+          ]
+        },
+        {
+          "id": "cryptography-encryption",
+          "title": {
+            "es": "Cifrado",
+            "en": "Encryption"
+          },
+          "pageIds": [
+            "encrypter-overview",
+            "encrypter-encrypting-values"
+          ]
+        }
       ]
     },
     {
@@ -210,6 +511,42 @@
         "schemas-application-rules",
         "schemas-validation-and-errors",
         "schemas-controllers-and-http"
+      ],
+      "groups": [
+        {
+          "id": "validation-schemas",
+          "title": {
+            "es": "Schemas e integración",
+            "en": "Schemas and integration"
+          },
+          "pageIds": [
+            "schemas-overview",
+            "schemas-declaring-schemas",
+            "schemas-integrations"
+          ]
+        },
+        {
+          "id": "validation-rules",
+          "title": {
+            "es": "Reglas de validación",
+            "en": "Validation rules"
+          },
+          "pageIds": [
+            "schemas-constraints-and-reference",
+            "schemas-application-rules"
+          ]
+        },
+        {
+          "id": "validation-results",
+          "title": {
+            "es": "Errores y respuestas",
+            "en": "Errors and responses"
+          },
+          "pageIds": [
+            "schemas-validation-and-errors",
+            "schemas-controllers-and-http"
+          ]
+        }
       ]
     },
     {
@@ -238,10 +575,80 @@
         "database-schema-alterations",
         "database-migrations-and-seeders",
         "database-seeders",
+        "database-commands",
         "database-dialects-and-production",
         "database-runtime-api",
         "database-query-plans",
         "database-api-coverage"
+      ],
+      "groups": [
+        {
+          "id": "database-start",
+          "title": {
+            "es": "Configuración y conexiones",
+            "en": "Configuration and connections"
+          },
+          "pageIds": [
+            "database-overview",
+            "database-drivers",
+            "database-configuration",
+            "database-connections"
+          ]
+        },
+        {
+          "id": "database-querying",
+          "title": {
+            "es": "Consultas y transacciones",
+            "en": "Queries and transactions"
+          },
+          "pageIds": [
+            "database-db-facade",
+            "database-raw-queries",
+            "database-query-builder",
+            "database-query-filters",
+            "database-joins-and-subqueries",
+            "database-query-writes",
+            "database-transactions"
+          ]
+        },
+        {
+          "id": "database-schema",
+          "title": {
+            "es": "Esquemas y tablas",
+            "en": "Schemas and tables"
+          },
+          "pageIds": [
+            "database-schema",
+            "database-column-types",
+            "database-schema-modifiers",
+            "database-schema-alterations"
+          ]
+        },
+        {
+          "id": "database-migrations",
+          "title": {
+            "es": "Migraciones y datos",
+            "en": "Migrations and data"
+          },
+          "pageIds": [
+            "database-migrations-and-seeders",
+            "database-seeders",
+            "database-commands"
+          ]
+        },
+        {
+          "id": "database-reference",
+          "title": {
+            "es": "Referencia avanzada",
+            "en": "Advanced reference"
+          },
+          "pageIds": [
+            "database-dialects-and-production",
+            "database-runtime-api",
+            "database-query-plans",
+            "database-api-coverage"
+          ]
+        }
       ]
     },
     {
@@ -256,25 +663,125 @@
         "orm-overview",
         "orm-models-and-attributes",
         "orm-model-api",
+        "orm-schema-and-type-reference",
         "orm-querying",
+        "orm-collections-and-pagination",
+        "orm-scopes",
         "orm-relationships",
         "orm-relationship-operations",
         "orm-eager-loading",
         "orm-soft-deletes",
-        "orm-scopes",
         "orm-events",
-        "orm-collections-and-pagination",
+        "orm-events-and-scopes",
         "orm-factories-and-testing",
+        "orm-testing"
+      ],
+      "groups": [
+        {
+          "id": "orm-models",
+          "title": {
+            "es": "Modelos y persistencia",
+            "en": "Models and persistence"
+          },
+          "pageIds": [
+            "orm-overview",
+            "orm-models-and-attributes",
+            "orm-model-api",
+            "orm-schema-and-type-reference"
+          ]
+        },
+        {
+          "id": "orm-querying",
+          "title": {
+            "es": "Consultas y resultados",
+            "en": "Queries and results"
+          },
+          "pageIds": [
+            "orm-querying",
+            "orm-collections-and-pagination",
+            "orm-scopes"
+          ]
+        },
+        {
+          "id": "orm-relations",
+          "title": {
+            "es": "Relaciones y carga",
+            "en": "Relationships and loading"
+          },
+          "pageIds": [
+            "orm-relationships",
+            "orm-relationship-operations",
+            "orm-eager-loading"
+          ]
+        },
+        {
+          "id": "orm-lifecycle",
+          "title": {
+            "es": "Ciclo de vida",
+            "en": "Lifecycle"
+          },
+          "pageIds": [
+            "orm-soft-deletes",
+            "orm-events",
+            "orm-events-and-scopes"
+          ]
+        },
+        {
+          "id": "orm-testing",
+          "title": {
+            "es": "Factories y pruebas",
+            "en": "Factories and testing"
+          },
+          "pageIds": [
+            "orm-factories-and-testing",
+            "orm-testing"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "faker",
+      "band": "data",
+      "icon": "faker",
+      "title": {
+        "es": "Faker",
+        "en": "Faker"
+      },
+      "groups": [
+        {
+          "id": "faker-usage",
+          "title": {
+            "es": "Uso y personalización",
+            "en": "Usage and customization"
+          },
+          "pageIds": [
+            "orm-faker"
+          ]
+        },
+        {
+          "id": "faker-providers",
+          "title": {
+            "es": "Catálogo de proveedores",
+            "en": "Provider catalog"
+          },
+          "pageIds": [
+            "orm-faker-reference-a-d",
+            "orm-faker-reference-e-h",
+            "orm-faker-reference-i-l",
+            "orm-faker-reference-m-p",
+            "orm-faker-reference-q-t",
+            "orm-faker-reference-u-z"
+          ]
+        }
+      ],
+      "pageIds": [
         "orm-faker",
         "orm-faker-reference-a-d",
         "orm-faker-reference-e-h",
         "orm-faker-reference-i-l",
         "orm-faker-reference-m-p",
         "orm-faker-reference-q-t",
-        "orm-faker-reference-u-z",
-        "orm-schema-and-type-reference",
-        "orm-events-and-scopes",
-        "orm-testing"
+        "orm-faker-reference-u-z"
       ]
     },
     {

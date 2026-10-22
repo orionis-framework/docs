@@ -7,15 +7,39 @@ import NavigationIcon from './NavigationIcon.astro';
 import { documentationNavigation, navigationSections } from '../utils/documentation-menu.mjs';
 
 const { sidebar, lang } = Astro.locals.starlightRoute;
+type SidebarEntry = (typeof sidebar)[number];
+type SidebarLink = Extract<SidebarEntry, { type: 'link' }>;
+
+function firstDescendantLink(items: SidebarEntry[]): SidebarLink | undefined {
+  for (const item of items) {
+    if (item.type === 'link') return item;
+    const link = firstDescendantLink(item.entries);
+    if (link) return link;
+  }
+}
+
+function isActive(entry: SidebarEntry): boolean {
+  return entry.type === 'link' ? entry.isCurrent : entry.entries.some(isActive);
+}
+
 const spanish = lang === 'es';
 const locale = spanish ? 'es' : 'en';
 const groups = new Map(navigationSections.map((section) => [section.id, section]));
 const bands = new Map(documentationNavigation.bands.map((band) => [band.id, band]));
 const entries = sidebar.map((entry) => {
-  const firstLink = entry.type === 'group' && entry.entries.find((item) => item.type === 'link');
+  const firstLink = entry.type === 'group' && firstDescendantLink(entry.entries);
   const section = firstLink ? groups.get(firstLink.attrs['data-nav-group']) : undefined;
   if (entry.type === 'group' && !section) throw new Error(`Missing navigation metadata: ${entry.label}`);
-  return { entry, section };
+  const subgroups = entry.type === 'group' && entry.entries.some((item) => item.type === 'group')
+    ? entry.entries.map((item) => {
+      if (item.type !== 'group') throw new Error(`Mixed grouped navigation: ${entry.label}`);
+      const link = firstDescendantLink(item.entries);
+      const id = link?.attrs['data-nav-subgroup'];
+      if (!id) throw new Error(`Missing subgroup metadata: ${item.label}`);
+      return { entry: item, id, active: isActive(item) };
+    })
+    : undefined;
+  return { entry, section, subgroups };
 });
 ---
 
@@ -40,10 +64,10 @@ const entries = sidebar.map((entry) => {
 
 {/* Open state comes from the current route, without restoring past expanded groups. */}
 <ul id="orionis-sidebar-tree" class="sidebar-tree top-level">
-  {entries.map(({ entry, section }, index) => {
+  {entries.map(({ entry, section, subgroups }, index) => {
     if (entry.type === 'group') {
       const startsBand = index === 0 || entries[index - 1].section?.band !== section.band;
-      const active = entry.entries.some((item) => item.type === 'link' && item.isCurrent);
+      const active = isActive(entry);
       return (
         <li>
           {startsBand && <p class="sidebar-band" data-band-id={section.band}>{bands.get(section.band).title[locale]}</p>}
@@ -54,7 +78,22 @@ const entries = sidebar.map((entry) => {
               <span class="section-label large">{entry.label}</span>
               <Icon name="right-caret" class="caret" size="1rem" />
             </summary>
-            <SidebarSublist sublist={entry.entries} nested />
+            {subgroups ? (
+              <ul class="sidebar-subgroups">
+                {subgroups.map((subgroup) => (
+                  <li>
+                    <details class:list={['sidebar-subgroup', { 'is-active': subgroup.active }]}
+                      data-subgroup-id={subgroup.id} data-section-id={section.id} open={subgroup.active}>
+                      <summary>
+                        <span class="subgroup-label">{subgroup.entry.label}</span>
+                        <Icon name="right-caret" class="caret" size="0.875rem" />
+                      </summary>
+                      <SidebarSublist sublist={subgroup.entry.entries} nested />
+                    </details>
+                  </li>
+                ))}
+              </ul>
+            ) : <SidebarSublist sublist={entry.entries} nested />}
           </details>
         </li>
       );
@@ -90,8 +129,9 @@ const entries = sidebar.map((entry) => {
       const input = filter.querySelector('input')!;
       const clear = filter.querySelector<HTMLButtonElement>('button')!;
       const status = filter.querySelector<HTMLElement>('[data-filter-status]')!;
-      const groups = [...this.querySelectorAll<HTMLDetailsElement>('.sidebar-section')];
-      const rows = [...this.querySelectorAll<HTMLElement>('.sidebar-tree > li')];
+      const tree = this.querySelector<HTMLUListElement>('.sidebar-tree')!;
+      const sections = [...tree.querySelectorAll<HTMLDetailsElement>('.sidebar-section')];
+      const disclosures = [...tree.querySelectorAll<HTMLDetailsElement>('details')];
       const savedOpen = new Map<HTMLDetailsElement, boolean>();
       const normalize = (text: string) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase();
       const controller = new AbortController();
@@ -102,23 +142,33 @@ const entries = sidebar.map((entry) => {
       input.addEventListener('input', () => {
         const query = normalize(input.value.trim());
         const filtering = this.hasAttribute('data-filtering');
-        if (query && !filtering) groups.forEach((group) => savedOpen.set(group, group.open));
+        if (query && !filtering) disclosures.forEach((group) => savedOpen.set(group, group.open));
         this.toggleAttribute('data-filtering', Boolean(query));
         clear.hidden = !query;
-        let count = 0;
-        for (const row of rows) {
-          const group = row.querySelector<HTMLDetailsElement>('details');
-          const categoryMatches = query && normalize(group?.querySelector('summary')?.textContent || '').includes(query);
-          let matches = 0;
-          for (const link of row.querySelectorAll<HTMLAnchorElement>('a')) {
-            const match = !query || categoryMatches || normalize(link.textContent || '').includes(query);
-            link.parentElement!.hidden = !match;
-            if (match) matches++;
+        // A matching ancestor exposes all its guides; a matching leaf exposes
+        // only its ancestors. Keep each disclosure's original state for clear.
+        const filterList = (list: HTMLUListElement, ancestorMatches = false): number => {
+          let count = 0;
+          for (const row of list.children) {
+            if (!(row instanceof HTMLLIElement)) continue;
+            const group = row.querySelector<HTMLDetailsElement>(':scope > details');
+            let matches = 0;
+            if (group) {
+              const label = group.querySelector(':scope > summary')?.textContent || '';
+              const groupMatches = ancestorMatches || Boolean(query && normalize(label).includes(query));
+              const children = group.querySelector<HTMLUListElement>(':scope > ul');
+              if (children) matches = filterList(children, groupMatches);
+              group.open = query ? matches > 0 : (savedOpen.get(group) ?? group.open);
+            } else {
+              const link = row.querySelector<HTMLAnchorElement>(':scope > a');
+              if (link && (!query || ancestorMatches || normalize(link.textContent || '').includes(query))) matches = 1;
+            }
+            row.hidden = matches === 0;
+            count += matches;
           }
-          row.hidden = matches === 0;
-          if (group) group.open = query ? matches > 0 : (savedOpen.get(group) ?? group.open);
-          count += matches;
-        }
+          return count;
+        };
+        const count = filterList(tree);
         status.textContent = query ? (count ? `${status.dataset.count} ${count}` : status.dataset.empty!) : '';
         if (!query) savedOpen.clear();
       }, options);
@@ -127,14 +177,18 @@ const entries = sidebar.map((entry) => {
         input.dispatchEvent(new Event('input'));
         input.focus();
       }, options);
-      // Keep a single category expanded on phones, so other categories stay within reach.
+      // Phones keep one category and one subgroup per category expanded. Native
+      // summary keyboard activation also emits click and uses the same logic.
       this.addEventListener('click', (event) => {
-        const summary = (event.target as Element).closest('.sidebar-section > summary');
+        const summary = (event.target as Element).closest('.sidebar-section > summary, .sidebar-subgroup > summary');
         if (!summary || this.hasAttribute('data-filtering') || window.matchMedia('(min-width: 50rem)').matches) return;
         event.preventDefault();
         const selected = summary.parentElement as HTMLDetailsElement;
         const open = !selected.open;
-        groups.forEach((group) => { group.open = group === selected && open; });
+        const peers = selected.classList.contains('sidebar-section')
+          ? sections
+          : [...selected.closest('.sidebar-section')!.querySelectorAll<HTMLDetailsElement>('.sidebar-subgroup')];
+        peers.forEach((group) => { group.open = group === selected && open; });
       }, options);
     }
 

@@ -74,6 +74,8 @@ Import the facade from `orionis.support.facades`. Application boot registers its
 
 ## Guides and reference
 
+[Database command reference](/en/database/commands): syntax, arguments and options for all 14 commands, including inspection and wiping.
+
 - [Drivers and dependencies](/en/database/drivers): backends and `reactor packages`.
 - [Configuration](/en/database/configuration): fields and environment variables.
 - [Connection management](/en/database/connections): names, injection and registration.

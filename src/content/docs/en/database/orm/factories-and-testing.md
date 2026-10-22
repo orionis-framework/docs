@@ -11,6 +11,8 @@ Every factory owns its generator, states, count and sequence index. Import its c
 
 ## Generate the file
 
+[Database command reference](/en/database/commands): syntax, arguments and options for all 14 commands, including inspection and wiping.
+
 ```bash
 orionis make:factory ProductFactory --model Product
 ```

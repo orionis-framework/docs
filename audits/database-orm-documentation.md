@@ -4,11 +4,19 @@ La documentación se contrastó directamente con el checkout de Orionis situado 
 
 ## Estructura resultante
 
-Se mantienen las 13 URLs anteriores y se incorporan 30 páginas: **43 guías por idioma, 86 archivos ES/EN**, distribuidos en dos categorías independientes. Los capítulos son elementos del mismo nivel, con etiquetas cortas, traducciones y estado activo propios. La navegación conserva el límite de dos niveles del sitio.
+Se mantienen las 13 URLs anteriores y se incorporan 31 páginas: **44 guías por idioma, 88 archivos ES/EN**, distribuidos en tres categorías independientes y consecutivas: **Database, ORM y Faker**. Estas categorías utilizan tres niveles —categoría, grupo y página—, al igual que las diez categorías de «Construye tu aplicación»; las restantes conservan su estructura de dos niveles. Las etiquetas, los grupos y el estado activo están disponibles en ambos idiomas. La separación de Faker no cambia sus URLs ni los identificadores de sus páginas.
 
-**Base de datos: 21 guías.** Introducción, drivers y dependencias, configuración, conexiones, fachada DB, SQL y bindings, selección y resultados, filtros, joins/subconsultas, escrituras/bloqueos, transacciones, esquemas, tipos, modificadores, alteraciones, migraciones, seeders, dialectos/producción, API de conexiones, planes SQL e inventario.
+**Base de datos: 22 guías.** Introducción, drivers y dependencias, configuración, conexiones, comandos de Database, fachada DB, SQL y bindings, selección y resultados, filtros, joins/subconsultas, escrituras/bloqueos, transacciones, esquemas, tipos, modificadores, alteraciones, migraciones, seeders, dialectos/producción, API de conexiones, planes SQL e inventario.
 
-**ORM: 22 guías.** Introducción, modelos/atributos, persistencia/estado, consultas, definición y operaciones de relaciones, carga anticipada/N+1, soft deletes, scopes, eventos, colecciones/paginación, factories, Faker, seis catálogos alfabéticos de proveedores, definiciones de tabla/tipos, mapa de mecanismos del modelo y testing.
+**ORM: 15 guías.** Introducción, modelos/atributos, persistencia/estado, consultas, definición y operaciones de relaciones, carga anticipada/N+1, soft deletes, scopes, eventos, colecciones/paginación, factories, definiciones de tabla/tipos, mapa de mecanismos del modelo y testing.
+
+**Faker: 7 guías.** Guía de uso y seis catálogos alfabéticos de proveedores. Se presenta inmediatamente después de ORM como categoría propia.
+
+| Categoría | Grupos de navegación |
+| --- | --- |
+| Database | Configuración y conexiones; consultas y transacciones; esquemas y tablas; migraciones y datos; referencia avanzada. |
+| ORM | Modelos y persistencia; consultas y resultados; relaciones y carga; ciclo de vida; factories y pruebas. |
+| Faker | Uso y personalización; catálogo de proveedores. |
 
 Las nuevas páginas tienen referencias cruzadas hacia HTTP, transacciones, esquemas, modelos y pruebas; no sustituyen las guías HTTP ni alteran otras categorías.
 
@@ -21,10 +29,11 @@ El inventario descargable se encuentra en `public/downloads/database-orm-api-inv
 | Declaraciones léxicas extraídas de Database y ORM | 978 |
 | Declaraciones públicas con referencia documental | 971 |
 | Exclusiones internas justificadas individualmente | 7 |
-| Entradas adicionales de API, configuración, comandos y colecciones | 423 |
+| Entradas adicionales de API, configuración, comandos y colecciones | 437 |
+| Comandos CLI de Database con referencia individual | 14 |
 | Proveedores Faker tipados | 675 |
 | Utilidades dinámicas adicionales de Faker | 7 |
-| Archivos fuente identificados mediante hash normalizado | 183 |
+| Archivos fuente identificados mediante hash normalizado | 190 |
 | Declaraciones pendientes dentro del alcance auditado | 0 |
 
 Las declaraciones incluyen clases, propiedades, métodos, enum, campos, contratos y determinados protocolos de Python. **No son 978 funcionalidades diferentes.** Los contratos enlazan a la implementación; los métodos heredados se documentan en su clase de origen. Los suplementos cubren, entre otros, constructores generados por dataclasses, configuración, CLI, `Collection` y `Paginator`.
@@ -95,9 +104,9 @@ Los 28 diagramas de ambas traducciones cubren arquitectura, relaciones con cardi
 | Pruebas publicadas | Los 16 tests pasaron en ES/EN mediante Reactor y `TestingEngine`: 64 ejecuciones en proyectos temporales. |
 | Sintaxis de ejemplos del sitio | 3.478 bloques Python, 276 JSON y 82 JavaScript comprobados; 2.656 imports nativos contrastados; cero errores. |
 | Mermaid | 28 diagramas parseados correctamente. |
-| Navegación | 17 pruebas del proyecto pasaron; categorías independientes y capítulos al mismo nivel. |
-| Documentación | 22 categorías, 162 guías por idioma y 2 recursos de contribución; 2.326 enlaces internos comprobados. |
-| Construcción de producción | `npm run build` pasó: 329 páginas generadas, 328 páginas de contenido verificadas, índices de búsqueda, sitemap, redirecciones, traducciones y enlaces del HTML válidos. |
+| Navegación | 19 pruebas del proyecto pasaron; categorías independientes, grupos traducidos, cobertura exacta de páginas y destinos conservados. Se rechazan grupos vacíos, duplicados, incompletos, reordenados y niveles adicionales. |
+| Documentación | 23 categorías, 163 guías por idioma y 2 recursos de contribución; 2.420 enlaces internos comprobados. |
+| Construcción de producción | `npm run build` pasó: 331 páginas generadas, 330 páginas de contenido verificadas, índices de búsqueda, sitemap, redirecciones, traducciones y enlaces del HTML válidos. |
 | Navegador | Revisión a 390 y 1440 px; navegación móvil, categoría activa, tablas sin desbordamiento de página y cuatro diagramas de relaciones renderizados. |
 
 La construcción de producción y la verificación del HTML generado pasaron. El servidor local se deja activo después de esa validación.
@@ -116,3 +125,27 @@ npm run build
 La validación de cobertura forma parte de la validación normal de documentación y del postbuild. No exige un checkout del framework en GitHub Pages; la comparación AST y hashes sí se invoca explícitamente con `--framework-root`.
 
 No se probaron servidores externos MySQL, PostgreSQL, Oracle, SQL Server o Redshift: la evidencia de ejecución corresponde a SQLite y a compilación/configuración según el caso. Esa comprobación de infraestructura externa queda fuera de la evidencia disponible; las diferencias de cada motor están documentadas.
+
+## Ampliación de la referencia de comandos
+
+La página `/es/database/commands` y su traducción EN reúnen los 14 comandos solicitados, con sintaxis, argumentos, aliases, defaults efectivos, salidas y ejemplos de ambas formas del CLI. Se enlazaron desde la introducción, migraciones, seeders, factories y consola. El auditor ahora contrasta los nombres de comandos del código y el validador exige sus 14 destinos individuales.
+
+La auditoría adicional ejecutó las 14 ayudas reales, 40 invocaciones de migraciones/generadores/seeders y 66 comprobaciones sobre SQLite temporal. Para inspección y borrado pasaron 38 pruebas nativas y 9 comprobaciones de argumentos/defaults. No se ejecutó `db:wipe` contra una conexión de la aplicación del usuario.
+
+Se precisaron el conteo exacto de `db:table`, la confirmación y alcance de `db:wipe`, sus diferencias por motor, los historiales de reset/refresh/fresh, y el retorno 0 de errores de generación capturados por MakeStubCommand. La referencia aclara la aplicación de un schema generado con `Schema.createFromDefinition` y que el generador de factories no comprueba la existencia del módulo del modelo.
+
+La ampliación CLI pasó `npm run build` y su postbuild: 331 páginas generadas, 330 verificadas y 2.420 enlaces internos. La página nueva contiene 14 destinos de comandos y 15 tablas con contenedor de desplazamiento en cada idioma; su estado activo de navegación también se comprobó en el HTML generado.
+
+## Reorganización de Database, ORM y Faker
+
+La navegación utiliza 12 subgrupos: cinco de Database, cinco de ORM y dos de Faker. El catálogo conserva sus siete destinos bajo `/database/orm/`; su nueva ubicación en el menú no requiere redirecciones. Las factories permanecen en ORM por su asociación con modelos y persistencia.
+
+El filtro recorre los tres niveles: una coincidencia de grupo muestra sus páginas y una coincidencia de página abre sus ancestros. Limpiar el filtro restaura el estado anterior de categorías y grupos. En móvil se mantiene una categoría abierta y un subgrupo abierto por categoría; los encabezados conservan la activación nativa con teclado. Al cargar una página se abren exclusivamente sus ancestros y se destaca su enlace.
+
+La reorganización pasó las 19 pruebas del proyecto, la validación documental y `npm run build` con su postbuild sobre las 330 páginas de contenido. Además, se verificaron 30 páginas servidas en ES/EN para cubrir los 12 subgrupos y las categorías sin agrupación, junto con 20 comprobaciones del comportamiento cliente. La revisión real en navegador a 390 y 1440 px confirmó selección de páginas, categorías independientes, teclado, filtro por grupo/página, estado sin resultados, restauración de apertura y ausencia de desbordamiento horizontal. El cambio de idioma conserva la página equivalente y traduce los subgrupos.
+
+### Extensión a las categorías de construcción de aplicaciones
+
+El mismo sistema de submenús se aplica a Primeros pasos, HTTP y APIs, Realtime, Servidores MCP, Vistas, Localización, Autenticación y autorización, Sesiones HTTP, Hashing y cifrado, y Schemas y validación. Sus 65 páginas conservan IDs, URLs, contenido y orden de lectura; se organizan en 28 grupos nuevos, cada uno con dos a cuatro páginas. Junto con Database, ORM y Faker, el sitio tiene 13 categorías agrupadas y 40 subgrupos. Las otras diez categorías conservan su estructura plana.
+
+La extensión pasó las 19 pruebas y la construcción completa con validación de las 330 páginas. Una comprobación adicional de 56 páginas servidas —una por grupo nuevo en cada idioma— contrastó todos los enlaces, traducciones, orden y ancestros activos. En el navegador se revisaron escritorio y móvil, navegación por teclado, cambio de categoría y subgrupo, selección de páginas, búsqueda por grupo y página, restauración del estado y cambio de idioma. No se detectaron desbordamientos horizontales ni etiquetas recortadas en las vistas comprobadas.

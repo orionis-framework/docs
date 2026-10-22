@@ -48,6 +48,8 @@ El descubrimiento se guarda en la instancia de `Migrator`. Un proceso nuevo ve a
 
 ## Todos los comandos y opciones
 
+[Referencia de comandos de Database](/es/database/commands): sintaxis, argumentos y opciones de los 14 comandos, incluida inspección y borrado.
+
 Todos se ejecutan desde la raíz mediante orionis <comando> o python -B reactor <comando>. Opciones comunes: --database NAME o -d NAME (str opcional, None usa la conexión default) y -h/--help. El nombre debe estar declarado en config/database.py.
 
 | Comando | Opciones propias | Resultado |

@@ -894,6 +894,22 @@
       }
     },
     {
+      "id": "database-commands",
+      "kind": "doc",
+      "title": {
+        "es": "Comandos de Database",
+        "en": "Database commands"
+      },
+      "label": {
+        "es": "Comandos de Database",
+        "en": "Database commands"
+      },
+      "slug": {
+        "es": "/es/database/commands",
+        "en": "/en/database/commands"
+      }
+    },
+    {
       "id": "database-db-facade",
       "kind": "doc",
       "title": {
@@ -1369,8 +1385,8 @@
         "en": "/en/database/orm/faker"
       },
       "label": {
-        "es": "Faker y datos simulados",
-        "en": "Faker and sample data"
+        "es": "Guía de uso",
+        "en": "Usage guide"
       }
     },
     {
@@ -1385,8 +1401,8 @@
         "en": "/en/database/orm/faker-reference-a-d"
       },
       "label": {
-        "es": "Faker: proveedores A–D",
-        "en": "Faker: providers A–D"
+        "es": "Proveedores A–D",
+        "en": "Providers A–D"
       }
     },
     {
@@ -1401,8 +1417,8 @@
         "en": "/en/database/orm/faker-reference-e-h"
       },
       "label": {
-        "es": "Faker: proveedores E–H",
-        "en": "Faker: providers E–H"
+        "es": "Proveedores E–H",
+        "en": "Providers E–H"
       }
     },
     {
@@ -1417,8 +1433,8 @@
         "en": "/en/database/orm/faker-reference-i-l"
       },
       "label": {
-        "es": "Faker: proveedores I–L",
-        "en": "Faker: providers I–L"
+        "es": "Proveedores I–L",
+        "en": "Providers I–L"
       }
     },
     {
@@ -1433,8 +1449,8 @@
         "en": "/en/database/orm/faker-reference-m-p"
       },
       "label": {
-        "es": "Faker: proveedores M–P",
-        "en": "Faker: providers M–P"
+        "es": "Proveedores M–P",
+        "en": "Providers M–P"
       }
     },
     {
@@ -1449,8 +1465,8 @@
         "en": "/en/database/orm/faker-reference-q-t"
       },
       "label": {
-        "es": "Faker: proveedores Q–T",
-        "en": "Faker: providers Q–T"
+        "es": "Proveedores Q–T",
+        "en": "Providers Q–T"
       }
     },
     {
@@ -1465,8 +1481,8 @@
         "en": "/en/database/orm/faker-reference-u-z"
       },
       "label": {
-        "es": "Faker: proveedores U–Z",
-        "en": "Faker: providers U–Z"
+        "es": "Proveedores U–Z",
+        "en": "Providers U–Z"
       }
     },
     {

@@ -83,6 +83,25 @@ def audit(framework: Path, manifest: dict) -> dict:
     provider_names = {node.name for node in provider_class.body if isinstance(node, ast.FunctionDef)
                       and not node.name.startswith("_")}
     documented_names = {entry["name"] for entry in manifest["fakerProviders"] if entry["kind"] == "provider method"}
+    cli_files = set()
+    for module in manifest["scope"].get("cliSourceRoots", []):
+        cli_files.update((framework / module).rglob("*.py"))
+    for pattern in manifest["scope"].get("cliGeneratorPatterns", []):
+        cli_files.update(framework.glob(pattern))
+    cli_names = set()
+    for file in cli_files:
+        tree = ast.parse(file.read_text(encoding="utf-8-sig"))
+        for node in tree.body:
+            if not isinstance(node, ast.ClassDef):
+                continue
+            for member in node.body:
+                targets = ([member.target] if isinstance(member, ast.AnnAssign)
+                           else member.targets if isinstance(member, ast.Assign) else [])
+                if (any(isinstance(target, ast.Name) and target.id == "signature" for target in targets)
+                        and isinstance(member.value, ast.Constant) and isinstance(member.value.value, str)):
+                    cli_names.add(member.value.value)
+    documented_cli = {entry["symbol"] for entry in manifest["supplemental"]
+                      if entry["kind"] == "CLI command"}
     return {
         "source_declarations": len(found),
         "new_declarations": new,
@@ -91,6 +110,9 @@ def audit(framework: Path, manifest: dict) -> dict:
         "new_source_files": untracked_files,
         "new_faker_providers": sorted(provider_names - documented_names),
         "removed_faker_providers": sorted(documented_names - provider_names),
+        "database_cli_commands": len(cli_names),
+        "new_database_cli_commands": sorted(cli_names - documented_cli),
+        "removed_database_cli_commands": sorted(documented_cli - cli_names),
     }
 
 
@@ -100,4 +122,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
     report = audit(args.framework_root.resolve(), json.loads(MANIFEST.read_text(encoding="utf-8")))
     print(json.dumps(report, ensure_ascii=False, indent=2))
-    raise SystemExit(any(value for key, value in report.items() if key != "source_declarations"))
+    raise SystemExit(any(value for key, value in report.items()
+                        if key not in {"source_declarations", "database_cli_commands"}))

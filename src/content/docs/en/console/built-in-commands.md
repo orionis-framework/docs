@@ -36,6 +36,8 @@ Generating a model does not migrate its table; generating a job does not start w
 
 ## Evolve data
 
+See the [Database command reference](/en/database/commands) for all arguments, defaults and examples for inspection, generators, migrations, seeding and wiping.
+
 `migrate`, `migrate:status`, `migrate:rollback`, `migrate:reset`, `migrate:refresh`, `migrate:fresh`, `seed`, and `db:seed` are covered in [migrations and seeders](/en/database/migrations-and-seeders). They share `--database`/`-d` connection selection. Rollback `--step` counts batches. `db:show` displays database information; `db:table` inspects tables; `db:wipe` removes schema data through its workflow and requires operational care.
 
 ```shell

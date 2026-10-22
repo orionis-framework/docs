@@ -32,6 +32,8 @@ class DefaultFlagsSeeder(Seeder):
 
 ## Running pending seeders
 
+[Database command reference](/en/database/commands): syntax, arguments and options for all 14 commands, including inspection and wiping.
+
 ```shell
 orionis seed
 python -B reactor seed
