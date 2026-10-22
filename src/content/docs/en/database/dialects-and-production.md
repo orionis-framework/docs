@@ -1,57 +1,68 @@
 ---
-title: "Backends and production operation"
-description: "The query API is shared, but backend capabilities differ. Choose types and operations supported by the target and verify migrations against it. SQLite suits isolated examples;…"
+title: "Dialects and production"
+description: "Actual backend compatibility, Redshift, operational boundaries and Database diagnosis."
 editUrl: true
 lastUpdated: false
 ---
 
-The query API is shared, but backend capabilities differ. Choose types and operations supported by the target and verify migrations against it. SQLite suits isolated examples; it does not demonstrate another server's locking, identity, or DDL behavior.
+A shared API does not make backends equivalent. Test types, DDL, identities, locks and failures on the target backend. SQLite verifies many functional examples but does not prove PostgreSQL, MySQL, Oracle, SQL Server or Redshift semantics.
 
-## Server connections
+## Effective settings
 
-PostgreSQL applies `charset`, `search_path`, and `sslmode` to both async and sync paths. The async path uses `asyncpg`; the sync path, also used by the scheduler job store, uses `psycopg2`. Configuring persistent tasks should not lose the search path. MySQL exposes charset, collation, strict mode, and engine. Oracle accepts service, SID, DSN, or TNS; SQL Server needs a system ODBC driver in addition to its Python extra.
+Runtime applies SQLite PRAGMAs, MySQL charset/collation/SQL mode, PGSQL session/TLS settings, Oracle addressing, ODBC TLS and Redshift connector options. The [configuration catalog](/en/database/configuration) distinguishes applied fields from retained but unconsumed settings.
 
-TLS options matter. The SQL Server template includes `DB_TRUST_SERVER_CERTIFICATE=True`; adapt that to your certificate-validation policy before production. Keep credentials out of application manuals, logs, and repositories. Pool options depend on the dialect and effective configuration; do not assume undocumented `DB_POOL_*` environment variables exist.
+Specifically, `SQLite.url` does not override `database`; `MySQL.engine` and `prefix_indexes` do not control table/index creation; Oracle does not forward `encoding`/`nencoding` and SQL Server does not use `charset` as an ODBC parameter. Changing those fields does not imply server changes.
+
+Connections do not indiscriminately forward every configuration key as an SQLAlchemy option. The template has no native `DB_POOL_*` variables or generic isolation/retry settings.
 
 ## Amazon Redshift
 
-Redshift uses the official `redshift-connector` with `sqlalchemy-redshift`, rather than treating the service as PostgreSQL through asyncpg. Basic configuration:
+Uses `redshift-connector` and `sqlalchemy-redshift` through a Core engine and reserved checkout worker. It is not PostgreSQL through `asyncpg`. Each physical connection retains its thread during a transaction; independent connections can use distinct workers. Rows are buffered on that worker before returning Python results.
+
+| Capability | Actual behavior |
+|---|---|
+| Savepoints | Unsupported; nesting raises `TransactionException`. |
+| SELECT row locks | `lockForUpdate()` and `sharedLock()` raise `QueryException`, including nested/aggregate plans. |
+| DML `RETURNING` | Disabled; omitted generated identities are not returned. |
+| `IDENTITY(1,1)` | Can be compiled from autoincrement; supply a client-generated key if a model immediately needs it. |
+| Traditional indexes | Unsupported; do not declare them as if using PostgreSQL. |
+| PK/unique/FK | Informational declarations without uniqueness/reference enforcement. |
+| `supportsUniqueConstraints()` | `False`. |
+
+Database cache, database sessions, database queues, tracked seeders and database scheduler stores reject Redshift because they require enforced uniqueness and/or indexes. Analytical queries and compatible models remain available.
+
+### IAM and Serverless
 
 ```dotenv
 DB_CONNECTION=redshift
 DB_HOST=warehouse.example.test
 DB_PORT=5439
 DB_DATABASE=dev
-DB_USERNAME=app_user
-DB_PASSWORD=replace-with-secret
-DB_REDSHIFT_SSL=True
+DB_REDSHIFT_SSL=true
 DB_REDSHIFT_SSLMODE=verify-full
 DB_REDSHIFT_TIMEOUT=30
+DB_REDSHIFT_IAM=true
+DB_REDSHIFT_REGION=us-east-1
+DB_REDSHIFT_CLUSTER_IDENTIFIER=example-cluster
+DB_REDSHIFT_DB_USER=app_user
 ```
 
-`verify-full` is the default; `verify-ca` is also supported. `DB_REDSHIFT_TIMEOUT=null` disables the socket timeout. IAM adds `DB_REDSHIFT_IAM`, `DB_REDSHIFT_REGION`, `DB_REDSHIFT_CLUSTER_IDENTIFIER`, `DB_REDSHIFT_DB_USER`, and optionally `DB_REDSHIFT_PROFILE`. Without an explicit profile, the connector uses its credential chain. Serverless adds `DB_REDSHIFT_IS_SERVERLESS`, `DB_REDSHIFT_SERVERLESS_WORK_GROUP`, and `DB_REDSHIFT_SERVERLESS_ACCT_ID`.
+The connector receives `iam`, `region`, `cluster_identifier`, `db_user` and optional `profile`. Without a profile it uses its credential resolution. Serverless adds `is_serverless`, `serverless_work_group` and `serverless_acct_id`. Fields are validated and forwarded; Orionis does not provision AWS resources or grant account permissions.
 
-The connector is synchronous; Orionis runs connection, query, result, and transaction-control work on a worker reserved for each checked-out Core connection. Independent queries may use different workers; one transaction keeps its worker. Cancellation waits for in-flight operations before cleanup and does not guarantee aborting server work.
+TLS defaults to `ssl=True` and `sslmode=verify-full`; `verify-ca` is also accepted. `timeout=None` leaves socket timeout unset. The [configuration table](/en/database/configuration#redshift) lists variables, types and defaults.
 
-| Redshift capability | Consequence |
-|---|---|
-| No savepoints | Do not nest transactions. |
-| No SELECT row locks | `lockForUpdate()` and `sharedLock()` raise `QueryException` at execution, including nested/aggregate plans. |
-| No DML `RETURNING` | Omitted server-generated identities are not returned in `last_insert_id`. |
-| `IDENTITY(1,1)` | `autoIncrement()` can create native identity, but a model needing its key immediately should use a client-generated key. |
-| No traditional indexes | Avoid index declarations. |
-| Informational PK/unique/FK | Do not rely on these declarations for exclusion or uniqueness. |
+## Identities and batches
 
-`supportsUniqueConstraints()` returns `False`. Database cache, database sessions, database queues, tracked seeders, and the scheduler database job store reject Redshift: they need enforced uniqueness and, for the scheduler, indexes. These restrictions do not prevent analytical queries or compatible models on Redshift.
+A single-row insert may report its first primary-key value depending on the driver. A batch does not guarantee keys. Parameterized PostgreSQL uses `RETURNING 1` to count actual rows, including trigger-skipped entries; SQL Server uses OUTPUT rows when driver counts are negative. Oracle preserves batch row counts before results close.
 
-## Diagnostics, resources, and volume
+Distinguish the integer from `DB.execute("INSERT...")` from the `InsertResult` returned by `DB.table(...).insert(...)` or `Connection.insert(plan)`. Read the available identity from `result.last_insert_id`; this API has no `insertGetId()`. Submitted batch length alone does not prove every entry was inserted.
 
-`db:show`, `db:table`, and `db:wipe` understand Redshift catalogs and qualified names. Size metrics use allocated 1 MB blocks; limited permissions or empty tables can leave sizes unknown. Displayed constraints are declarations, rather than enforcement guarantees.
+## Resources, cancellation and diagnosis
 
-Engines initialize lazily and are reused. Close direct connections when finished; let application lifecycle close managed connections. Manager `disconnect(name=None)` closes all cached connections; a supplied name closes only that connection. Do not disconnect a shared service while other tasks use it.
+Engines are lazy. Temporary operations release checkouts after buffering results and settling transaction control; explicit transactions retain them until their final level settles. Do not dispose shared services midway through requests.
 
-Reads materialize full results. Filter, select columns, and paginate instead of designing a large exporter around assumed cursor streaming. Split large writes and remember each batch consumes memory. Distinguish configuration/driver errors from SQL failures; track latency, row counts, and business operations without exposing bound data. This layer does not guarantee automatic transaction retries.
+[Cancellation](/en/database/transactions#isolation-and-cancellation) drains sensitive work and cleanup; immediate SQL cancellation is not promised. Commit may complete despite consumer cancellation. Retry only with a known outcome or idempotency.
 
-Independent operations use `engine.begin()` contexts and release their connection after each call; transactions retain their connection until nested levels finish. Parsed raw SQL uses an LRU cache of 256 texts without turning variable values into interpolated SQL. PostgreSQL batch inserts count rows returned by `RETURNING`, including differences when a trigger suppresses an input row.
+All reads buffer complete results: filter, select columns, paginate and split batches. Do not assume streaming cursors. Record business operation, connection name, latency and counts without credentials or bindings. SQL errors are sanitized and there are no general automatic retries.
 
-Before deployment, exercise your application migrations and queries against a dedicated test database on the destination backend. Keep its credentials out of version control and separate from production configuration. SQLite tests do not establish compatibility with another engine: verify types, DDL, locking, cancellation, and cleanup with that engine and its installed driver.
+`db:show`, `db:table` and `db:wipe` inspect catalogs including Redshift. Redshift size metrics use allocated 1 MB blocks; empty tables or limited permissions can leave size unknown. Displayed constraints are declarations, not proof of enforcement.

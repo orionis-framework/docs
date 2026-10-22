@@ -1,61 +1,147 @@
 ---
 title: "Transactions and concurrency"
-description: "A transaction groups operations that must commit or roll back together. Use one connection name throughout that unit of work. Orionis does not implement distributed…"
+description: "Commit, rollback, async contexts, savepoints, isolation, task ownership and cancellation."
 editUrl: true
 lastUpdated: false
 ---
 
-A transaction groups operations that must commit or roll back together. Use one connection name throughout that unit of work. Orionis does not implement distributed transactions across connections.
+A transaction groups reads and writes into a unit that can be committed together. Use the same connection name and asyncio task. `DB`, raw SQL and models using that connection share transaction state. No distributed coordinator spans connections or servers.
 
-## Automatic commit and rollback
-
-The async context commits when its body completes normally and rolls back when an exception escapes. This program shows an inner operation failing while preserving the outer operation:
+## Async context manager
 
 ```python
-import asyncio
-from orionis.database import Connection
+from orionis.support.facades import DB
 
 
-async def main() -> None:
-    db = Connection("tx", {"driver": "sqlite", "database": ":memory:"})
-    try:
-        await db.statement("CREATE TABLE events (name TEXT NOT NULL)")
-        async with db.transaction():
-            await db.execute("INSERT INTO events VALUES (:name)", {"name": "outer"})
-            try:
-                async with db.transaction():
-                    await db.execute(
-                        "INSERT INTO events VALUES (:name)", {"name": "inner"}
-                    )
-                    raise ValueError("discard inner work")
-            except ValueError:
-                pass
-        assert await db.select("SELECT name FROM events") == [{"name": "outer"}]
-    finally:
-        await db.disconnect()
-
-
-asyncio.run(main())
+async def transfer(source_id: int, target_id: int, amount: int) -> None:
+    if source_id == target_id or amount <= 0:
+        raise ValueError("Invalid transfer")
+    async with DB.transaction():
+        debited = await DB.execute(
+            "UPDATE accounts SET balance = balance - :amount "
+            "WHERE id = :id AND balance >= :amount",
+            {"amount": amount, "id": source_id},
+        )
+        if debited != 1:
+            raise ValueError("Account missing or insufficient funds")
+        credited = await DB.execute(
+            "UPDATE accounts SET balance = balance + :amount WHERE id = :id",
+            {"amount": amount, "id": target_id},
+        )
+        if credited != 1:
+            raise ValueError("Target account missing")
 ```
 
-Inside an application, use `async with DB.transaction():` or `async with DB.transaction("reporting"):`. Manual facade control uses `beginTransaction()`, `commit()`, and `rollback()`; direct connections use `begin()`, `commit()`, and `rollback()`. Prefer the context manager: manual control must handle failures and cancellation on every path. Committing or rolling back without an active transaction raises `TransactionException`.
+Requires `accounts` with a unique `id` and integer `balance`. The debit condition is evaluated in the database, avoiding reliance on an earlier read that could become stale.
 
-## Nesting and task ownership
+Entry opens a dedicated connection and transaction level. Normal exit awaits `commit()`. Any escaping `BaseException`, including cancellation, triggers `rollback()` and propagates. Hiding an exception **inside** the block makes exit appear successful and commits: re-raise or catch outside.
 
-The first level opens a dedicated connection and root transaction. Further levels create savepoints, except on Redshift, where nesting is rejected. Each `commit` or `rollback` ends only the innermost level.
+`async with DB.transaction() as transaction` yields the context, not a builder or SQL connection. Continue querying through `DB` or models; do not manually settle the same level managed by the context.
 
-State belongs to the asyncio task that opened the transaction. A child task inherits context but does not own the transaction: Orionis rejects its use with `TransactionException`. Execute transactional queries sequentially in the owning task; do not use `asyncio.gather()` or `create_task()` to share that connection inside the block. Outside a transaction, independent queries may use separate pooled connections.
+```mermaid
+flowchart TD
+    A["Enter async with"] --> B["Acquire connection + BEGIN"]
+    B --> C["Await operations in owner task"]
+    C --> D{"Exception escapes?"}
+    D -->|"No"| E["Await COMMIT"]
+    D -->|"Yes"| F["Await ROLLBACK"]
+    E --> G["Release root connection"]
+    F --> G
+    F --> H["Propagate exception"]
+```
 
-This also affects [pagination](/en/database/orm/querying): the ORM counts and fetches sequentially inside a transaction and may run them concurrently outside one.
+## Equivalent manual control
 
-## Cancellation and uncertain outcomes
+```python
+from orionis.support.facades import DB
 
-Transaction-control operations wait for the driver to settle before propagating cancellation. Once `COMMIT` has been requested, changes may persist even if the caller receives `CancelledError`. Cancellation does not prove rollback. Waiting to acquire a pooled connection remains cancellable.
 
-The implementation drains operations and cleans up or invalidates interrupted connections as appropriate, including the Redshift thread bridge. It does not promise to abort server work immediately. If a business outcome becomes uncertain after commit, query using a stable identity or apply idempotency before retrying.
+async def record_event(message: str) -> None:
+    await DB.beginTransaction()
+    try:
+        await DB.execute(
+            "INSERT INTO audit_log (message) VALUES (:message)", {"message": message}
+        )
+    except BaseException:
+        await DB.rollback()
+        raise
+    else:
+        await DB.commit()
+```
 
-## Practical boundaries
+`beginTransaction(name=None)`, `commit(name=None)` and `rollback(name=None)` are async and return `None`. Begin occurs before `try`: if it fails there is no owned level to roll back. Commit is in `else`: after a failure, do not assume an active level remains available to roll back.
 
-Keep blocks short. Avoid HTTP requests or email delivery inside transactions: they retain resources longer and are not undone by SQL rollback. When updating data and submitting a job, examine the [queue backend](/en/asynchronous/queues/drivers-and-configuration): a database queue participates in its connection's transaction; Redis does not share the SQL transaction. There is no general `afterCommit` API here that makes both systems atomic.
+Each settlement closes the innermost level; without an active transaction, `commit()`/`rollback()` raise `TransactionException`. Keep the same name for begin, queries and settlement. See [DB signatures](/en/database/db-facade#transaction-control).
 
-DDL and savepoints depend on the backend. Opening a transaction in the migrator does not make every server's DDL reversible. Test successful and failed migration paths on the selected backend before production use.
+Use `finally` to release resources you created. Do not dispose the singleton manager after business operations. For a test or preview that must always roll back, use `try/finally` and `rollback()` with no commit branch.
+
+## Selecting the connection
+
+```python
+from orionis.support.facades import DB
+
+
+async def report_event(message: str) -> None:
+    reporting = DB.connection("reporting")
+    async with reporting.transaction():
+        await reporting.execute(
+            "INSERT INTO audit_log (message) VALUES (:message)", {"message": message}
+        )
+```
+
+A scoped gateway does not establish a block-wide implicit default. Unnamed `DB.table("...")` still resolves the manager default, except within the dedicated migration context. Use the scoped gateway or `connection="reporting"` on each builder to participate in its transaction.
+
+## Savepoints and nesting
+
+```python
+from orionis.support.facades import DB
+
+
+async def save_with_optional_event() -> None:
+    async with DB.transaction():
+        await DB.execute(
+            "INSERT INTO notes (body) VALUES (:body)", {"body": "retained"}
+        )
+        try:
+            async with DB.transaction():
+                await DB.execute(
+                    "INSERT INTO notes (body) VALUES (:body)", {"body": "discarded"}
+                )
+                raise ValueError("Discard only inner work")
+        except ValueError:
+            pass
+```
+
+The first level starts a root transaction; later levels create savepoints on the same connection. Catching outside the inner context rolls back its row while the outer row can commit. If the exception also escapes the outer block, everything rolls back.
+
+Redshift rejects nesting with `TransactionException`. Other drivers request savepoints, subject to their DDL compatibility. These are not independent transactions, and `DB.transaction()` exposes no savepoint-name or isolation arguments.
+
+## Concurrency and task ownership
+
+A `ContextVar` retains the stack and owning task. A child inherits context but not ownership: attempting to use that active state raises `TransactionException`. Do not share a transaction through `asyncio.gather()` or `create_task()`; await operations sequentially in its task.
+
+Outside transactions, independent tasks may acquire different physical connections. Create a builder per query: sharing mutable builders can mix conditions. In-memory SQLite uses one pooled connection with exclusive checkout, serializing acquisition.
+
+`IConnection.inTransaction()` returns `True` only for the owning task with active levels. A child receives `False`, which does not authorize use of an inherited transaction. Inherited state that has already settled is cleared during resolution.
+
+ORM pagination performs its count and rows sequentially inside transactions and may run them concurrently outside. Without a transaction there is no shared-snapshot guarantee between those results.
+
+## Isolation and cancellation
+
+Backend settings determine isolation. No universal policy or deadlock retries are added. Builder `lockForUpdate()`/`sharedLock()` apply on execution and depend on dialect support; Redshift rejects them and SQLite does not provide relational-server row locks.
+
+`Connection.createTable()` requests `BEGIN IMMEDIATE` on SQLite when creating its own temporary transaction. It does not change an existing transaction's mode; normal operations use `BEGIN`.
+
+Pool acquisition remains cancellable. Transaction control and cleanup drain driver work before propagating cancellation; Oracle also protects native execution and Redshift drains its worker. This protects resources but does not guarantee immediately stopping server-side SQL.
+
+A submitted `COMMIT` may have persisted changes even when the caller receives `CancelledError`. Cancellation does not prove rollback. Verify outcomes through a stable identity or idempotency before retrying.
+
+## External effects and DDL
+
+Keep blocks short. Email, files and HTTP calls are not rolled back with SQL. A database queue can participate on its connection; Redis does not share the SQL transaction. This layer exposes no general `afterCommit` API.
+
+DDL can implicitly commit depending on the backend. A transaction-wrapped migration does not guarantee complete structural rollback: test errors, locks and DDL against the chosen backend.
+
+### Transaction
+
+`Transaction(connection: IConnection)` implements `ITransaction`. `async __aenter__() -> ITransaction` opens a level and returns `self`. `async __aexit__(exc_type: type[BaseException] | None, exc: BaseException | None, traceback: TracebackType | None) -> bool` commits or rolls back according to `exc_type` and always returns `False`. Exceptions are not suppressed. Use `async with connection.transaction()` rather than calling these special methods manually.

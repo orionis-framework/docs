@@ -839,22 +839,154 @@
       "slug": {
         "es": "/es/database",
         "en": "/en/database"
+      },
+      "label": {
+        "es": "Introducción",
+        "en": "Introduction"
+      }
+    },
+    {
+      "id": "database-drivers",
+      "kind": "doc",
+      "title": {
+        "es": "Drivers y dependencias",
+        "en": "Drivers and dependencies"
+      },
+      "slug": {
+        "es": "/es/database/drivers",
+        "en": "/en/database/drivers"
+      },
+      "label": {
+        "es": "Drivers y dependencias",
+        "en": "Drivers and dependencies"
+      }
+    },
+    {
+      "id": "database-configuration",
+      "kind": "doc",
+      "title": {
+        "es": "Configuración de bases de datos",
+        "en": "Database configuration"
+      },
+      "slug": {
+        "es": "/es/database/configuration",
+        "en": "/en/database/configuration"
+      },
+      "label": {
+        "es": "Configuración",
+        "en": "Configuration"
       }
     },
     {
       "id": "database-connections",
       "kind": "doc",
       "title": {
-        "es": "Configurar conexiones y ejecutar SQL",
-        "en": "Configure connections and execute SQL"
+        "es": "Gestión de conexiones",
+        "en": "Connection management"
       },
       "label": {
-        "en": "Connections and SQL",
-        "es": "Conexiones y SQL"
+        "es": "Conexiones",
+        "en": "Connections"
       },
       "slug": {
         "es": "/es/database/connections",
         "en": "/en/database/connections"
+      }
+    },
+    {
+      "id": "database-db-facade",
+      "kind": "doc",
+      "title": {
+        "es": "Fachada DB",
+        "en": "DB facade"
+      },
+      "slug": {
+        "es": "/es/database/db-facade",
+        "en": "/en/database/db-facade"
+      },
+      "label": {
+        "es": "Fachada DB",
+        "en": "DB facade"
+      }
+    },
+    {
+      "id": "database-raw-queries",
+      "kind": "doc",
+      "title": {
+        "es": "SQL parametrizado y resultados",
+        "en": "Parameterized SQL and results"
+      },
+      "slug": {
+        "es": "/es/database/raw-queries",
+        "en": "/en/database/raw-queries"
+      },
+      "label": {
+        "es": "SQL y bindings",
+        "en": "SQL and bindings"
+      }
+    },
+    {
+      "id": "database-query-builder",
+      "kind": "doc",
+      "title": {
+        "es": "Query Builder: selección y resultados",
+        "en": "Query Builder: selection and results"
+      },
+      "slug": {
+        "es": "/es/database/query-builder",
+        "en": "/en/database/query-builder"
+      },
+      "label": {
+        "es": "Selección y resultados",
+        "en": "Selection and results"
+      }
+    },
+    {
+      "id": "database-query-filters",
+      "kind": "doc",
+      "title": {
+        "es": "Filtros y condiciones",
+        "en": "Filters and conditions"
+      },
+      "slug": {
+        "es": "/es/database/query-filters",
+        "en": "/en/database/query-filters"
+      },
+      "label": {
+        "es": "Filtros y condiciones",
+        "en": "Filters and conditions"
+      }
+    },
+    {
+      "id": "database-joins-and-subqueries",
+      "kind": "doc",
+      "title": {
+        "es": "Joins y subconsultas",
+        "en": "Joins and subqueries"
+      },
+      "slug": {
+        "es": "/es/database/joins-and-subqueries",
+        "en": "/en/database/joins-and-subqueries"
+      },
+      "label": {
+        "es": "Joins y subconsultas",
+        "en": "Joins and subqueries"
+      }
+    },
+    {
+      "id": "database-query-writes",
+      "kind": "doc",
+      "title": {
+        "es": "Escrituras y bloqueos",
+        "en": "Writes and locks"
+      },
+      "slug": {
+        "es": "/es/database/query-writes",
+        "en": "/en/database/query-writes"
+      },
+      "label": {
+        "es": "Escrituras y bloqueos",
+        "en": "Writes and locks"
       }
     },
     {
@@ -867,18 +999,22 @@
       "slug": {
         "es": "/es/database/transactions",
         "en": "/en/database/transactions"
+      },
+      "label": {
+        "es": "Transacciones y concurrencia",
+        "en": "Transactions and concurrency"
       }
     },
     {
       "id": "database-schema",
       "kind": "doc",
       "title": {
-        "es": "Crear esquemas",
-        "en": "Create schemas"
+        "es": "Crear esquemas y tablas",
+        "en": "Creating schemas and tables"
       },
       "label": {
-        "en": "Creating schemas",
-        "es": "Crear esquemas"
+        "es": "Crear esquemas y tablas",
+        "en": "Creating schemas and tables"
       },
       "slug": {
         "es": "/es/database/schema",
@@ -886,15 +1022,63 @@
       }
     },
     {
+      "id": "database-column-types",
+      "kind": "doc",
+      "title": {
+        "es": "Catálogo completo de tipos de columna",
+        "en": "Complete column type catalog"
+      },
+      "slug": {
+        "es": "/es/database/column-types",
+        "en": "/en/database/column-types"
+      },
+      "label": {
+        "es": "Tipos de columna",
+        "en": "Column types"
+      }
+    },
+    {
+      "id": "database-schema-modifiers",
+      "kind": "doc",
+      "title": {
+        "es": "Modificadores, claves e índices",
+        "en": "Modifiers, keys, and indexes"
+      },
+      "slug": {
+        "es": "/es/database/schema-modifiers",
+        "en": "/en/database/schema-modifiers"
+      },
+      "label": {
+        "es": "Modificadores, claves e índices",
+        "en": "Modifiers, keys and indexes"
+      }
+    },
+    {
+      "id": "database-schema-alterations",
+      "kind": "doc",
+      "title": {
+        "es": "Alteraciones y límites del esquema",
+        "en": "Schema alterations and limits"
+      },
+      "slug": {
+        "es": "/es/database/schema-alterations",
+        "en": "/en/database/schema-alterations"
+      },
+      "label": {
+        "es": "Modificar estructuras",
+        "en": "Altering structures"
+      }
+    },
+    {
       "id": "database-migrations-and-seeders",
       "kind": "doc",
       "title": {
-        "es": "Evolucionar y poblar la base de datos",
-        "en": "Evolve and populate the database"
+        "es": "Migraciones y evolución del esquema",
+        "en": "Migrations and schema evolution"
       },
       "label": {
-        "en": "Migrations and seeders",
-        "es": "Migraciones y seeders"
+        "es": "Migraciones",
+        "en": "Migrations"
       },
       "slug": {
         "es": "/es/database/migrations-and-seeders",
@@ -902,15 +1086,31 @@
       }
     },
     {
+      "id": "database-seeders",
+      "kind": "doc",
+      "title": {
+        "es": "Seeders y datos iniciales",
+        "en": "Seeders and initial data"
+      },
+      "slug": {
+        "es": "/es/database/seeders",
+        "en": "/en/database/seeders"
+      },
+      "label": {
+        "es": "Seeders",
+        "en": "Seeders"
+      }
+    },
+    {
       "id": "database-dialects-and-production",
       "kind": "doc",
       "title": {
-        "es": "Motores y operación en producción",
-        "en": "Backends and production operation"
+        "es": "Dialectos y producción",
+        "en": "Dialects and production"
       },
       "label": {
-        "en": "Backends and production",
-        "es": "Motores y producción"
+        "es": "Motores y producción",
+        "en": "Engines and production"
       },
       "slug": {
         "es": "/es/database/dialects-and-production",
@@ -918,15 +1118,63 @@
       }
     },
     {
+      "id": "database-runtime-api",
+      "kind": "doc",
+      "title": {
+        "es": "API de conexiones y compilación",
+        "en": "Connection and compilation API"
+      },
+      "slug": {
+        "es": "/es/database/runtime-api",
+        "en": "/en/database/runtime-api"
+      },
+      "label": {
+        "es": "API de conexiones",
+        "en": "Connection API"
+      }
+    },
+    {
+      "id": "database-query-plans",
+      "kind": "doc",
+      "title": {
+        "es": "Planes y expresiones SQL",
+        "en": "SQL plans and expressions"
+      },
+      "slug": {
+        "es": "/es/database/query-plans",
+        "en": "/en/database/query-plans"
+      },
+      "label": {
+        "es": "Planes y expresiones SQL",
+        "en": "SQL plans and expressions"
+      }
+    },
+    {
+      "id": "database-api-coverage",
+      "kind": "doc",
+      "title": {
+        "es": "Inventario y cobertura de Database y ORM",
+        "en": "Database and ORM inventory and coverage"
+      },
+      "slug": {
+        "es": "/es/database/api-coverage",
+        "en": "/en/database/api-coverage"
+      },
+      "label": {
+        "es": "Inventario y cobertura",
+        "en": "Inventory and coverage"
+      }
+    },
+    {
       "id": "orm-overview",
       "kind": "doc",
       "title": {
-        "es": "ORM y consultas",
-        "en": "ORM and queries"
+        "es": "Introducción al ORM",
+        "en": "Introduction to the ORM"
       },
       "label": {
-        "en": "ORM",
-        "es": "ORM"
+        "es": "Introducción al ORM",
+        "en": "ORM introduction"
       },
       "slug": {
         "es": "/es/database/orm",
@@ -937,12 +1185,12 @@
       "id": "orm-models-and-attributes",
       "kind": "doc",
       "title": {
-        "es": "Modelos, atributos y persistencia",
-        "en": "Models, attributes, and persistence"
+        "es": "Definir modelos y atributos",
+        "en": "Defining models and attributes"
       },
       "label": {
-        "en": "Models and attributes",
-        "es": "Modelos y atributos"
+        "es": "Definir modelos",
+        "en": "Defining models"
       },
       "slug": {
         "es": "/es/database/orm/models-and-attributes",
@@ -950,15 +1198,31 @@
       }
     },
     {
+      "id": "orm-model-api",
+      "kind": "doc",
+      "title": {
+        "es": "Persistencia y estado del modelo",
+        "en": "Model persistence and state"
+      },
+      "slug": {
+        "es": "/es/database/orm/model-api",
+        "en": "/en/database/orm/model-api"
+      },
+      "label": {
+        "es": "Persistencia y estado",
+        "en": "Persistence and state"
+      }
+    },
+    {
       "id": "orm-querying",
       "kind": "doc",
       "title": {
-        "es": "Consultar, actualizar y paginar",
-        "en": "Query, update, and paginate"
+        "es": "Consultas con modelos",
+        "en": "Querying models"
       },
       "label": {
-        "en": "Queries and pagination",
-        "es": "Consultas y paginación"
+        "es": "Consultar modelos",
+        "en": "Querying models"
       },
       "slug": {
         "es": "/es/database/orm/querying",
@@ -969,12 +1233,12 @@
       "id": "orm-relationships",
       "kind": "doc",
       "title": {
-        "es": "Relacionar y cargar modelos",
-        "en": "Relate and load models"
+        "es": "Definir relaciones",
+        "en": "Defining relationships"
       },
       "label": {
-        "en": "Relationships",
-        "es": "Relaciones"
+        "es": "Definir relaciones",
+        "en": "Defining relationships"
       },
       "slug": {
         "es": "/es/database/orm/relationships",
@@ -982,15 +1246,255 @@
       }
     },
     {
+      "id": "orm-relationship-operations",
+      "kind": "doc",
+      "title": {
+        "es": "Consultar y modificar relaciones",
+        "en": "Querying and modifying relationships"
+      },
+      "slug": {
+        "es": "/es/database/orm/relationship-operations",
+        "en": "/en/database/orm/relationship-operations"
+      },
+      "label": {
+        "es": "Operaciones de relaciones",
+        "en": "Relationship operations"
+      }
+    },
+    {
+      "id": "orm-eager-loading",
+      "kind": "doc",
+      "title": {
+        "es": "Carga anticipada y N+1",
+        "en": "Eager loading and N+1"
+      },
+      "slug": {
+        "es": "/es/database/orm/eager-loading",
+        "en": "/en/database/orm/eager-loading"
+      },
+      "label": {
+        "es": "Carga anticipada y N+1",
+        "en": "Eager loading and N+1"
+      }
+    },
+    {
+      "id": "orm-soft-deletes",
+      "kind": "doc",
+      "title": {
+        "es": "Eliminación lógica",
+        "en": "Soft deletes"
+      },
+      "slug": {
+        "es": "/es/database/orm/soft-deletes",
+        "en": "/en/database/orm/soft-deletes"
+      },
+      "label": {
+        "es": "Eliminación lógica",
+        "en": "Soft deletion"
+      }
+    },
+    {
+      "id": "orm-scopes",
+      "kind": "doc",
+      "title": {
+        "es": "Scopes locales y globales",
+        "en": "Local and global scopes"
+      },
+      "slug": {
+        "es": "/es/database/orm/scopes",
+        "en": "/en/database/orm/scopes"
+      },
+      "label": {
+        "es": "Scopes",
+        "en": "Scopes"
+      }
+    },
+    {
+      "id": "orm-events",
+      "kind": "doc",
+      "title": {
+        "es": "Eventos y observers",
+        "en": "Events and observers"
+      },
+      "slug": {
+        "es": "/es/database/orm/events",
+        "en": "/en/database/orm/events"
+      },
+      "label": {
+        "es": "Eventos y observers",
+        "en": "Events and observers"
+      }
+    },
+    {
+      "id": "orm-collections-and-pagination",
+      "kind": "doc",
+      "title": {
+        "es": "Colecciones y paginación",
+        "en": "Collections and pagination"
+      },
+      "slug": {
+        "es": "/es/database/orm/collections-and-pagination",
+        "en": "/en/database/orm/collections-and-pagination"
+      },
+      "label": {
+        "es": "Colecciones y paginación",
+        "en": "Collections and pagination"
+      }
+    },
+    {
+      "id": "orm-factories-and-testing",
+      "kind": "doc",
+      "title": {
+        "es": "Factories de modelos",
+        "en": "Model factories"
+      },
+      "slug": {
+        "es": "/es/database/orm/factories-and-testing",
+        "en": "/en/database/orm/factories-and-testing"
+      },
+      "label": {
+        "es": "Factories",
+        "en": "Factories"
+      }
+    },
+    {
+      "id": "orm-faker",
+      "kind": "doc",
+      "title": {
+        "es": "Faker y datos simulados",
+        "en": "Faker and sample data"
+      },
+      "slug": {
+        "es": "/es/database/orm/faker",
+        "en": "/en/database/orm/faker"
+      },
+      "label": {
+        "es": "Faker y datos simulados",
+        "en": "Faker and sample data"
+      }
+    },
+    {
+      "id": "orm-faker-reference-a-d",
+      "kind": "doc",
+      "title": {
+        "es": "Faker: proveedores A–D",
+        "en": "Faker: providers A–D"
+      },
+      "slug": {
+        "es": "/es/database/orm/faker-reference-a-d",
+        "en": "/en/database/orm/faker-reference-a-d"
+      },
+      "label": {
+        "es": "Faker: proveedores A–D",
+        "en": "Faker: providers A–D"
+      }
+    },
+    {
+      "id": "orm-faker-reference-e-h",
+      "kind": "doc",
+      "title": {
+        "es": "Faker: proveedores E–H",
+        "en": "Faker: providers E–H"
+      },
+      "slug": {
+        "es": "/es/database/orm/faker-reference-e-h",
+        "en": "/en/database/orm/faker-reference-e-h"
+      },
+      "label": {
+        "es": "Faker: proveedores E–H",
+        "en": "Faker: providers E–H"
+      }
+    },
+    {
+      "id": "orm-faker-reference-i-l",
+      "kind": "doc",
+      "title": {
+        "es": "Faker: proveedores I–L",
+        "en": "Faker: providers I–L"
+      },
+      "slug": {
+        "es": "/es/database/orm/faker-reference-i-l",
+        "en": "/en/database/orm/faker-reference-i-l"
+      },
+      "label": {
+        "es": "Faker: proveedores I–L",
+        "en": "Faker: providers I–L"
+      }
+    },
+    {
+      "id": "orm-faker-reference-m-p",
+      "kind": "doc",
+      "title": {
+        "es": "Faker: proveedores M–P",
+        "en": "Faker: providers M–P"
+      },
+      "slug": {
+        "es": "/es/database/orm/faker-reference-m-p",
+        "en": "/en/database/orm/faker-reference-m-p"
+      },
+      "label": {
+        "es": "Faker: proveedores M–P",
+        "en": "Faker: providers M–P"
+      }
+    },
+    {
+      "id": "orm-faker-reference-q-t",
+      "kind": "doc",
+      "title": {
+        "es": "Faker: proveedores Q–T",
+        "en": "Faker: providers Q–T"
+      },
+      "slug": {
+        "es": "/es/database/orm/faker-reference-q-t",
+        "en": "/en/database/orm/faker-reference-q-t"
+      },
+      "label": {
+        "es": "Faker: proveedores Q–T",
+        "en": "Faker: providers Q–T"
+      }
+    },
+    {
+      "id": "orm-faker-reference-u-z",
+      "kind": "doc",
+      "title": {
+        "es": "Faker: proveedores U–Z",
+        "en": "Faker: providers U–Z"
+      },
+      "slug": {
+        "es": "/es/database/orm/faker-reference-u-z",
+        "en": "/en/database/orm/faker-reference-u-z"
+      },
+      "label": {
+        "es": "Faker: proveedores U–Z",
+        "en": "Faker: providers U–Z"
+      }
+    },
+    {
+      "id": "orm-schema-and-type-reference",
+      "kind": "doc",
+      "title": {
+        "es": "Definiciones de tabla y tipos",
+        "en": "Table and type definitions"
+      },
+      "label": {
+        "es": "Definiciones de tabla y tipos",
+        "en": "Table definitions and types"
+      },
+      "slug": {
+        "es": "/es/database/orm/schema-and-type-reference",
+        "en": "/en/database/orm/schema-and-type-reference"
+      }
+    },
+    {
       "id": "orm-events-and-scopes",
       "kind": "doc",
       "title": {
-        "es": "Eventos, scopes y soft deletes",
-        "en": "Events, scopes, and soft deletes"
+        "es": "Eventos, scopes y ciclo del modelo",
+        "en": "Events, scopes and model lifecycle"
       },
       "label": {
-        "en": "Events, scopes and soft deletes",
-        "es": "Eventos, scopes y soft deletes"
+        "es": "Guía de mecanismos del modelo",
+        "en": "Model mechanism guide"
       },
       "slug": {
         "es": "/es/database/orm/events-and-scopes",
@@ -998,31 +1502,19 @@
       }
     },
     {
-      "id": "orm-factories-and-testing",
+      "id": "orm-testing",
       "kind": "doc",
       "title": {
-        "es": "Factories y pruebas",
-        "en": "Factories and testing"
+        "es": "Probar Database y ORM",
+        "en": "Testing Database and ORM"
       },
       "slug": {
-        "es": "/es/database/orm/factories-and-testing",
-        "en": "/en/database/orm/factories-and-testing"
-      }
-    },
-    {
-      "id": "orm-schema-and-type-reference",
-      "kind": "doc",
-      "title": {
-        "es": "Tipos y restricciones del esquema",
-        "en": "Schema types and constraints"
+        "es": "/es/database/orm/testing",
+        "en": "/en/database/orm/testing"
       },
       "label": {
-        "en": "Schema types and constraints",
-        "es": "Tipos y restricciones"
-      },
-      "slug": {
-        "es": "/es/database/orm/schema-and-type-reference",
-        "en": "/en/database/orm/schema-and-type-reference"
+        "es": "Pruebas de Database y ORM",
+        "en": "Database and ORM tests"
       }
     },
     {

@@ -1,13 +1,13 @@
 ---
-title: "Relate and load models"
-description: "A relationship is an instance method returning a specialized builder. Methods let models refer to each other without resolving relationships while their classes are being declared."
+title: "Defining relationships"
+description: "Defining relationships in Orionis Framework."
 editUrl: true
 lastUpdated: false
 ---
 
-A relationship is an instance method returning a specialized builder. Methods let models refer to each other without resolving relationships while their classes are being declared.
+A relationship is a **synchronous instance method returning a specialized builder**. Calling it does not load data; `await` executes the query. Orionis implements exactly four relationship kinds: `hasOne`, `hasMany`, `belongsTo` and `belongsToMany`. Polymorphic, `hasManyThrough` and `hasOneThrough` relationships are not implemented.
 
-## One-to-many and inverse relationships
+## Complete example models
 
 ```python
 from typing import ClassVar
@@ -20,62 +20,186 @@ class Team(Model):
     timestamps = False
     fillable: ClassVar[list[str]] = ["name"]
 
+    def profile(self):
+        return self.hasOne(TeamProfile, foreign_key="team_id")
+
     def players(self):
         return self.hasMany(Player)
+
+    def tags(self):
+        return self.belongsToMany(Tag)
+
+
+class TeamProfile(Model):
+    id = Integer().primary().autoIncrement()
+    team_id = Integer().foreign("teams.id").unique()
+    motto = String(180)
+    timestamps = False
+    fillable: ClassVar[list[str]] = ["team_id", "motto"]
+
+    def team(self):
+        return self.belongsTo(Team)
 
 
 class Player(Model):
     id = Integer().primary().autoIncrement()
-    team_id = Integer().nullable()
+    team_id = Integer().foreign("teams.id").nullable()
     name = String(120)
     timestamps = False
     fillable: ClassVar[list[str]] = ["team_id", "name"]
 
     def team(self):
         return self.belongsTo(Team)
+
+
+class Tag(Model):
+    id = Integer().primary().autoIncrement()
+    name = String(80)
+    timestamps = False
+    fillable: ClassVar[list[str]] = ["name"]
+
+    def teams(self):
+        return self.belongsToMany(Team)
 ```
 
-After creating `teams` and `players` and bootstrapping the application:
+Store these in application modules and import the classes needed by controllers. References resolve when the method runs, which allows a class to be declared later. Do not declare `players = hasMany(Player)` in the class body.
+
+Migrate `teams`, `team_profiles`, `players`, `tags` and pivot `tag_team` before querying. Declare pivot `team_id`, `tag_id`, `featured` (integer default `0`), foreign keys to both tables and composite PK/UNIQUE `(team_id, tag_id)`. Declaring a relationship does not create those tables or constraints. The diagram represents pivot uniqueness, not a composite `Model` identity.
+
+## One-to-one: team profile
+
+```mermaid
+erDiagram
+    teams ||--o| team_profiles : "hasOne → team_id = id"
+    teams { int id PK string name }
+    team_profiles { int id PK int team_id FK,UK string motto }
+```
+
+<a id="relationsmixin-hasone"></a>
+
+### `hasOne`
+
+```text
+def hasOne[TRelated: 'Model'](self, related: type[TRelated], foreign_key: str | None=None, local_key: str | None=None) -> HasOneRelation[TRelated]
+```
+
+One-to-one: `related` is the target class; `foreign_key=None` derives from the parent class snake case + `_id`, and `local_key=None` uses its PK. Returns `HasOneRelation`; `await relation`/`getResults` returns a model or `None`. The related table owns the FK. SQL UNIQUE is needed to enforce one-to-one.
 
 ```python
-async def recruit(team_id: int):
+async def show_profile(team_id: int):
     team = await Team.findOrFail(team_id)
-    player = await team.players().create({"name": "Ada"})
-    teammates = await team.players().orderBy("id").get()
-    owner = await player.team().getResults()
-    return player, teammates, owner
+    profile = await team.profile()
+    return profile.toDict() if profile is not None else None
 ```
 
-`hasMany` resolves to a collection; `hasOne` and `belongsTo` resolve to a model or `None` through `getResults()`. Relationship `first()` returns the first model. `hasOne` does not impose database uniqueness: a true one-to-one relationship needs a unique constraint on its FK.
+`hasOne` retrieves the first match; the unique profile column enforces that only one can exist. Write with `await team.profile().create({"motto": "Build together"})`; the relationship supplies `team_id` and does not automatically replace an existing profile.
 
-Conventions use `team_id` on `Player` for both `Team.hasMany(Player)` and `Player.belongsTo(Team)`, with the primary key as local/owner key. Customize through `hasMany(Player, foreign_key="owner_id", local_key="id")`, `hasOne(...)`, or `belongsTo(Team, foreign_key="owner_id", owner_key="id")`. Relationship builders retain these constraints when adding filters.
+## One-to-many: players
 
-## Load a list without N+1 queries
+```mermaid
+erDiagram
+    teams ||--o{ players : "hasMany → team_id = id"
+    teams { int id PK string name }
+    players { int id PK int team_id FK string name }
+```
+
+<a id="relationsmixin-hasmany"></a>
+
+### `hasMany`
+
+```text
+def hasMany[TRelated: 'Model'](self, related: type[TRelated], foreign_key: str | None=None, local_key: str | None=None) -> HasManyRelation[TRelated]
+```
+
+One-to-many with the FK in the related table. Key defaults match `hasOne`. Returns `HasManyRelation`; `await relation`/`getResults` returns a `Collection`, empty for a parent without a key.
 
 ```python
-async def roster():
-    teams = await Team.withRelations("players").orderBy("id").get()
-    return [
-        {"team": team.name, "players": [p.toDict() for p in team.getRelation("players")]}
-        for team in teams
-    ]
+async def list_players(team_id: int):
+    team = await Team.findOrFail(team_id)
+    return (await team.players().orderBy("id").get()).serialize()
 ```
 
-`withRelations("players")` loads the relationship for the batch and stores results through `setRelation`. `relationLoaded(name)` reports whether it was loaded; `getRelation(name, default=None)` retrieves it without querying. Calling `team.players()` constructs another relationship: use the stored result to avoid additional queries.
+Retrieving a team then its players runs a query per operation. Avoid accessing each team's relationship in a large loop: use [eager loading](/en/database/orm/eager-loading). `await team.players().create({"name": "Ada"})` supplies the FK; other relationship read filters are not copied into the new record.
 
-`ModelQueryBuilder.load(*names)` is a fluent eager-loading alias, rather than an async loader for an already retrieved instance. Nested paths such as `"players.team"` and restriction callbacks in `withRelations` are not supported by the implementation described here; use direct names and explicit queries for additional levels. Missing relationships raise `RelationNotFoundException` when executing a query with results.
+## Inverse relationship: a player's team
 
-## Many-to-many relationships
+```mermaid
+erDiagram
+    players }o--o| teams : "belongsTo → players.team_id = teams.id"
+    players { int id PK int team_id FK string name }
+    teams { int id PK string name }
+```
 
-Declare a method returning `self.belongsToMany(Role)`, or specify names: `self.belongsToMany(Role, table="role_user", foreign_pivot_key="user_id", related_pivot_key="role_id")`. The default pivot table combines singular snake-case class names in alphabetical order; keys derive from each class.
+<a id="relationsmixin-belongsto"></a>
 
-For a relationship on a persisted user:
+### `belongsTo`
+
+```text
+def belongsTo[TRelated: 'Model'](self, related: type[TRelated], foreign_key: str | None=None, owner_key: str | None=None) -> BelongsToRelation[TRelated]
+```
+
+Inverse relationship: the current instance owns `foreign_key`, defaulting to **the related class** snake case + `_id`. `owner_key=None` uses the related PK. Returns `BelongsToRelation`; result is a model or `None`. With a null FK, `getResults` skips SQL.
 
 ```python
-async def replace_roles(user, role_ids: list[int]):
-    return await user.roles().sync(role_ids)
+async def show_team(player_id: int):
+    player = await Player.findOrFail(player_id)
+    team = await player.team().getResults()
+    return team.toDict() if team is not None else None
 ```
 
-This fragment requires an application model with a `roles()` method and a migrated pivot table. `attach(ids, attributes=None)` inserts links and returns a count; it accepts one identity, models, iterables, or an identity-to-pivot-attributes mapping. `detach(ids=None)` removes links; without arguments it removes all links for the parent. `sync(ids)` retains exactly those identities and returns `attached` and `detached` lists; `toggle(ids)` reverses links. `wherePivot(column, value)` or `(column, operator, value)` filters pivot reads.
+Associate/reassociate a player by assigning `player.team_id = team.id` then calling `await player.save()`. Set `None` and save to unlink; this is why the example FK is nullable. This relation has no `associate()`/`dissociate()` methods. Deleting a team does not automatically change all players: that depends on SQL constraints or transactional application logic.
 
-The current implementation has no `updateExistingPivot` method or implicit atomic synchronization: `sync` reads, deletes, and inserts in separate steps. Wrap critical workflows in a [transaction](/en/database/transactions) on the same connection and define a composite unique constraint to prevent duplicates. `detach` removes links; relationship `delete()` deletes related rows. Choose according to the intended business effect.
+## Many-to-many: tags
+
+```mermaid
+erDiagram
+    teams ||--o{ tag_team : "team_id = id"
+    tags ||--o{ tag_team : "tag_id = id"
+    teams { int id PK string name }
+    tags { int id PK string name }
+    tag_team { int team_id PK,FK int tag_id PK,FK int featured }
+```
+
+<a id="relationsmixin-belongstomany"></a>
+
+### `belongsToMany`
+
+```text
+def belongsToMany[TRelated: 'Model'](self, related: type[TRelated], table: str | None=None, foreign_pivot_key: str | None=None, related_pivot_key: str | None=None, parent_key: str | None=None, related_key: str | None=None) -> BelongsToManyRelation[TRelated]
+```
+
+Many-to-many through a pivot. `table=None` alphabetically joins both snake case class names without pluralization. `foreign_pivot_key` and `related_pivot_key` derive from parent/related class names + `_id`; `parent_key`/`related_key` use their PKs. All those arguments accept `None` for defaults. Returns `BelongsToManyRelation`. Keys are single columns; pivot and related table are queried separately.
+
+```python
+async def list_tags(team_id: int):
+    team = await Team.findOrFail(team_id)
+    return (await team.tags().orderBy("name").get()).serialize()
+```
+
+Reads resolve ids from `tag_team`, then query `tags`. Results are `Tag` models, without a hydrated `pivot` object or extra attributes. Values such as `featured` support [pivot filtering and writes](/en/database/orm/relationship-operations). Query `DB.table("tag_team")` explicitly to read them.
+
+## Customizing keys
+
+```python
+def players_by_owner(self):
+    return self.hasMany(Player, foreign_key="team_id", local_key="id")
+
+
+def team_by_owner(self):
+    return self.belongsTo(Team, foreign_key="team_id", owner_key="id")
+
+
+def tags_by_owner(self):
+    return self.belongsToMany(
+        Tag,
+        table="tag_team",
+        foreign_pivot_key="team_id",
+        related_pivot_key="tag_id",
+        parent_key="id",
+        related_key="id",
+    )
+```
+
+These are alternative methods to add to Team, Player and Team respectively. Referenced keys must exist, be loaded and have compatible types. Each relation uses the **related model's** connection; pivot operations use that same connection. Keep participating tables on a coherent connection; this does not implement distributed transactions.
+
+Continue with [queries and writes](/en/database/orm/relationship-operations) and [eager loading](/en/database/orm/eager-loading).

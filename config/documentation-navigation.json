@@ -213,27 +213,68 @@
       ]
     },
     {
-      "id": "database-and-orm",
+      "id": "database",
       "band": "data",
       "icon": "database-and-orm",
       "title": {
-        "en": "Database and ORM",
-        "es": "Bases de datos y ORM"
+        "es": "Base de datos",
+        "en": "Database"
       },
       "pageIds": [
         "database-overview",
+        "database-drivers",
+        "database-configuration",
         "database-connections",
+        "database-db-facade",
+        "database-raw-queries",
+        "database-query-builder",
+        "database-query-filters",
+        "database-joins-and-subqueries",
+        "database-query-writes",
         "database-transactions",
         "database-schema",
+        "database-column-types",
+        "database-schema-modifiers",
+        "database-schema-alterations",
         "database-migrations-and-seeders",
+        "database-seeders",
         "database-dialects-and-production",
+        "database-runtime-api",
+        "database-query-plans",
+        "database-api-coverage"
+      ]
+    },
+    {
+      "id": "orm",
+      "band": "data",
+      "icon": "orm",
+      "title": {
+        "es": "ORM",
+        "en": "ORM"
+      },
+      "pageIds": [
         "orm-overview",
         "orm-models-and-attributes",
+        "orm-model-api",
         "orm-querying",
         "orm-relationships",
-        "orm-events-and-scopes",
+        "orm-relationship-operations",
+        "orm-eager-loading",
+        "orm-soft-deletes",
+        "orm-scopes",
+        "orm-events",
+        "orm-collections-and-pagination",
         "orm-factories-and-testing",
-        "orm-schema-and-type-reference"
+        "orm-faker",
+        "orm-faker-reference-a-d",
+        "orm-faker-reference-e-h",
+        "orm-faker-reference-i-l",
+        "orm-faker-reference-m-p",
+        "orm-faker-reference-q-t",
+        "orm-faker-reference-u-z",
+        "orm-schema-and-type-reference",
+        "orm-events-and-scopes",
+        "orm-testing"
       ]
     },
     {

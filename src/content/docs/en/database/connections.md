@@ -1,81 +1,184 @@
 ---
-title: "Configure connections and execute SQL"
-description: "Application configuration lives in config/database.py, under database. BootstrapDatabase extends the Database entity and defines a default connection and named connections.…"
+title: "Connection management"
+description: "Lazy resolution, names, injection, runtime registration and the ConnectionManager API."
 editUrl: true
 lastUpdated: false
 ---
 
-## Choose a backend
+Each name identifies configuration and a reusable `Connection` object, not a permanently open physical session. The manager caches resolved objects; the engine acquires physical connections per operation or transaction.
 
-Application configuration lives in `config/database.py`, under `database`. `BootstrapDatabase` extends the `Database` entity and defines a default connection and named connections. `DB_CONNECTION` defaults to `sqlite`. Resolving a name creates a connection object; its engine initializes on the first operation.
+Typed configuration accepts `sqlite`, `mysql`, `pgsql`, `oracle`, `sqlserver` and `redshift`. Register additional names during startup for multiple databases of one backend; do not add `reporting=...` to `Connections`: its fields are fixed.
 
-| Driver | Additional installation | Common configuration |
-|---|---|---|
-| `sqlite` | None | `DB_DATABASE`, `DB_FOREIGN_KEYS`, `DB_BUSY_TIMEOUT` |
-| `mysql` | `uv add 'orionis[mysql]'` | host, port 3306, database, credentials, charset/collation |
-| `pgsql` | `uv add 'orionis[pgsql]'` | port 5432, `DB_SEARCH_PATH`, `DB_SSLMODE` |
-| `oracle` | `uv add 'orionis[oracle]'` | port 1521, service/SID/DSN/TNS |
-| `sqlserver` | `uv add 'orionis[sqlserver]'` | port 1433, ODBC driver and TLS |
-| `redshift` | `uv add 'orionis[redshift]'` | port 5439, TLS and AWS connector options |
-
-`orionis[database]` bundles optional drivers. In a framework checkout, use a command such as `uv sync --extra pgsql`. Installing a Python package does not create a server or install a system ODBC driver. Missing optional dependencies produce `MissingDatabaseDependencyException` when that backend initializes.
-
-## First SQLite program
-
-Save the program as `database_example.py` in a project where Orionis is installed and run `uv run python database_example.py`. It creates data only in memory and disconnects when finished. User values are bound using `:name` placeholders; no SQL string interpolation is needed.
-
-```python
-import asyncio
-from orionis.database import Connection
-
-
-async def main() -> None:
-    db = Connection("docs", {"driver": "sqlite", "database": ":memory:"})
-    try:
-        await db.statement(
-            "CREATE TABLE notes (id INTEGER PRIMARY KEY, body TEXT NOT NULL)"
-        )
-        affected = await db.execute(
-            "INSERT INTO notes (body) VALUES (:body)", {"body": "Hello"}
-        )
-        rows = await db.select(
-            "SELECT id, body FROM notes WHERE body = :body", {"body": "Hello"}
-        )
-        assert affected == 1
-        print(rows)  # [{"id": 1, "body": "Hello"}]
-    finally:
-        await db.disconnect()
-
-
-asyncio.run(main())
-```
-
-`select()` materializes `list[dict]`, rather than returning an open cursor. `execute()` returns affected rows; `statement()` returns `True` on successful completion. `insert(plan)` returns `InsertResult` with `last_insert_id` and `row_count`; batch inserts do not guarantee a generated identity. `scalar(plan)` returns the first column or `None`. These last methods accept query-builder plans, rather than arbitrary SQL.
-
-## Work inside an application
-
-The in-memory example does not create a table in your configured application database. For the following application functions, first create and migrate a `notes` table with `id` and `body` on the configured connection. Call these functions from an async controller, command, or service after bootstrap, using the facade rather than creating a connection for every request:
+## Per-operation selection
 
 ```python
 from orionis.support.facades import DB
 
 
-async def find_note(body: str):
-    return await DB.table("notes").where("body", body).first()
-
-
-async def count_notes():
-    return await DB.select("SELECT COUNT(*) AS total FROM notes")
+async def list_notes():
+    primary = await DB.table("notes", connection="sqlite").get()
+    reporting = await DB.connection("reporting").table("notes").get()
+    raw = await DB.select("SELECT id, body FROM notes", name="reporting")
+    return {"primary": primary, "reporting": reporting, "raw": raw}
 ```
 
-`DB.connection("reporting")` returns a new gateway. `DB.connection("reporting").table("notes")` targets the registered connection without changing other consumers' selection. The manager provides `connection(name)`, `hasConnection(name)`, `configFor(name)`, `addConnection(name, config)`, and `setDefaultName(name)`. Changing the default affects future consumers without an explicit selection: do that during configuration, rather than using it for request isolation.
+`DB.connection()` does not change other callers' targets. `setDefaultName()` changes the shared default. Every operation participating in a transaction must resolve the same name.
 
-## Configuration values and common failures
+## Registering a second connection
 
-The current SQLite template uses `database/database.sqlite`, a 5000 ms busy timeout, `DELETE` journal mode, `NORMAL` synchronization, and foreign keys `OFF`. Deliberately enable `DB_FOREIGN_KEYS` when your application relies on references. Server connections share `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, and `DB_PASSWORD`; MySQL adds `DB_SOCKET`, `DB_COLLATION`, `DB_STRICT`, and `DB_ENGINE`. A configured URL takes precedence in dialects that support it; inspect the driver's configuration entity before copying `DB_URL` between backends.
+```python
+from orionis.container.providers.service_provider import ServiceProvider
+from orionis.database.contracts.connection_manager import IConnectionManager
 
-Other template settings include `DB_PREFIX` and `DB_PREFIX_INDEXES`; SQLite exposes `DB_JOURNAL_MODE` and `DB_SYNCHRONOUS`; Oracle exposes `DB_SERVICE_NAME`, `DB_SID`, `DB_DSN`, `DB_TNS`, `DB_ENCODING`, and `DB_NENCODING`; SQL Server exposes `DB_ENCRYPT`, `DB_TRUST_SERVER_CERTIFICATE`, and `DB_ODBC_DRIVER`. `DB_CHARSET` applies according to the active driver; do not copy incompatible charset values across backends.
 
-An unknown name raises `ConnectionNotFoundException`; an invalid driver raises `UnsupportedDriverException`; SQL failures raise `QueryException`. Execution errors sanitize SQL, bindings, and credentials. Log business context and the connection name without secrets. Table/column names are not bindable values: choose identifiers from a controlled allowlist. Raw SQL does not automatically add table prefixes either.
+class ReportingProvider(ServiceProvider):
+    async def boot(self, manager: IConnectionManager) -> None:
+        settings = dict(manager.configFor("sqlite"))
+        settings["database"] = "database/reporting.sqlite"
+        settings["url"] = "sqlite:///database/reporting.sqlite"
+        manager.addConnection("reporting", settings)
+```
 
-Continue with [ORM queries](/en/database/orm/querying) or [transactions](/en/database/transactions).
+Register the provider with `app.withProviders(ReportingProvider)` in `bootstrap/app.py` alongside existing providers. The `database` directory must exist. The example copies validated settings and changes the file; `url` stays consistent although runtime uses `database`.
+
+`addConnection()` does not repeat complete typed-configuration validation: construct a driver entity and use `toDict()` for new settings. Do not register uncontrolled credentials received from a request.
+
+## ConnectionManager
+
+`ConnectionManager(app: IApplication)` consumes `app.config("database")` as a `Database` entity or dictionary. The container registers it as an `IConnectionManager` singleton. These are all its public methods:
+
+### connection()
+
+```text
+def connection(self, name: str | None = None) -> IConnection:
+```
+
+Resolves `name` or the default and caches `Connection` on first access. No I/O yet. Unknown name: `ConnectionNotFoundException`. Invalid driver: `UnsupportedDriverException` during construction.
+
+```python
+from orionis.database.contracts.connection_manager import IConnectionManager
+
+
+def example(manager: IConnectionManager):
+    connection = manager.connection("sqlite")
+    assert connection.getName() == "sqlite"
+```
+
+### addConnection()
+
+```text
+def addConnection(self, name: str, config: dict[str, Any]) -> None:
+```
+
+Registers or replaces settings; empty names raise `ValueError` and non-`dict` settings raise `TypeError`. Retains the supplied dictionary. A cached connection keeps its previous copy until disposed.
+
+```python
+from orionis.database.contracts.connection_manager import IConnectionManager
+
+
+def example(manager: IConnectionManager):
+    manager.addConnection("reporting", {"driver": "sqlite", "database": "database/reporting.sqlite"})
+```
+
+### hasConnection()
+
+```text
+def hasConnection(self, name: str) -> bool:
+```
+
+Checks registration rather than connectivity. Name lookup is case-sensitive.
+
+```python
+from orionis.database.contracts.connection_manager import IConnectionManager
+
+
+def example(manager: IConnectionManager):
+    assert manager.hasConnection("sqlite")
+```
+
+### getDefaultName()
+
+```text
+def getDefaultName(self) -> str:
+```
+
+Returns the manager default. Initial construction lowercases this name; it does not imply an open physical connection.
+
+```python
+from orionis.database.contracts.connection_manager import IConnectionManager
+
+
+def example(manager: IConnectionManager):
+    name = manager.getDefaultName()
+```
+
+### setDefaultName()
+
+```text
+def setDefaultName(self, name: str) -> None:
+```
+
+Selects a registered name or raises `ConnectionNotFoundException`. Changes future unnamed operations, not builders with a captured connection.
+
+```python
+from orionis.database.contracts.connection_manager import IConnectionManager
+
+
+def example(manager: IConnectionManager):
+    manager.setDefaultName("sqlite")
+```
+
+### configFor()
+
+```text
+def configFor(self, name: str | None = None) -> dict[str, Any]:
+```
+
+Returns the registered dictionary, not a copy. Unknown name: `ConnectionNotFoundException`. Copy with `dict(...)` before customization. It can contain passwords: never expose it to clients.
+
+```python
+from orionis.database.contracts.connection_manager import IConnectionManager
+
+
+def example(manager: IConnectionManager):
+    settings = dict(manager.configFor("sqlite"))
+```
+
+### disconnect()
+
+```text
+async def disconnect(self, name: str | None = None) -> None:
+```
+
+With a name removes and disposes that cached instance; an uncached name is a no-op. `None` clears the cache and disposes all instances sequentially. Settings remain registered. Disposal failures propagate. Do not call per request.
+
+```python
+from orionis.database.contracts.connection_manager import IConnectionManager
+
+
+async def example(manager: IConnectionManager):
+    await manager.disconnect("reporting")
+```
+
+## Constructor and method injection
+
+```python
+from orionis.database.contracts.connection_manager import IConnectionManager
+from orionis.http import JSONResponse
+
+
+class DatabaseStatusController:
+    def __init__(self, manager: IConnectionManager) -> None:
+        self.manager = manager
+
+    async def index(self) -> JSONResponse:
+        rows = await self.manager.connection().select("SELECT 1 AS ready")
+        return JSONResponse({"ready": rows[0]["ready"] == 1})
+
+    async def name(self, manager: IConnectionManager) -> JSONResponse:
+        return JSONResponse({"connection": manager.getDefaultName()})
+```
+
+`IConnection` represents a specific connection; there is no single automatic binding that arbitrarily chooses a name. Inject the manager or register your own binding.
+
+After replacing cached settings, call `await manager.disconnect(name)` before resolving again. An older `Connection` reference can recreate an engine with its old settings: registration updates do not update existing references. Do not dispose shared services while other tasks use them.

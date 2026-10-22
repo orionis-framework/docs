@@ -48,6 +48,8 @@ def exports(file):
                     for target in getattr(node, "targets", [getattr(node, "target", None)]):
                         if target:
                             names.update(child.id for child in ast.walk(target) if isinstance(child, ast.Name) and isinstance(child.ctx, ast.Store))
+                elif isinstance(node, ast.TypeAlias):
+                    names.add(node.name.id)
                 else:
                     for attribute in ("body", "orelse", "finalbody"):
                         collect(getattr(node, attribute, []))

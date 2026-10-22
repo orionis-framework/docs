@@ -1,96 +1,139 @@
 ---
-title: "Query, update, and paginate"
-description: "Article.query() and class entry points such as Article.where(...) create fresh builders returning models. DB.table(\"articles\") creates a builder returning dictionaries. They…"
+title: "Querying models"
+description: "Build queries, retrieve models and combine SQL language with scopes, relationships and persistence."
 editUrl: true
 lastUpdated: false
 ---
 
-## Choose models or tables
+## From query to model
 
-`Article.query()` and class entry points such as `Article.where(...)` create fresh builders returning models. `DB.table("articles")` creates a builder returning dictionaries. They share a query language, but raw table queries do not apply model scopes, events, hidden attributes, or soft deletion.
+`Product.query()` creates a `ModelQueryBuilder[Product]`. Clauses are added without I/O; asynchronous terminals execute the plan, receive Database rows and construct `Product` instances. Hydration establishes original state and dispatches `retrieved`; eager loading runs afterwards.
 
-Clauses are synchronous. Await only the terminal: `await query.get()`, rather than `await query.where(...)`. This plan can be inspected without a connection:
-
-```python
-from orionis.orm import Integer, Model, String
-
-
-class Article(Model):
-    id = Integer().primary().autoIncrement()
-    title = String(180)
-    status = String(30)
-    timestamps = False
-
-
-base = Article.where("status", "published")
-recent = base.clone().whereContains("title", "Orionis").orderBy("id", "desc").limit(10)
-assert recent.toPlan().limit_value == 10
-assert len(base.toPlan().wheres) == 1
+```mermaid
+flowchart LR
+  M["Product.query()"] --> B["ModelQueryBuilder"]
+  B --> P["Plan + scopes + deleted visibility"]
+  P --> C["ConnectionResolver → Database"]
+  C --> R["Rows"]
+  R --> H["Models + retrieved"]
+  H --> E["Eager relations"]
+  E --> O["Collection / model / Paginator"]
 ```
 
-Builders mutate their own state: use `clone()` when branching and do not share one builder between concurrent tasks.
-
-## Compose safe filters
-
-`where("status", "published")` means equality; `where("id", ">", 10)` supplies an operator. A callback groups conditions:
+This example uses the [complete Product model](/en/database/orm/factories-and-testing#complete-model-and-factory) and its existing table. In an initialized application, register the controller actions through the [router](/en/http/routing):
 
 ```python
-async def search_articles():
-    return await (
-        Article.where("status", "published")
-        .where(lambda group: group.whereContains("title", "Python")
-               .orWhere("title", "Orionis"))
-        .whereIn("id", [1, 2, 3])
-        .orderBy("id")
-        .get()
-    )
+from app.models.product import Product
+from orionis.http import JSONResponse
+
+
+class ProductController:
+    async def index(self) -> JSONResponse:
+        products = await (
+            Product.query()
+            .where("active", True)
+            .where("stock", ">", 0)
+            .orderBy("id")
+            .get()
+        )
+        return JSONResponse([product.toDict() for product in products])
+
+    async def show(self, product_id: int) -> JSONResponse:
+        product = await Product.findOrFail(product_id)
+        return JSONResponse(product.toDict())
 ```
 
-Run this function inside a booted application with the `articles` table. Other predicates include `whereNull`, `whereNotNull`, `whereBetween`, `whereNotBetween`, `whereNotIn`, `whereColumn`, `whereExists`/`whereNotExists` subqueries, and `whereLike`, `whereILike`, `whereStartsWith`, `whereEndsWith`, `whereRegexpMatch`. Regex support differs by dialect.
+The controller explicitly serializes every model. `get()` returns `Collection`, rather than a JSON list; `first()` and `find()` may return `None`. `firstOrFail()` and `findOrFail()` raise `ModelNotFoundException`; the [HTTP exception handler](/en/http/exceptions) determines the endpoint response.
 
-Values are bound as parameters. `whereRaw`, `selectRaw`, and `havingRaw` accept trusted SQL and bindings; they do not safely interpolate arbitrary text. Allowlist column names, operators, and ordering received from requests.
+## Class, builder and instance methods
 
-## Project, join, and group
+| Form | Meaning |
+| --- | --- |
+| `Product.query()` | Class method creating a fresh builder. |
+| `Product.where(...)`, `Product.orderBy(...)`, `Product.paginate(...)` | Metaclass shortcuts to supported methods of a new builder. They do not share a global builder. |
+| `query.where(...)`, `query.select(...)` | Synchronous configuration of the same mutable builder. |
+| `await query.get()` / `await query.update(...)` | Execution over rows matching that plan. |
+| `await product.save()` / `await product.update(...)` | Instance persistence with attribute tracking and events. |
 
-This application fragment produces a report over existing raw tables:
+The [model API](/en/database/orm/model-api) documents signatures and distinctions between class and instance methods; `ModelQueryBuilder` extensions are covered under [retrieval and pagination](/en/database/orm/collections-and-pagination), [scopes](/en/database/orm/scopes), [relationships](/en/database/orm/relationship-operations) and [soft deletion](/en/database/orm/soft-deletes).
+
+Not every builder name is a class shortcut. For instance, use `Product.query().adoptPlan(plan)` to adopt a plan. There is no `Product.factory()`.
+
+## Shared query language
+
+| Topic | Complete reference |
+| --- | --- |
+| `select`, `addSelect`, `selectRaw`, `selectSub`, `distinct` | [Selection and results](/en/database/query-builder). |
+| `where` variants, NULL, ranges, LIKE, regex, columns, SQL and EXISTS | [Filters and conditions](/en/database/query-filters). |
+| JOIN, subqueries and UNION | [Joins and subqueries](/en/database/joins-and-subqueries). |
+| Ordering, grouping, HAVING, limits, aggregates and terminals | [Query Builder reference](/en/database/query-builder). |
+| `insert`, `update`, `delete`, `lockForUpdate`, `sharedLock` | [Writes and locks](/en/database/query-writes). |
+| `toPlan`, `clone`, `adoptPlan`, `adoptConnection` and structures | [Plans and expressions](/en/database/query-plans). |
+
+The same clauses work with `DB.table()` and `Model.query()`, with different result representations. `DB.table()` returns dictionaries without applying model configuration. Qualify joined tables and columns; retain primary and relationship keys if the model will later save or load associations. Partial selection does not hydrate omitted columns automatically.
+
+Values are bound as parameters. Identifiers, operators and SQL fragments remain the application's responsibility. Conditions combine left to right: explicitly group alternatives to control logical meaning.
+
+## Reuse a query
 
 ```python
+from app.models.product import Product
+
+
+async def product_reports():
+    base = Product.where("active", True)
+    available = await base.clone().where("stock", ">", 0).orderBy("id").get()
+    sold_out = await base.clone().where("stock", 0).orderBy("id").get()
+    return available, sold_out
+```
+
+`clone()` copies plan lists; appending new clauses does not alter `base` lists. Existing clause objects and nested plans remain shared: do not change them expecting a deep copy. Do not share a mutable builder across requests or tasks.
+
+Scopes and the soft-delete filter are incorporated before execution and marked as applied. Configure `withoutGlobalScope`, `withTrashed` and other options **before the first terminal**; use a fresh builder for a different policy.
+
+## Results, scalars and pagination
+
+`get()` returns models; `value(column)` returns the first instance's attribute or `None`; `pluck(column)` returns a `Collection` of attributes. The last two hydrate and read attributes, so casts/accessors may apply. Aggregates (`count`, `sum`, `avg`, `min`, `max`) are SQL calculations without hydrating every row.
+
+```python
+from app.models.product import Product
+from orionis.http import JSONResponse
+
+
+class ProductPageController:
+    async def index(self) -> JSONResponse:
+        page = await Product.where("active", True).orderBy("id").paginate(
+            page=1,
+            per_page=20,
+        )
+        return JSONResponse(page.toDict())
+```
+
+`paginate(page=1, per_page=15)` performs a count and a read. Model builders run them concurrently outside transactions and sequentially within an active transaction. This differs from raw builders, which run them sequentially. Without suitable isolation, the two reads may observe different changes. Order by a unique key for stable pages. [Paginator and Collection](/en/database/orm/collections-and-pagination) detail every method and field.
+
+## Individual persistence versus bulk writing
+
+```python
+from app.models.product import Product
 from orionis.support.facades import DB
 
 
-async def articles_by_author():
-    return await (
-        DB.table("articles", alias="a")
-        .join("authors", "a.author_id", "=", "u.id", alias="u")
-        .select("u.id", "u.name")
-        .selectRaw("COUNT(*) AS article_count")
-        .groupBy("u.id", "u.name")
-        .havingRaw("COUNT(*) > :minimum", {"minimum": 1})
-        .orderBy("u.id")
-        .get()
-    )
+async def change_price(product_id: int, price: int) -> bool:
+    async with DB.transaction():
+        product = await Product.findOrFail(product_id)
+        return await product.update({"price": price})
+
+
+async def archive_out_of_stock() -> int:
+    return await Product.where("stock", 0).update({"active": False})
 ```
 
-`leftJoin`, `rightJoin`, `fullJoin`, `crossJoin`, `joinSub`, and their variants cover other forms, subject to backend support. Qualify names to avoid ambiguity. `select`, `addSelect`, `selectSub`, `distinct`, `union`, and `unionAll` extend projections. Include the primary and relationship keys when selecting models that will later be saved or related.
+The first function uses instance `fillable`, mutators, state and events. A listener may veto the operation, producing `False`. The second updates a set in SQL and returns a count: dict/list/UUID storage serialization follows column types and the update timestamp applies where configured, but assignment casts from `Model.casts`, per-instance `fillable`, mutators and events do not.
 
-## Results and pagination
+`insert()` returns `InsertResult`, rather than models or a list of IDs; it does not automatically add creation timestamps. `update()` and `delete()` ignore read JOINs, ordering, limit and offset: restrict them through `where` and explicit keys. Individual operations use the normal execution lifecycle; use [transactions](/en/database/transactions) for an atomic unit.
 
-| Async terminal | Result |
-|---|---|
-| `get()` | `Collection` of models or dictionaries. |
-| `first()` / `find(key)` | One result or `None`. |
-| `firstOrFail()` / `findOrFail(key)` | Model or missing-result error; model builders only. |
-| `value(column)` / `pluck(column)` | One value or a collection of values. |
-| `count`, `exists`, `doesntExist` | Integer or boolean. |
-| `min`, `max`, `avg`, `sum` | Aggregate; `sum` returns 0 without results. |
-| `paginate(page=1, per_page=15)` | `Paginator` containing items and metadata. |
+## Loading, errors and next steps
 
-`limit`, `offset`, `take`, `skip`, and `forPage` compose bounds without executing. Use deterministic ordering, including a unique key, for stable pages. `Paginator` exposes `items`, `total`, `page`, `perPage`, `lastPage`, `hasNext`, `hasPrevious`, and `toDict()`/`toJson()`. Count and fetch are two queries: outside transactions they may observe different changes and run concurrently; inside they run sequentially. Page and page size must be positive integers.
+Builder `withRelations()`/`load()` help [avoid N+1](/en/database/orm/eager-loading). Do not add relationship names as `select` columns: they are separate mechanisms. Models do not automatically include relationships in `toDict()`.
 
-## Writes and locks
-
-`await DB.table("articles").insert({...})` returns `InsertResult` and also accepts a list of rows. `update(values)` and `delete()` return counts. **Without filters they affect every row**. Do not assume `limit()` bounds writes: update/delete plans use conditions, rather than read pagination.
-
-Bulk writes do not hydrate each model or run its `fillable`, mutators, or instance events. Use instances when those rules are required. Model builders maintain update timestamps and soft-delete policy; raw tables do not.
-
-Use `lockForUpdate()` and `sharedLock()` inside a [transaction](/en/database/transactions), subject to backend support. Redshift rejects them. Bounded queries materialize results; this API does not promise cursor streaming. Composition failures raise `InvalidQueryException`; SQL compilation/execution failures come from the database layer.
+Composition errors raise `InvalidQueryException`; unknown relationships raise `RelationNotFoundException`; explicitly requested missing scopes raise `ScopeNotFoundException`; SQL failures propagate from Database. Types and rules for each operation are linked in the references above. The [testing module](/en/database/orm/testing) provides fixtures and checks for queries, persistence and relationships.

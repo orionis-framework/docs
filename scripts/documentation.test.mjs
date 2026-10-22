@@ -106,6 +106,26 @@ test('retained contribution pages switch languages through their stable IDs', ()
   assert.deepEqual(getTranslations(page.id).map((item) => item.slug), ['/en/contribute/contributors', '/es/contribute/contributors']);
 });
 
+test('Database and ORM have independent trees and peer chapters', () => {
+  const sections = new Map(navigationSections.map((section) => [section.id, section]));
+  assert.ok(!sections.has('database-and-orm'));
+  const database = sections.get('database'), orm = sections.get('orm');
+  assert.ok(database && orm && database !== orm);
+  assert.equal(database.band, 'data');
+  assert.equal(orm.band, 'data');
+  for (const id of ['database-overview', 'database-db-facade', 'database-transactions', 'database-column-types', 'database-seeders']) assert.ok(database.pageIds.includes(id), id);
+  for (const id of ['orm-overview', 'orm-model-api', 'orm-relationships', 'orm-eager-loading', 'orm-soft-deletes', 'orm-scopes', 'orm-events', 'orm-factories-and-testing', 'orm-faker']) assert.ok(orm.pageIds.includes(id), id);
+  assert.ok(database.pages.every((page) => !page.slug.en.includes('/database/orm')));
+  assert.ok(orm.pages.every((page) => page.slug.en.startsWith('/en/database/orm')));
+  const sidebar = createSidebar();
+  for (const id of ['database', 'orm']) {
+    const group = sidebar.find((item) => item.items?.some((child) => child.attrs?.['data-nav-group'] === id));
+    assert.ok(group);
+    for (const item of group.items) assert.equal(item.attrs.class, 'module-peer');
+    for (const locale of documentationCatalog.locales) assert.notEqual(group.translations[locale], group.items[0].translations[locale]);
+  }
+});
+
 test('MCP component guides are peers under a distinct introduction', () => {
   const group = createSidebar().find((item) => item.items?.some((child) => child.attrs?.['data-nav-group'] === 'mcp'));
   assert.ok(group);

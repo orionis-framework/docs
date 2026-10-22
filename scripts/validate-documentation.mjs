@@ -3,6 +3,7 @@ import path from 'node:path';
 import { parse } from 'parse5';
 import { root, within, validateCatalog, contentPath, filesUnder, sha256, stripFrontmatter, markdownLinks, headingIds, parser, walk } from './documentation-lib.mjs';
 import { createSidebar, createRedirects, getTranslations, supplementalPages, documentationPages, sitePages, documentationCatalog, documentationNavigation, navigationSections } from '../src/utils/documentation-menu.mjs';
+import './validate-database-orm-coverage.mjs';
 
 const catalog = documentationCatalog;
 const pages = validateCatalog(catalog);

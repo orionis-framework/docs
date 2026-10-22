@@ -1,57 +1,68 @@
 ---
-title: "Motores y operación en producción"
-description: "La API de consultas es común, pero no todos los motores ofrecen las mismas capacidades. Usa tipos y operaciones compatibles con el destino y verifica migraciones contra ese…"
+title: "Dialectos y producción"
+description: "Compatibilidad real entre motores, Redshift, restricciones operativas y diagnóstico de Database."
 editUrl: true
 lastUpdated: false
 ---
 
-La API de consultas es común, pero no todos los motores ofrecen las mismas capacidades. Usa tipos y operaciones compatibles con el destino y verifica migraciones contra ese motor. SQLite es útil para ejemplos aislados; no demuestra comportamiento de locks, identidades o DDL de un servidor diferente.
+Una API común no convierte todos los motores en equivalentes. Verifica tipos, DDL, identidades, locks y errores en una base de pruebas del motor de destino. SQLite valida numerosos ejemplos funcionales, pero no demuestra semántica de PostgreSQL, MySQL, Oracle, SQL Server o Redshift.
 
-## Conexiones de servidor
+## Configuración efectiva
 
-PostgreSQL aplica `charset`, `search_path` y `sslmode` a sus rutas async y sync. La primera usa `asyncpg`; la segunda, utilizada también por el job store del scheduler, usa `psycopg2`. El search path no debe perderse al configurar tareas persistentes. MySQL expone charset, collation, modo estricto y engine. Oracle permite servicio, SID, DSN o TNS; SQL Server requiere un driver ODBC disponible en el sistema además del extra Python.
+El runtime aplica PRAGMA SQLite, charset/collation/modo SQL MySQL, ajustes de sesión/TLS PGSQL, direccionamiento Oracle, TLS ODBC y opciones del conector Redshift. El [catálogo de configuración](/es/database/configuration) diferencia campos aplicados de campos conservados sin consumo.
 
-Las opciones TLS tienen consecuencias reales. La plantilla de SQL Server incluye `DB_TRUST_SERVER_CERTIFICATE=True`; adapta ese valor a tu política de validación de certificados antes de producción. No publiques credenciales en manuales de aplicación, logs ni repositorios. Las opciones de pool dependen del dialecto y configuración efectiva; no presupongas variables `DB_POOL_*` inexistentes.
+En particular, `SQLite.url` no sobrescribe `database`; `MySQL.engine` y `prefix_indexes` no se aplican a creación de tablas/índices; Oracle no envía `encoding`/`nencoding` al conector y SQL Server no usa `charset` como parámetro ODBC. No supongas que cambiar esos campos altera el servidor.
+
+Las conexiones no reciben indiscriminadamente todas las claves de configuración como opciones SQLAlchemy. No hay variables nativas `DB_POOL_*` ni ajustes generales de aislamiento/reintento en la plantilla.
 
 ## Amazon Redshift
 
-Redshift utiliza el conector oficial `redshift-connector` y `sqlalchemy-redshift`; no se trata como PostgreSQL a través de asyncpg. Configuración básica:
+Utiliza `redshift-connector` y `sqlalchemy-redshift` mediante un engine Core y un worker reservado por checkout. No es PostgreSQL a través de `asyncpg`. Cada conexión física conserva su thread durante una transacción; las independientes pueden usar workers distintos. Las filas se materializan en ese worker antes de devolver resultados a Python.
+
+| Capacidad | Comportamiento real |
+|---|---|
+| Savepoints | No soportados; anidamiento produce `TransactionException`. |
+| Locks de fila SELECT | `lockForUpdate()` y `sharedLock()` producen `QueryException`, incluso en planes anidados/agregados. |
+| DML `RETURNING` | Desactivado; no se devuelve identidad omitida. |
+| `IDENTITY(1,1)` | Puede compilarse desde autoincremento; si el modelo necesita su clave inmediata, proporciona una desde el cliente. |
+| Índices tradicionales | No soportados; no los declares como si fueran PostgreSQL. |
+| PK/unique/FK | Declaraciones informativas, sin enforcement de unicidad/referencia. |
+| `supportsUniqueConstraints()` | `False`. |
+
+Cache database, sesiones database, cola database, seeders registrados y almacén database del scheduler rechazan Redshift porque requieren unicidad impuesta y/o índices. Esto no impide sus consultas analíticas ni modelos compatibles.
+
+### IAM y Serverless
 
 ```dotenv
 DB_CONNECTION=redshift
 DB_HOST=warehouse.example.test
 DB_PORT=5439
 DB_DATABASE=dev
-DB_USERNAME=app_user
-DB_PASSWORD=replace-with-secret
-DB_REDSHIFT_SSL=True
+DB_REDSHIFT_SSL=true
 DB_REDSHIFT_SSLMODE=verify-full
 DB_REDSHIFT_TIMEOUT=30
+DB_REDSHIFT_IAM=true
+DB_REDSHIFT_REGION=us-east-1
+DB_REDSHIFT_CLUSTER_IDENTIFIER=example-cluster
+DB_REDSHIFT_DB_USER=app_user
 ```
 
-`verify-full` es el valor predeterminado; también se admite `verify-ca`. `DB_REDSHIFT_TIMEOUT=null` desactiva el timeout de socket. IAM añade `DB_REDSHIFT_IAM`, `DB_REDSHIFT_REGION`, `DB_REDSHIFT_CLUSTER_IDENTIFIER`, `DB_REDSHIFT_DB_USER` y opcionalmente `DB_REDSHIFT_PROFILE`. Sin perfil explícito, el conector usa su cadena de credenciales. Serverless añade `DB_REDSHIFT_IS_SERVERLESS`, `DB_REDSHIFT_SERVERLESS_WORK_GROUP` y `DB_REDSHIFT_SERVERLESS_ACCT_ID`.
+El conector recibe `iam`, `region`, `cluster_identifier`, `db_user` y `profile` opcional. Sin perfil explícito utiliza su resolución de credenciales. Serverless añade `is_serverless`, `serverless_work_group` y `serverless_acct_id`. Estos campos se validan y transmiten; Orionis no crea recursos AWS ni obtiene permisos de cuenta por ti.
 
-El conector es síncrono; Orionis ejecuta conexión, queries, resultados y control transaccional en un worker reservado por conexión Core adquirida. Consultas independientes pueden utilizar distintos workers; una transacción conserva el suyo. Cancelar espera la operación en curso antes de limpiar recursos y no garantiza cancelar trabajo en el servidor.
+TLS predetermina `ssl=True` y `sslmode=verify-full`; también admite `verify-ca`. `timeout=None` permite no fijar límite de socket. La [tabla de configuración](/es/database/configuration#redshift) documenta variables, tipos y defaults.
 
-| Capacidad Redshift | Consecuencia |
-|---|---|
-| Sin savepoints | No anidar transacciones. |
-| Sin locks de fila SELECT | `lockForUpdate()` y `sharedLock()` fallan con `QueryException` al ejecutar, también en planes anidados/agregados. |
-| Sin DML `RETURNING` | Una identidad generada omitida no se devuelve en `last_insert_id`. |
-| `IDENTITY(1,1)` | `autoIncrement()` puede crear identidad nativa, pero un modelo que necesite conocer su clave debe usar una clave generada por el cliente. |
-| Sin índices tradicionales | Evitar declaraciones de índices. |
-| PK/unique/FK informativas | No basar exclusión mutua o unicidad en esas declaraciones. |
+## Identidades y lotes
 
-`supportsUniqueConstraints()` devuelve `False`. Cache database, sesiones database, colas database, seeders registrados y job store database del scheduler rechazan Redshift: necesitan unicidad impuesta y, en el scheduler, índices. Estas restricciones no impiden usar Redshift para consultas analíticas y modelos compatibles.
+Un insert de una fila puede informar su primera clave primaria según el driver. Un lote no garantiza claves. PostgreSQL parametrizado utiliza `RETURNING 1` para contar filas reales, incluidas filas omitidas por un trigger; SQL Server utiliza filas OUTPUT cuando el driver devuelve recuento negativo. Oracle preserva el recuento antes de cerrar resultados de lotes.
 
-## Diagnóstico, recursos y volumen
+No confundas el entero de `DB.execute("INSERT...")` con el `InsertResult` que devuelve `DB.table(...).insert(...)` o `Connection.insert(plan)`. Obtén la identidad disponible desde `result.last_insert_id`; no existe `insertGetId()` en esta API. No infieras éxito de cada entrada sólo por la longitud enviada.
 
-`db:show`, `db:table` y `db:wipe` conocen catálogos de Redshift y nombres calificados. Las métricas de tamaño usan bloques asignados de 1 MB; permisos limitados o tablas vacías pueden dejar tamaño desconocido. Las restricciones mostradas son declaraciones, no garantías de enforcement.
+## Recursos, cancelación y diagnóstico
 
-Los engines son perezosos y reutilizables. Cierra una conexión directa cuando termines; deja que el ciclo de aplicación cierre las conexiones administradas. `disconnect(name=None)` del gestor cierra todas las cacheadas; con nombre, solamente la seleccionada. No desconectes un servicio compartido mientras otras tareas lo usan.
+Los engines son perezosos. Las operaciones temporales liberan su checkout después de materializar resultados y completar control transaccional; una transacción explícita lo retiene hasta cerrar su último nivel. No desconectes servicios compartidos en mitad de peticiones.
 
-Las lecturas materializan resultados completos. Aplica filtros, selección de columnas y paginación; no diseñes un exportador masivo suponiendo streaming de cursores. Divide escrituras grandes y considera que cada lote ocupa memoria. Para errores, diferencia configuración/driver de SQL fallido; conserva métricas de latencia, número de filas y operación de negocio sin exponer datos enlazados. No hay en esta capa garantía general de reintento automático de transacciones.
+La [cancelación](/es/database/transactions#aislamiento-y-cancelación) espera trabajo sensible y limpieza; no promete detener SQL instantáneamente. Un commit puede completarse aunque el consumidor sea cancelado. Reintenta sólo cuando conozcas el resultado o tengas idempotencia.
 
-Las operaciones independientes usan contextos `engine.begin()` y liberan su conexión después de cada llamada; una transacción conserva la conexión hasta terminar sus niveles. El SQL crudo parseado se reutiliza con una caché LRU de 256 textos, sin convertir valores variables en SQL interpolado. En PostgreSQL, los inserts por lotes cuentan filas devueltas por `RETURNING`, incluidas las diferencias cuando un trigger omite una fila de entrada.
+Todas las lecturas materializan datos completos: filtra, selecciona columnas, pagina y divide lotes. No presupongas cursores en streaming. Para observar producción registra operación de negocio, nombre de conexión, latencia y recuento sin credenciales ni bindings. Los errores SQL se sanitizan y no hay reintentos automáticos generales.
 
-Antes de desplegar, ejecuta las migraciones y consultas de tu aplicación en una base de pruebas dedicada del motor de destino. Mantén sus credenciales fuera del control de versiones y separadas de producción. Las pruebas SQLite no demuestran compatibilidad con otro motor: comprueba tipos, DDL, bloqueos, cancelación y cierre de recursos con ese motor y su driver instalado.
+`db:show`, `db:table` y `db:wipe` disponen de introspección de catálogos, incluido Redshift. Sus métricas Redshift utilizan bloques asignados de 1 MB; tablas vacías/permisos limitados pueden dejar tamaño desconocido. Las restricciones mostradas son declaraciones, no prueba de enforcement.

@@ -1,81 +1,184 @@
 ---
-title: "Configurar conexiones y ejecutar SQL"
-description: "La configuración de la aplicación está en config/database.py, sección database. BootstrapDatabase extiende la entidad Database y reúne una conexión predeterminada y conexiones…"
+title: "Gestión de conexiones"
+description: "Resolución perezosa, nombres, inyección, registro dinámico y API de ConnectionManager."
 editUrl: true
 lastUpdated: false
 ---
 
-## Elegir un motor
+Cada nombre identifica una configuración y un objeto `Connection` reutilizable, no una sesión física permanentemente abierta. El gestor conserva los objetos resueltos y el engine adquiere conexiones físicas por operación o transacción.
 
-La configuración de la aplicación está en `config/database.py`, sección `database`. `BootstrapDatabase` extiende la entidad `Database` y reúne una conexión predeterminada y conexiones con nombre. `DB_CONNECTION` selecciona `sqlite` por defecto. Una conexión se crea al resolver su nombre y su engine se inicializa al ejecutar la primera operación.
+La configuración tipada admite `sqlite`, `mysql`, `pgsql`, `oracle`, `sqlserver` y `redshift`. Para utilizar dos bases del mismo motor registra nombres adicionales durante el arranque; no añadas `reporting=...` a `Connections`: sus campos son fijos.
 
-| Driver | Instalación adicional | Configuración habitual |
-|---|---|---|
-| `sqlite` | Ninguna | `DB_DATABASE`, `DB_FOREIGN_KEYS`, `DB_BUSY_TIMEOUT` |
-| `mysql` | `uv add 'orionis[mysql]'` | host, puerto 3306, base, usuario, contraseña, charset/collation |
-| `pgsql` | `uv add 'orionis[pgsql]'` | puerto 5432, `DB_SEARCH_PATH`, `DB_SSLMODE` |
-| `oracle` | `uv add 'orionis[oracle]'` | puerto 1521, servicio/SID/DSN/TNS |
-| `sqlserver` | `uv add 'orionis[sqlserver]'` | puerto 1433, driver ODBC y TLS |
-| `redshift` | `uv add 'orionis[redshift]'` | puerto 5439, TLS y opciones del conector AWS |
-
-`orionis[database]` reúne los drivers opcionales. En un checkout del framework se puede usar `uv sync --extra pgsql`, por ejemplo. Instalar el paquete no crea un servidor ni instala un driver ODBC del sistema. La ausencia de una dependencia opcional se informa como `MissingDatabaseDependencyException` al inicializar ese backend.
-
-## Primer programa con SQLite
-
-Guarda el programa como `database_example.py` en un proyecto con Orionis instalado y ejecuta `uv run python database_example.py`. Solo crea datos en memoria y desconecta al terminar. Los valores se enlazan con marcadores `:name`; no necesitas interpolar datos dentro del SQL.
-
-```python
-import asyncio
-from orionis.database import Connection
-
-
-async def main() -> None:
-    db = Connection("docs", {"driver": "sqlite", "database": ":memory:"})
-    try:
-        await db.statement(
-            "CREATE TABLE notes (id INTEGER PRIMARY KEY, body TEXT NOT NULL)"
-        )
-        affected = await db.execute(
-            "INSERT INTO notes (body) VALUES (:body)", {"body": "Hello"}
-        )
-        rows = await db.select(
-            "SELECT id, body FROM notes WHERE body = :body", {"body": "Hello"}
-        )
-        assert affected == 1
-        print(rows)  # [{"id": 1, "body": "Hello"}]
-    finally:
-        await db.disconnect()
-
-
-asyncio.run(main())
-```
-
-`select()` materializa `list[dict]`; no devuelve un cursor abierto. `execute()` devuelve filas afectadas y `statement()` devuelve `True` cuando la sentencia finaliza correctamente. Para `insert(plan)`, el resultado es `InsertResult` con `last_insert_id` y `row_count`; un insert por lotes no garantiza una identidad generada. `scalar(plan)` devuelve la primera columna o `None`. Estos últimos métodos reciben planes del query builder, no SQL arbitrario.
-
-## Trabajar dentro de una aplicación
-
-El programa en memoria no crea una tabla en la base de datos configurada de tu aplicación. Para las siguientes funciones, crea primero una migración de `notes` con `id` y `body` en esa conexión y aplícala. Invoca las funciones desde un controlador, comando o servicio async después del arranque; usa la fachada en lugar de abrir una conexión por petición:
+## Selección por operación
 
 ```python
 from orionis.support.facades import DB
 
 
-async def find_note(body: str):
-    return await DB.table("notes").where("body", body).first()
-
-
-async def count_notes():
-    return await DB.select("SELECT COUNT(*) AS total FROM notes")
+async def list_notes():
+    primary = await DB.table("notes", connection="sqlite").get()
+    reporting = await DB.connection("reporting").table("notes").get()
+    raw = await DB.select("SELECT id, body FROM notes", name="reporting")
+    return {"primary": primary, "reporting": reporting, "raw": raw}
 ```
 
-`DB.connection("reporting")` devuelve un gateway nuevo. `DB.connection("reporting").table("notes")` dirige esa consulta a la conexión registrada; no cambia la conexión de otros consumidores. El gestor ofrece `connection(name)`, `hasConnection(name)`, `configFor(name)`, `addConnection(name, config)` y `setDefaultName(name)`. Cambiar el predeterminado sí afecta a futuros consumidores sin selección explícita: hazlo durante configuración, no como mecanismo de aislamiento por petición.
+`DB.connection()` no cambia a otros consumidores. `setDefaultName()` sí modifica el predeterminado compartido. Toda operación participante en una transacción debe resolver el mismo nombre.
 
-## Valores de configuración y fallos frecuentes
+## Registrar una segunda conexión
 
-SQLite usa `database/database.sqlite`, timeout ocupado de 5000 ms, journal `DELETE`, sincronización `NORMAL` y claves foráneas `OFF` en la plantilla actual. Activa deliberadamente `DB_FOREIGN_KEYS` si tu aplicación depende de referencias. Las conexiones de servidor comparten `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME` y `DB_PASSWORD`; MySQL añade `DB_SOCKET`, `DB_COLLATION`, `DB_STRICT` y `DB_ENGINE`. Una URL configurada tiene prioridad en los dialectos que la admiten; revisa la entidad del driver antes de copiar `DB_URL` entre motores.
+```python
+from orionis.container.providers.service_provider import ServiceProvider
+from orionis.database.contracts.connection_manager import IConnectionManager
 
-Otros selectores de la plantilla son `DB_PREFIX` y `DB_PREFIX_INDEXES`; SQLite expone `DB_JOURNAL_MODE` y `DB_SYNCHRONOUS`; Oracle, `DB_SERVICE_NAME`, `DB_SID`, `DB_DSN`, `DB_TNS`, `DB_ENCODING` y `DB_NENCODING`; SQL Server, `DB_ENCRYPT`, `DB_TRUST_SERVER_CERTIFICATE` y `DB_ODBC_DRIVER`. `DB_CHARSET` se aplica según el driver activo; no copies valores de charset incompatibles entre motores.
 
-Un nombre desconocido produce `ConnectionNotFoundException`; un driver inválido, `UnsupportedDriverException`; un fallo SQL, `QueryException`. Los errores de ejecución sanitizan SQL, bindings y credenciales. Registra el contexto de negocio y el nombre de conexión sin registrar secretos. Los nombres de tablas/columnas no son valores enlazables: elige identificadores de una lista controlada. El SQL crudo tampoco añade automáticamente prefijos de tabla.
+class ReportingProvider(ServiceProvider):
+    async def boot(self, manager: IConnectionManager) -> None:
+        settings = dict(manager.configFor("sqlite"))
+        settings["database"] = "database/reporting.sqlite"
+        settings["url"] = "sqlite:///database/reporting.sqlite"
+        manager.addConnection("reporting", settings)
+```
 
-Continúa con [consultas del ORM](/es/database/orm/querying) o [transacciones](/es/database/transactions).
+Registra el provider con `app.withProviders(ReportingProvider)` en `bootstrap/app.py` junto a los existentes. El directorio `database` debe existir. El ejemplo copia opciones ya validadas y cambia el archivo; mantiene `url` coherente aunque el runtime utiliza `database`.
+
+`addConnection()` no repite la validación completa de la configuración tipada: para una configuración nueva construye una entidad de driver y usa `toDict()`. No registres credenciales recibidas sin control desde una petición.
+
+## ConnectionManager
+
+`ConnectionManager(app: IApplication)` consume `app.config("database")` como entidad `Database` o diccionario. El contenedor la registra como singleton bajo `IConnectionManager`. Estos son todos sus métodos públicos:
+
+### connection()
+
+```text
+def connection(self, name: str | None = None) -> IConnection:
+```
+
+Resuelve `name` o el predeterminado; crea y cachea `Connection` en el primer acceso. No hace E/S todavía. Nombre desconocido: `ConnectionNotFoundException`. Driver inválido: `UnsupportedDriverException` al construir la conexión.
+
+```python
+from orionis.database.contracts.connection_manager import IConnectionManager
+
+
+def example(manager: IConnectionManager):
+    connection = manager.connection("sqlite")
+    assert connection.getName() == "sqlite"
+```
+
+### addConnection()
+
+```text
+def addConnection(self, name: str, config: dict[str, Any]) -> None:
+```
+
+Registra o reemplaza configuración; nombre vacío produce `ValueError` y configuración no `dict` produce `TypeError`. Conserva el diccionario recibido. Una conexión cacheada sigue usando su copia anterior hasta desconectarla.
+
+```python
+from orionis.database.contracts.connection_manager import IConnectionManager
+
+
+def example(manager: IConnectionManager):
+    manager.addConnection("reporting", {"driver": "sqlite", "database": "database/reporting.sqlite"})
+```
+
+### hasConnection()
+
+```text
+def hasConnection(self, name: str) -> bool:
+```
+
+Comprueba registro, no conectividad. La búsqueda distingue mayúsculas y minúsculas.
+
+```python
+from orionis.database.contracts.connection_manager import IConnectionManager
+
+
+def example(manager: IConnectionManager):
+    assert manager.hasConnection("sqlite")
+```
+
+### getDefaultName()
+
+```text
+def getDefaultName(self) -> str:
+```
+
+Devuelve el predeterminado del gestor. La construcción inicial normaliza ese nombre a minúsculas; no implica conexión física abierta.
+
+```python
+from orionis.database.contracts.connection_manager import IConnectionManager
+
+
+def example(manager: IConnectionManager):
+    name = manager.getDefaultName()
+```
+
+### setDefaultName()
+
+```text
+def setDefaultName(self, name: str) -> None:
+```
+
+Selecciona un nombre registrado o lanza `ConnectionNotFoundException`. Cambia futuras operaciones sin selección explícita, pero no builders que ya fijaron conexión.
+
+```python
+from orionis.database.contracts.connection_manager import IConnectionManager
+
+
+def example(manager: IConnectionManager):
+    manager.setDefaultName("sqlite")
+```
+
+### configFor()
+
+```text
+def configFor(self, name: str | None = None) -> dict[str, Any]:
+```
+
+Devuelve el diccionario registrado, no una copia. Nombre desconocido: `ConnectionNotFoundException`. Copia con `dict(...)` antes de personalizar. Puede incluir contraseñas: no lo expongas al cliente.
+
+```python
+from orionis.database.contracts.connection_manager import IConnectionManager
+
+
+def example(manager: IConnectionManager):
+    settings = dict(manager.configFor("sqlite"))
+```
+
+### disconnect()
+
+```text
+async def disconnect(self, name: str | None = None) -> None:
+```
+
+Con nombre elimina esa instancia cacheada y espera su cierre; nombre no cacheado no hace nada. `None` vacía la caché y cierra todas secuencialmente. La configuración permanece registrada. Un fallo de cierre se propaga. No lo ejecutes por petición.
+
+```python
+from orionis.database.contracts.connection_manager import IConnectionManager
+
+
+async def example(manager: IConnectionManager):
+    await manager.disconnect("reporting")
+```
+
+## Inyección por constructor y método
+
+```python
+from orionis.database.contracts.connection_manager import IConnectionManager
+from orionis.http import JSONResponse
+
+
+class DatabaseStatusController:
+    def __init__(self, manager: IConnectionManager) -> None:
+        self.manager = manager
+
+    async def index(self) -> JSONResponse:
+        rows = await self.manager.connection().select("SELECT 1 AS ready")
+        return JSONResponse({"ready": rows[0]["ready"] == 1})
+
+    async def name(self, manager: IConnectionManager) -> JSONResponse:
+        return JSONResponse({"connection": manager.getDefaultName()})
+```
+
+`IConnection` representa una conexión concreta; no tiene un binding automático único para elegir arbitrariamente un nombre. Inyecta el gestor o registra un binding propio.
+
+Para cambiar una configuración cacheada utiliza `await manager.disconnect(name)` antes de resolver otra vez. Una referencia anterior a `Connection` puede reconstruir el engine con sus ajustes antiguos: cambiar el registro no actualiza referencias existentes. No desconectes un servicio compartido mientras otras tareas lo usan.

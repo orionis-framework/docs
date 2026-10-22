@@ -1,29 +1,88 @@
 ---
 title: "Database"
-description: "Orionis separates query construction from execution. The database module manages named SQL connections, compiles ORM plans, executes parameterized SQL, and controls…"
+description: "SQL architecture, connections, the DB facade, queries, schemas and Orionis transactions."
 editUrl: true
 lastUpdated: false
 ---
 
-Orionis separates query construction from execution. The `database` module manages named SQL connections, compiles [ORM](/en/database/orm) plans, executes parameterized SQL, and controls transactions, schemas, migrations, and seeders. Models are optional when querying a table.
+Database manages named SQL connections and provides query, transaction, schema, migration and seeder infrastructure. You can execute SQL, use the query builder or work with [ORM](/en/database/orm) models. All three alternatives share the manager and transactions.
 
-Start with SQLite, included in the base installation. Database I/O is asynchronous; declaring columns, selecting a connection, and composing a query are synchronous operations. Python 3.14 or later is required.
+Await I/O operations with `await`. Selecting a connection, building a query and defining a table are synchronous operations; terminal operations such as `get()` or `insert()` execute SQL.
 
-## Build your first data-backed feature
+## Architecture
 
-In an installed application, begin with these steps:
+```mermaid
+flowchart TD
+    A["config/database.py + .env"] --> B["ConnectionManager"]
+    C["DB / IQueryBuilder"] --> D["RawQueryBuilder"]
+    E["Model / Builder"] --> F["Query plans"]
+    D --> F
+    C -->|"SQL + bindings"| G["Connection"]
+    F --> H["SQLCompiler"]
+    H --> G
+    B --> G
+    G --> I{"Driver"}
+    I --> J["Async engine"]
+    I --> K["Redshift: Core + reserved worker"]
+    J --> L["Database server / SQLite"]
+    K --> L
+    L --> M["Dictionaries, affected rows, InsertResult or models"]
+```
 
-1. Set `DB_CONNECTION=sqlite` in `.env` and check the location selected by `DB_DATABASE` in `config/database.py`. SQLite needs no separate database server.
-2. Add a migration under `database/migrations` to create your tables. Run `uv run python -B reactor migrate` from the application root; the command boots the application before applying changes.
-3. In an async controller, command, or service, import `DB` from `orionis.support.facades`, compose a query, and await its terminal operation. For example, `await DB.table("notes").where("id", note_id).first()` returns a dictionary or `None` once the `notes` table exists.
-4. Add a [transaction](/en/database/transactions) when several writes must succeed together. Introduce [models](/en/database/orm/models-and-attributes) when the feature needs domain behavior or relationships.
+| Component | Responsibility |
+|---|---|
+| `BootstrapDatabase` | Reads environment values and validates typed settings. |
+| `ConnectionManager` / `IConnectionManager` | Resolves and reuses named connections. |
+| `DB` / `IQueryBuilder` | Selects tables, executes SQL and controls transactions without models. |
+| `RawQueryBuilder` | Builds query plans over tables. |
+| `Model` / `Builder` | Add attributes, persistence and relationships. |
+| `SQLCompiler` | Translates plans and definitions to the selected dialect. |
+| `Connection` / `IConnection` | Acquires resources, executes statements, buffers results and manages transactions. |
+| `Schema`, migrator and seeders | Define structures, apply changes and populate data. |
 
-The [connections guide](/en/database/connections) also includes a complete in-memory SQLite program. Use it to learn SQL execution without changing your application's database.
+## First query from a controller
 
-1. [Configure connections and execute SQL](/en/database/connections): driver installation, connection selection, bindings, and results.
-2. [Transactions and concurrency](/en/database/transactions): atomicity, savepoints, task ownership, and cancellation.
-3. [Create schemas](/en/database/schema): blueprints, constraints, and versioned definitions.
-4. [Evolve and populate the database](/en/database/migrations-and-seeders): migrations, batches, reversal, and tracked seeder execution.
-5. [Backends and production operation](/en/database/dialects-and-production): dialect differences, Redshift, security, and troubleshooting.
+Configure a connection and create tables through [migrations](/en/database/migrations-and-seeders). This example assumes a `notes` table with `id` and `body` columns. Register the controller through [HTTP routes](/en/http/routing):
 
-A booted application receives services through providers and can use the `DB` and `Schema` facades. Examples constructing `Connection` directly are standalone programs and close the resources they own. Facade fragments require [Foundation](/en/getting-started) bootstrap.
+```python
+from orionis.http import JSONResponse
+from orionis.support.facades import DB
+
+
+class NoteController:
+    async def index(self) -> JSONResponse:
+        notes = await (
+            DB.table("notes")
+            .select("id", "body")
+            .orderBy("id")
+            .limit(20)
+            .get()
+        )
+        return JSONResponse({"notes": notes.all()})
+```
+
+Import the facade from `orionis.support.facades`. Application boot registers its services. Async services, commands, jobs and MCP components use the same API; `IQueryBuilder` or `IConnectionManager` can also be injected.
+
+## Lifecycle
+
+1. Configuration is loaded and validated without connecting to a server.
+2. The manager creates and caches `Connection` when its name is first resolved.
+3. The engine is created when I/O is needed; constructing the object does not check connectivity or credentials.
+4. Without an explicit transaction, each operation acquires a physical connection, starts a temporary transaction, buffers its results and commits or rolls back before release.
+5. Inside an explicit transaction, operations from its owning task reuse the same physical connection.
+6. `disconnect()` disposes the engine and idle connections; later use can recreate it. Do not call it per request or while other tasks use the shared service.
+
+## Guides and reference
+
+- [Drivers and dependencies](/en/database/drivers): backends and `reactor packages`.
+- [Configuration](/en/database/configuration): fields and environment variables.
+- [Connection management](/en/database/connections): names, injection and registration.
+- [DB facade](/en/database/db-facade): its eleven entry-point methods.
+- [SQL and results](/en/database/raw-queries): bindings, return values and errors.
+- [Query builder](/en/database/query-builder): model-less queries.
+- [Transactions](/en/database/transactions): contexts, savepoints and concurrency.
+- [Schemas](/en/database/schema), [migrations and seeders](/en/database/migrations-and-seeders).
+- [Dialects and production](/en/database/dialects-and-production).
+- [Connection and compilation API](/en/database/runtime-api).
+
+Use `DB` without model instances; its builder returns collections of dictionaries and does not dispatch model events. Use the [ORM](/en/database/orm) for entity state, casts, scopes, events, relationships and factories.
