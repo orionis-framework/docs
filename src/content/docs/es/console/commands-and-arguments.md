@@ -1,15 +1,50 @@
 ---
-title: "Crear comandos y argumentos"
-description: "Un comando reúne una identidad (signature), documentación de ayuda, argumentos y un método handle. El loader combina comandos incluidos, clases descubiertas en…"
+title: "Argumentos y opciones"
+description: "Declara argumentos y opciones, acciones, valores opcionales, conversores y lectura de datos CLI."
 editUrl: true
 lastUpdated: false
 ---
 
-Un comando reúne una identidad (`signature`), documentación de ayuda, argumentos y un método `handle`. El loader combina comandos incluidos, clases descubiertas en `app_console_commands` y registros fluidos de las rutas de consola. En la plantilla, la ruta de clases corresponde a `app/console/commands` y las rutas fluidas a `routes/console.py`.
+Los valores CLI se definen mediante `Argument` y se procesan con `argparse`. La firma identifica el comando; no incorpora una sintaxis adicional como `{name}`. Declara los argumentos en `BaseCommand.arguments` o en `.arguments([...])` al registrar una [ruta de consola](/es/console/command-routing).
 
-## Crear un comando de aplicación
+<a id="argument-construction"></a>
 
-Crea `app/console/commands/greet_command.py` con el siguiente módulo completo. El cargador predeterminado lo descubre automáticamente:
+## Declarar argumentos con Argument
+
+Importa `Argument` desde `orionis.console`. Es una dataclass inmutable, con construcción exclusivamente por nombre. Solo `name_or_flags` es obligatorio:
+
+| Campo | Tipo y predeterminado | Función |
+| --- | --- | --- |
+| `name_or_flags` | `str` o `Iterable[str]`, obligatorio. | Nombre posicional o flags como `("-n", "--count")`; se normaliza a una tupla. |
+| `action` | `str \| ArgumentAction \| None = None`. | Acción del parser; `None` utiliza el almacenamiento normal. |
+| `nargs` | `int \| str \| None = None`. | Cantidad de valores: entero, `?`, `*` o `+`. |
+| `const` | `Any = MISSING`. | Valor usado por acciones constantes o un opcional presente sin valor. |
+| `default` | `Any = MISSING`. | Valor cuando no se proporciona el argumento. El sentinel conserva la diferencia entre ausencia y `None`. |
+| `type_` | `Callable[[str], Any] \| None = None`. | Conversión de cada valor, por ejemplo `int` o un conversor importable. |
+| `choices` | `Iterable[Any] \| None = None`. | Valores permitidos después de la conversión. No acepta un string como colección. |
+| `required` | `bool = False`. | Exige que una opción con flags esté presente. No configura la cardinalidad de un posicional. |
+| `help` | `str \| None = None`. | Descripción mostrada en la ayuda. |
+| `metavar` | `str \| tuple[str, ...] \| None = None`. | Etiqueta visible para los valores; una tupla permite etiquetas distintas con cardinalidad fija. |
+| `dest` | `str \| None = None`. | Nombre de la clave en los argumentos resueltos. |
+| `version` | `str \| None = None`. | Texto obligatorio cuando `action="version"`. |
+
+`-h` y `--help` están reservados por Orionis. Un iterable vacío o un elemento que no sea string se rechaza; las combinaciones de flags, nombres y acciones también deben ser válidas para `argparse`.
+
+Los campos se validan al construir la entidad. Algunas incompatibilidades solo aparecen al crear el parser o al analizar una invocación. Los valores deben ser compatibles con la [serialización de metadatos](/es/console/command-cache).
+
+<a id="argument-cardinality"></a>
+
+## Posicionales, cardinalidad y valores ausentes
+
+| Declaración | Ejemplo de entrada | Resultado |
+| --- | --- | --- |
+| `Argument(name_or_flags="name")` | `Ada` | Un string obligatorio. |
+| `Argument(name_or_flags="name", nargs="?", default="guest")` | Sin valor, o `Ada`. | `"guest"` o `"Ada"`. |
+| `Argument(name_or_flags="pair", nargs=2, type_=int)` | `10 20` | `[10, 20]`; exige exactamente dos valores. |
+| `Argument(name_or_flags="files", nargs="*", default=[])` | Sin valores, o `a.csv b.csv`. | Una lista que puede estar vacía. |
+| `Argument(name_or_flags="ids", nargs="+", type_=int)` | `10 20` | Lista no vacía; omitirla es un error de parsing. |
+
+Cada fila es una definición independiente. Este comando muestra una **opción** con valor opcional. Guárdalo en `app/console/commands/inspect_mode_command.py`:
 
 ```python
 from typing import ClassVar
@@ -17,129 +52,212 @@ from orionis.console import Argument
 from orionis.console.base import BaseCommand
 
 
-class GreetCommand(BaseCommand):
-    signature = "app:greet"
-    description = "Print a greeting."
+class InspectModeCommand(BaseCommand):
+    signature = "app:inspect-mode"
+    description = "Show the selected execution mode."
     arguments: ClassVar[list[Argument]] = [
-        Argument(name_or_flags="name", help="Name to greet."),
-        Argument(name_or_flags=("-n", "--times"), type_=int, default=1),
-        Argument(name_or_flags="--quiet", action="store_true", default=False),
+        Argument(
+            name_or_flags="--mode", nargs="?",
+            default="normal", const="fast", choices=("normal", "fast", "safe"),
+        ),
     ]
 
     async def handle(self) -> int:
-        count = self.getArgument("times")
-        if count < 1:
-            self.error("--times must be positive", timestamp=False)
-            return 2
-        if not self.getArgument("quiet"):
-            for _ in range(count):
-                self.writeLine(f"Hello, {self.getArgument('name')}!")
+        self.writeLine(self.getArgument("mode"))
         return 0
 ```
 
 ```shell
-uv run python -B reactor app:greet Ada --times 2
-uv run python -B reactor app:greet --help
+python -B reactor app:inspect-mode
+python -B reactor app:inspect-mode --mode
+python -B reactor app:inspect-mode --mode safe
 ```
 
-La primera invocación imprime `Hello, Ada!` dos veces y termina con código 0. `--times 0` imprime un error y termina con 2. `--quiet` omite el saludo. Si el comando no aparece en `list`, revisa la ruta de comandos configurada y los errores de importación; invalida los metadatos compilados si están habilitados.
+Las tres invocaciones imprimen `normal`, `fast` y `safe`, respectivamente. Puedes sustituir `python -B reactor` por `orionis`.
 
-El loader escanea módulos importables y solo registra clases definidas en ese módulo que hereden `BaseCommand`. No basta con importar una clase ajena en otro archivo para descubrirla de nuevo. Las firmas usan minúsculas, dígitos y, opcionalmente, un namespace separado por `:`; un nombre como `reports:build-daily` es válido. Asigna identidades únicas para evitar colisiones entre las fuentes de registro.
+Para una opción obligatoria utiliza `required=True`. Para un posicional opcional utiliza `nargs="?"`; `required=False` por sí solo no lo hace opcional. Una lista con `nargs` agrupa valores de una aparición; `append` acumula apariciones de una opción.
 
-`handle()` puede solicitar dependencias tipadas al contenedor. En una clase que hereda `BaseCommand`, los valores CLI se consultan con `getArgument()`; no se pasan automáticamente como argumentos de `handle()`. Si sobrescribes `__init__` para inyectar servicios, llama a `super().__init__()` para inicializar el estado de `BaseCommand`.
+`MISSING` no es `None`. El parser recibe ese sentinel como default y Reactor elimina del diccionario las claves cuyo valor siga siendo exactamente `MISSING`. Si declaras `default=None`, la clave se conserva con `None`. Por ello, declara defaults explícitos cuando tu código necesite siempre una lista, un contador o un booleano.
 
-### Inyección por constructor y por método
+<a id="argument-actions"></a>
 
-Guarda este módulo completo en `app/console/commands/build_report_command.py`:
+## Las nueve acciones del enum
+
+`ArgumentAction` se importa desde `orionis.console.enums.actions`. Puedes utilizar sus miembros o las cadenas equivalentes:
+
+| Miembro | Acción | Uso |
+| --- | --- | --- |
+| `STORE` | `store` | Guardar un valor. |
+| `STORE_CONST` | `store_const` | Guardar `const` cuando aparece el flag. |
+| `STORE_TRUE` | `store_true` | Activar un booleano. |
+| `STORE_FALSE` | `store_false` | Desactivar un booleano. |
+| `APPEND` | `append` | Añadir cada aparición a una lista. |
+| `APPEND_CONST` | `append_const` | Añadir una constante por aparición. |
+| `COUNT` | `count` | Contar apariciones. |
+| `HELP` | `help` | Imprimir ayuda y terminar con `SystemExit(0)`. |
+| `VERSION` | `version` | Imprimir `version` y terminar con `SystemExit(0)`. |
+
+Este comando completo muestra las siete acciones que entregan valores. Guárdalo como `app/console/commands/inspect_options_command.py`:
 
 ```python
 from typing import ClassVar
 from orionis.console import Argument
 from orionis.console.base import BaseCommand
+from orionis.console.enums.actions import ArgumentAction
 
 
-class ReportBuilder:
-    def build(self, report_id: str) -> str:
-        return f"Report {report_id}"
-
-
-class ReportPresenter:
-    def format(self, report: str) -> str:
-        return f"Ready: {report}"
-
-
-class BuildReportCommand(BaseCommand):
-    signature = "reports:build-one"
-    description = "Build a report."
+class InspectOptionsCommand(BaseCommand):
+    signature = "app:inspect-options"
+    description = "Inspect parsed command options."
     arguments: ClassVar[list[Argument]] = [
-        Argument(name_or_flags="report_id", help="Report identifier."),
+        Argument(name_or_flags="--format", action=ArgumentAction.STORE,
+                 choices=("json", "csv"), default="json"),
+        Argument(name_or_flags="--preview", action="store_const",
+                 const="preview", default="write", dest="mode"),
+        Argument(name_or_flags="--verbose", action="store_true", default=False),
+        Argument(name_or_flags="--no-color", action="store_false",
+                 default=True, dest="color"),
+        Argument(name_or_flags="--tag", action="append", default=[]),
+        Argument(name_or_flags="--email", action="append_const",
+                 const="email", default=[], dest="channels"),
+        Argument(name_or_flags=("-v", "--verbosity"), action="count", default=0),
     ]
 
-    def __init__(self, builder: ReportBuilder) -> None:
-        super().__init__()
-        self.builder = builder
-
-    async def handle(self, presenter: ReportPresenter) -> int:
-        report = self.builder.build(self.getArgument("report_id"))
-        self.writeLine(presenter.format(report))
+    async def handle(self) -> int:
+        self.table(
+            ["Key", "Value"],
+            [[key, repr(value)] for key, value in self.getArguments().items()],
+        )
         return 0
 ```
 
 ```shell
-orionis reports:build-one report-42
-python -B reactor reports:build-one report-42
+orionis app:inspect-options --format csv --preview --verbose --no-color --tag urgent --tag paid --email --email -vv
 ```
 
-Ambos comandos imprimen `Ready: Report report-42` y devuelven 0, además de la salida de ejecución normal de Reactor. El contenedor construye `ReportBuilder` antes del comando y resuelve `ReportPresenter` antes de ejecutar `handle()`. Estas clases concretas no requieren registro adicional. `report_id` procede del parser CLI, no es una dependencia del contenedor.
+```shell
+python -B reactor app:inspect-options --format csv --preview --verbose --no-color --tag urgent --tag paid --email --email -vv
+```
 
-En handlers fluidos que **no** heredan `BaseCommand`, Reactor sí entrega los argumentos CLI por nombre al método y resuelve sus demás dependencias tipadas. Añadir anotaciones a una llamada Python directa no activa inyección: esta ocurre al despachar mediante Reactor.
+Los resultados son `format="csv"`, `mode="preview"`, `verbose=True`, `color=False`, `tag=["urgent", "paid"]`, `channels=["email", "email"]` y `verbosity=2`.
 
-## Describir argumentos correctamente
+Para `append` y `append_const`, utiliza `default=[]`; para `count`, `default=0`. En esta implementación, el sentinel predeterminado no sirve como acumulador: sin esos defaults, la primera aparición puede producir `AttributeError` o `TypeError`. Las acciones constantes y booleanas no admiten `type_`: Orionis lo rechaza antes de construir el parser. No utilices `type_=bool` para interpretar el texto `"false"`.
 
-`Argument` es una entidad validada e inmutable que alimenta `argparse`. `name_or_flags` recibe un nombre posicional o flags; `type_` transforma valores; `choices` los restringe; `nargs` controla cantidad; `dest` fija el nombre leído por el comando. `default`, `const`, `required`, `help`, `metavar`, `version` y `extra` completan la definición.
+Las acciones de ayuda y versión pueden añadirse con nombres distintos de los reservados:
 
-Puedes comprobar el parsing sin arrancar una aplicación:
+```python
+from typing import ClassVar
+from orionis.console import Argument
+from orionis.console.base import BaseCommand
+from orionis.console.enums.actions import ArgumentAction
+
+
+class ApplicationInfoCommand(BaseCommand):
+    signature = "app:info"
+    description = "Show application CLI information."
+    arguments: ClassVar[list[Argument]] = [
+        Argument(name_or_flags="--usage", action=ArgumentAction.HELP),
+        Argument(
+            name_or_flags="--release", action=ArgumentAction.VERSION,
+            version="Example application CLI",
+        ),
+    ]
+
+    async def handle(self) -> int:
+        self.writeLine("Use --usage or --release for CLI information.")
+        return 0
+```
+
+Guárdalo en `app/console/commands/application_info_command.py` y ejecuta:
+
+```shell
+orionis app:info --usage
+python -B reactor app:info --release
+```
+
+`--usage` imprime la ayuda del comando; `--release` imprime el texto configurado. Ambos terminan con código `0` antes de ejecutar `handle()`. El flag nativo `--help` continúa disponible en cada comando.
+
+<a id="argument-conversion"></a>
+
+## Conversión, choices, aliases y dest
+
+Define conversores propios a nivel de módulo para que el loader pueda importarlos al reconstruir sus metadatos. Por ejemplo, en `app/console/types.py`:
 
 ```python
 import argparse
-from orionis.console import Argument
 
-parser = argparse.ArgumentParser(add_help=False)
-Argument(
-    name_or_flags=("-f", "--format"),
-    choices=["json", "csv"], default="json", dest="format_name",
-).addToParser(parser)
-assert vars(parser.parse_args(["--format", "csv"])) == {"format_name": "csv"}
+
+def positive_integer(value: str) -> int:
+    try:
+        number = int(value)
+    except ValueError as error:
+        raise argparse.ArgumentTypeError("Expected an integer.") from error
+    if number < 1:
+        raise argparse.ArgumentTypeError("Expected a positive integer.")
+    return number
 ```
 
-Orionis reserva `-h`/`--help`. `required` no vuelve opcional un posicional: para ello usa `nargs="?"` y un default. Acciones booleanas/const no admiten `type_`; `choices` debe ser una colección, no un string; la acción `version` necesita un texto `version`. Definiciones inválidas fallan al construir `Argument`, antes de ejecutar trabajo.
-
-`getArgument("missing", default)` usa el default solo si falta la clave: un `None` proporcionado explícitamente se conserva. `getArguments()` devuelve una copia superficial. No interpretes `bool("false")` como parsing de booleanos; usa acciones como `store_true`/`store_false`.
-
-## Registrar una operación fluida
-
-Añade esta declaración completa al `routes/console.py` de la aplicación:
+En la lista de argumentos de tu comando:
 
 ```python
-from orionis.support.facades import Reactor
+from app.console.types import positive_integer
+from orionis.console import Argument
 
-
-class ReportHandler:
-    async def run(self) -> int:
-        return 0
-
-
-def register_reports() -> None:
-    Reactor.command("reports:build", [ReportHandler, "run"]).description(
-        "Build reports."
-    ).timestamp(enabled=False)
-
-
-register_reports()
+arguments = [
+    Argument(
+        name_or_flags=("-l", "--limit"), type_=positive_integer,
+        choices=(10, 50, 100), default=10, dest="row_limit", metavar="ROWS",
+        help="Maximum number of rows.",
+    ),
+]
 ```
 
-La llamada final `register_reports()` registra el comando cuando se carga la ruta, antes de guardar sus metadatos en caché. La ruta de aplicación se ejecuta dentro del arranque; no es un script independiente. El handler es una lista de clase y nombre de método, no una cadena de import arbitraria. Añade `.arguments([...])` cuando lo necesites.
+`--limit 50` y `-l 50` producen `row_limit=50`. `--limit 0` falla en el conversor; `--limit 25`, en `choices`. Los choices son enteros porque se comparan después de convertir. Para aliases cortos y largos utiliza una tupla o lista de flags, no un string que los contenga separados por espacios.
 
-## Resultado y diagnóstico
+El loader usa `allow_abbrev=False`: debes escribir `--limit`, no `--lim`. Puedes pasar `--limit=50` o `--limit 50`; para tratar como posicional un valor que empieza por guion, utiliza el separador `--` del parser cuando la estructura del comando lo permita.
 
-Devuelve un entero para controlar el exit code; otros resultados correctos se normalizan a 0. Un fallo normal del flujo Reactor se registra, se delega al capturador de errores y devuelve 1. La ayuda y los errores de parsing utilizan `SystemExit` internamente. Prueba tanto argumentos inválidos como retornos de negocio: que el proceso termine sin traceback no implica que su código de salida sea 0.
+<a id="base-getargument"></a>
+
+## Leer un valor: getArgument()
+
+```text
+getArgument(key: str, default: Any | None = None) -> Any | None
+```
+
+Busca la clave exacta asignada por el parser, que depende de `dest` o del nombre de la opción. Una clave ausente devuelve `default`; un `None` presente se conserva. Una clave que no sea `str` produce `TypeError`. No uses el texto del flag con sus guiones: para `--row-limit`, la clave habitual es `row_limit`.
+
+<a id="base-getarguments"></a>
+
+## Leer todos: getArguments()
+
+```text
+getArguments() -> dict[str, Any]
+```
+
+Devuelve una copia superficial del diccionario de la instancia. Cambiar sus claves no cambia el original, pero los objetos anidados siguen compartidos. Los valores son los ya convertidos por el parser.
+
+<a id="base-setarguments"></a>
+
+## Asignar datos: setArguments()
+
+```text
+setArguments(args: dict[str, Any]) -> None
+```
+
+Reactor lo utiliza antes de `handle()`. Fusiona el diccionario con el existente mediante `update`; no borra claves anteriores ni ejecuta el parser. Un valor que no sea `dict` produce `TypeError`. También sirve para probar un comando aislado:
+
+```python
+from orionis.console.base import BaseCommand
+
+command = BaseCommand()
+command.setArguments({"limit": 10, "optional": None})
+command.setArguments({"limit": 20})
+assert command.getArgument("limit") == 20
+assert command.getArgument("optional", "fallback") is None
+assert command.getArgument("missing", "fallback") == "fallback"
+copy = command.getArguments()
+copy["limit"] = 99
+assert command.getArgument("limit") == 20
+```
+
+Este ejemplo inspecciona estado y no llama al `handle()` sin implementar de la clase base. Para una ejecución normal no llames a `setArguments()` a mano: utiliza Reactor y una lista de tokens CLI.

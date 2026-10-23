@@ -1,15 +1,81 @@
 ---
 title: "Programar tareas"
-description: "El scheduler ejecuta comandos registrados con triggers de APScheduler 3. No es una cola de jobs: no añade automáticamente serialización de dominio, reintentos de negocio ni…"
+description: "Crea la agenda de la aplicación, registra el scheduler y ejecuta comandos periódicos con inyección de dependencias."
 editUrl: true
 lastUpdated: false
 ---
 
-El scheduler ejecuta comandos registrados con triggers de APScheduler 3. No es una cola de jobs: no añade automáticamente serialización de dominio, reintentos de negocio ni historial de fallos de [Queues](/es/asynchronous/queues).
+Una tarea programada indica **cuándo ejecutar un comando registrado en Reactor**. Por ejemplo, generar un informe a las 02:30, limpiar registros cada hora o sincronizar un catálogo de lunes a viernes. El scheduler calcula las próximas ejecuciones y despacha la firma del comando cuando llega su turno.
 
-## Configurar la agenda de la aplicación
+La agenda se define en `app/console/scheduler.py`. La configuración de horarios y persistencia está en `config/scheduler.py`; `config/queue.py` configura el sistema independiente de [colas y jobs](/es/asynchronous/queues). Una tarea programada también puede ejecutar un comando que envíe jobs a una cola, pero programar ese comando no inicia un worker de colas.
 
-La plantilla usa `app/console/scheduler.py`, con una clase que hereda `BaseScheduler`. Su método `tasks` recibe `ISchedule` y registra comandos existentes. Por ejemplo, con `reports:build` definido mediante [comandos](/es/console/commands-and-arguments):
+```mermaid
+flowchart TD
+    accTitle: Ciclo de una tarea programada
+    accDescr: La aplicación carga una agenda de comandos; el scheduler conserva sus horarios y usa Reactor para ejecutar cada comando con sus dependencias.
+    A[bootstrap/app.py: withScheduler] --> B[schedule:work]
+    B --> C[Construir Scheduler y llamar tasks]
+    C --> D[Validar firmas y crear triggers]
+    D --> E[Store: memory, database o redis]
+    E --> F[Llega el horario de una tarea]
+    F --> G[Reactor.call: firma y argumentos]
+    G --> H[Scope del comando e inyección de dependencias]
+    H --> I[handle: código de salida]
+    I --> J[Evento y próxima ejecución]
+    J --> E
+```
+
+## 1. Crear el comando que se ejecutará
+
+Genera un comando con cualquiera de estas alternativas:
+
+```shell
+orionis make:console-command scheduled_report --signature reports:build
+python -B reactor make:console-command scheduled_report --signature reports:build
+```
+
+El archivo predeterminado es `app/console/commands/scheduled_report_command.py`. Sustituye su contenido por este ejemplo mínimo; en una aplicación real el servicio puede consultar la base de datos y almacenar el resultado mediante [Storage](/es/services/storage):
+
+```python
+from orionis.console.base import BaseCommand
+
+
+class ReportService:
+    async def build(self) -> int:
+        # Reemplaza esta operación por la generación real del informe.
+        return 1
+
+
+class ScheduledReportCommand(BaseCommand):
+    signature = "reports:build"
+    description = "Build the daily report."
+
+    async def handle(self, reports: ReportService) -> int:
+        generated = await reports.build()
+        self.success(f"Reports generated: {generated}")
+        return 0
+```
+
+Comprueba primero el comando de forma independiente:
+
+```shell
+orionis reports:build
+python -B reactor reports:build
+```
+
+Reactor descubre la clase del comando y resuelve `ReportService` al ejecutar `handle()`. Consulta [creación de comandos](/es/console/creating-commands) para sus convenciones, argumentos y opciones.
+
+<a id="2-declarar-la-agenda"></a>
+
+## 2. Programar con Schedule.command()
+
+<a id="scheduler-registration"></a>
+
+La clase de la aplicación hereda `BaseScheduler`, implementación de `IBaseScheduler`. Su método `tasks(schedule: ISchedule)` registra las tareas. La clase base declara `async def tasks(self, schedule: ISchedule) -> None` y lanza `NotImplementedError` si no lo implementas; tu implementación puede ser síncrona o asíncrona porque la aplicación la invoca mediante el contenedor.
+
+El registro se realiza con **`Schedule.command()`** desde la fachada, o con **`schedule.command()`** desde el servicio inyectado. [Consulta su firma, parámetros y ejemplo con argumentos CLI](/es/console/scheduler-execution#schedule-command).
+
+En `app/console/scheduler.py`:
 
 ```python
 from orionis.console.base import BaseScheduler
@@ -19,7 +85,7 @@ from orionis.console.contracts import ISchedule
 class Scheduler(BaseScheduler):
     def tasks(self, schedule: ISchedule) -> None:
         (
-            schedule.command("reports:build", purpose="Daily reports")
+            schedule.command("reports:build", purpose="Build the daily report")
             .coalesce()
             .misfireGraceTime(60)
             .maxInstances(1)
@@ -27,20 +93,42 @@ class Scheduler(BaseScheduler):
         )
 ```
 
-```shell
-uv run python -B reactor schedule:list
-uv run python -B reactor schedule:work
+Esto ejecuta `reports:build` cada día a las 02:30 en la zona horaria de la aplicación (`app.timezone`, normalmente `APP_TIMEZONE`, predeterminada `UTC`). La firma debe existir en Reactor: no basta con nombrar un archivo o una clase.
+
+Los métodos que seleccionan frecuencia, como `dailyAt()`, son terminales y devuelven `True`; los configuradores anteriores devuelven la misma tarea. Configura fechas, listeners y políticas **antes** de seleccionar la frecuencia. La [referencia de frecuencias](/es/console/scheduler-frequencies) incluye todos los métodos y ejemplos.
+
+En `bootstrap/app.py`, conserva el registro del esqueleto o importa tu clase y regístrala antes de `app.create()`:
+
+```python
+from app.console.scheduler import Scheduler
+
+# app es la instancia de Application que configura este archivo.
+app.withScheduler(Scheduler)
 ```
 
-Conserva el registro del scheduler del esqueleto en `bootstrap/app.py`. Si introduces otra clase, impórtala allí y llama a `app.withScheduler(Scheduler)` antes de `app.create()`. `schedule:list` debe mostrar `reports:build` con el horario diario configurado; `schedule:work` debe permanecer activo para ejecutar las tareas. Declarar una agenda no inicia ese proceso automáticamente. Este ejemplo se ejecuta cada día a las 02:30 en la zona horaria configurada.
+`Application.withScheduler(scheduler: type[IBaseScheduler]) -> Self` guarda la clase, no una instancia. Exige una subclase de `IBaseScheduler` y configuración todavía mutable; una nueva declaración sustituye la anterior. Si el bootstrap ya está compilado, la configuración compilada prevalece. Después del arranque, `await app.getScheduler()` construye una instancia mediante el contenedor; antes del arranque produce `RuntimeError`. Este registro **no inicia el proceso del scheduler**.
 
-`schedule:work` carga la agenda, registra listeners, inicia el servicio y espera hasta la parada. `tasks` puede ser síncrono, como en la plantilla, o async. Es distinto de importar una clase de comando: la firma debe existir en el registro.
+## 3. Revisar y ejecutar la agenda
 
-La selección temporal (`dailyAt`, `everySeconds`, `cron`, etc.) es terminal y devuelve `bool`. Configura `purpose`, `coalesce`, `misfireGraceTime`, `maxInstances`, `randomDelay`, fechas y listeners **antes** del trigger. No encadenes otro método después de `dailyAt`.
+```shell
+orionis schedule:list
+python -B reactor schedule:list
+```
 
-## Dependencias en el scheduler y en los comandos
+`schedule:list` construye el scheduler de la aplicación, llama a `tasks()` y muestra firma, argumentos, propósito, políticas, fechas y descripción del horario. Valida las firmas y los triggers sin iniciar el reloj ni procesar las tareas del store.
 
-El scheduler también admite inyección en el constructor y en `tasks()`. Por ejemplo, este módulo completo puede reemplazar `app/console/scheduler.py`:
+Para mantener el proceso activo:
+
+```shell
+orionis schedule:work
+python -B reactor schedule:work
+```
+
+`schedule:work` carga la agenda, conecta los listeners, inicia el servicio y espera la parada. Debe permanecer ejecutándose para que los horarios se cumplan. `Ctrl+C` solicita su apagado. Ambos comandos incluyen `-h`/`--help` y no declaran argumentos ni opciones específicas adicionales. Orionis no incluye un comando `schedule:run`.
+
+## Inyección en la agenda y en cada ejecución
+
+Este módulo puede reemplazar `app/console/scheduler.py` manteniendo el comando anterior:
 
 ```python
 from orionis.console.base import BaseScheduler
@@ -61,7 +149,7 @@ class Scheduler(BaseScheduler):
     def __init__(self, policy: ReportSchedulePolicy) -> None:
         self.policy = policy
 
-    def tasks(
+    async def tasks(
         self,
         schedule: ISchedule,
         labels: ReportScheduleLabel,
@@ -73,46 +161,15 @@ class Scheduler(BaseScheduler):
         )
 ```
 
-La aplicación construye `Scheduler` mediante el contenedor y resuelve `ReportSchedulePolicy`. Al cargar la agenda, `schedule:list` y `schedule:work` proporcionan `schedule` explícitamente y el contenedor resuelve `ReportScheduleLabel` para `tasks()`. Las dos clases concretas se construyen sin bindings adicionales. Este método configura la agenda al cargarla; no se invoca nuevamente para inyectar servicios en cada ejecución programada.
+El contenedor construye `ReportSchedulePolicy` para el constructor y `ReportScheduleLabel` para `tasks()`. Estas clases concretas no requieren un binding adicional. `schedule:list` y `schedule:work` proporcionan `schedule` explícitamente; las demás dependencias se resuelven por anotación de tipo.
 
-Cuando vence un horario, se despacha la firma mediante Reactor. El comando obtiene sus propias dependencias de constructor y `handle()` como se muestra en [comandos](/es/console/commands-and-arguments#inyección-por-constructor-y-por-método). Los callbacks de eventos del scheduler reciben sus argumentos de evento mediante una llamada directa: no añadas parámetros de servicios esperando la misma inyección de `tasks()`; usa colaboradores preparados en el constructor.
+`tasks()` se ejecuta al cargar la agenda. Cuando vence el horario, Reactor crea el scope de **cada ejecución del comando**, construye su clase e invoca `handle()` con sus propias dependencias. Los listeners reciben el evento mediante una llamada directa; usa dependencias preparadas en su constructor, como muestra [Listeners y eventos](/es/console/scheduler-listeners).
 
-## Elegir un trigger
+## Cómo continuar
 
-| Necesidad | Terminal |
-|---|---|
-| Intervalo breve | `everySeconds(15)` |
-| Intervalos combinados | `every(hours=1, minutes=30)` |
-| Hora diaria | `dailyAt(2, 30, 0)` |
-| Día de semana | `everyMondayAt(...)`, y equivalentes |
-| Fecha única | `onceAt(2027, 1, 10, 9, 0, 0)` |
-| Calendario cron | `cron(day_of_week="mon-fri", hour="9", minute="0")` |
+- [Configuración y persistencia](/es/console/scheduler-configuration): stores, variables de entorno y reinicios.
+- [Frecuencias y calendario](/es/console/scheduler-frequencies): todos los intervalos, horarios, fechas y políticas de tarea.
+- [Listeners y eventos](/es/console/scheduler-listeners): callbacks, clases de listener y códigos de salida.
+- [Ejecución y API](/es/console/scheduler-execution): fachada `Schedule`, servicio `ISchedule`, control y apagado.
 
-Existen helpers de minutos, horas, días y semanas, además de `startDate` y `endDate`. Usa intervalos para tiempo transcurrido y cron para calendario. No asumas que ambos responden igual a cambios de horario estacional. La zona viene de `app.timezone`, normalmente `APP_TIMEZONE`, con default `UTC`.
-
-La agenda fluida guarda tareas por **firma de comando**. Registrar otra vez la misma firma reemplaza esa definición pendiente; no es una API para crear dos horarios independientes para una firma. Usa comandos con identidades distintas que deleguen al mismo servicio si necesitas agendas separadas.
-
-## Persistencia y valores predeterminados
-
-La sección `scheduler` de `config/scheduler.py` usa:
-
-| Variable | Default / efecto |
-|---|---|
-| `TASKS_STORE` | `memory`; alternativas `redis`, `database`. |
-| `TASKS_MAX_INSTANCES` | 1 instancia concurrente por tarea en el scheduler. |
-| `TASKS_COALESCE` | `True`, agrupa ejecuciones atrasadas. |
-| `TASKS_MISFIRE_GRACE_TIME` | 30 segundos de tolerancia. |
-| `TASKS_REPLACE_EXISTING` | `True`, reemplaza tareas persistidas al reiniciar. |
-| `TASKS_JITTER` | 0 segundos de dispersión aleatoria. |
-
-Redis utiliza `REDIS_HOST`, `REDIS_PORT`, `REDIS_DB`, `REDIS_PASSWORD`, `REDIS_TASKS_KEY` (`scheduler:tasks`) y `REDIS_RUN_TIMES_KEY` (`scheduler:run_times`). Database utiliza `DB_TASK_CONNECTION` y `DB_TASK_TABLE` (`scheduler_tasks`). Ese store crea una ruta SQLAlchemy **síncrona**, por lo que necesita el driver sync del extra correspondiente; no comparte la transacción async de una petición. Redshift se rechaza por falta de unicidad impuesta e índices.
-
-`memory` se pierde al terminar el proceso. Un store persistente conserva definiciones, pero no establece por sí mismo un líder distribuido ni una garantía de ejecución única entre procesos. Opera una instancia responsable de cada agenda salvo arquitectura externa probada; `maxInstances(1)` no es un mutex global. Mantén `replace_existing=True` para reiniciar con identidades ya persistidas.
-
-## Eventos, estado y apagado
-
-`BaseScheduler` ofrece `onStarted`, `onPaused`, `onResumed` y `onShutdown`. Para eventos de tarea usa `.on(event, callback)` o `registerListener` con `BaseTaskListener`; los tipos `TaskEvent` y `SchedulerEvent` de enums seleccionan eventos, mientras entidades del mismo nombre transportan datos. No confundas ambos imports.
-
-El servicio expone `boot()` e `info()` async; `state`, `isRunning`, `isPaused`, `isStopped`, `pauseTask`, `resumeTask`, `removeTask`, `removeAllTasks`, `pause` y `resume` permiten control. `shutdown()` solicita la parada y `await wait()` espera su finalización; las coroutines de listeners se gestionan y drenan durante el apagado. No se permiten nuevas tareas después de iniciar: `command()` produce `RuntimeError`.
-
-Una interrupción/misfire no genera automáticamente un retry de negocio. Diseña comandos idempotentes, observa sus códigos de salida y utiliza jobs cuando necesites leases y reintentos explícitos.
+El scheduler no añade por sí mismo reintentos de negocio ni historial de ejecuciones fallidas. Para ese comportamiento, el comando puede despachar un [job persistente](/es/asynchronous/queues/jobs-and-dispatch) a un backend de colas y dejar su procesamiento al worker correspondiente.

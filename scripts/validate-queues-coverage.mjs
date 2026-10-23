@@ -8,10 +8,10 @@ const expectedPages = [
   'queues-overview', 'queues-drivers-and-configuration', 'queues-configuration',
   'queues-jobs-and-dispatch', 'queues-execution-modes', 'queues-workers-and-failures', 'queues-failures-and-retries',
   'queues-manager-and-injection', 'queues-api-reference',
-  'background-overview', 'background-response-tasks', 'console-task-scheduling',
+  'background-overview', 'background-response-tasks',
 ];
 const queues = navigationSections.find((section) => section.id === 'queues');
-if (JSON.stringify(queues?.pageIds) !== JSON.stringify(expectedPages) || queues?.groups?.length !== 4) throw new Error('Queues must retain nine queue guides and three related guides in four ordered subgroups.');
+if (JSON.stringify(queues?.pageIds) !== JSON.stringify(expectedPages) || queues?.groups?.length !== 4) throw new Error('Queues must retain nine queue guides and two response-task guides in four ordered subgroups.');
 if (!inventory.entries?.length || !inventory.hashes || inventory.entries.filter((entry) => entry.kind === 'type-alias').length !== 3 || !inventory.entries.some((entry) => entry.symbol === 'PendingDispatch.__await__')) throw new Error('Incomplete Queues API inventory.');
 const symbols = new Set(), documents = new Map();
 for (const entry of inventory.entries) {

@@ -2481,8 +2481,8 @@
         "en": "Console and task scheduling"
       },
       "label": {
-        "en": "Console",
-        "es": "Consola"
+        "es": "Introducción",
+        "en": "Introduction"
       },
       "slug": {
         "es": "/es/console",
@@ -2493,12 +2493,12 @@
       "id": "console-commands-and-arguments",
       "kind": "doc",
       "title": {
-        "es": "Crear comandos y argumentos",
-        "en": "Create commands and arguments"
+        "es": "Argumentos y opciones",
+        "en": "Arguments and options"
       },
       "label": {
-        "en": "Commands and arguments",
-        "es": "Comandos y argumentos"
+        "es": "Argumentos y opciones",
+        "en": "Arguments and options"
       },
       "slug": {
         "es": "/es/console/commands-and-arguments",
@@ -2509,12 +2509,16 @@
       "id": "console-output-and-programmatic-execution",
       "kind": "doc",
       "title": {
-        "es": "Salida y ejecución programática",
-        "en": "Output and programmatic execution"
+        "es": "Fachada Reactor y ejecución programática",
+        "en": "Reactor facade and programmatic execution"
       },
       "slug": {
         "es": "/es/console/output-and-programmatic-execution",
         "en": "/en/console/output-and-programmatic-execution"
+      },
+      "label": {
+        "es": "Fachada e inyección",
+        "en": "Facade and injection"
       }
     },
     {
@@ -2543,6 +2547,262 @@
       "slug": {
         "es": "/es/console/built-in-commands",
         "en": "/en/console/built-in-commands"
+      }
+    },
+    {
+      "id": "console-creating-commands",
+      "kind": "doc",
+      "title": {
+        "es": "Crear comandos e inyectar servicios",
+        "en": "Create commands and inject services"
+      },
+      "label": {
+        "es": "Creación e inyección",
+        "en": "Creation and injection"
+      },
+      "slug": {
+        "es": "/es/console/creating-commands",
+        "en": "/en/console/creating-commands"
+      }
+    },
+    {
+      "id": "console-command-routing",
+      "kind": "doc",
+      "title": {
+        "es": "Comandos por rutas de consola",
+        "en": "Console route commands"
+      },
+      "label": {
+        "es": "Rutas de consola",
+        "en": "Console routes"
+      },
+      "slug": {
+        "es": "/es/console/command-routing",
+        "en": "/en/console/command-routing"
+      }
+    },
+    {
+      "id": "console-command-cache",
+      "kind": "doc",
+      "title": {
+        "es": "Descubrimiento y caché de comandos",
+        "en": "Command discovery and cache"
+      },
+      "label": {
+        "es": "Descubrimiento y caché",
+        "en": "Discovery and cache"
+      },
+      "slug": {
+        "es": "/es/console/command-cache",
+        "en": "/en/console/command-cache"
+      }
+    },
+    {
+      "id": "console-api-reference",
+      "kind": "doc",
+      "title": {
+        "es": "Referencia técnica de consola",
+        "en": "Console technical reference"
+      },
+      "label": {
+        "es": "Referencia técnica",
+        "en": "Technical reference"
+      },
+      "slug": {
+        "es": "/es/console/api-reference",
+        "en": "/en/console/api-reference"
+      }
+    },
+    {
+      "id": "console-console-output",
+      "kind": "doc",
+      "title": {
+        "es": "Texto, tablas y salida",
+        "en": "Text, tables and output"
+      },
+      "label": {
+        "es": "Texto y tablas",
+        "en": "Text and tables"
+      },
+      "slug": {
+        "es": "/es/console/console-output",
+        "en": "/en/console/console-output"
+      }
+    },
+    {
+      "id": "console-interactive-input",
+      "kind": "doc",
+      "title": {
+        "es": "Preguntas y entrada interactiva",
+        "en": "Questions and interactive input"
+      },
+      "label": {
+        "es": "Preguntas y entrada",
+        "en": "Questions and input"
+      },
+      "slug": {
+        "es": "/es/console/interactive-input",
+        "en": "/en/console/interactive-input"
+      }
+    },
+    {
+      "id": "console-progress-and-debugging",
+      "kind": "doc",
+      "title": {
+        "es": "Progreso",
+        "en": "Progress"
+      },
+      "label": {
+        "es": "Progreso",
+        "en": "Progress"
+      },
+      "slug": {
+        "es": "/es/console/progress-and-debugging",
+        "en": "/en/console/progress-and-debugging"
+      }
+    },
+    {
+      "id": "console-scheduler-configuration",
+      "kind": "doc",
+      "title": {
+        "es": "Configuración y persistencia del scheduler",
+        "en": "Scheduler configuration and persistence"
+      },
+      "label": {
+        "es": "Configuración y persistencia",
+        "en": "Configuration and persistence"
+      },
+      "slug": {
+        "es": "/es/console/scheduler-configuration",
+        "en": "/en/console/scheduler-configuration"
+      }
+    },
+    {
+      "id": "console-scheduler-frequencies",
+      "kind": "doc",
+      "title": {
+        "es": "Frecuencias y calendario de tareas",
+        "en": "Task frequencies and calendars"
+      },
+      "label": {
+        "es": "Frecuencias y calendario",
+        "en": "Frequencies and calendars"
+      },
+      "slug": {
+        "es": "/es/console/scheduler-frequencies",
+        "en": "/en/console/scheduler-frequencies"
+      }
+    },
+    {
+      "id": "console-scheduler-listeners",
+      "kind": "doc",
+      "title": {
+        "es": "Listeners y eventos",
+        "en": "Listeners and events"
+      },
+      "label": {
+        "es": "Listeners y eventos",
+        "en": "Listeners and events"
+      },
+      "slug": {
+        "es": "/es/console/scheduler-listeners",
+        "en": "/en/console/scheduler-listeners"
+      }
+    },
+    {
+      "id": "console-scheduler-execution",
+      "kind": "doc",
+      "title": {
+        "es": "Ejecución y API del scheduler",
+        "en": "Scheduler execution and API"
+      },
+      "label": {
+        "es": "Ejecución y API",
+        "en": "Execution and API"
+      },
+      "slug": {
+        "es": "/es/console/scheduler-execution",
+        "en": "/en/console/scheduler-execution"
+      }
+    },
+    {
+      "id": "console-built-in-generators",
+      "kind": "doc",
+      "title": {
+        "es": "Generadores de código",
+        "en": "Code generators"
+      },
+      "label": {
+        "es": "Generadores",
+        "en": "Code generators"
+      },
+      "slug": {
+        "es": "/es/console/built-in-generators",
+        "en": "/en/console/built-in-generators"
+      }
+    },
+    {
+      "id": "console-built-in-application",
+      "kind": "doc",
+      "title": {
+        "es": "Comandos de aplicación y mantenimiento",
+        "en": "Application and maintenance commands"
+      },
+      "label": {
+        "es": "Aplicación y mantenimiento",
+        "en": "Application and maintenance"
+      },
+      "slug": {
+        "es": "/es/console/built-in-application",
+        "en": "/en/console/built-in-application"
+      }
+    },
+    {
+      "id": "console-built-in-database",
+      "kind": "doc",
+      "title": {
+        "es": "Comandos de bases de datos",
+        "en": "Database commands"
+      },
+      "label": {
+        "es": "Bases de datos",
+        "en": "Database"
+      },
+      "slug": {
+        "es": "/es/console/built-in-database",
+        "en": "/en/console/built-in-database"
+      }
+    },
+    {
+      "id": "console-built-in-workers",
+      "kind": "doc",
+      "title": {
+        "es": "Comandos de workers y scheduler",
+        "en": "Worker and scheduler commands"
+      },
+      "label": {
+        "es": "Workers, scheduler y MCP",
+        "en": "Workers, scheduler and MCP"
+      },
+      "slug": {
+        "es": "/es/console/built-in-workers",
+        "en": "/en/console/built-in-workers"
+      }
+    },
+    {
+      "id": "console-built-in-bootstrap",
+      "kind": "doc",
+      "title": {
+        "es": "Bootstrap y recuperación del proyecto",
+        "en": "Project bootstrap and recovery"
+      },
+      "label": {
+        "es": "Bootstrap y recuperación",
+        "en": "Bootstrap and recovery"
+      },
+      "slug": {
+        "es": "/es/console/built-in-bootstrap",
+        "en": "/en/console/built-in-bootstrap"
       }
     },
     {

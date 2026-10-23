@@ -959,8 +959,8 @@
       "band": "automate",
       "icon": "queues",
       "title": {
-        "en": "Queues, jobs and scheduling",
-        "es": "Colas, jobs y tareas programadas"
+        "es": "Colas y tareas en segundo plano",
+        "en": "Queues and background tasks"
       },
       "pageIds": [
         "queues-overview",
@@ -973,8 +973,7 @@
         "queues-manager-and-injection",
         "queues-api-reference",
         "background-overview",
-        "background-response-tasks",
-        "console-task-scheduling"
+        "background-response-tasks"
       ],
       "groups": [
         {
@@ -1016,13 +1015,12 @@
         {
           "id": "queues-related",
           "title": {
-            "es": "Respuesta y programación",
-            "en": "Responses and scheduling"
+            "es": "Tareas de respuesta",
+            "en": "Response tasks"
           },
           "pageIds": [
             "background-overview",
-            "background-response-tasks",
-            "console-task-scheduling"
+            "background-response-tasks"
           ]
         }
       ]
@@ -1032,14 +1030,99 @@
       "band": "automate",
       "icon": "console-and-protocols",
       "title": {
-        "en": "Console and generators",
-        "es": "Consola y generadores"
+        "es": "Consola, comandos y scheduler",
+        "en": "Console, commands and scheduler"
       },
       "pageIds": [
         "console-overview",
+        "console-creating-commands",
         "console-commands-and-arguments",
+        "console-command-routing",
+        "console-console-output",
+        "console-interactive-input",
+        "console-progress-and-debugging",
         "console-output-and-programmatic-execution",
-        "console-built-in-commands"
+        "console-command-cache",
+        "console-api-reference",
+        "console-task-scheduling",
+        "console-scheduler-configuration",
+        "console-scheduler-frequencies",
+        "console-scheduler-listeners",
+        "console-scheduler-execution",
+        "console-built-in-commands",
+        "console-built-in-generators",
+        "console-built-in-application",
+        "console-built-in-database",
+        "console-built-in-workers",
+        "console-built-in-bootstrap"
+      ],
+      "groups": [
+        {
+          "id": "console-foundations",
+          "title": {
+            "es": "Crear y ejecutar comandos",
+            "en": "Create and run commands"
+          },
+          "pageIds": [
+            "console-overview",
+            "console-creating-commands",
+            "console-commands-and-arguments",
+            "console-command-routing"
+          ]
+        },
+        {
+          "id": "console-io",
+          "title": {
+            "es": "Entrada, salida y progreso",
+            "en": "Input, output and progress"
+          },
+          "pageIds": [
+            "console-console-output",
+            "console-interactive-input",
+            "console-progress-and-debugging"
+          ]
+        },
+        {
+          "id": "console-reactor",
+          "title": {
+            "es": "Reactor y metadatos",
+            "en": "Reactor and metadata"
+          },
+          "pageIds": [
+            "console-output-and-programmatic-execution",
+            "console-command-cache",
+            "console-api-reference"
+          ]
+        },
+        {
+          "id": "console-scheduler",
+          "title": {
+            "es": "Scheduler y tareas",
+            "en": "Scheduler and tasks"
+          },
+          "pageIds": [
+            "console-task-scheduling",
+            "console-scheduler-configuration",
+            "console-scheduler-frequencies",
+            "console-scheduler-listeners",
+            "console-scheduler-execution"
+          ]
+        },
+        {
+          "id": "console-catalog",
+          "title": {
+            "es": "Comandos incluidos",
+            "en": "Built-in commands"
+          },
+          "pageIds": [
+            "console-built-in-commands",
+            "console-built-in-generators",
+            "console-built-in-application",
+            "console-built-in-database",
+            "console-built-in-workers",
+            "console-built-in-bootstrap"
+          ]
+        }
       ]
     },
     {
