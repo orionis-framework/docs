@@ -1847,18 +1847,22 @@
       "slug": {
         "es": "/es/services/mail",
         "en": "/en/services/mail"
+      },
+      "label": {
+        "en": "Introduction",
+        "es": "Introducción"
       }
     },
     {
       "id": "mail-composing-mail",
       "kind": "doc",
       "title": {
-        "es": "Declarar contenido, destinatarios y adjuntos",
-        "en": "Declaring content, recipients, and attachments"
+        "es": "Crear clases de correo",
+        "en": "Creating mailable classes"
       },
       "label": {
-        "en": "Content and attachments",
-        "es": "Contenido y adjuntos"
+        "es": "Clases Mailable",
+        "en": "Mailable classes"
       },
       "slug": {
         "es": "/es/services/mail/composing-mail",
@@ -1895,6 +1899,86 @@
       "slug": {
         "es": "/es/services/mail/transports-and-extensions",
         "en": "/en/services/mail/transports-and-extensions"
+      }
+    },
+    {
+      "id": "mail-configuration",
+      "kind": "doc",
+      "title": {
+        "es": "Configuración de correo",
+        "en": "Mail configuration"
+      },
+      "label": {
+        "es": "Configuración",
+        "en": "Configuration"
+      },
+      "slug": {
+        "es": "/es/services/mail/configuration",
+        "en": "/en/services/mail/configuration"
+      }
+    },
+    {
+      "id": "mail-content-and-views",
+      "kind": "doc",
+      "title": {
+        "es": "Contenido y vistas de correo",
+        "en": "Mail content and views"
+      },
+      "label": {
+        "es": "Contenido y vistas",
+        "en": "Content and views"
+      },
+      "slug": {
+        "es": "/es/services/mail/content-and-views",
+        "en": "/en/services/mail/content-and-views"
+      }
+    },
+    {
+      "id": "mail-attachments",
+      "kind": "doc",
+      "title": {
+        "es": "Adjuntos desde Storage",
+        "en": "Attachments from Storage"
+      },
+      "label": {
+        "es": "Adjuntos desde Storage",
+        "en": "Storage attachments"
+      },
+      "slug": {
+        "es": "/es/services/mail/attachments",
+        "en": "/en/services/mail/attachments"
+      }
+    },
+    {
+      "id": "mail-manager-and-injection",
+      "kind": "doc",
+      "title": {
+        "es": "Fachada e inyección de Mail",
+        "en": "Mail facade and injection"
+      },
+      "label": {
+        "es": "Fachada e inyección",
+        "en": "Facade and injection"
+      },
+      "slug": {
+        "es": "/es/services/mail/manager-and-injection",
+        "en": "/en/services/mail/manager-and-injection"
+      }
+    },
+    {
+      "id": "mail-api-reference",
+      "kind": "doc",
+      "title": {
+        "es": "Referencia técnica de correo",
+        "en": "Mail technical reference"
+      },
+      "label": {
+        "es": "Referencia técnica",
+        "en": "Technical reference"
+      },
+      "slug": {
+        "es": "/es/services/mail/api-reference",
+        "en": "/en/services/mail/api-reference"
       }
     },
     {

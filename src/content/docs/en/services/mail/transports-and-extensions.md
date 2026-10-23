@@ -1,183 +1,200 @@
 ---
 title: "Configuring SMTP, file, and custom transports"
-description: "Mail separates message declarations, MIME composition, and transport. Prepare sender, content, and delivery policy before the first send."
+description: "How SMTP and file transports work, effective security settings, and custom transport registration."
 editUrl: true
 lastUpdated: false
 ---
 
-Mail separates message declarations, MIME composition, and transport. Prepare sender, content, and delivery policy before the first send.
+Mail separates message declarations, MIME composition, and transport. The manager resolves a mailer from [config/mail.py](/en/services/mail/configuration), prepares every body and attachment, and only then creates and invokes its transport.
 
-## Select a mailer
+## Mailer and driver
 
-A mailer name identifies an entry in `mail.mailers`; `driver` identifies its implementation. `Mail.mailer("archive")` selects an entry and does not register a transport. Conventional `smtp` and `file` entries can infer their driver; other names require explicit `driver`. The manager resolves selection on each send and passes a normalized configuration copy to the factory.
+A **mailer** is an entry in `mail.mailers`; a **driver** identifies its implementation. Multiple mailers can use `driver="file"` or `driver="smtp"` with different settings. Selecting `mailer("archive")` does not register a new transport.
 
-`config/mail.py` includes SMTP and file entities. The top-level `Mail` entity also accepts an arbitrary mailer mapping; `Mailers` is the conventional field set. For another transport, declare a mapping like this and register its factory before sending. This block validates configuration only and does not change the active application configuration:
+The built-in drivers are `smtp` and `file`. The manager infers those drivers only for entries named exactly `smtp` or `file`; every other mailer needs an explicit `driver`.
 
-```python
-from orionis.foundation.config.mail import Mail
-
-config = Mail(
-    default="archive",
-    from_address={"address": "notifications@example.com", "name": "Reports"},
-    mailers={
-        "archive": {"driver": "custom_archive", "path": "storage/mail/archive"},
-        "file": {"driver": "file", "path": "storage/mail"},
-    },
-)
-assert config.default == "archive"
-```
-
-## Configuration
-
-`config/mail.py` defines the central mail section:
-
-| Setting | Environment | Default |
+| Driver | Dependencies | Confirmed result |
 |---|---|---|
-| Default mailer | `MAIL_MAILER` | `smtp` |
-| Global sender address | `MAIL_FROM_ADDRESS` | empty (must be supplied elsewhere before send) |
-| Global sender name | `MAIL_FROM_NAME` | `APP_NAME`, then `Orionis` |
-| SMTP URL | `MAIL_URL` | empty |
-| SMTP endpoint | `MAIL_HOST`, `MAIL_PORT` | empty host, port 587 |
-| SMTP security | `MAIL_ENCRYPTION` | `TLS` (`TLS`, `SSL`, or `none`) |
-| SMTP credentials | `MAIL_USERNAME`, `MAIL_PASSWORD` | empty pair |
-| SMTP timeout | `MAIL_TIMEOUT` | `None` |
-| File output | `MAIL_FILE_PATH` | `storage/mail` |
+| `smtp` | Python's `smtplib`, `ssl`, and `email`; an accessible SMTP server. | Complete or partial SMTP acceptance rather than final mailbox receipt. |
+| `file` | Writable filesystem supporting hard links. | MIME published as an `.eml` file rather than sent to a server. |
 
-An `smtps://` URL forces SSL; an `smtp://` URL retains configured encryption. URL credentials replace credentials as a pair when present. Named mailers may be added to `mailers`; conventional entries named `smtp` and `file` infer their driver, while other names require an explicit `driver`.
+No Orionis extras are required for these transports. The view engine and Storage are integrated framework services; cloud storage drivers used by attachments retain their [own dependencies](/en/services/storage/disks-and-drivers). Installing another mail SDK does not automatically register it as a transport.
 
+<a id="driver-smtp"></a>
 
+## SMTP: connection and delivery
 
-## Operate SMTP
+The transport uses effective `SmtpSettings`. Each send creates its own client and moves blocking work off the event loop through Orionis's executor:
 
-`TLS` means mandatory STARTTLS; `SSL` uses implicit TLS; `none` or an empty string disables TLS. There is no silent STARTTLS-to-plaintext fallback. TLS verifies hostnames and certificates using the system context and minimum TLS 1.2. The backend exposes no option to skip verification.
+1. Constructs `SMTP_SSL` for `SSL`, or `SMTP` for `TLS`/`none`.
+2. Connects to host and port, requiring an SMTP 220 greeting.
+3. Negotiates through `ehlo_or_helo_if_needed()`.
+4. In `TLS` mode, runs STARTTLS and negotiates capabilities again.
+5. Authenticates with username/password when a username is present.
+6. Checks SMTPUTF8 and 8BITMIME when the message's addresses require them.
+7. Calls `sendmail()` with the sender and recipient union from its envelope.
+8. Closes the client in `finally`, including on errors.
 
-An `smtps://` URL selects SSL and port 465 unless an explicit port is supplied. An `smtp://` URL replaces the host and any explicit port but retains configured encryption and port when not overridden: it does not force plaintext. URL credentials replace username/password as a pair. Reserved characters must be URL-encoded. Paths, queries, and fragments are rejected; hosts must be valid and ports integers from 1 through 65535.
+The transport envelope includes Bcc even though MIME has no Bcc header. A Unicode display name is encoded as a header and does not alone require SMTPUTF8. International addresses remaining non-ASCII require both server extensions.
 
-Username and password must both be present or both empty. `timeout` accepts a positive integer or `None`; set a bounded timeout for real operations because `None` leaves socket timeout behavior unbounded. International mailbox local parts require SMTPUTF8 and 8BITMIME; IDNA domain normalization alone does not require them. Errors avoid exposing credentials, but still do not log complete configuration objects or URLs.
+### Security modes
 
-## Use file for development or archives
+| Effective mode | Behavior |
+|---|---|
+| `TLS` / `MailEncryption.TLS` | Initial normal connection followed by mandatory STARTTLS. Failure does not continue in plaintext. |
+| `SSL` / `MailEncryption.SSL` | Implicit TLS through `SMTP_SSL`. |
+| `none` or empty string / `MailEncryption.NONE` | No transport-requested TLS. |
 
-The transport writes MIME to a private temporary file, flushes/fsyncs, then publishes through a random-named hard link without overwriting an existing file. Only then does it return `STORED` and `file_path`. The filesystem must support hard links; an unsupported mount fails explicitly. Relative paths resolve against the base path, absolute paths remain absolute, and anchored-but-relative Windows paths are rejected.
+Modes are case-insensitive but whitespace is not trimmed. TLS uses the system trust context, verifies certificates and hostnames, and requires at least TLS 1.2. The transport exposes no option to bypass verification.
 
-`.eml` files contain bodies, attachments, and visible addresses; protect them as application data. Publication does not send mail or schedule a worker. Define rotation, retention, and deletion outside this module: mail files are not cleaned automatically. Consumer cancellation does not guarantee that publication already running in the executor stops.
+Username and password must both be present or both empty. No alternate authentication or encryption mode is detected after failure. `timeout` is a positive integer or `None`; `None` sets no explicit socket wait limit. It is not a global deadline for every stage of a send.
 
+### Results, failures, and cancellation
 
-### Validate SMTP settings without connecting
+A transaction with no rejected recipients returns `MailStatus.ACCEPTED`; mixed acceptance and rejection returns `PARTIAL`. Rejecting every recipient raises `MailTransportException`. The [results guide](/en/services/mail/sending-and-results) explains `MailResult` fields.
+
+Connection, STARTTLS, authentication, and transaction failures become `MailTransportException` identifying the stage and SMTP code when available. Public diagnostics omit full server responses and credentials; rejection reasons are bounded, converted to one line, and redacted using known sensitive values.
+
+There is no automatic retry. An exception or cancellation does not prove server rejection: it may have accepted the message before confirmation was lost. Canceling the caller also does not necessarily stop the worker or cancel an in-progress SMTP transaction. Define retries with partial acceptance and possible duplicates in mind.
+
+<a id="smtp-settings"></a>
+
+## SmtpSettings: effective options
+
+`SmtpSettings.fromConfig(config: Mapping[str, object]) -> SmtpSettings` combines fields and URL, validates the result, and returns an immutable dataclass without connecting. Use this factory for operational settings; direct dataclass construction does not run that normalization.
+
+| Result field | Meaning |
+|---|---|
+| `host` | Effective host from URL or individual field. |
+| `port` | Effective integer port from 1 through 65535. |
+| `encryption` | `MailEncryption.TLS`, `SSL`, or `NONE`. |
+| `username` | Effective username; excluded from `repr`. |
+| `password` | Effective password; excluded from `repr`. |
+| `timeout` | Positive integer seconds or `None`. |
+| `sensitive` | URL and credential variants used to redact diagnostics; excluded from `repr`. |
+
+`smtps://` forces `SSL` and port 465 unless a port is explicit. `smtp://` retains configured encryption and port when the URL does not replace them. URL credentials replace both fields as a pair; timeout remains independent. See the [complete precedence table](/en/services/mail/configuration#config-smtp).
 
 ```python
 from orionis.mail.entities.smtp_settings import SmtpSettings
 from orionis.mail.enums.encryption import MailEncryption
 
-settings = SmtpSettings.fromConfig({
-    "url": "smtps://user:secret@mail.example.com",
-    "host": "ignored.example.com",
-    "port": 587,
-    "encryption": "TLS",
-    "username": "",
-    "password": "",
-    "timeout": 10,
-})
-assert settings.host == "mail.example.com"
-assert settings.port == 465
-assert settings.encryption is MailEncryption.SSL
-assert "secret" not in repr(settings)
-print(settings.host)
+
+def validate_smtp_options() -> SmtpSettings:
+    settings = SmtpSettings.fromConfig({
+        "url": "smtps://smtp.example.com",
+        "port": 587,
+        "encryption": "TLS",
+        "username": "",
+        "password": "",
+        "timeout": 15,
+    })
+    assert settings.port == 465
+    assert settings.encryption is MailEncryption.SSL
+    return settings
 ```
 
-### Publish a prepared message with the file transport
+Hiding fields from `repr` does not make configuration a secret store; avoid logging complete mappings, URLs, or the `sensitive` field.
+
+<a id="driver-file"></a>
+
+## File: preview or archive messages
+
+Configure local storage before startup:
+
+```dotenv
+MAIL_MAILER=file
+MAIL_FROM_ADDRESS=notifications@example.com
+MAIL_FILE_PATH=storage/mail
+```
+
+This service receives the manager through injection and explicitly selects file; it only publishes a local file:
 
 ```python
-import asyncio
-from tempfile import TemporaryDirectory
-from pathlib import Path
-from orionis.mail.entities.prepared import PreparedMail
-from orionis.mail.transports.file import FileTransport
+from orionis.mail.contracts import IMailManager
+from orionis.mail.entities.result import MailResult
 
 
-async def main() -> None:
-    prepared = PreparedMail(
-        message_id="<example@example.com>",
-        sender="a@example.com",
-        recipients=("b@example.com",),
-        mime=b"Subject: Example\r\n\r\nHello\r\n",
-        smtp_utf8=False,
-    )
-    with TemporaryDirectory() as root:
-        result = await FileTransport(Path(root)).send(prepared, mailer="file", driver="file")
-        assert result.file_path is not None
-        assert result.file_path.read_bytes() == prepared.mime
-        print(result.status)
+class LocalMailPreview:
+    def __init__(self, mail: IMailManager) -> None:
+        self.mail = mail
 
-
-asyncio.run(main())
+    async def save(self) -> MailResult:
+        return await (
+            self.mail.mailer("file")
+            .fromAddress("notifications@example.com", "Example")
+            .to("reader@example.com")
+            .subject("Preview")
+            .raw("This message is stored locally.")
+        )
 ```
 
-## Implement and register a transport
+The transport creates its output directory when publishing. Relative paths resolve from the application root; absolute paths are preserved. Its factory rejects anchored but relative Windows paths. It does not use a Storage disk to publish `.eml`: `MAIL_FILE_PATH` directly configures the destination.
 
-Implement async `IMailTransport.send(prepared, *, mailer, driver) -> MailResult`. It receives `PreparedMail` with complete MIME and separate sender/recipient data: use that transport envelope to preserve Bcc, and do not infer delivery recipients from visible headers. Composition is validated before transport creation.
+### Publication and retention
 
-A factory receives `(app, normalized_config)` and may be sync or async. It must return an `IMailTransport` instance; an unrelated object with a similarly named method is insufficient. `extend(name, factory)` rejects empty names, duplicates, and built-in `smtp`/`file` drivers. Registration is shared; finish during boot. Results must describe real evidence and must not claim SMTP acceptance before confirmation.
+The worker writes complete MIME to a private temporary file in the output directory, calls `flush()` and `fsync()`, then publishes a random filename through a hard link. It never replaces an existing file; a collision or filesystem lacking hard-link support raises `MailTransportException`. The temporary is removed in `finally` when possible. Cleanup is not guaranteed if the filesystem also rejects deletion.
 
-The following factory reuses file transport at another destination. The second block assumes `archive_factory` has been defined by the first:
+Only after publication does it return `MailStatus.STORED` with `file_path`. This implies neither SMTP acceptance nor delivery. A new final directory is created with mode `0700`; effective permissions depend on the operating system, and existing directory permissions are not rewritten.
 
+Files contain bodies, visible addresses, and every encoded attachment. Published `.eml` files have no automatic rotation, retention, or cleanup. Define those policies for the destination. Cancellation may return control to the caller while the worker finishes publishing and cleaning its temporary file.
 
-### Implement an asynchronous custom transport factory
+<a id="custom-transports"></a>
+
+## Register custom transports
+
+The actual contract is:
+
+```text
+async IMailTransport.send(
+    message: PreparedMail,
+    *,
+    mailer: str,
+    driver: str,
+) -> MailResult
+```
+
+The transport receives complete MIME, `message_id`, sender, recipients, and `smtp_utf8` through `PreparedMail`. It receives no views, controllers, or Storage paths. Use `message.sender` and `message.recipients` for the envelope; rebuilding recipients from visible headers would lose Bcc.
+
+`extend(driver, factory)` accepts a synchronous or asynchronous factory with arguments `(app, normalized_config)`. It must return an **`IMailTransport` instance**, rather than just an object exposing `send`. The factory runs per send after MIME preparation. It can resolve container services; an implementation needing shared connections must manage their lifecycle.
+
+### Reuse file through a custom driver
+
+This factory retains `FileTransport`'s publication behavior:
 
 ```python
 from collections.abc import Mapping
-from pathlib import Path
+from orionis.container.providers import ServiceProvider
 from orionis.foundation.contracts.application import IApplication
-from orionis.mail.contracts.transport import IMailTransport
-from orionis.mail.transports.file import FileTransport
+from orionis.mail.contracts import IMailManager, IMailTransport
+from orionis.mail.transports.file import create_file_transport
 
 
-async def archive_factory(
+def create_archive_transport(
     app: IApplication,
     config: Mapping[str, object],
 ) -> IMailTransport:
-    path = Path(str(config.get("path", "storage/mail/archive")))
-    if not path.is_absolute():
-        path = app.basePath / path
-    return FileTransport(path)
+    return create_file_transport(app, config)
+
+
+class ArchiveMailProvider(ServiceProvider):
+    async def boot(self) -> None:
+        mail: IMailManager = await self.app.make(IMailManager)
+        mail.extend("custom_archive", create_archive_transport)
 ```
 
-### Register the custom driver
+Add `ArchiveMailProvider` to the existing `app.withProviders(...)` call in `bootstrap/app.py`. Configure an entry with explicit name and driver in the `BootstrapMail.mailers` factory:
 
 ```python
-from orionis.mail.manager import MailManager
-
-
-def register_archive(manager: MailManager) -> None:
-    manager.extend("custom_archive", archive_factory)
+def archive_mailers() -> dict:
+    return {
+        "archive": {"driver": "custom_archive", "path": "storage/mail/archive"},
+        "file": {"driver": "file", "path": "storage/mail"},
+    }
 ```
 
-## Errors and edge cases
+Use `archive_mailers` as that field's `default_factory` and select `MAIL_MAILER=archive`, or call `mail.mailer("archive")` for one operation. The provider registered the driver implementation; the mailer name only selects configuration.
 
-- Header controls, ambiguous address syntax, invalid domains, empty view identifiers, body conflicts, unsafe attachment paths/names/types, and Bcc overlap raise `MailCompositionException` subclasses.
-- Sending without a sender or transport recipients fails during composition. An empty subject or literal body is valid.
-- Attachment failures are reported as `MailAttachmentException`; missing files are not detected at declaration time.
-- Unknown mailers/drivers, duplicate extensions, malformed SMTP settings, and invalid factory results raise `MailConfigurationException`.
-- SMTP failures become `MailTransportException` with bounded, single-line, credential-redacted diagnostics.
-- Mandatory STARTTLS fails when the server does not advertise it. International local parts require SMTPUTF8 support.
-- File publication never overwrites an existing file and fails explicitly when atomic hard links are unsupported.
-- Bcc recipients are included in the transport union but never serialized into MIME headers.
-- A partial SMTP result must be handled according to application retry/idempotency policy; blindly resending may duplicate delivery to already accepted recipients.
+Registration rejects blank names, non-callable factories, duplicates, and the built-in `smtp`/`file` drivers rather than replacing them. Register extensions once during startup, before concurrent sends. The manager adds no retry, fallback, queue, or automatic closure for custom transports; their results must represent actual evidence of acceptance or storage.
 
-## Implementation reference for extensions
-
-| Path | Responsibility |
-|---|---|
-| `entities/` | Addresses, envelopes, content, attachments, options, prepared MIME, settings, and results. |
-| `mailable.py` | Reusable declarative mail abstraction. |
-| `message.py` | Operation-local callback configurator. |
-| `pending.py` | Immutable fluent chains and async terminal overloads. |
-| `composer.py` | View rendering, storage reads, MIME composition, Bcc separation. |
-| `manager.py` | Configuration, driver registry, global sender, and delivery orchestration. |
-| `transports/smtp.py` | Blocking SMTP boundary executed away from the event loop. |
-| `transports/file.py` | Atomic unique `.eml` publication. |
-| `contracts/` | Manager and transport interfaces. |
-| `provider.py`, `exceptions.py`, `enums/`, `types.py` | Container wiring and supporting public types. |
-
----
-
-[Index](/en/services/mail) · [foundation](/en/getting-started) · [container](/en/architecture/service-container) · [storage](/en/services/storage)
+See [attachments from Storage](/en/services/mail/attachments) for preparation before transport and the [technical reference](/en/services/mail/api-reference) for contracts.

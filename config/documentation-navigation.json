@@ -906,9 +906,52 @@
       },
       "pageIds": [
         "mail-overview",
+        "mail-configuration",
+        "mail-transports-and-extensions",
         "mail-composing-mail",
+        "mail-content-and-views",
+        "mail-attachments",
         "mail-sending-and-results",
-        "mail-transports-and-extensions"
+        "mail-manager-and-injection",
+        "mail-api-reference"
+      ],
+      "groups": [
+        {
+          "id": "mail-setup",
+          "title": {
+            "es": "Configuración y transportes",
+            "en": "Configuration and transports"
+          },
+          "pageIds": [
+            "mail-overview",
+            "mail-configuration",
+            "mail-transports-and-extensions"
+          ]
+        },
+        {
+          "id": "mail-messages",
+          "title": {
+            "es": "Construcción y envío",
+            "en": "Composition and sending"
+          },
+          "pageIds": [
+            "mail-composing-mail",
+            "mail-content-and-views",
+            "mail-attachments",
+            "mail-sending-and-results"
+          ]
+        },
+        {
+          "id": "mail-reference",
+          "title": {
+            "es": "Servicios y referencia",
+            "en": "Services and reference"
+          },
+          "pageIds": [
+            "mail-manager-and-injection",
+            "mail-api-reference"
+          ]
+        }
       ]
     },
     {

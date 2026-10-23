@@ -1,0 +1,1478 @@
+{
+  "scope": "Own public declarations in Mail, mail configuration and its facade; constructors included; generated dataclass constructors are described through their fields. Contracts and backend overrides are separate lexical declarations. Overloads and public type aliases are included. Private implementation, export plumbing, inherited third-party APIs and generated dataclass methods are excluded.",
+  "sourceRoots": [
+    "orionis/mail",
+    "orionis/foundation/config/mail"
+  ],
+  "sourceFiles": [
+    "config/mail.py",
+    "orionis/support/facades/mail.py"
+  ],
+  "hashes": {
+    "config/mail.py": "42d504c5d3f90c7e2b668da8584fd155dd3220e364ed30169888522cdea06fc3",
+    "orionis/foundation/config/mail/__init__.py": "83886d01594650c68fe7b715b372d20d653445bd2816e63ad9033a64adc90237",
+    "orionis/foundation/config/mail/entities/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "orionis/foundation/config/mail/entities/file.py": "fa67136703e1d05f8e6b6f5624cb806809d365c8538704f222ba30b16e748f7e",
+    "orionis/foundation/config/mail/entities/from_address.py": "2f3915b66dc55e83270b6584f15f2b2a14e7dc04c2755f1c23d283e068c490ee",
+    "orionis/foundation/config/mail/entities/mail.py": "c0f6fb1a107e663c7fb1411612ff29348c94bfbcf638334704d31b4996b56394",
+    "orionis/foundation/config/mail/entities/mailers.py": "f698e5097983d8c5c6a9bd66c769fe5af1a550636c06fe3c9e025b2dd12030ea",
+    "orionis/foundation/config/mail/entities/smtp.py": "cc27bf446dc56f847ca536829453994bae802822b043acf6210826d8bf86673a",
+    "orionis/foundation/config/mail/enums/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "orionis/foundation/config/mail/enums/drivers.py": "b0b7809cc8e9fc16d8e3617c4f97777093f856e5ab357cc8a67f6ebedecc2fe3",
+    "orionis/mail/__init__.py": "524f508bc49e531a914125b4261914548f766c8c9976901b9361d7336919de09",
+    "orionis/mail/composer.py": "e5d920f2091a87f014b4dee14702730be4152895f79349ae59540ace12c8503a",
+    "orionis/mail/contracts/__init__.py": "b6d7c8982638880a8088766bffdce195015c25bea41bca942444d580b4d5e46d",
+    "orionis/mail/contracts/manager.py": "f65818a6d19b4f477194e1683237b9aea4c136d5fb7ca92b29fe91d73900c491",
+    "orionis/mail/contracts/transport.py": "ddf87382e1a50f9ed2b33b2b894dbda4253dc022ac730fb674c3d5404e3408db",
+    "orionis/mail/entities/__init__.py": "6102469134c2e81eee8c909e5d3db8380f0b21adf91b5488e9392518e223dd7d",
+    "orionis/mail/entities/address.py": "daf1868d32c8a3d962ba8a36197ccee4bc54eb7ade44762c0be7689164206409",
+    "orionis/mail/entities/attachment.py": "87897bb46969b003363662621fc75b4d86eccbcb4fc6ae183cc9b6e2ef459e74",
+    "orionis/mail/entities/content.py": "75a6f7fcb78ef14d90d76490718e9fae0acd3288f5d746b9dcc6991d286f084c",
+    "orionis/mail/entities/envelope.py": "3bcd142f6f2e52dc8c761c1522a3587abc90d664257b0fa5bf0a44d371b797b2",
+    "orionis/mail/entities/options.py": "1db91dd5a261b833a4ba0b55cf7665bbb90a07b99a011141471e1b9ae5be0fc8",
+    "orionis/mail/entities/prepared.py": "688e9130023f455dd08ddb561adac7982c8e3d65c75d175f211a2cc1a074de54",
+    "orionis/mail/entities/result.py": "21ad3a7a194ea7944ae677372c6c3b8af6c223e670ae66e2f011ebae3fdfa583",
+    "orionis/mail/entities/smtp_settings.py": "78ece13226eeb65e33333da1c56483d8d89da945f4ef02a9b5376d3a6f58a96e",
+    "orionis/mail/enums/__init__.py": "a9f68f15b2b46432131babb007cc1e9e298a69c23d75ddfc7290da1dcef1a906",
+    "orionis/mail/enums/encryption.py": "f406553dcb3afd58b984602db4cb5b6db86e13a2380c58f24d406972739415ae",
+    "orionis/mail/enums/status.py": "c337de9950254ac4ba68d0983fa313a9ed0b5349cc46c022a139098ebd0ff614",
+    "orionis/mail/exceptions.py": "5b50d8ae764ab4a99913ea36fa99ee3e591d6db42af8bc0135355c0934fc2982",
+    "orionis/mail/functions.py": "2fcf8e88d77f724f10d5f00cc52635eee4c05dbc02514727658c99830bb11a4d",
+    "orionis/mail/mailable.py": "548c93f34e1c1c2bc83be2805fa2fb24c42872ab563c407568980b8c0bc85bc0",
+    "orionis/mail/manager.py": "2f68fcf2b8f345dfa6e8520e8fefa68e087b09126508854f165625c67f56c358",
+    "orionis/mail/message.py": "52822f78fb177edbe7d75c38d4f94e176e076ff3152871f8ed05d9cc355d85cc",
+    "orionis/mail/pending.py": "55cbcfb9f79f56c6260d3e37b17d57a13de9b308d9201399843b9b03db41f68f",
+    "orionis/mail/provider.py": "012e2c27a3f22d743ea43cb78142438215e6d68749c818b721ce6fa07a3cd35b",
+    "orionis/mail/transports/__init__.py": "b7c0789268edefd096e2901bb54cf45028ce395c02958b8d0005bd041d2ab911",
+    "orionis/mail/transports/file.py": "c4b86dad37d29dbcc1a3b698ec5850bff995ef68f7d1317f3beac62908bb721f",
+    "orionis/mail/transports/smtp.py": "186cae9828004c60b025273af29ad508dafda7e089c422547f2a43e2a021e487",
+    "orionis/mail/types.py": "15b38f714f43d1d8de784b8f4f3ce0881763a47eb7a1dac3fea0387b97642ab6",
+    "orionis/support/facades/mail.py": "a1b799e19e069d89afaf90559c5d6c49e95885c314acd77bb93f1806ec38331b"
+  },
+  "entries": [
+    {
+      "source": "config/mail.py",
+      "symbol": "BootstrapMail",
+      "kind": "class",
+      "line": 9,
+      "signature": "class BootstrapMail",
+      "reference": "/services/mail/configuration#config-mail"
+    },
+    {
+      "source": "config/mail.py",
+      "symbol": "BootstrapMail.default",
+      "kind": "field",
+      "line": 16,
+      "signature": "default: str | MailDriver = field(default_factory=lambda: Env.get('MAIL_MAILER', MailDriver.SMTP))",
+      "reference": "/services/mail/configuration#config-mail"
+    },
+    {
+      "source": "config/mail.py",
+      "symbol": "BootstrapMail.from_address",
+      "kind": "field",
+      "line": 25,
+      "signature": "from_address: FromAddress | dict = field(default_factory=lambda: FromAddress(address=Env.get('MAIL_FROM_ADDRESS', ''), name=Env.get('MAIL_FROM_NAME', Env.get('APP_NAME', 'Orionis'))))",
+      "reference": "/services/mail/configuration#config-mail"
+    },
+    {
+      "source": "config/mail.py",
+      "symbol": "BootstrapMail.mailers",
+      "kind": "field",
+      "line": 37,
+      "signature": "mailers: Mailers | dict = field(default_factory=lambda: Mailers(smtp=Smtp(url=Env.get('MAIL_URL', ''), host=Env.get('MAIL_HOST', ''), port=Env.get('MAIL_PORT', 587), encryption=Env.get('MAIL_ENCRYPTION', 'TLS'), username=Env.get('MAIL_USERNAME', ''), password=Env.get('MAIL_PASSWORD', ''), timeout=Env.get('MAIL_TIMEOUT', None)), file=File(path=Env.get('MAIL_FILE_PATH', 'storage/mail'))))",
+      "reference": "/services/mail/configuration#config-mail"
+    },
+    {
+      "source": "orionis/foundation/config/mail/entities/file.py",
+      "symbol": "File",
+      "kind": "class",
+      "line": 7,
+      "signature": "class File",
+      "reference": "/services/mail/configuration#config-file"
+    },
+    {
+      "source": "orionis/foundation/config/mail/entities/file.py",
+      "symbol": "File.path",
+      "kind": "field",
+      "line": 17,
+      "signature": "path: str = field(default_factory=lambda: Env.get('MAIL_FILE_PATH', 'storage/mail'), metadata={'description': 'The file path where outgoing emails are stored.', 'default': 'storage/mail'})",
+      "reference": "/services/mail/configuration#config-file"
+    },
+    {
+      "source": "orionis/foundation/config/mail/entities/from_address.py",
+      "symbol": "FromAddress",
+      "kind": "class",
+      "line": 7,
+      "signature": "class FromAddress",
+      "reference": "/services/mail/configuration#config-fromaddress"
+    },
+    {
+      "source": "orionis/foundation/config/mail/entities/from_address.py",
+      "symbol": "FromAddress.address",
+      "kind": "field",
+      "line": 19,
+      "signature": "address: str = field(default_factory=lambda: Env.get('MAIL_FROM_ADDRESS', ''), metadata={'description': 'The sender mailbox used when a message declares none.', 'default': ''})",
+      "reference": "/services/mail/configuration#config-fromaddress"
+    },
+    {
+      "source": "orionis/foundation/config/mail/entities/from_address.py",
+      "symbol": "FromAddress.name",
+      "kind": "field",
+      "line": 27,
+      "signature": "name: str = field(default_factory=lambda: Env.get('MAIL_FROM_NAME', Env.get('APP_NAME', 'Orionis')), metadata={'description': 'The display name attached to the global sender.', 'default': 'Orionis'})",
+      "reference": "/services/mail/configuration#config-fromaddress"
+    },
+    {
+      "source": "orionis/foundation/config/mail/entities/mail.py",
+      "symbol": "Mail",
+      "kind": "class",
+      "line": 14,
+      "signature": "class Mail",
+      "reference": "/services/mail/configuration#config-mail"
+    },
+    {
+      "source": "orionis/foundation/config/mail/entities/mail.py",
+      "symbol": "Mail.default",
+      "kind": "field",
+      "line": 28,
+      "signature": "default: str | MailDriver = field(default_factory=lambda: Env.get('MAIL_MAILER', MailDriver.SMTP), metadata={'description': 'The default configured mailer name.', 'default': 'smtp'})",
+      "reference": "/services/mail/configuration#config-mail"
+    },
+    {
+      "source": "orionis/foundation/config/mail/entities/mail.py",
+      "symbol": "Mail.from_address",
+      "kind": "field",
+      "line": 36,
+      "signature": "from_address: FromAddress | dict = field(default_factory=FromAddress, metadata={'description': 'The global sender used when a message declares none.', 'default': lambda: FromAddress().toDict()})",
+      "reference": "/services/mail/configuration#config-mail"
+    },
+    {
+      "source": "orionis/foundation/config/mail/entities/mail.py",
+      "symbol": "Mail.mailers",
+      "kind": "field",
+      "line": 44,
+      "signature": "mailers: Mailers | dict = field(default_factory=Mailers, metadata={'description': 'The available named mailer configurations.', 'default': lambda: Mailers().toDict()})",
+      "reference": "/services/mail/configuration#config-mail"
+    },
+    {
+      "source": "orionis/foundation/config/mail/entities/mailers.py",
+      "symbol": "Mailers",
+      "kind": "class",
+      "line": 11,
+      "signature": "class Mailers",
+      "reference": "/services/mail/configuration#config-mailers"
+    },
+    {
+      "source": "orionis/foundation/config/mail/entities/mailers.py",
+      "symbol": "Mailers.smtp",
+      "kind": "field",
+      "line": 23,
+      "signature": "smtp: Smtp | dict = field(default_factory=Smtp, metadata={'description': 'The SMTP configuration used for sending emails.', 'default': lambda: Smtp().toDict()})",
+      "reference": "/services/mail/configuration#config-mailers"
+    },
+    {
+      "source": "orionis/foundation/config/mail/entities/mailers.py",
+      "symbol": "Mailers.file",
+      "kind": "field",
+      "line": 31,
+      "signature": "file: File | dict = field(default_factory=File, metadata={'description': 'The file-based mail transport configuration.', 'default': lambda: File().toDict()})",
+      "reference": "/services/mail/configuration#config-mailers"
+    },
+    {
+      "source": "orionis/foundation/config/mail/entities/smtp.py",
+      "symbol": "Smtp",
+      "kind": "class",
+      "line": 8,
+      "signature": "class Smtp",
+      "reference": "/services/mail/configuration#config-smtp"
+    },
+    {
+      "source": "orionis/foundation/config/mail/entities/smtp.py",
+      "symbol": "Smtp.driver",
+      "kind": "field",
+      "line": 38,
+      "signature": "driver: str = field(default='smtp', metadata={'description': 'The driver type for the mail transport.', 'default': 'smtp'})",
+      "reference": "/services/mail/configuration#config-smtp"
+    },
+    {
+      "source": "orionis/foundation/config/mail/entities/smtp.py",
+      "symbol": "Smtp.url",
+      "kind": "field",
+      "line": 46,
+      "signature": "url: str = field(default_factory=lambda: Env.get('MAIL_URL', ''), metadata={'description': 'The full URL for the SMTP service.', 'default': ''})",
+      "reference": "/services/mail/configuration#config-smtp"
+    },
+    {
+      "source": "orionis/foundation/config/mail/entities/smtp.py",
+      "symbol": "Smtp.host",
+      "kind": "field",
+      "line": 54,
+      "signature": "host: str = field(default_factory=lambda: Env.get('MAIL_HOST', ''), metadata={'description': 'The hostname of the SMTP server.', 'default': ''})",
+      "reference": "/services/mail/configuration#config-smtp"
+    },
+    {
+      "source": "orionis/foundation/config/mail/entities/smtp.py",
+      "symbol": "Smtp.port",
+      "kind": "field",
+      "line": 62,
+      "signature": "port: int = field(default_factory=lambda: Env.get('MAIL_PORT', 587), metadata={'description': 'The port number used for SMTP communication.', 'default': 587})",
+      "reference": "/services/mail/configuration#config-smtp"
+    },
+    {
+      "source": "orionis/foundation/config/mail/entities/smtp.py",
+      "symbol": "Smtp.encryption",
+      "kind": "field",
+      "line": 70,
+      "signature": "encryption: str = field(default_factory=lambda: Env.get('MAIL_ENCRYPTION', 'TLS'), metadata={'description': 'The encryption type used for secure communication.', 'default': 'TLS'})",
+      "reference": "/services/mail/configuration#config-smtp"
+    },
+    {
+      "source": "orionis/foundation/config/mail/entities/smtp.py",
+      "symbol": "Smtp.username",
+      "kind": "field",
+      "line": 78,
+      "signature": "username: str = field(default_factory=lambda: Env.get('MAIL_USERNAME', ''), metadata={'description': 'The username for authentication with the SMTP server.', 'default': ''})",
+      "reference": "/services/mail/configuration#config-smtp"
+    },
+    {
+      "source": "orionis/foundation/config/mail/entities/smtp.py",
+      "symbol": "Smtp.password",
+      "kind": "field",
+      "line": 86,
+      "signature": "password: str = field(default_factory=lambda: Env.get('MAIL_PASSWORD', ''), metadata={'description': 'The password for authentication with the SMTP server.', 'default': ''})",
+      "reference": "/services/mail/configuration#config-smtp"
+    },
+    {
+      "source": "orionis/foundation/config/mail/entities/smtp.py",
+      "symbol": "Smtp.timeout",
+      "kind": "field",
+      "line": 94,
+      "signature": "timeout: int | None = field(default_factory=lambda: Env.get('MAIL_TIMEOUT', None), metadata={'description': 'The connection timeout duration in seconds.', 'default': None})",
+      "reference": "/services/mail/configuration#config-smtp"
+    },
+    {
+      "source": "orionis/foundation/config/mail/enums/drivers.py",
+      "symbol": "MailDriver",
+      "kind": "class",
+      "line": 3,
+      "signature": "class MailDriver",
+      "reference": "/services/mail/configuration#config-maildriver"
+    },
+    {
+      "source": "orionis/foundation/config/mail/enums/drivers.py",
+      "symbol": "MailDriver.SMTP",
+      "kind": "constant",
+      "line": 15,
+      "signature": "SMTP = 'smtp'",
+      "reference": "/services/mail/configuration#config-maildriver"
+    },
+    {
+      "source": "orionis/foundation/config/mail/enums/drivers.py",
+      "symbol": "MailDriver.FILE",
+      "kind": "constant",
+      "line": 16,
+      "signature": "FILE = 'file'",
+      "reference": "/services/mail/configuration#config-maildriver"
+    },
+    {
+      "source": "orionis/mail/composer.py",
+      "symbol": "LoadedAttachment",
+      "kind": "type-alias",
+      "line": 23,
+      "signature": "type LoadedAttachment = tuple[Attachment, bytes, str | None]",
+      "reference": "/services/mail/api-reference#mail-types"
+    },
+    {
+      "source": "orionis/mail/composer.py",
+      "symbol": "MailComposer",
+      "kind": "class",
+      "line": 27,
+      "signature": "class MailComposer",
+      "reference": "/services/mail/api-reference#composer"
+    },
+    {
+      "source": "orionis/mail/composer.py",
+      "symbol": "MailComposer.__init__",
+      "kind": "method",
+      "line": 39,
+      "signature": "__init__(self, view: IViewEngine, storage: IStorageManager) -> None",
+      "reference": "/services/mail/api-reference#composer"
+    },
+    {
+      "source": "orionis/mail/composer.py",
+      "symbol": "MailComposer.prepare",
+      "kind": "method",
+      "line": 58,
+      "signature": "async prepare(self, envelope: Envelope, content: Content, attachments: tuple[Attachment, ...]) -> PreparedMail",
+      "reference": "/services/mail/api-reference#composer"
+    },
+    {
+      "source": "orionis/mail/contracts/manager.py",
+      "symbol": "IMailManager",
+      "kind": "class",
+      "line": 16,
+      "signature": "class IMailManager",
+      "reference": "/services/mail/sending-and-results#pending-construction"
+    },
+    {
+      "source": "orionis/mail/contracts/manager.py",
+      "symbol": "IMailManager.mailer",
+      "kind": "method",
+      "line": 28,
+      "signature": "mailer(self, name: str) -> PendingMail",
+      "reference": "/services/mail/sending-and-results#pending-mailer"
+    },
+    {
+      "source": "orionis/mail/contracts/manager.py",
+      "symbol": "IMailManager.fromAddress",
+      "kind": "method",
+      "line": 49,
+      "signature": "fromAddress(self, address: str | Address, name: str | None=None) -> PendingMail",
+      "reference": "/services/mail/sending-and-results#pending-fromaddress"
+    },
+    {
+      "source": "orionis/mail/contracts/manager.py",
+      "symbol": "IMailManager.to",
+      "kind": "method",
+      "line": 76,
+      "signature": "to(self, addresses: Recipients, name: str | None=None) -> PendingMail",
+      "reference": "/services/mail/sending-and-results#pending-to"
+    },
+    {
+      "source": "orionis/mail/contracts/manager.py",
+      "symbol": "IMailManager.cc",
+      "kind": "method",
+      "line": 99,
+      "signature": "cc(self, addresses: Recipients, name: str | None=None) -> PendingMail",
+      "reference": "/services/mail/sending-and-results#pending-cc"
+    },
+    {
+      "source": "orionis/mail/contracts/manager.py",
+      "symbol": "IMailManager.bcc",
+      "kind": "method",
+      "line": 122,
+      "signature": "bcc(self, addresses: Recipients, name: str | None=None) -> PendingMail",
+      "reference": "/services/mail/sending-and-results#pending-bcc"
+    },
+    {
+      "source": "orionis/mail/contracts/manager.py",
+      "symbol": "IMailManager.replyTo",
+      "kind": "method",
+      "line": 145,
+      "signature": "replyTo(self, addresses: Recipients, name: str | None=None) -> PendingMail",
+      "reference": "/services/mail/sending-and-results#pending-replyto"
+    },
+    {
+      "source": "orionis/mail/contracts/manager.py",
+      "symbol": "IMailManager.subject",
+      "kind": "method",
+      "line": 168,
+      "signature": "subject(self, value: str) -> PendingMail",
+      "reference": "/services/mail/sending-and-results#pending-subject"
+    },
+    {
+      "source": "orionis/mail/contracts/manager.py",
+      "symbol": "IMailManager.attach",
+      "kind": "method",
+      "line": 189,
+      "signature": "attach(self, attachment: Attachment) -> PendingMail",
+      "reference": "/services/mail/sending-and-results#pending-attach"
+    },
+    {
+      "source": "orionis/mail/contracts/manager.py",
+      "symbol": "IMailManager.send[overload 1]",
+      "kind": "overload",
+      "line": 210,
+      "signature": "async send(self, mailable: Mailable | type[Mailable], /) -> MailResult",
+      "reference": "/services/mail/sending-and-results#pending-send"
+    },
+    {
+      "source": "orionis/mail/contracts/manager.py",
+      "symbol": "IMailManager.send[overload 2]",
+      "kind": "overload",
+      "line": 214,
+      "signature": "async send(self, view: str, /, data: Mapping[str, object] | None=None, callback: MessageCallback | None=None) -> MailResult",
+      "reference": "/services/mail/sending-and-results#pending-send"
+    },
+    {
+      "source": "orionis/mail/contracts/manager.py",
+      "symbol": "IMailManager.send[overload 3]",
+      "kind": "overload",
+      "line": 224,
+      "signature": "async send(self, content: Content, /, *, callback: MessageCallback | None=None) -> MailResult",
+      "reference": "/services/mail/sending-and-results#pending-send"
+    },
+    {
+      "source": "orionis/mail/contracts/manager.py",
+      "symbol": "IMailManager.send",
+      "kind": "method",
+      "line": 234,
+      "signature": "async send(self, value: Mailable | type[Mailable] | str | Content, /, data: object=MISSING, callback: object=MISSING) -> MailResult",
+      "reference": "/services/mail/sending-and-results#pending-send"
+    },
+    {
+      "source": "orionis/mail/contracts/manager.py",
+      "symbol": "IMailManager.raw",
+      "kind": "method",
+      "line": 265,
+      "signature": "async raw(self, text: str, callback: MessageCallback | None=None) -> MailResult",
+      "reference": "/services/mail/sending-and-results#pending-raw"
+    },
+    {
+      "source": "orionis/mail/contracts/manager.py",
+      "symbol": "IMailManager.html",
+      "kind": "method",
+      "line": 292,
+      "signature": "async html(self, html: str, callback: MessageCallback | None=None) -> MailResult",
+      "reference": "/services/mail/sending-and-results#pending-html"
+    },
+    {
+      "source": "orionis/mail/contracts/manager.py",
+      "symbol": "IMailManager.extend",
+      "kind": "method",
+      "line": 319,
+      "signature": "extend(self, driver: str, factory: TransportFactory) -> None",
+      "reference": "/services/mail/transports-and-extensions#custom-transports"
+    },
+    {
+      "source": "orionis/mail/contracts/transport.py",
+      "symbol": "IMailTransport",
+      "kind": "class",
+      "line": 9,
+      "signature": "class IMailTransport",
+      "reference": "/services/mail/transports-and-extensions#custom-transports"
+    },
+    {
+      "source": "orionis/mail/contracts/transport.py",
+      "symbol": "IMailTransport.send",
+      "kind": "method",
+      "line": 20,
+      "signature": "async send(self, message: PreparedMail, *, mailer: str, driver: str) -> MailResult",
+      "reference": "/services/mail/transports-and-extensions#custom-transports"
+    },
+    {
+      "source": "orionis/mail/entities/address.py",
+      "symbol": "Address",
+      "kind": "class",
+      "line": 15,
+      "signature": "class Address",
+      "reference": "/services/mail/composing-mail#address"
+    },
+    {
+      "source": "orionis/mail/entities/address.py",
+      "symbol": "Address.address",
+      "kind": "field",
+      "line": 27,
+      "signature": "address: str",
+      "reference": "/services/mail/composing-mail#address"
+    },
+    {
+      "source": "orionis/mail/entities/address.py",
+      "symbol": "Address.name",
+      "kind": "field",
+      "line": 28,
+      "signature": "name: str | None = None",
+      "reference": "/services/mail/composing-mail#address"
+    },
+    {
+      "source": "orionis/mail/entities/address.py",
+      "symbol": "Address.asHeader",
+      "kind": "method",
+      "line": 81,
+      "signature": "asHeader(self) -> HeaderAddress",
+      "reference": "/services/mail/composing-mail#address-asheader"
+    },
+    {
+      "source": "orionis/mail/entities/address.py",
+      "symbol": "one_address",
+      "kind": "function",
+      "line": 98,
+      "signature": "one_address(value: str | Address, name: str | None=None) -> Address",
+      "reference": "/services/mail/composing-mail#address-one_address"
+    },
+    {
+      "source": "orionis/mail/entities/address.py",
+      "symbol": "addresses",
+      "kind": "function",
+      "line": 126,
+      "signature": "addresses(value: Recipients, name: str | None=None) -> tuple[Address, ...]",
+      "reference": "/services/mail/composing-mail#address-addresses"
+    },
+    {
+      "source": "orionis/mail/entities/attachment.py",
+      "symbol": "Attachment",
+      "kind": "class",
+      "line": 9,
+      "signature": "class Attachment",
+      "reference": "/services/mail/attachments#attachment"
+    },
+    {
+      "source": "orionis/mail/entities/attachment.py",
+      "symbol": "Attachment.path",
+      "kind": "field",
+      "line": 25,
+      "signature": "path: str",
+      "reference": "/services/mail/attachments#attachment"
+    },
+    {
+      "source": "orionis/mail/entities/attachment.py",
+      "symbol": "Attachment.disk",
+      "kind": "field",
+      "line": 26,
+      "signature": "disk: str | None = None",
+      "reference": "/services/mail/attachments#attachment"
+    },
+    {
+      "source": "orionis/mail/entities/attachment.py",
+      "symbol": "Attachment.name",
+      "kind": "field",
+      "line": 27,
+      "signature": "name: str | None = None",
+      "reference": "/services/mail/attachments#attachment"
+    },
+    {
+      "source": "orionis/mail/entities/attachment.py",
+      "symbol": "Attachment.mime_type",
+      "kind": "field",
+      "line": 28,
+      "signature": "mime_type: str | None = None",
+      "reference": "/services/mail/attachments#attachment"
+    },
+    {
+      "source": "orionis/mail/entities/attachment.py",
+      "symbol": "Attachment.fromStorage",
+      "kind": "method",
+      "line": 60,
+      "signature": "fromStorage(cls, path: str, *, disk: str | None=None, name: str | None=None, mime_type: str | None=None) -> Self",
+      "reference": "/services/mail/attachments#attachment-fromstorage"
+    },
+    {
+      "source": "orionis/mail/entities/content.py",
+      "symbol": "Content",
+      "kind": "class",
+      "line": 8,
+      "signature": "class Content",
+      "reference": "/services/mail/content-and-views#content"
+    },
+    {
+      "source": "orionis/mail/entities/content.py",
+      "symbol": "Content.view",
+      "kind": "field",
+      "line": 26,
+      "signature": "view: str | None = None",
+      "reference": "/services/mail/content-and-views#content"
+    },
+    {
+      "source": "orionis/mail/entities/content.py",
+      "symbol": "Content.html",
+      "kind": "field",
+      "line": 27,
+      "signature": "html: str | None = None",
+      "reference": "/services/mail/content-and-views#content"
+    },
+    {
+      "source": "orionis/mail/entities/content.py",
+      "symbol": "Content.text",
+      "kind": "field",
+      "line": 28,
+      "signature": "text: str | None = None",
+      "reference": "/services/mail/content-and-views#content"
+    },
+    {
+      "source": "orionis/mail/entities/content.py",
+      "symbol": "Content.text_view",
+      "kind": "field",
+      "line": 29,
+      "signature": "text_view: str | None = None",
+      "reference": "/services/mail/content-and-views#content"
+    },
+    {
+      "source": "orionis/mail/entities/content.py",
+      "symbol": "Content.data",
+      "kind": "field",
+      "line": 30,
+      "signature": "data: Mapping[str, object] | None = field(default=None, repr=False)",
+      "reference": "/services/mail/content-and-views#content"
+    },
+    {
+      "source": "orionis/mail/entities/envelope.py",
+      "symbol": "Envelope",
+      "kind": "class",
+      "line": 11,
+      "signature": "class Envelope",
+      "reference": "/services/mail/composing-mail#envelope"
+    },
+    {
+      "source": "orionis/mail/entities/envelope.py",
+      "symbol": "Envelope.subject",
+      "kind": "field",
+      "line": 31,
+      "signature": "subject: str",
+      "reference": "/services/mail/composing-mail#envelope"
+    },
+    {
+      "source": "orionis/mail/entities/envelope.py",
+      "symbol": "Envelope.from_address",
+      "kind": "field",
+      "line": 32,
+      "signature": "from_address: Address | None",
+      "reference": "/services/mail/composing-mail#envelope"
+    },
+    {
+      "source": "orionis/mail/entities/envelope.py",
+      "symbol": "Envelope.to",
+      "kind": "field",
+      "line": 33,
+      "signature": "to: tuple[Address, ...]",
+      "reference": "/services/mail/composing-mail#envelope"
+    },
+    {
+      "source": "orionis/mail/entities/envelope.py",
+      "symbol": "Envelope.cc",
+      "kind": "field",
+      "line": 34,
+      "signature": "cc: tuple[Address, ...]",
+      "reference": "/services/mail/composing-mail#envelope"
+    },
+    {
+      "source": "orionis/mail/entities/envelope.py",
+      "symbol": "Envelope.bcc",
+      "kind": "field",
+      "line": 35,
+      "signature": "bcc: tuple[Address, ...]",
+      "reference": "/services/mail/composing-mail#envelope"
+    },
+    {
+      "source": "orionis/mail/entities/envelope.py",
+      "symbol": "Envelope.reply_to",
+      "kind": "field",
+      "line": 36,
+      "signature": "reply_to: tuple[Address, ...]",
+      "reference": "/services/mail/composing-mail#envelope"
+    },
+    {
+      "source": "orionis/mail/entities/envelope.py",
+      "symbol": "Envelope.__init__",
+      "kind": "method",
+      "line": 38,
+      "signature": "__init__(self, *, subject: str='', from_address: str | Address | None=None, to: Recipients=(), cc: Recipients=(), bcc: Recipients=(), reply_to: Recipients=()) -> None",
+      "reference": "/services/mail/composing-mail#envelope"
+    },
+    {
+      "source": "orionis/mail/entities/envelope.py",
+      "symbol": "Envelope.recipients",
+      "kind": "method",
+      "line": 94,
+      "signature": "recipients(self) -> tuple[str, ...]",
+      "reference": "/services/mail/composing-mail#envelope-recipients"
+    },
+    {
+      "source": "orionis/mail/entities/options.py",
+      "symbol": "MailOptions",
+      "kind": "class",
+      "line": 10,
+      "signature": "class MailOptions",
+      "reference": "/services/mail/sending-and-results#delivery-options"
+    },
+    {
+      "source": "orionis/mail/entities/options.py",
+      "symbol": "MailOptions.mailer",
+      "kind": "field",
+      "line": 34,
+      "signature": "mailer: str | None = None",
+      "reference": "/services/mail/sending-and-results#delivery-options"
+    },
+    {
+      "source": "orionis/mail/entities/options.py",
+      "symbol": "MailOptions.from_address",
+      "kind": "field",
+      "line": 35,
+      "signature": "from_address: Address | None = None",
+      "reference": "/services/mail/sending-and-results#delivery-options"
+    },
+    {
+      "source": "orionis/mail/entities/options.py",
+      "symbol": "MailOptions.subject",
+      "kind": "field",
+      "line": 36,
+      "signature": "subject: str | None = None",
+      "reference": "/services/mail/sending-and-results#delivery-options"
+    },
+    {
+      "source": "orionis/mail/entities/options.py",
+      "symbol": "MailOptions.to",
+      "kind": "field",
+      "line": 37,
+      "signature": "to: tuple[Address, ...] = ()",
+      "reference": "/services/mail/sending-and-results#delivery-options"
+    },
+    {
+      "source": "orionis/mail/entities/options.py",
+      "symbol": "MailOptions.cc",
+      "kind": "field",
+      "line": 38,
+      "signature": "cc: tuple[Address, ...] = ()",
+      "reference": "/services/mail/sending-and-results#delivery-options"
+    },
+    {
+      "source": "orionis/mail/entities/options.py",
+      "symbol": "MailOptions.bcc",
+      "kind": "field",
+      "line": 39,
+      "signature": "bcc: tuple[Address, ...] = ()",
+      "reference": "/services/mail/sending-and-results#delivery-options"
+    },
+    {
+      "source": "orionis/mail/entities/options.py",
+      "symbol": "MailOptions.reply_to",
+      "kind": "field",
+      "line": 40,
+      "signature": "reply_to: tuple[Address, ...] = ()",
+      "reference": "/services/mail/sending-and-results#delivery-options"
+    },
+    {
+      "source": "orionis/mail/entities/options.py",
+      "symbol": "MailOptions.attachments",
+      "kind": "field",
+      "line": 41,
+      "signature": "attachments: tuple[Attachment, ...] = ()",
+      "reference": "/services/mail/sending-and-results#delivery-options"
+    },
+    {
+      "source": "orionis/mail/entities/options.py",
+      "symbol": "MailOptions.envelope",
+      "kind": "method",
+      "line": 43,
+      "signature": "envelope(self, base: Envelope | None=None) -> Envelope",
+      "reference": "/services/mail/sending-and-results#delivery-options"
+    },
+    {
+      "source": "orionis/mail/entities/prepared.py",
+      "symbol": "PreparedMail",
+      "kind": "class",
+      "line": 4,
+      "signature": "class PreparedMail",
+      "reference": "/services/mail/sending-and-results#prepared-mail"
+    },
+    {
+      "source": "orionis/mail/entities/prepared.py",
+      "symbol": "PreparedMail.message_id",
+      "kind": "field",
+      "line": 25,
+      "signature": "message_id: str",
+      "reference": "/services/mail/sending-and-results#prepared-mail"
+    },
+    {
+      "source": "orionis/mail/entities/prepared.py",
+      "symbol": "PreparedMail.sender",
+      "kind": "field",
+      "line": 26,
+      "signature": "sender: str",
+      "reference": "/services/mail/sending-and-results#prepared-mail"
+    },
+    {
+      "source": "orionis/mail/entities/prepared.py",
+      "symbol": "PreparedMail.recipients",
+      "kind": "field",
+      "line": 27,
+      "signature": "recipients: tuple[str, ...]",
+      "reference": "/services/mail/sending-and-results#prepared-mail"
+    },
+    {
+      "source": "orionis/mail/entities/prepared.py",
+      "symbol": "PreparedMail.mime",
+      "kind": "field",
+      "line": 28,
+      "signature": "mime: bytes",
+      "reference": "/services/mail/sending-and-results#prepared-mail"
+    },
+    {
+      "source": "orionis/mail/entities/prepared.py",
+      "symbol": "PreparedMail.smtp_utf8",
+      "kind": "field",
+      "line": 29,
+      "signature": "smtp_utf8: bool",
+      "reference": "/services/mail/sending-and-results#prepared-mail"
+    },
+    {
+      "source": "orionis/mail/entities/result.py",
+      "symbol": "MailResult",
+      "kind": "class",
+      "line": 12,
+      "signature": "class MailResult",
+      "reference": "/services/mail/sending-and-results#mail-result"
+    },
+    {
+      "source": "orionis/mail/entities/result.py",
+      "symbol": "MailResult.message_id",
+      "kind": "field",
+      "line": 40,
+      "signature": "message_id: str",
+      "reference": "/services/mail/sending-and-results#mail-result"
+    },
+    {
+      "source": "orionis/mail/entities/result.py",
+      "symbol": "MailResult.mailer",
+      "kind": "field",
+      "line": 41,
+      "signature": "mailer: str",
+      "reference": "/services/mail/sending-and-results#mail-result"
+    },
+    {
+      "source": "orionis/mail/entities/result.py",
+      "symbol": "MailResult.driver",
+      "kind": "field",
+      "line": 42,
+      "signature": "driver: str",
+      "reference": "/services/mail/sending-and-results#mail-result"
+    },
+    {
+      "source": "orionis/mail/entities/result.py",
+      "symbol": "MailResult.status",
+      "kind": "field",
+      "line": 43,
+      "signature": "status: MailStatus",
+      "reference": "/services/mail/sending-and-results#mail-result"
+    },
+    {
+      "source": "orionis/mail/entities/result.py",
+      "symbol": "MailResult.recipients",
+      "kind": "field",
+      "line": 44,
+      "signature": "recipients: tuple[str, ...]",
+      "reference": "/services/mail/sending-and-results#mail-result"
+    },
+    {
+      "source": "orionis/mail/entities/result.py",
+      "symbol": "MailResult.accepted_recipients",
+      "kind": "field",
+      "line": 45,
+      "signature": "accepted_recipients: tuple[str, ...] = ()",
+      "reference": "/services/mail/sending-and-results#mail-result"
+    },
+    {
+      "source": "orionis/mail/entities/result.py",
+      "symbol": "MailResult.rejected_recipients",
+      "kind": "field",
+      "line": 46,
+      "signature": "rejected_recipients: Mapping[str, tuple[int, str]] = field(default_factory=dict)",
+      "reference": "/services/mail/sending-and-results#mail-result"
+    },
+    {
+      "source": "orionis/mail/entities/result.py",
+      "symbol": "MailResult.file_path",
+      "kind": "field",
+      "line": 47,
+      "signature": "file_path: Path | None = None",
+      "reference": "/services/mail/sending-and-results#mail-result"
+    },
+    {
+      "source": "orionis/mail/entities/smtp_settings.py",
+      "symbol": "SmtpSettings",
+      "kind": "class",
+      "line": 25,
+      "signature": "class SmtpSettings",
+      "reference": "/services/mail/transports-and-extensions#smtp-settings"
+    },
+    {
+      "source": "orionis/mail/entities/smtp_settings.py",
+      "symbol": "SmtpSettings.host",
+      "kind": "field",
+      "line": 47,
+      "signature": "host: str",
+      "reference": "/services/mail/transports-and-extensions#smtp-settings"
+    },
+    {
+      "source": "orionis/mail/entities/smtp_settings.py",
+      "symbol": "SmtpSettings.port",
+      "kind": "field",
+      "line": 48,
+      "signature": "port: int",
+      "reference": "/services/mail/transports-and-extensions#smtp-settings"
+    },
+    {
+      "source": "orionis/mail/entities/smtp_settings.py",
+      "symbol": "SmtpSettings.encryption",
+      "kind": "field",
+      "line": 49,
+      "signature": "encryption: MailEncryption",
+      "reference": "/services/mail/transports-and-extensions#smtp-settings"
+    },
+    {
+      "source": "orionis/mail/entities/smtp_settings.py",
+      "symbol": "SmtpSettings.username",
+      "kind": "field",
+      "line": 50,
+      "signature": "username: str = field(repr=False)",
+      "reference": "/services/mail/transports-and-extensions#smtp-settings"
+    },
+    {
+      "source": "orionis/mail/entities/smtp_settings.py",
+      "symbol": "SmtpSettings.password",
+      "kind": "field",
+      "line": 51,
+      "signature": "password: str = field(repr=False)",
+      "reference": "/services/mail/transports-and-extensions#smtp-settings"
+    },
+    {
+      "source": "orionis/mail/entities/smtp_settings.py",
+      "symbol": "SmtpSettings.timeout",
+      "kind": "field",
+      "line": 52,
+      "signature": "timeout: int | None",
+      "reference": "/services/mail/transports-and-extensions#smtp-settings"
+    },
+    {
+      "source": "orionis/mail/entities/smtp_settings.py",
+      "symbol": "SmtpSettings.sensitive",
+      "kind": "field",
+      "line": 53,
+      "signature": "sensitive: tuple[str, ...] = field(repr=False)",
+      "reference": "/services/mail/transports-and-extensions#smtp-settings"
+    },
+    {
+      "source": "orionis/mail/entities/smtp_settings.py",
+      "symbol": "SmtpSettings.fromConfig",
+      "kind": "method",
+      "line": 56,
+      "signature": "fromConfig(cls, config: Mapping[str, object]) -> Self",
+      "reference": "/services/mail/transports-and-extensions#smtp-settings"
+    },
+    {
+      "source": "orionis/mail/enums/encryption.py",
+      "symbol": "MailEncryption",
+      "kind": "class",
+      "line": 3,
+      "signature": "class MailEncryption",
+      "reference": "/services/mail/configuration#config-smtp"
+    },
+    {
+      "source": "orionis/mail/enums/encryption.py",
+      "symbol": "MailEncryption.TLS",
+      "kind": "constant",
+      "line": 21,
+      "signature": "TLS = 'tls'",
+      "reference": "/services/mail/configuration#config-smtp"
+    },
+    {
+      "source": "orionis/mail/enums/encryption.py",
+      "symbol": "MailEncryption.SSL",
+      "kind": "constant",
+      "line": 22,
+      "signature": "SSL = 'ssl'",
+      "reference": "/services/mail/configuration#config-smtp"
+    },
+    {
+      "source": "orionis/mail/enums/encryption.py",
+      "symbol": "MailEncryption.NONE",
+      "kind": "constant",
+      "line": 23,
+      "signature": "NONE = 'none'",
+      "reference": "/services/mail/configuration#config-smtp"
+    },
+    {
+      "source": "orionis/mail/enums/status.py",
+      "symbol": "MailStatus",
+      "kind": "class",
+      "line": 3,
+      "signature": "class MailStatus",
+      "reference": "/services/mail/sending-and-results#mail-result"
+    },
+    {
+      "source": "orionis/mail/enums/status.py",
+      "symbol": "MailStatus.ACCEPTED",
+      "kind": "constant",
+      "line": 21,
+      "signature": "ACCEPTED = 'accepted'",
+      "reference": "/services/mail/sending-and-results#mail-result"
+    },
+    {
+      "source": "orionis/mail/enums/status.py",
+      "symbol": "MailStatus.PARTIAL",
+      "kind": "constant",
+      "line": 22,
+      "signature": "PARTIAL = 'partial'",
+      "reference": "/services/mail/sending-and-results#mail-result"
+    },
+    {
+      "source": "orionis/mail/enums/status.py",
+      "symbol": "MailStatus.STORED",
+      "kind": "constant",
+      "line": 23,
+      "signature": "STORED = 'stored'",
+      "reference": "/services/mail/sending-and-results#mail-result"
+    },
+    {
+      "source": "orionis/mail/exceptions.py",
+      "symbol": "MailException",
+      "kind": "class",
+      "line": 1,
+      "signature": "class MailException",
+      "reference": "/services/mail/api-reference#exceptions"
+    },
+    {
+      "source": "orionis/mail/exceptions.py",
+      "symbol": "MailConfigurationException",
+      "kind": "class",
+      "line": 7,
+      "signature": "class MailConfigurationException",
+      "reference": "/services/mail/api-reference#exceptions"
+    },
+    {
+      "source": "orionis/mail/exceptions.py",
+      "symbol": "MailCompositionException",
+      "kind": "class",
+      "line": 13,
+      "signature": "class MailCompositionException",
+      "reference": "/services/mail/api-reference#exceptions"
+    },
+    {
+      "source": "orionis/mail/exceptions.py",
+      "symbol": "MailAttachmentException",
+      "kind": "class",
+      "line": 19,
+      "signature": "class MailAttachmentException",
+      "reference": "/services/mail/api-reference#exceptions"
+    },
+    {
+      "source": "orionis/mail/exceptions.py",
+      "symbol": "MailTransportException",
+      "kind": "class",
+      "line": 25,
+      "signature": "class MailTransportException",
+      "reference": "/services/mail/api-reference#exceptions"
+    },
+    {
+      "source": "orionis/mail/functions.py",
+      "symbol": "header_value",
+      "kind": "function",
+      "line": 20,
+      "signature": "header_value(value: str, label: str) -> str",
+      "reference": "/services/mail/api-reference#helper-header-value"
+    },
+    {
+      "source": "orionis/mail/functions.py",
+      "symbol": "attachment_name",
+      "kind": "function",
+      "line": 48,
+      "signature": "attachment_name(value: str) -> str",
+      "reference": "/services/mail/api-reference#helper-attachment-name"
+    },
+    {
+      "source": "orionis/mail/functions.py",
+      "symbol": "media_type",
+      "kind": "function",
+      "line": 83,
+      "signature": "media_type(value: str) -> str",
+      "reference": "/services/mail/api-reference#helper-media-type"
+    },
+    {
+      "source": "orionis/mail/functions.py",
+      "symbol": "freeze_owned",
+      "kind": "function",
+      "line": 110,
+      "signature": "freeze_owned(value: object, active: frozenset[int]=frozenset()) -> object",
+      "reference": "/services/mail/api-reference#helper-freeze-owned"
+    },
+    {
+      "source": "orionis/mail/functions.py",
+      "symbol": "sanitize_reason",
+      "kind": "function",
+      "line": 149,
+      "signature": "sanitize_reason(value: str | bytes, sensitive: tuple[str, ...]=()) -> str",
+      "reference": "/services/mail/api-reference#helper-sanitize-reason"
+    },
+    {
+      "source": "orionis/mail/mailable.py",
+      "symbol": "Mailable",
+      "kind": "class",
+      "line": 10,
+      "signature": "class Mailable",
+      "reference": "/services/mail/composing-mail#mailable-construction"
+    },
+    {
+      "source": "orionis/mail/mailable.py",
+      "symbol": "Mailable.envelope",
+      "kind": "method",
+      "line": 24,
+      "signature": "envelope(self) -> Envelope",
+      "reference": "/services/mail/composing-mail#mailable-envelope"
+    },
+    {
+      "source": "orionis/mail/mailable.py",
+      "symbol": "Mailable.content",
+      "kind": "method",
+      "line": 35,
+      "signature": "content(self) -> Content",
+      "reference": "/services/mail/composing-mail#mailable-content"
+    },
+    {
+      "source": "orionis/mail/mailable.py",
+      "symbol": "Mailable.attachments",
+      "kind": "method",
+      "line": 45,
+      "signature": "attachments(self) -> Sequence[Attachment]",
+      "reference": "/services/mail/composing-mail#mailable-attachments"
+    },
+    {
+      "source": "orionis/mail/manager.py",
+      "symbol": "MailManager",
+      "kind": "class",
+      "line": 26,
+      "signature": "class MailManager",
+      "reference": "/services/mail/manager-and-injection#manager-construction"
+    },
+    {
+      "source": "orionis/mail/manager.py",
+      "symbol": "MailManager.__init__",
+      "kind": "method",
+      "line": 47,
+      "signature": "__init__(self, app: IApplication, composer: MailComposer) -> None",
+      "reference": "/services/mail/manager-and-injection#manager-construction"
+    },
+    {
+      "source": "orionis/mail/manager.py",
+      "symbol": "MailManager.extend",
+      "kind": "method",
+      "line": 88,
+      "signature": "extend(self, driver: str, factory: TransportFactory) -> None",
+      "reference": "/services/mail/transports-and-extensions#custom-transports"
+    },
+    {
+      "source": "orionis/mail/message.py",
+      "symbol": "Message",
+      "kind": "class",
+      "line": 12,
+      "signature": "class Message",
+      "reference": "/services/mail/sending-and-results#message-construction"
+    },
+    {
+      "source": "orionis/mail/message.py",
+      "symbol": "Message.__init__",
+      "kind": "method",
+      "line": 22,
+      "signature": "__init__(self, options: MailOptions | None=None) -> None",
+      "reference": "/services/mail/sending-and-results#message-construction"
+    },
+    {
+      "source": "orionis/mail/message.py",
+      "symbol": "Message.fromAddress",
+      "kind": "method",
+      "line": 38,
+      "signature": "fromAddress(self, address: str | Address, name: str | None=None) -> Self",
+      "reference": "/services/mail/sending-and-results#message-fromaddress"
+    },
+    {
+      "source": "orionis/mail/message.py",
+      "symbol": "Message.to",
+      "kind": "method",
+      "line": 60,
+      "signature": "to(self, addresses: Recipients, name: str | None=None) -> Self",
+      "reference": "/services/mail/sending-and-results#message-to"
+    },
+    {
+      "source": "orionis/mail/message.py",
+      "symbol": "Message.cc",
+      "kind": "method",
+      "line": 78,
+      "signature": "cc(self, addresses: Recipients, name: str | None=None) -> Self",
+      "reference": "/services/mail/sending-and-results#message-cc"
+    },
+    {
+      "source": "orionis/mail/message.py",
+      "symbol": "Message.bcc",
+      "kind": "method",
+      "line": 96,
+      "signature": "bcc(self, addresses: Recipients, name: str | None=None) -> Self",
+      "reference": "/services/mail/sending-and-results#message-bcc"
+    },
+    {
+      "source": "orionis/mail/message.py",
+      "symbol": "Message.replyTo",
+      "kind": "method",
+      "line": 114,
+      "signature": "replyTo(self, addresses: Recipients, name: str | None=None) -> Self",
+      "reference": "/services/mail/sending-and-results#message-replyto"
+    },
+    {
+      "source": "orionis/mail/message.py",
+      "symbol": "Message.subject",
+      "kind": "method",
+      "line": 132,
+      "signature": "subject(self, value: str) -> Self",
+      "reference": "/services/mail/sending-and-results#message-subject"
+    },
+    {
+      "source": "orionis/mail/message.py",
+      "symbol": "Message.attach",
+      "kind": "method",
+      "line": 149,
+      "signature": "attach(self, attachment: Attachment) -> Self",
+      "reference": "/services/mail/sending-and-results#message-attach"
+    },
+    {
+      "source": "orionis/mail/pending.py",
+      "symbol": "PendingMail",
+      "kind": "class",
+      "line": 19,
+      "signature": "class PendingMail",
+      "reference": "/services/mail/sending-and-results#pending-construction"
+    },
+    {
+      "source": "orionis/mail/pending.py",
+      "symbol": "PendingMail.__init__",
+      "kind": "method",
+      "line": 31,
+      "signature": "__init__(self, delivery: Delivery, options: MailOptions | None=None, mailable_builder: Callable[[type[Mailable]], Awaitable[Mailable]] | None=None) -> None",
+      "reference": "/services/mail/sending-and-results#pending-construction"
+    },
+    {
+      "source": "orionis/mail/pending.py",
+      "symbol": "PendingMail.mailer",
+      "kind": "method",
+      "line": 58,
+      "signature": "mailer(self, name: str) -> PendingMail",
+      "reference": "/services/mail/sending-and-results#pending-mailer"
+    },
+    {
+      "source": "orionis/mail/pending.py",
+      "symbol": "PendingMail.fromAddress",
+      "kind": "method",
+      "line": 86,
+      "signature": "fromAddress(self, address: str | Address, name: str | None=None) -> PendingMail",
+      "reference": "/services/mail/sending-and-results#pending-fromaddress"
+    },
+    {
+      "source": "orionis/mail/pending.py",
+      "symbol": "PendingMail.to",
+      "kind": "method",
+      "line": 108,
+      "signature": "to(self, addresses: Recipients, name: str | None=None) -> PendingMail",
+      "reference": "/services/mail/sending-and-results#pending-to"
+    },
+    {
+      "source": "orionis/mail/pending.py",
+      "symbol": "PendingMail.cc",
+      "kind": "method",
+      "line": 126,
+      "signature": "cc(self, addresses: Recipients, name: str | None=None) -> PendingMail",
+      "reference": "/services/mail/sending-and-results#pending-cc"
+    },
+    {
+      "source": "orionis/mail/pending.py",
+      "symbol": "PendingMail.bcc",
+      "kind": "method",
+      "line": 144,
+      "signature": "bcc(self, addresses: Recipients, name: str | None=None) -> PendingMail",
+      "reference": "/services/mail/sending-and-results#pending-bcc"
+    },
+    {
+      "source": "orionis/mail/pending.py",
+      "symbol": "PendingMail.replyTo",
+      "kind": "method",
+      "line": 162,
+      "signature": "replyTo(self, addresses: Recipients, name: str | None=None) -> PendingMail",
+      "reference": "/services/mail/sending-and-results#pending-replyto"
+    },
+    {
+      "source": "orionis/mail/pending.py",
+      "symbol": "PendingMail.subject",
+      "kind": "method",
+      "line": 180,
+      "signature": "subject(self, value: str) -> PendingMail",
+      "reference": "/services/mail/sending-and-results#pending-subject"
+    },
+    {
+      "source": "orionis/mail/pending.py",
+      "symbol": "PendingMail.attach",
+      "kind": "method",
+      "line": 196,
+      "signature": "attach(self, attachment: Attachment) -> PendingMail",
+      "reference": "/services/mail/sending-and-results#pending-attach"
+    },
+    {
+      "source": "orionis/mail/pending.py",
+      "symbol": "PendingMail.send[overload 1]",
+      "kind": "overload",
+      "line": 213,
+      "signature": "async send(self, mailable: Mailable | type[Mailable], /) -> MailResult",
+      "reference": "/services/mail/sending-and-results#pending-send"
+    },
+    {
+      "source": "orionis/mail/pending.py",
+      "symbol": "PendingMail.send[overload 2]",
+      "kind": "overload",
+      "line": 216,
+      "signature": "async send(self, view: str, /, data: Mapping[str, object] | None=None, callback: MessageCallback | None=None) -> MailResult",
+      "reference": "/services/mail/sending-and-results#pending-send"
+    },
+    {
+      "source": "orionis/mail/pending.py",
+      "symbol": "PendingMail.send[overload 3]",
+      "kind": "overload",
+      "line": 225,
+      "signature": "async send(self, content: Content, /, *, callback: MessageCallback | None=None) -> MailResult",
+      "reference": "/services/mail/sending-and-results#pending-send"
+    },
+    {
+      "source": "orionis/mail/pending.py",
+      "symbol": "PendingMail.send",
+      "kind": "method",
+      "line": 233,
+      "signature": "async send(self, value: Mailable | type[Mailable] | str | Content, /, data: object=MISSING, callback: object=MISSING) -> MailResult",
+      "reference": "/services/mail/sending-and-results#pending-send"
+    },
+    {
+      "source": "orionis/mail/pending.py",
+      "symbol": "PendingMail.raw",
+      "kind": "method",
+      "line": 313,
+      "signature": "async raw(self, text: str, callback: MessageCallback | None=None) -> MailResult",
+      "reference": "/services/mail/sending-and-results#pending-raw"
+    },
+    {
+      "source": "orionis/mail/pending.py",
+      "symbol": "PendingMail.html",
+      "kind": "method",
+      "line": 342,
+      "signature": "async html(self, html: str, callback: MessageCallback | None=None) -> MailResult",
+      "reference": "/services/mail/sending-and-results#pending-html"
+    },
+    {
+      "source": "orionis/mail/provider.py",
+      "symbol": "MailProvider",
+      "kind": "class",
+      "line": 7,
+      "signature": "class MailProvider",
+      "reference": "/services/mail/api-reference#provider"
+    },
+    {
+      "source": "orionis/mail/provider.py",
+      "symbol": "MailProvider.register",
+      "kind": "method",
+      "line": 17,
+      "signature": "register(self) -> None",
+      "reference": "/services/mail/api-reference#provider"
+    },
+    {
+      "source": "orionis/mail/provider.py",
+      "symbol": "MailProvider.boot",
+      "kind": "method",
+      "line": 29,
+      "signature": "async boot(self) -> None",
+      "reference": "/services/mail/api-reference#provider"
+    },
+    {
+      "source": "orionis/mail/transports/file.py",
+      "symbol": "FileTransport",
+      "kind": "class",
+      "line": 21,
+      "signature": "class FileTransport",
+      "reference": "/services/mail/transports-and-extensions#driver-file"
+    },
+    {
+      "source": "orionis/mail/transports/file.py",
+      "symbol": "FileTransport.__init__",
+      "kind": "method",
+      "line": 33,
+      "signature": "__init__(self, path: Path) -> None",
+      "reference": "/services/mail/transports-and-extensions#driver-file"
+    },
+    {
+      "source": "orionis/mail/transports/file.py",
+      "symbol": "FileTransport.send",
+      "kind": "method",
+      "line": 49,
+      "signature": "async send(self, message: PreparedMail, *, mailer: str, driver: str) -> MailResult",
+      "reference": "/services/mail/transports-and-extensions#driver-file"
+    },
+    {
+      "source": "orionis/mail/transports/file.py",
+      "symbol": "create_file_transport",
+      "kind": "function",
+      "line": 137,
+      "signature": "create_file_transport(app: IApplication, config: Mapping[str, object]) -> IMailTransport",
+      "reference": "/services/mail/transports-and-extensions#driver-file"
+    },
+    {
+      "source": "orionis/mail/transports/smtp.py",
+      "symbol": "SmtpTransport",
+      "kind": "class",
+      "line": 21,
+      "signature": "class SmtpTransport",
+      "reference": "/services/mail/transports-and-extensions#driver-smtp"
+    },
+    {
+      "source": "orionis/mail/transports/smtp.py",
+      "symbol": "SmtpTransport.__init__",
+      "kind": "method",
+      "line": 31,
+      "signature": "__init__(self, settings: SmtpSettings) -> None",
+      "reference": "/services/mail/transports-and-extensions#driver-smtp"
+    },
+    {
+      "source": "orionis/mail/transports/smtp.py",
+      "symbol": "SmtpTransport.send",
+      "kind": "method",
+      "line": 47,
+      "signature": "async send(self, message: PreparedMail, *, mailer: str, driver: str) -> MailResult",
+      "reference": "/services/mail/transports-and-extensions#driver-smtp"
+    },
+    {
+      "source": "orionis/mail/transports/smtp.py",
+      "symbol": "create_smtp_transport",
+      "kind": "function",
+      "line": 261,
+      "signature": "create_smtp_transport(app: IApplication, config: Mapping[str, object]) -> IMailTransport",
+      "reference": "/services/mail/transports-and-extensions#driver-smtp"
+    },
+    {
+      "source": "orionis/mail/types.py",
+      "symbol": "Recipients",
+      "kind": "type-alias",
+      "line": 12,
+      "signature": "type Recipients = str | Address | list[str | Address] | tuple[str | Address, ...]",
+      "reference": "/services/mail/api-reference#mail-types"
+    },
+    {
+      "source": "orionis/mail/types.py",
+      "symbol": "MessageCallback",
+      "kind": "type-alias",
+      "line": 15,
+      "signature": "type MessageCallback = Callable[[Message], Message | Awaitable[Message | None] | None]",
+      "reference": "/services/mail/api-reference#mail-types"
+    },
+    {
+      "source": "orionis/mail/types.py",
+      "symbol": "Delivery",
+      "kind": "type-alias",
+      "line": 18,
+      "signature": "type Delivery = Callable[[str | None, Envelope, Content, tuple[Attachment, ...]], Awaitable[MailResult]]",
+      "reference": "/services/mail/api-reference#mail-types"
+    },
+    {
+      "source": "orionis/mail/types.py",
+      "symbol": "TransportFactory",
+      "kind": "type-alias",
+      "line": 24,
+      "signature": "type TransportFactory = Callable[[IApplication, Mapping[str, object]], IMailTransport | Awaitable[IMailTransport]]",
+      "reference": "/services/mail/api-reference#mail-types"
+    },
+    {
+      "source": "orionis/support/facades/mail.py",
+      "symbol": "Mail",
+      "kind": "class",
+      "line": 4,
+      "signature": "class Mail",
+      "reference": "/services/mail/manager-and-injection#facade"
+    },
+    {
+      "source": "orionis/support/facades/mail.py",
+      "symbol": "Mail.getFacadeAccessor",
+      "kind": "method",
+      "line": 9,
+      "signature": "getFacadeAccessor(cls) -> type[IMailManager]",
+      "reference": "/services/mail/api-reference#facade-accessor"
+    }
+  ]
+}

@@ -1,66 +1,52 @@
 ---
-title: "Declaring content, recipients, and attachments"
-description: "Mail separates message declarations, MIME composition, and transport. Prepare sender, content, and delivery policy before the first send."
+title: "Creating mailable classes"
+description: "Generate Mailable classes, declare recipients with Envelope, and normalize mailboxes with Address."
 editUrl: true
 lastUpdated: false
 ---
 
-Mail separates message declarations, MIME composition, and transport. Prepare sender, content, and delivery policy before the first send.
+A `Mailable` brings together the subject, recipients, content, and attachments of a reusable notification. Its methods declare the message; asynchronous sending subsequently renders views, reads attachments, and hands the MIME message to the transport. This keeps a welcome or confirmation notification outside the controller.
 
-## Requirements
+For a one-off message, see [sending and results](/en/services/mail/sending-and-results). Mailer selection is covered in [configuration](/en/services/mail/configuration).
 
-- Python 3.14 or newer.
-- A booted Orionis application for the `Mail` facade, dependency injection, views, and configured storage disks.
-- A reachable SMTP server for the SMTP driver, or a local filesystem supporting hard links for the file driver.
-- Valid sender and recipient mailbox addresses; at least one body and one transport recipient per send.
+## Generate a class
 
+From the project root, use either alternative:
 
-
-## Quick start
-
-```python
-from orionis.mail import Address, Content, Envelope
-
-sender = Address("notifications@example.com", "Example App")
-envelope = Envelope(
-    subject="Welcome",
-    from_address=sender,
-    to=("ana@example.com", "ops@example.com"),
-    reply_to="support@example.com",
-)
-content = Content(text="Welcome to Orionis.", html="<p>Welcome to Orionis.</p>")
-assert envelope.recipients() == ("ana@example.com", "ops@example.com")
-assert content.text == "Welcome to Orionis."
-print(sender.asHeader())
+```bash
+orionis make:mail welcome
 ```
 
+```bash
+python -B reactor make:mail welcome
+```
 
+The syntax is `make:mail name`. `name` is a required positional `str` argument; the command adds no options beyond `-h` / `--help` and has no overwrite option. Its destination is `app.path("app_notifications")`, which is `app/notifications` in the default project structure.
 
+| Input | Default file | Class |
+| --- | --- | --- |
+| `welcome` | `app/notifications/welcome_mail.py` | `WelcomeMail` |
+| `billing/invoice` | `app/notifications/billing/invoice_mail.py` | `InvoiceMail` |
+| `welcome_mail` | `app/notifications/welcome_mail.py` | `WelcomeMail` |
 
-## Choose a reusable message or a direct send
+The generator accepts subdirectories with `/` or `\`, creates the required directories, and removes an extension supplied on the final component. It lowercases file and directory names and adds `_mail` to the filename and `Mail` to the class when missing. The class is formed from `_`-separated components: use `order_ready` to obtain `OrderReadyMail`. CamelCase is not automatically converted to snake_case: `WelcomeMail` produces `welcomemail.py`.
 
-A `Mailable` represents a reusable business notification, such as invoice confirmation. Implement synchronous `envelope()` and `content()` methods; optional `attachments()` returns a sequence of `Attachment` declarations. Prepare required data before constructing it: avoid queries or sending inside these methods. The manager invokes them when the async terminal runs.
+Normalized components must match `[a-z][a-z0-9_]*`. Absolute paths and empty, `.` or `..` components are rejected. An existing file causes an error and is not replaced.
 
-For a one-off note use `raw(text)` or `html(html)`; for a template use `send("emails.welcome", data, callback)`. `html()` treats its input literally and does not process Jinja syntax. HTML and plain-text alternatives can coexist through `Content(view=..., text=...)` or `Content(view=..., text_view=...)`; the same `data` feeds both views. Do not combine `view` with `html` or `text_view` with `text` in one `Content`.
+The template generates a constructor receiving `IApplication`, an `envelope()` that reads `mail.from_address.address` and `mail.from_address.name`, and a `content()` returning `Content(text="Notification message")`. Its initial subject is `"Notification subject"`. It adds no recipients: declare them or supply them when sending. It inherits `attachments()`, whose initial result is `()`.
 
-`Content` requires at least one body; an empty literal string is valid, an empty template identifier is not. Context must be a mapping with string keys. Owned containers are copied and frozen, but opaque objects retain identity: do not assume a model's internal state is frozen. A `Mailable` is an application class and may have mutable attributes; the guarantee is that the pipeline does not mutate its declaration while sending.
+<a id="mailable-construction"></a>
+## Define a notification with application data
 
-### Addresses, privacy, and precedence
-
-Use `Address("ana@example.com", "Ana")` to separate a mailbox and its display name. Validation normalizes IDNA domains and rejects header control characters. An `Envelope` normalizes and deduplicates recipients. `reply_to` only sets reply destinations; it adds no transport recipient. A mailbox visible in To/Cc cannot also appear in Bcc.
-
-Explicit chain options replace a mailable's sender and subject and append recipients and attachments. When no sender is declared, `mail.from_address` is used; if that is also absent, composition fails. Neither address validation nor SMTP acceptance verifies account existence.
-
-The composer removes Bcc from MIME headers while retaining its recipients in the transport envelope. Do not expose a `MailResult`'s complete recipient list to users who must not see it.
-
-
-### Declare a reusable mailable
+Replace the contents of `app/notifications/welcome_mail.py` with a declaration focused on your use case:
 
 ```python
 from orionis.mail import Content, Envelope, Mailable
 
 
 class WelcomeMail(Mailable):
+    __slots__ = ("recipient", "name")
+
     def __init__(self, recipient: str, name: str) -> None:
         self.recipient = recipient
         self.name = name
@@ -74,72 +60,238 @@ class WelcomeMail(Mailable):
             text=f"Welcome, {self.name}.",
             data={"name": self.name},
         )
-
-
-mail = WelcomeMail("ana@example.com", "Ana")
-assert mail.envelope().subject == "Welcome"
-assert mail.attachments() == ()
-print(mail.content().text)
 ```
 
-### Render and send the welcome template
-
-With the default view path, create `resources/views/emails/welcome.html`:
+With the default view configuration, create `resources/views/emails/welcome.html`:
 
 ```html
 <p>Welcome, {{ name }}.</p>
 ```
 
-In the booted application, after defining or importing `WelcomeMail`, send an instance with the recipient and business data:
+`recipient` and `name` are constructor data for this class, not special framework parameters. `data` is the context passed to Jinja. Mailable attributes are not automatically exposed to views. The [content and views guide](/en/services/mail/content-and-views) covers HTML and text alternatives.
+
+In a booted application, a controller can send the instance:
 
 ```python
+from app.notifications.welcome_mail import WelcomeMail
+from orionis.http import JSONResponse
 from orionis.support.facades import Mail
 
 
-async def welcome(recipient: str, name: str):
-    return await Mail.send(WelcomeMail(recipient, name))
+class WelcomeController:
+    async def __call__(self) -> JSONResponse:
+        manager = await Mail.resolve()
+        result = await (
+            manager.mailer("file")
+            .fromAddress("notifications@example.com", "Example App")
+            .send(WelcomeMail("ana@example.com", "Ana"))
+        )
+        return JSONResponse({"status": result.status.value})
 ```
 
-The HTML template receives `name`; the literal text provides the plain-text alternative. The mailer and sender come from `config/mail.py`/`.env` unless the declaration or fluent chain supplies them. See the [first-send setup](/en/services/mail) and [result handling](/en/services/mail/sending-and-results).
+The example selects the configured mailer named `file`: it stores the message and returns the `stored` status. Change the selection according to your [configuration](/en/services/mail/configuration). `send()` is the asynchronous operation; constructing `WelcomeMail` neither renders nor sends anything.
 
-## Attach storage content
+## Send an instance or a class
 
-`Attachment.fromStorage(path, disk=None, name=None, mime_type=None)` only declares intent. Paths are logical and disk-relative; display names are basenames without separators. The file opens during sending and may disappear or change between declaration and reading. Authorize document access before attaching it and use a configured disk, such as `local` for private data.
+When given an **instance**, `send()` uses that object. Its constructor has already run and the framework does not inject dependencies into it again. This suits business data obtained through an earlier query or asynchronous operation.
 
-An explicit MIME type takes precedence over storage metadata; otherwise the filename is used for inference, falling back to `application/octet-stream`. This inference does not inspect content or provide antivirus scanning. This module has no remote-URL attachments, inline/CID attachments, or bytes-based attachment API. Store validated content first when that workflow is needed.
+When given a **class derived from `Mailable`**, the manager executes `await app.build(Class)` for each send. The container builds a new instance and injects its constructor dependencies. This also allows sending the class generated by `make:mail`, whose constructor receives `IApplication`.
 
-Every attachment is read completely and the resulting MIME message is built in memory. Even with a streaming driver, mail is not constant-memory: bound attachment count and combined size before sending. For large files, send an authorized or temporary link according to your policy.
-
-
-### Declare a named storage attachment
+For example, this class uses application configuration and requires no business arguments:
 
 ```python
-from orionis.mail import Attachment
+from orionis.foundation.contracts.application import IApplication
+from orionis.mail import Content, Envelope, Mailable
 
-attachment = Attachment.fromStorage(
-    "reports/annual.pdf",
-    disk="local",
-    name="Annual Report.pdf",
-    mime_type="application/pdf",
-)
-assert attachment.path == "reports/annual.pdf"
-assert attachment.disk == "local"
-assert attachment.name == "Annual Report.pdf"
-print(attachment.mime_type)
+
+class ProjectNoticeMail(Mailable):
+    __slots__ = ("application",)
+
+    def __init__(self, application: IApplication) -> None:
+        self.application = application
+
+    def envelope(self) -> Envelope:
+        return Envelope(subject="Project notice")
+
+    def content(self) -> Content:
+        name = str(self.application.config("app.name"))
+        return Content(text=f"A notification from {name}.")
 ```
 
-### Value objects
+After defining or importing `ProjectNoticeMail`, an asynchronous service can send it as follows:
 
-- `Address(address, name=None)` accepts one addr-spec and normalizes its IDNA domain.
-- `Envelope(...)` validates headers, normalizes/deduplicates recipients, and prevents a mailbox being both visible and Bcc.
-- `Content(view=None, html=None, text=None, text_view=None, data=None)` requires at least one body and forbids view/literal conflicts for the same alternative.
-- `Attachment.fromStorage(path, disk=None, name=None, mime_type=None)` declares deferred storage I/O with safe logical paths and metadata.
-- `MailResult` returns message ID, mailer/driver, intended/accepted/rejected recipients, status, and optional file path.
+```python
+from orionis.mail import MailResult
+from orionis.support.facades import Mail
 
-### `Mailable`
 
-Implement `envelope()` and `content()`; optionally implement `attachments()`. Pass an instance to `Mail.send()`, or pass the class so the container constructs it with dependency injection for each send.
+class ProjectNoticeService:
+    async def send(self) -> MailResult:
+        manager = await Mail.resolve()
+        return await (
+            manager.mailer("file")
+            .fromAddress("notifications@example.com", "Example App")
+            .to("ana@example.com")
+            .send(ProjectNoticeMail)
+        )
+```
 
----
+Do not pass a class needing `recipient: str` or `name: str` expecting the manager to invent those values; prepare an instance as with `WelcomeMail`. Class construction failures become `MailCompositionException` and retain their original cause. See [manager and injection](/en/services/mail/manager-and-injection) for service resolution through contracts.
 
-[Index](/en/services/mail) · [view](/en/services/views) · [storage](/en/services/storage)
+## Complete Mailable contract
+
+`Mailable` is an abstract class with `__slots__ = ()`. Each subclass decides its attributes and may declare its own `__slots__`, as above. It does not impose immutability on application objects.
+
+<a id="mailable-envelope"></a>
+### `envelope(self) -> Envelope`
+
+Required; returns the notification headers and recipients. It must be synchronous and takes no additional arguments. It may leave the sender or recipients to configuration and sending options.
+
+<a id="mailable-content"></a>
+### `content(self) -> Content`
+
+Required; returns the body declaration. It is also synchronous and takes no parameters. Return `Content`, not a string, HTTP response object, or pending view.
+
+<a id="mailable-attachments"></a>
+### `attachments(self) -> Sequence[Attachment]`
+
+Optional; the base implementation returns `()`. To attach a document already stored in Storage, return a list or tuple of declarations:
+
+```python
+from collections.abc import Sequence
+from orionis.mail import Attachment, Content, Envelope, Mailable
+
+
+class GuideMail(Mailable):
+    __slots__ = ()
+
+    def envelope(self) -> Envelope:
+        return Envelope(subject="User guide", to="ana@example.com")
+
+    def content(self) -> Content:
+        return Content(text="Your guide is attached.")
+
+    def attachments(self) -> Sequence[Attachment]:
+        return (
+            Attachment.fromStorage(
+                "documents/guide.pdf",
+                disk="local",
+                name="User Guide.pdf",
+                mime_type="application/pdf",
+            ),
+        )
+```
+
+The path is logical within the disk; reading happens when sending. The [Storage attachments guide](/en/services/mail/attachments) explains saving files through the `Storage` facade, resolving disks, and handling failures. A generator or asynchronous iterator cannot replace the required sequence.
+
+### Declaration order and errors
+
+The pipeline calls `envelope()`, then `content()`, then `attachments()` directly. It validates each result before continuing. None is invoked through method injection: do not add `Request`, repositories, or other service parameters to their signatures. Inject services into the constructor or prepare data before sending.
+
+An `async def` implementation returns a coroutine and is rejected with `MailCompositionException`; the pipeline does not await it. Incorrect return types and errors raised by declarations also prevent reaching the transport. Declaration exceptions retain their original cause.
+
+Keep the methods repeatable. The pipeline does not mutate the mailable, but it does not freeze its state either: do not modify a shared instance while it is used by several sends.
+
+<a id="envelope"></a>
+## Envelope: subject and recipient groups
+
+All arguments are keyword-only:
+
+```text
+Envelope(
+    *,
+    subject: str = "",
+    from_address: str | Address | None = None,
+    to: Recipients = (),
+    cc: Recipients = (),
+    bcc: Recipients = (),
+    reply_to: Recipients = (),
+)
+```
+
+`subject` is literal text; an empty string is valid. `from_address` is the sender and may remain `None` to use configuration. `to` identifies primary visible recipients; `cc`, additional visible recipients; `bcc`, hidden recipients; and `reply_to`, reply destinations. The constructor transforms the sender into `Address | None` and each group into `tuple[Address, ...]`, copying input collections.
+
+```python
+from orionis.mail import Address, Envelope
+
+envelope = Envelope(
+    subject="Monthly report",
+    from_address=Address("notifications@example.com", "Example App"),
+    to=[Address("ana@example.com", "Ana"), "ana@EXAMPLE.COM"],
+    cc="ops@example.com",
+    bcc="archive@example.com",
+    reply_to="support@example.com",
+)
+assert len(envelope.to) == 1
+assert envelope.to[0].name == "Ana"
+assert envelope.recipients() == (
+    "ana@example.com", "ops@example.com", "archive@example.com",
+)
+```
+
+<a id="envelope-recipients"></a>
+### `recipients(self) -> tuple[str, ...]`
+
+Returns the deduplicated union of `To`, `Cc`, and `Bcc`, in that order. It excludes `Reply-To`. An address may appear in both `To` and `Cc` and keep both headers; the transport receives it once. It cannot appear in `Bcc` and a visible group simultaneously: that combination raises `MailCompositionException`.
+
+An incomplete `Envelope()` is a valid declaration. Before transport, a sender and at least one recipient among `To`, `Cc`, and `Bcc` are required. The composer omits the `Bcc` header from MIME and retains those recipients only in the transport envelope.
+
+<a id="address"></a>
+## Address and recipient declarations
+
+`Address(address: str, name: str | None = None)` is an immutable value object for one mailbox and its display name. Use `Address("ana@example.com", "Ana")`; do not put `"Ana <ana@example.com>"` or several comma-separated addresses in `address`.
+
+The domain is normalized to lowercase IDNA while local-part case is preserved. International mailboxes are accepted; whether a transport can send them depends on SMTPUTF8 support. Validation rejects ambiguous headers and control or line-separating characters. It does not query DNS or verify that the account exists.
+
+<a id="address-asheader"></a>
+### `asHeader(self) -> email.headerregistry.Address`
+
+Converts the object into a standard-library header value; it does not send mail:
+
+```python
+from orionis.mail import Address
+
+address = Address("Ana@EXAMPLE.COM", "Ana López")
+assert address.address == "Ana@example.com"
+assert address.asHeader().display_name == "Ana López"
+assert address.asHeader().addr_spec == "Ana@example.com"
+```
+
+The `Recipients` alias, defined in `orionis.mail.types`, accepts `str | Address | list[str | Address] | tuple[str | Address, ...]`. Sets, generators, and `None` are unsupported. A tuple `(email, name)` means two recipient entries, not a mailbox/name pair: use `Address` for that.
+
+<a id="address-one_address"></a>
+### `one_address(value: str | Address, name: str | None = None) -> Address`
+
+Normalizes one mailbox. An existing `Address` is returned unchanged when no `name` is added; supplying a second name raises `MailCompositionException`.
+
+<a id="address-addresses"></a>
+### `addresses(value: Recipients, name: str | None = None) -> tuple[Address, ...]`
+
+Normalizes a declaration and deduplicates normalized addresses. It keeps the first occurrence's order and display name. `name` is only allowed with a single string, not a list or tuple. Import both helpers from their module:
+
+```python
+from orionis.mail import Address
+from orionis.mail.entities.address import addresses, one_address
+
+ana = one_address("ana@example.com", "Ana")
+assert one_address(ana) is ana
+recipients = addresses([
+    ana,
+    "ana@EXAMPLE.COM",
+    Address("ops@example.com", "Operations"),
+])
+assert recipients == (ana, Address("ops@example.com", "Operations"))
+```
+
+## Sending option precedence
+
+Explicit chain options are applied over the mailable's `Envelope`:
+
+- `fromAddress()` replaces its sender. If the result is still `None`, the manager uses `mail.from_address`.
+- `subject()` replaces its subject, including when the new subject is `""`.
+- `to()`, `cc()`, `bcc()`, and `replyTo()` append recipients after the declaration; each group is normalized and deduplicated. The visible-recipient/Bcc conflict is checked again.
+- Chain attachments are appended after those returned by `attachments()`.
+
+Content comes exclusively from `content()`. `send(mailable)` accepts no extra `data` or callback, even `None`; those variants belong to direct sending and are documented in [sending and results](/en/services/mail/sending-and-results).
+
+`Envelope` and `Address` are immutable. Their validation errors raise `MailCompositionException`; the [API reference](/en/services/mail/api-reference) gathers module signatures and errors.

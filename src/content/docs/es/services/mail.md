@@ -1,6 +1,6 @@
 ---
 title: "Correo"
-description: "Envía notificaciones con Mail, mediante texto/HTML literal o clases Mailable reutilizables. Orionis compone mensajes MIME y los entrega por SMTP o los guarda como archivos .eml…"
+description: "Aprende a crear correos, usar vistas y adjuntos de Storage y enviar con Mail o inyección de dependencias."
 editUrl: true
 lastUpdated: false
 ---
@@ -20,29 +20,66 @@ MAIL_FILE_PATH=storage/mail
 
 El directorio debe ser escribible y su sistema de archivos debe admitir enlaces duros. La aplicación estándar necesita los proveedores de correo, vistas y almacenamiento disponibles; importar `Mail` en un script externo no los inicia.
 
-Usa esta función dentro de un controlador, comando o servicio async de la aplicación iniciada:
+Guarda este controlador en `app/http/controllers/welcome_mail_controller.py`. Utiliza la fachada desde su módulo público y selecciona explícitamente el transporte de archivos:
 
 ```python
-from orionis.mail import MailResult
+from orionis.http import JSONResponse
 from orionis.support.facades import Mail
 
 
-async def send_welcome(recipient: str, name: str) -> MailResult:
-    return await (
-        Mail.to(recipient)
-        .subject("Welcome")
-        .raw(f"Welcome, {name}.")
-    )
+class WelcomeMailController:
+    async def __call__(self) -> JSONResponse:
+        result = await (
+            Mail.mailer("file")
+            .to("ana@example.com", "Ana")
+            .subject("Welcome")
+            .raw("Welcome, Ana.")
+        )
+        return JSONResponse({
+            "message_id": result.message_id,
+            "status": result.status.value,
+        })
 ```
 
-Proporciona la dirección real del destinatario y llama `await send_welcome(address, name)` desde ese contexto de aplicación. Con `MAIL_MAILER=file`, el resultado tiene estado `stored` y `file_path` apunta al `.eml` completo. Ábrelo en un cliente de correo o inspecciona su contenido. Este transporte no entrega el mensaje al destinatario.
+Asocia una ruta en el archivo API configurado:
 
-Para entregar correo, configura el [transporte SMTP](/es/services/mail/transports-and-extensions) y selecciona `MAIL_MAILER=smtp`. Un resultado de aceptación indica que el servidor aceptó el mensaje; no confirma entrega en el buzón.
+```python
+from app.http.controllers.welcome_mail_controller import WelcomeMailController
+from orionis.support.facades import Route
 
-## Elegir el siguiente paso
+Route.post("/mail-preview", WelcomeMailController)
+```
 
-1. [Declarar mensajes](/es/services/mail/composing-mail): mailables reutilizables, plantillas, destinatarios y archivos adjuntos.
-2. [Enviar y manejar resultados](/es/services/mail/sending-and-results): cadenas independientes, callbacks, entrega parcial y errores.
-3. [Configurar transportes](/es/services/mail/transports-and-extensions): ajustes SMTP, archivos de desarrollo y drivers propios.
+El resultado tiene estado `stored` y `file_path` apunta al `.eml` completo. Ábrelo en un cliente de correo o inspecciona su contenido. Este transporte no entrega el mensaje al destinatario. El correo requiere un remitente y al menos un destinatario; configura el remitente global del ejemplo antes de arrancar.
+
+Para entregar correo, configura el [transporte SMTP](/es/services/mail/transports-and-extensions) y cambia la cadena a `.mailer("smtp")`. También puedes quitar la selección explícita y utilizar `MAIL_MAILER=smtp` como predeterminado. Un resultado de aceptación indica que el servidor aceptó el mensaje; no confirma entrega en el buzón.
+
+## Flujo de un envío
+
+```mermaid
+flowchart TD
+  accTitle: Ciclo de composición y entrega de correo
+  Access["Mail o inyección IMailManager"] --> Pending["Cadena PendingMail"]
+  Pending --> Declare["send / raw / html"]
+  Declare --> Composer["MailComposer: renderizar y cargar adjuntos"]
+  Composer --> MIME["PreparedMail: MIME y destinatarios separados"]
+  MIME --> Transport["Transporte del mailer seleccionado"]
+  Transport --> Result["MailResult: accepted / partial / stored"]
+```
+
+Las opciones fluidas son síncronas y devuelven una cadena nueva. Los terminales son asíncronos y preparan el contenido antes de crear el transporte. Los destinatarios Bcc se conservan en el sobre de transporte y no se escriben como encabezado MIME. La aceptación SMTP confirma la aceptación del servidor, no la recepción en el buzón.
+
+El `MailProvider` nativo registra el manager y el composer como singletons y fija la fachada durante el arranque. El composer utiliza los servicios de vistas y Storage, incluso cuando una operación particular solo contiene texto. No necesitas registrar estos servicios nuevamente en una aplicación estándar.
+
+## Recorrido por la documentación
+
+- [Configuración](/es/services/mail/configuration): todas las propiedades, variables de entorno y validaciones.
+- [Transportes y extensiones](/es/services/mail/transports-and-extensions): SMTP, archivos y drivers propios.
+- [Clases Mailable](/es/services/mail/composing-mail): crear una clase, declarar sus datos y enviarla como instancia o clase.
+- [Contenido y vistas](/es/services/mail/content-and-views): texto, HTML, alternativas y variables de plantillas.
+- [Adjuntos desde Storage](/es/services/mail/attachments): rutas, discos, nombres visibles, MIME y lectura de archivos.
+- [Envío y resultados](/es/services/mail/sending-and-results): API completa de las cadenas, callbacks y resultados.
+- [Fachada e inyección](/es/services/mail/manager-and-injection): controladores, servicios y dependencias de una clase de correo.
+- [Referencia técnica](/es/services/mail/api-reference): compositor, contratos, helpers, excepciones e inventario.
 
 Si el trabajo debe sobrevivir al reinicio del proceso, envía un [job persistente](/es/asynchronous/queues) que reconstruya y envíe el mensaje. El correo y la confirmación de una transacción de base de datos son efectos separados.
