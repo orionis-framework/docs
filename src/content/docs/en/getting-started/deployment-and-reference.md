@@ -1,92 +1,122 @@
 ---
-title: "Deployment, diagnostics, and Application reference"
-description: "Use the generated project root, retain uv.lock, and provide the production .env and existing private APP_KEY. Configure APP_ENV=production and APP_DEBUG=bool:false through the…"
+title: "Prepare a deployment"
+description: "Prepare Orionis for production and choose Windows Server, Linux or Docker with supervision, HTTPS and a reverse proxy."
 editUrl: true
 lastUpdated: false
 ---
 
-## Prepare an application release
+Publish your **complete application project**: code, `bootstrap/`, `config/`, `routes/`, `resources/`, `database/`, `reactor`, `pyproject.toml` and `uv.lock`, together with any frontend build artifacts it uses. Installing only the framework package does not publish your application.
 
-Use the generated project root, retain `uv.lock`, and provide the production `.env` and existing private `APP_KEY`. Configure `APP_ENV=production` and `APP_DEBUG=bool:false` through the application configuration. Make the configured storage and log directories writable by the application process, and review database migrations before applying them.
+The guides assume an installed, tested application. Replace the example domain `app.example.com`, paths and credentials with your own.
 
-```shell
-uv sync --frozen --python 3.14
-uv run python -B reactor about
-uv run python -B reactor route:list
-uv run python -B reactor serve --export
+| Scenario | Application process | Proxy and HTTPS |
+| --- | --- | --- |
+| [Windows Server](/en/getting-started/deployment/windows-server) | Windows service through WinSW | Caddy as a separate service |
+| [Linux](/en/getting-started/deployment/linux) | Unprivileged systemd service | Nginx with a TLS certificate |
+| [Docker](/en/getting-started/deployment/docker) | Unprivileged container | Caddy and a private Compose network |
+
+## Publication architecture
+
+```mermaid
+flowchart TD
+    accTitle: Publishing an Orionis application
+    B["Client"] -->|"HTTPS / WSS :443"| P["Reverse proxy"]
+    P -->|"Private HTTP / WebSocket :8000"| G["Granian · ASGI · one worker"]
+    G --> A["bootstrap.app:app"]
+    A --> K["HTTP kernel · routes · middleware"]
+    K --> S["Services and storage"]
+    Q["Queue worker / scheduler"] --> S
+    M["System supervisor or Docker"] --> G
+    M --> Q
 ```
 
-`serve --export` prints the resolved Granian command without starting the server. It reflects the current environment, protocol, platform, and port; review that output when configuring your process supervisor. `serve` uses `127.0.0.1` in development and `0.0.0.0` in production, with port 8000 unless specified. In production, place the server behind the application's configured TLS/proxy setup and supervise HTTP workers, queue workers, and the scheduler as separate processes.
+Granian is already an Orionis dependency. The `app` object created in `bootstrap/app.py` implements **ASGI** and **RSGI**. These guides explicitly select ASGI, with its startup and shutdown lifecycle enabled, and one worker as a starting point. See [Application and Container](/en/getting-started/application-overview) to customize bootstrap.
 
-The default `/up` route confirms that the application's HTTP path responds. Add an application-specific check when deployment readiness also depends on a database or external service. After changing code or startup configuration, refresh affected bootstrap caches and restart every long-running process; [Realtime groups](/en/asynchronous/realtime/groups-and-deployment), [sessions](/en/http/sessions/stores-and-concurrency), and [MCP events](/en/protocols/mcp/advanced-workflows) have explicit worker-local limits.
+## Prepare dependencies and configuration
 
-## Public API
+Examples use Python **3.14**. Check your application's `requires-python`, `.python-version` and lockfile before choosing another version. Resolve and test required dependencies and extras in development; ship the resulting `uv.lock`. From the project root on the server:
 
-### `Application(base_path=Path.cwd())`
+```shell
+uv sync --locked --no-default-groups --python 3.14
+```
 
-`orionis.Application` is a thread-safe singleton per concrete subclass. `Application.current()` returns an existing instance without creating it. Properties expose base/entry paths, start time, compiled-cache state, health route, creation/provider/HTTP readiness, debug/production flags, and maintenance state.
+`--locked` requires the lockfile to match the project; correct it before publishing if validation fails. `--no-default-groups` excludes default groups, including `dev`; production dependencies must be declared outside those groups. Services subsequently run the Python in `.venv` directly, without resolving packages on every start. [uv reference](https://docs.astral.sh/uv/reference/cli/#uv-sync).
 
-### Bootstrap methods
+Provide the private production `.env` **before importing the application or running Reactor**. Set the service working directory to the project root: the environment component uses that location to read the file. Its values are consumed from `config/`. See [Environment](/en/architecture/environment).
 
-- `compile(path=None, invalidation_paths=None)` enables cached bootstrap state.
-- `withRouting(api, web, console, health, ai, websocket=...)` registers validated route files.
-- `withProviders(*classes)` and `withMiddleware(*classes)` register extension classes.
-- `withExceptionHandler(cls)` and `withScheduler(cls)` replace defaults.
-- `withConfigApp/Auth/Cache/Http/Database/Filesystems/Logging/Mail/Mcp/Queue/Session/Testing(**values)` supplies section overrides.
-- `withConfigPaths(**paths)` resolves the full application directory map.
-- `on(lifespan, *callbacks, runtime=None)` registers global or runtime-specific hooks.
+```dotenv
+APP_ENV=production
+APP_DEBUG=bool:false
+ALLOWED_HOSTS=list:["app.example.com"]
+TRUSTED_PROXIES=list:["127.0.0.1"]
+SESSION_DRIVER=file
+SESSION_SECURE=bool:true
+```
 
-`with...` and `on(...)` return the application for chaining and reject mutation after creation. `compile(...)` returns `None` and must be a separate statement. On a valid compiled-cache hit, cached bootstrap metadata wins and registration/configuration methods intentionally become no-ops.
+Keep the remaining variables, especially **the existing `APP_KEY`** and connections. This fragment assumes a proxy on the same server and file sessions on one instance; Docker uses a different proxy IP. Configuring sessions does not add them to API routes.
 
-### Runtime methods
+For a new installation without a key, `python -B reactor key:generate` creates one and saves it in `.env`; without `--force` it preserves an existing key. Provision it once and reuse it across all processes of the same application. Do not regenerate it on every deployment: previously encrypted data depends on it.
 
-`create()` is synchronous registration/configuration. `boot()` is async provider readiness for headless processes. `handleCommand(args=None)` executes the CLI kernel within CLI lifecycle hooks. `config()`, `path()`, and `routingPaths()` expose runtime configuration, immutable bootstrap paths, and thawed route lists.
+Use `.venv/bin/python` on Linux and `.venv\Scripts\python.exe` on Windows. Abbreviated `python` commands assume that environment is active:
 
-`getExceptionHandler()` and `getScheduler()` lazily build configured application classes after creation. Container methods inherited by `Application` provide binding, resolution, scopes, and invocation.
+```shell
+python -B reactor about
+python -B reactor route:list
+python -B reactor serve --interface asgi --export
+```
 
-### `Directory`
+Run these checks with the service identity and working directory. `serve --export` prints the resolved command and exits without starting the server.
 
-`Directory(app)` snapshots `app.path()` once and exposes typed methods such as `root()`, `appModels()`, `databaseMigrations()`, `resourcesViews()`, and `storageLogs()`. Later path-map replacement does not change that snapshot.
+## Server and public files
 
-## Errors and edge cases
+```shell
+python -B reactor serve --interface asgi --port 8000 --log
+```
 
-- `config`, `path`, environment flags, handler, and scheduler access reject use before creation where applicable.
-- Bootstrap mutation after creation raises `RuntimeError`; invalid provider, middleware, handler, or scheduler classes raise `TypeError`.
-- Routing rejects missing files, invalid argument types, and files without an allowed facade import.
-- Invalid config entities fail creation with their original validation error, wrapped only where discovery requires it.
-- Application construction is singleton per subclass: later constructor arguments do not reinitialize an existing instance.
-- Runtime config is mutable and returned mappings are live; call `resetRuntimeConfig()` to restore the frozen baseline.
-- Unknown `path`/routing keys return `None`; `routeHealthCheck` defaults to `/up`.
-- A corrupt/unreadable maintenance marker deliberately reports maintenance mode.
+You can also use `orionis serve --interface asgi --port 8000 --log`. Reactor accepts `--interface` (`rsgi` by default or `asgi`), `--port` (8000), `--log` and `--export`; it **does not expose `--host`, `--workers` or `--reload`**.
 
-## Performance and concurrency
+| Decision | `serve` | Services in these guides |
+| --- | --- | --- |
+| Address | Loopback in development; `0.0.0.0` in production | Loopback on Windows/Linux; private network in Docker |
+| Workers | One on Windows; CPU count on Unix | Explicitly one |
+| Reload | Only outside production | Explicitly disabled |
+| Public files | Reads the `public` disk | Equivalent mount configured in Granian |
 
-Compiled mode stores bootstrap state in `FileBasedCache` and invalidates it from monitored files/directories. Core providers and config entities use lazy imports. Dot-notation config keys use an LRU capped at 256, and frequently queried production/debug flags are precomputed at creation.
+The guides call `python -B -m granian` to pin those decisions. The target is `bootstrap.app:app`, without `--factory`. For RSGI, select `--interface rsgi` with the same object. Do not use `wsgi` or `asginl`: the first does not match Orionis's contract; the second omits ASGI lifespan. [Granian interfaces](https://github.com/emmett-framework/granian).
 
-Provider boot, CLI kernel initialization, and HTTP kernel initialization each use async locks so concurrent callers share one successful startup. Maintenance refresh uses a thread lock. Request scopes and container resolution are context-local, but the application explicitly does not promise mutable-state safety across event loops or arbitrary threads.
+The default public disk is `storage/app/public`, published at `/static`. If you change `PUBLIC_PATH` or `PUBLIC_URL`, update the direct server's mount arguments as well. Granian serves that mount before the kernel: public files do not pass through Orionis middleware. Never publish the project root or `storage/app/private`.
 
-Optional HTTP disconnect monitoring uses a bounded ASGI queue (eight queued messages plus one producer-held message) or an RSGI watcher and cancels request work on client disconnect. WebSockets bypass that body-monitoring path.
+## Permissions, caches and persistent data
 
-## Compatibility
+The process needs to read code and write to directories it uses: bootstrap, logs, compiled views, sessions, temporary files and application files. These guides grant write access to `storage/`. SQLite also needs write access to the **directory** containing its file to create auxiliary files; configure that path and its permissions. See [database drivers](/en/database/drivers).
 
-Orionis foundation targets Python 3.14+ and implements ASGI HTTP/WebSocket/lifespan plus Granian RSGI integration and CLI Reactor dispatch. Path resolution uses `pathlib`; locale/timezone application remains platform-dependent and unsupported locales are ignored after config validation.
+`app.compile(...)` enables persistence of configuration, commands and routes as startup prepares them, usually in `storage/framework/bootstrap`. This cache contains resolved configuration, absolute paths and possibly secrets. Protect it like `.env`; do not copy it from development or between releases with different code paths.
 
-## Module structure
+Invalidation checks paths declared in bootstrap. Changing only process variables does not guarantee invalidation of an existing cache. With the release stopped, remove its bootstrap cache or run `python -B reactor optimize:clear` knowing its scope: it also cleans bytecode and Python `build`/`dist` directories. Restart all persistent processes afterwards. See [application configuration](/en/getting-started/configuration).
 
-| Area | Responsibility |
-|---|---|
-| `application.py` | Bootstrap, protocols, kernels, providers, routing, config, paths, maintenance. |
-| `contracts/` | `IApplication` and `IDirectory` interfaces. |
-| `directory.py`, `core_paths.py` | Snapshot path access and default application tree. |
-| `config/` | Native frozen entities, enums, normalization, shared environment helpers. |
-| `core_config.py` | Lazy construction of independent core defaults. |
-| `core_providers.py`, `core_kernels.py` | Lazy provider classes and kernel metadata. |
-| `core_exception_handler.py`, `core_scheduler.py` | Default extension metadata. |
-| `enums/` | `Lifespan` and `Runtime`. |
-| `lifespan/` | Debug startup/shutdown panels and uptime summary. |
+Keep uploads, SQLite databases, sessions and required persistent queues outside disposable releases. Docker uses volumes. A local directory is not automatically shared between servers.
 
-## Reference and next steps
+## Data and auxiliary processes
 
-[application.py](https://github.com/orionis-framework/framework/blob/470229f78a5db61263ce887bcdd16bc98f9141db/orionis/foundation/application.py) · [application.py](https://github.com/orionis-framework/framework/blob/470229f78a5db61263ce887bcdd16bc98f9141db/orionis/foundation/contracts/application.py) · [core_providers.py](https://github.com/orionis-framework/framework/blob/470229f78a5db61263ce887bcdd16bc98f9141db/orionis/foundation/core_providers.py)
+Back up and review migrations before applying them. Run them once per deployment with the production configuration:
 
-[Return to the module index](/en/getting-started).
+```shell
+python -B reactor migrate:status
+python -B reactor migrate
+```
+
+`migrate` accepts `--database` for another connection; it has no `--force` flag. Do not run `migrate:fresh`, `db:wipe` or demonstration seeders as a routine release step. See [database commands](/en/database/commands).
+
+HTTP does not automatically start persistent queue workers or a CLI scheduler. If you use them, create separate services with the same code, configuration and key; follow [queues](/en/asynchronous/queues/workers-and-failures) and [console and tasks](/en/console). Restart them when updating code too.
+
+## Concurrency and verification
+
+One worker does not make memory state durable. Before increasing workers or replicas, review [sessions](/en/http/sessions/stores-and-concurrency), [Realtime groups](/en/asynchronous/realtime/groups-and-deployment), [MCP events](/en/protocols/mcp/advanced-workflows), [cache](/en/services/cache) and [logs](/en/services/logging/rotation-and-lifecycle). A shared store does not by itself replace the Realtime connection registry.
+
+Check the private backend, then the public domain. `/up`, if you retain the default route, returns 200 normally and 503 during maintenance; it does not automatically check databases. Test a real route, public files, secure sessions and WebSocket/SSE where present. [Health and default responses](/en/http/default-responses).
+
+For a planned interruption, `python -B reactor down` writes the maintenance marker for processes sharing its storage; it does not interrupt operations already in progress. Stop processes, publish and verify; `python -B reactor up` restores availability. Investigate startup failures in the supervisor and [Logs](/en/services/logging).
+
+Continue with [Windows Server](/en/getting-started/deployment/windows-server), [Linux](/en/getting-started/deployment/linux) or [Docker](/en/getting-started/deployment/docker), and review [the proxy contract](/en/getting-started/deployment/reverse-proxies).
+
+The [deployment traceability inventory](/downloads/deployment-source-inventory.json) maps documented integration points to reviewed configuration, implementation and test files.

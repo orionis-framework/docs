@@ -1,160 +1,247 @@
 ---
 title: "Configuring rotation and lifecycle"
-description: "A channel determines file growth and retention. Configuration must match worker count and your operations policy."
+description: "File locations, suffixes, retention by file count, and the actual behavior of log rotation and shutdown."
 editUrl: true
 lastUpdated: false
 ---
 
-A channel determines file growth and retention. Configuration must match worker count and your operations policy.
+The selected channel determines which file receives records and how it rotates. All six channels write to the local filesystem; `stack` means a single file rather than a combination of channels. Set its fields in [Logging configuration](/en/services/logging/configuration) and use the [facade or service](/en/services/logging/writing-logs) to write messages.
 
-## Operate rotated files
+<a id="log-files"></a>
 
-`stack` writes one file without rotation; its name does not mean a stack of channels. Time channels rotate when a record arrives with a different suffix: no thread creates files during idle periods. `daily.at` computes the resolver's next rotation time, but the handler decides by suffix changes; do not assume a scheduler rotates precisely at the configured time.
+## Where files are written
 
-The size limit is checked before writing against bytes already recorded; one entry can push a file beyond the limit before the next check. Retention counts files matching the pattern, ordered by mtime; it does not guarantee deletion at a precise age. Include available disk space and external retention in operations.
+Default paths start at the project root:
 
-`switchChannel()` removes handlers before building the replacement. A `False` result after a failure does not mean the previous channel remains active. Check `getActiveChannel()` and report failure through an available operational channel. `reloadConfiguration()` rereads `app.config("logging")`: it does not automatically reload `.env` or Python files. Editing a file on disk does not itself change a running application's configuration.
-
-### Extend output
-
-`getLogger()` allows standard handlers. A subsequent reload or close may remove them: coordinate ownership. For a custom rotation policy, construct `AdvancedRotatingFileHandler` with a `SuffixResolver` implementation (`getSuffix`, `getNextRotationTime`); the built-in factory only knows the six documented names. `Logger` has no channel `extend()` registry. Replace `ILogger` in your provider for another global policy.
-
-Locks are thread-level, not process-level. Workers using the same pattern can rotate or delete each other's files. Use per-worker paths or external aggregation infrastructure. Emission, compression, and cleanup are synchronous and can add event-loop latency.
-
-
-### Rotation
-
-Time channels use a suffix resolver and rotate when its suffix changes. Hourly uses `YYYY-MM-DD_HH`, daily `YYYY-MM-DD`, weekly the ISO year/week, and monthly `YYYY-MM`. `chunked` rotates when the tracked encoded byte size reaches `mb_size`, generates timestamp/counter suffixes, and gzip-compresses rotated files.
-
-### Retention
-
-Rotating handlers scan only files matching their path template, sort them by modification time, and delete entries beyond the configured backup count. Retention values represent channel periods: hours, days, weeks, months, or a file count—not a universal duration.
-
-## Configuration
-
-`config/logging.py` builds frozen entities for every channel:
-
-| Setting | Environment | Default |
+| Channel | Default path | Initial opening |
 |---|---|---|
-| Default channel | `LOG_CHANNEL` | `stack` |
-| Handler level | `LOG_LEVEL` | `INFO` |
-| Selected channel path | `LOG_PATH` | Channel-specific path under `storage/logs/` |
-| Selected time-channel retention | `LOG_RETENTION` | hourly 24, daily 7, weekly 4, monthly 4 |
-| Daily rotation time | `LOG_ROTATION_TIME` | `00:00:00` |
-| Chunk size | `LOG_MB_SIZE` | 10 MiB |
-| Chunk retention | `LOG_FILES` | 5 files |
+| `stack` | `storage/logs/stack.log` | When the logger initializes, even if the first message is filtered out. |
+| `hourly` | `storage/logs/hourly_{suffix}.log` | When the first record passes the level filter. |
+| `daily` | `storage/logs/daily_{suffix}.log` | When the first record passes the level filter. |
+| `weekly` | `storage/logs/weekly_{suffix}.log` | When the first record passes the level filter. |
+| `monthly` | `storage/logs/monthly_{suffix}.log` | When the first record passes the level filter. |
+| `chunked` | `storage/logs/chunked_{suffix}.log` | When the first record passes the level filter. |
 
-`LOG_PATH` and `LOG_RETENTION` override only the channel selected by `LOG_CHANNEL`; edit `config/logging.py` or use dedicated environment keys if several channels need independent overrides. Paths are resolved below the application root. Rotating path templates should contain `{suffix}` to avoid writing every period to the same file.
+Parent directories are created automatically. Records are appended using UTF-8. The process user needs permission to create and write files, and to delete them when using rotating channels.
 
+Configuration entities require a nonempty string ending in `.log`; rotating channels also require the literal `{suffix}` placeholder. Put it in the **filename**, as shown here: cleanup only scans the directory of the file that has just been closed. Using `{suffix}` to split periods into separate directories does not provide cleanup across those directories.
 
+Use paths relative to the root, especially with `stack`: its default initialization concatenates the root and configured path, while the factory used when switching channels resolves paths through `Path`. An absolute `stack` path does not behave consistently across both paths.
 
-### Switch channels at runtime
+<a id="time-rotation"></a>
 
-```python
-from pathlib import Path
-from tempfile import TemporaryDirectory
-from orionis.logging import Logger
+## Rotation by period
 
+Each record requests the current suffix. When it differs from the open file's suffix, the handler closes that file, applies retention, and opens the file for the new period. Without new records, no files are created, period changes are not checked, and cleanup does not run.
 
-class App:
-    def __init__(self, root: str) -> None:
-        self.root = root
+| Channel | Suffix | Effective file boundary |
+|---|---|---|
+| `hourly` | `YYYY-MM-DD_HH` | Hour change in the application's configured timezone. |
+| `daily` | `YYYY-MM-DD` | Date change in that timezone. |
+| `weekly` | `YYYY-weekWW` | ISO week change: Monday, using the ISO year. |
+| `monthly` | `YYYY-MM` | Calendar month change. |
 
-    def config(self, name: str) -> dict:
-        return {
-            "default": "stack",
-            "channels": {
-                "stack": {"path": "stack.log", "level": "INFO"},
-                "chunked": {"path": "chunk_{suffix}.log", "level": "INFO", "mb_size": 1, "files": 2},
-            },
-        }
+For example, December 29, 2025 belongs to `2026-week01`. The week is not calculated by splitting the year into seven-day blocks. Resolvers capture the `DateTime` timezone when constructed; when passed an explicit `datetime`, `getSuffix(dt)` formats that value without converting it to another timezone.
 
-    def path(self, name: str) -> str:
-        return self.root
-
-
-with TemporaryDirectory() as root:
-    logger = Logger(App(root))
-    assert logger.switchChannel("chunked")
-    logger.warning("written to chunked channel")
-    assert logger.getActiveChannel() == "chunked"
-    logger.close()
-    assert any(Path(root).glob("chunk_*.log"))
-    print("channel switched")
+```dotenv
+LOG_CHANNEL=daily
+LOG_LEVEL=INFO
+LOG_PATH=storage/logs/application_{suffix}.log
+LOG_RETENTION=int:14
 ```
 
-### Resolve deterministic time suffixes
+With that configuration, a record on October 23 writes to `application_2026-10-23.log`. The first record of the following day opens `application_2026-10-24.log`. Changing `.env` requires reloading application configuration as explained in [Environment](/en/architecture/environment); reloading the logger alone does not do that.
+
+### What `daily.at` affects
+
+`Daily.at` accepts `datetime.time` or a string supported by `time.fromisoformat()`, such as `"02:30:00"`. The resolver can calculate the next time through `getNextRotationTime()`, but the integrated handler **does not call that method**: it decides when to rotate by comparing suffixes. Therefore, `LOG_ROTATION_TIME=02:30:00` does not move the effective daily boundary from midnight to 02:30 or schedule a cleanup task.
+
+<a id="size-rotation"></a>
+
+## `chunked`: size, suffixes, and compression
+
+Configuration exposes `mb_size` —an integer from 1 to 1000, default 10— and `files` —a positive integer, default 5—. The factory converts `mb_size` to bytes using `mb_size * 1024 * 1024`, making the effective unit MiB. The handler counts the encoded text bytes and its line break.
+
+There is an important consideration in the current implementation: `ChunkedSuffixResolver.getSuffix()` produces a new suffix **on every call**, formatted as `YYYYMMDD_HHMMSS_counter`, and the handler requests one on every emission. Because changing the suffix already causes rotation, **the integrated channel rotates for every emitted record**, even when the file is far below `mb_size`. The parameter exists and reaches the handler; it does not guarantee that records accumulate until reaching that size.
+
+For example, three consecutive messages normally produce two closed `.log.gz` files and one active `.log` file, each containing one record. The counter starts at `0001` for each resolver instance; timestamp and counter are not a global identifier across processes.
+
+```dotenv
+LOG_CHANNEL=chunked
+LOG_PATH=storage/logs/application_{suffix}.log
+LOG_MB_SIZE=int:10
+LOG_FILES=int:5
+```
+
+Gzip compression runs during rotation, after closing the previous file. On success, the original `.log` file is removed. The active file remains uncompressed; `close()` does not compress it. If compression encounters an `OSError`, it attempts to remove the incomplete compressed file.
+
+The handler checks size **before** writing the next record, using the bytes already accumulated. It does not anticipate the next message's size: one entry can exceed the threshold. This is also not a maximum disk usage limit.
+
+<a id="log-retention"></a>
+
+## What retention preserves
+
+The names `retention_hours`, `retention_days`, `retention_weeks`, and `retention_months` express the channel's period, but the factory passes them directly as `backup_count`. Cleanup retains a **number of files** rather than comparing record age with a duration.
+
+| Channel | Field | Default | Entity validation range |
+|---|---|---|---|
+| `stack` | No integrated retention | — | — |
+| `hourly` | `retention_hours` | `24` | `1` to `168` |
+| `daily` | `retention_days` | `7` | `1` to `90` |
+| `weekly` | `retention_weeks` | `4` | `1` to `12` |
+| `monthly` | `retention_months` | `4` | `1` to `12` |
+| `chunked` | `files` | `5` | Integer greater than `0` |
+
+On every rotation, cleanup runs in this order:
+
+1. Find files in the directory of the file that has just been closed.
+2. Select names matching the template, including the `.gz` variant.
+3. Sort by modification time (`mtime`), newest first.
+4. Delete files beyond `backup_count` and, where applicable, their compressed variant.
+5. The handler then opens the new active file.
+
+```mermaid
+flowchart TD
+    A[Record accepted by the level filter] --> B[Obtain suffix]
+    B --> C{Suffix changed or max_bytes reached?}
+    C -- No --> G[Write and update byte count]
+    C -- Yes --> D[Close previous file]
+    D --> E[Compress when enabled]
+    E --> F[Keep the newest backup_count files]
+    F --> H[Open active file]
+    H --> G
+```
+
+After this sequence there may be up to **`backup_count + 1` files**: those kept during cleanup plus the new active file. Setting `daily.retention_days=7` does not delete each record exactly seven days later. Periods without traffic generate no files, while changing `mtime` or sharing a pattern with another process affects which files count as newest.
+
+Cleanup does not run when constructing a handler with no active file or when closing it. Filesystem inspection and deletion errors are suppressed, so retention is an attempted cleanup rather than a strict maximum-space guarantee. Configuration entities reject zero retention; do not use it to disable keeping files.
+
+<a id="logger-lifecycle"></a>
+
+## Initialization, channel switching, and shutdown
+
+The service reads `app.config("logging")` during construction and prepares the native logger on its first operation that requires it. It initializes a single default channel. Channel enumeration methods inspect configuration or the handler cache without forcing initialization.
+
+`switchChannel(name)` closes and removes current handlers before creating the replacement. A missing channel returns `False` before removing them; a configured channel whose creation fails can return `False` after the logger has lost its handlers. Check the result and `getActiveChannel()` when the change matters to your operation. Switching does not modify `logging.default`.
+
+`reloadConfiguration()` removes handlers, reads application configuration again, and rebuilds the default channel. It does not preserve a previous channel switch or reload `.env` or Python configuration modules. Initialization and reloading can raise `RuntimeError`.
+
+`close()` removes and closes handlers, clears their references, and suppresses common closing errors. It is idempotent; it does not permanently disable the service: a later record can initialize it again. The destructor also attempts to release resources. For an explicit shutdown phase, use an application hook:
+
+```python
+# bootstrap/app.py: register before app.create().
+from orionis.foundation.enums import Lifespan
+from orionis.logging.contracts.logger import ILogger
+
+
+def close_logs(logger: ILogger) -> None:
+    logger.close()
+
+
+app.on(Lifespan.SHUTDOWN, close_logs)
+```
+
+Here, `app` is the instance already configured by the bootstrap. The callback receives the shared service through `ILogger`. Avoid logging after closing it if you want the files to remain closed. See the [application lifecycle](/en/getting-started/application-lifecycle) for hook ordering.
+
+<a id="log-concurrency"></a>
+
+## Workers, concurrency, and write errors
+
+The service uses thread locks for initialization, switching, reloading, and closing; the rotating handler protects writes and file changes with another lock. These mechanisms work within a process: there is no distributed lock or rotation coordination between workers or servers.
+
+Each process owns its counters and file descriptors. Processes sharing a template in a shared directory can compress or delete files another process is still using. Separate their files by configuring an instance-specific path at deployment, or adopt an external collection infrastructure. [Configuration](/en/services/logging/configuration) explains how to construct a path from configuration values.
+
+Writing, gzip compression, and deletion are synchronous. Calling `Log.info()` or a `Logger` method in an asynchronous controller does not move that work into a queue. The integrated implementation does not add a network transport or logging worker.
+
+The handler captures `OSError` during emission and reports it through `handleError(record)`, the standard logging mechanism. Returning `None` is not a persisted-write acknowledgment. Other errors, such as those from a custom formatter, are not covered by that `OSError` handler.
+
+<a id="handler-extension"></a>
+
+## Integrating your own handler
+
+`getLogger()` returns the underlying `logging.Logger`. You can attach another handler through the standard API; coordinate its lifecycle because `switchChannel()`, `reloadConfiguration()`, and `close()` remove handlers attached to that logger. The service uses a shared native logger name, `__orionis__`, within the process: manually constructing another `Logger` does not provide an isolated destination.
+
+The factory recognizes only the six integrated names; the service has no `extend()` channel registry. This function creates a daily handler for an integration that explicitly manages attachment and closing:
+
+```python
+import logging
+from orionis.foundation.contracts.application import IApplication
+from orionis.logging.handlers.rotating_handler_factory import RotatingHandlerFactory
+
+
+def create_audit_handler(app: IApplication) -> logging.Handler:
+    handler = RotatingHandlerFactory.createHandler(
+        channel_name="daily",
+        channel_config={
+            "path": "storage/logs/audit_{suffix}.log",
+            "level": logging.WARNING,
+            "retention_days": 14,
+        },
+        app_root=str(app.path("root")),
+    )
+    assert handler is not None
+    handler.setFormatter(logging.Formatter("%(levelname)s %(message)s"))
+    return handler
+```
+
+`createHandler(channel_name: str, channel_config: dict, app_root: str) -> Handler | None` returns `FileHandler` for `stack`, `AdvancedRotatingFileHandler` for the other five channels, or `None` for an unsupported name. It accepts a numeric level; `Logger` normalizes `Level` or strings before calling the factory. The factory uses the supplied `path` or `storage/logs/default.log`, with a default level of `20`; it does not replace configuration entity validation. Its `stack` opens the file lazily, unlike the service's default initialization.
+
+<a id="suffix-resolvers"></a>
+
+## Suffix resolver contract
+
+`SuffixResolver` is an abstract contract with two methods. All integrated implementations expose:
+
+```text
+getSuffix(dt: datetime | None = None) -> str
+getNextRotationTime(current_time: datetime) -> datetime
+```
+
+| Class | Constructor | `getNextRotationTime()` result |
+|---|---|---|
+| `HourlySuffixResolver` | `()` | Beginning of the following hour, using the resolver's timezone. |
+| `DailySuffixResolver` | `(at_time: time | None = None)` | Next configured daily date/time; the following day if it has passed. |
+| `WeeklySuffixResolver` | `(at_time: time | None = None)` | Monday of the following week at that time. |
+| `MonthlySuffixResolver` | `(at_time: time | None = None)` | First day of the following month at that time. |
+| `ChunkedSuffixResolver` | `()` | `current_time + timedelta(hours=1)`, unused as an integrated trigger. |
+
+For the three constructors with `at_time`, `None` means midnight. These are extension APIs: the integrated handler consumes `getSuffix()` and does not schedule the time calculated by `getNextRotationTime()`.
 
 ```python
 from datetime import UTC, datetime, time
 from orionis.logging.handlers.daily_suffix_resolver import DailySuffixResolver
-from orionis.logging.handlers.monthly_suffix_resolver import MonthlySuffixResolver
 from orionis.logging.handlers.weekly_suffix_resolver import WeeklySuffixResolver
 
-moment = datetime(2026, 10, 6, 15, 30, tzinfo=UTC)
-assert DailySuffixResolver(time(2, 0)).getSuffix(moment) == "2026-10-06"
-assert WeeklySuffixResolver().getSuffix(moment) == "2026-week41"
-assert MonthlySuffixResolver().getSuffix(moment) == "2026-10"
-print(DailySuffixResolver(time(2, 0)).getNextRotationTime(moment))
+moment = datetime(2026, 10, 23, 15, 30, tzinfo=UTC)
+daily = DailySuffixResolver(time(2, 30))
+
+assert daily.getSuffix(moment) == "2026-10-23"
+assert WeeklySuffixResolver().getSuffix(moment) == "2026-week43"
 ```
 
-### Create a delayed handler
+<a id="handler-api"></a>
 
-```python
-import logging
-from tempfile import TemporaryDirectory
-from orionis.logging.handlers.rotating_handler_factory import RotatingHandlerFactory
+## `AdvancedRotatingFileHandler` reference
 
-with TemporaryDirectory() as root:
-    handler = RotatingHandlerFactory.createHandler(
-        "stack",
-        {"path": "logs/example.log", "level": logging.WARNING},
-        root,
-    )
-    assert handler is not None
-    assert handler.level == logging.WARNING
-    assert handler.stream is None
-    handler.close()
-    print(type(handler).__name__)
+```text
+AdvancedRotatingFileHandler(
+    path_template: str,
+    suffix_resolver: SuffixResolver,
+    max_bytes: int | None = None,
+    backup_count: int = 5,
+    encoding: str = "utf-8",
+    *,
+    delay: bool = True,
+    compress_rotated: bool = False,
+    app_root: str = ".",
+) -> None
+
+emit(record: LogRecord) -> None
+close() -> None
 ```
 
-## Errors and edge cases
+`path_template` and `app_root` determine the path; `suffix_resolver` generates suffixes. `max_bytes=None` disables the size check. `backup_count` controls how many files are kept during rotation. `encoding` is used both to write and count bytes. `delay=True` defers opening until the first emission; `False` prepares the stream in the constructor. `compress_rotated=True` compresses files closed during rotation.
 
-- Initialization and configuration reload failures are wrapped in `RuntimeError`.
-- An absent configured default creates `storage/logs/default.log`; a present but unsupported channel may leave the logger with no handlers.
-- `switchChannel()` returns `False` for missing, unsupported, or failed channels and suppresses common I/O/config errors.
-- String levels are normalized through standard logging names; unknown strings become `INFO`.
-- Rotation/compression/retention I/O errors are handled defensively so logging does not normally interrupt application work; standard logging may report handler errors.
-- Retention `0` removes matching rotated files during cleanup. Misconfigured templates without `{suffix}` defeat distinct time files.
-- `close()` is idempotent and suppresses common cleanup errors; using the wrapper afterward rebuilds it.
-- Multiple processes write independently and do not coordinate rotation locks across process boundaries.
+`emit()` formats a record, adds `\n`, ensures the correct file, writes, and updates the byte counter. `close()` closes the stream under a lock and delegates to the base class without compression or cleanup. Reopening an existing file restores its initial size; later external writes do not continuously update that counter.
 
-
-
-## Performance and concurrency
-
-The hot path uses standard logger filtering and one handler. Initialization, reload, channel switch, file emission, and chunk suffix generation use locks. Rotating handlers cache up to roughly 50 resolved suffix paths for five minutes and track written encoded bytes without stat calls on every record.
-
-Locks are thread-level, not process-level. Avoid several workers targeting the same rotating filename unless the deployment supplies external coordination. File writes are synchronous and can affect event-loop latency at high volume; use an application-level queue/aggregation architecture when logging throughput is substantial.
-
-
-
-### Rotation internals
-
-`RotatingHandlerFactory.createHandler(channel_name, channel_config, app_root)` returns a standard `FileHandler`, an `AdvancedRotatingFileHandler`, or `None` for an unsupported channel. Each `SuffixResolver` provides `getSuffix(dt=None)` and `getNextRotationTime(current_time)`.
-
-## Implementation reference for extensions
-
-| Path | Responsibility |
-|---|---|
-| `logger.py` | Lazy logger construction, levels, channel switch/reload, and cleanup. |
-| `provider.py` | Container singleton and `Log` facade pinning. |
-| `contracts/logger.py` | `ILogger` service contract. |
-| `contracts/suffix_resolver.py` | Rotation suffix/time contract. |
-| `handlers/rotating_handler_factory.py` | Channel-to-handler dispatch. |
-| `handlers/advanced_rotating_file_handler.py` | Thread-safe writing, rotation, compression, and retention. |
-| `handlers/*_suffix_resolver.py` | Hourly, daily, weekly, monthly, and chunk suffix policies. |
-
----
-
-[Index](/en/services/logging) · [foundation](/en/getting-started)
+The configuration attributes above are accessible on the handler, as are `stream`, `current_path`, `current_suffix`, and `file_size`. The latter represent active-file state rather than an API for forcing rotation. The handler maintains an internal path cache and exposes no public manual cleanup or `rotate()` method.

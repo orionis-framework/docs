@@ -36,7 +36,7 @@ Foundation también define entidades congeladas para cada subsistema, metadata c
 - [Arquitectura y ciclo de vida de la aplicación](/es/getting-started/architecture-and-lifecycle)
 - [Ciclo de vida y recursos de aplicación](/es/getting-started/application-lifecycle)
 - [Configuración tipada y valores en ejecución](/es/getting-started/configuration)
-- [Despliegue, diagnóstico y referencia de Application](/es/getting-started/deployment-and-reference)
+- [Preparar un despliegue](/es/getting-started/deployment-and-reference)
 - [Crear y arrancar una aplicación](/es/getting-started/getting-started)
 - [Directorios y caché de arranque](/es/getting-started/paths-and-caching)
 

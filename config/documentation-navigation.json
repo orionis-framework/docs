@@ -1251,22 +1251,124 @@
       ]
     },
     {
+      "id": "logging",
+      "band": "operate",
+      "icon": "logging",
+      "title": {
+        "es": "Logs",
+        "en": "Logs"
+      },
+      "pageIds": [
+        "logging-overview",
+        "logging-configuration",
+        "logging-writing-logs",
+        "logging-rotation-and-lifecycle"
+      ],
+      "groups": [
+        {
+          "id": "logging-start",
+          "title": {
+            "es": "Configuración inicial",
+            "en": "Initial configuration"
+          },
+          "pageIds": [
+            "logging-overview",
+            "logging-configuration"
+          ]
+        },
+        {
+          "id": "logging-operation",
+          "title": {
+            "es": "Uso y archivos",
+            "en": "Usage and files"
+          },
+          "pageIds": [
+            "logging-writing-logs",
+            "logging-rotation-and-lifecycle"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "exceptions",
+      "band": "operate",
+      "icon": "exceptions",
+      "title": {
+        "es": "Exceptions",
+        "en": "Exceptions"
+      },
+      "pageIds": [
+        "failure-overview",
+        "failure-handling-exceptions",
+        "failure-contexts-and-transports",
+        "failure-policies-and-reference"
+      ],
+      "groups": [
+        {
+          "id": "exceptions-application",
+          "title": {
+            "es": "Política de aplicación",
+            "en": "Application policy"
+          },
+          "pageIds": [
+            "failure-overview",
+            "failure-handling-exceptions"
+          ]
+        },
+        {
+          "id": "exceptions-contexts",
+          "title": {
+            "es": "Contextos y referencia",
+            "en": "Contexts and reference"
+          },
+          "pageIds": [
+            "failure-contexts-and-transports",
+            "failure-policies-and-reference"
+          ]
+        }
+      ]
+    },
+    {
       "id": "deployment",
       "band": "operate",
       "icon": "deployment",
       "title": {
-        "en": "Deployment, logs and errors",
-        "es": "Despliegue, logs y errores"
+        "es": "Despliegue",
+        "en": "Deployment"
       },
       "pageIds": [
         "foundation-deployment-and-reference",
+        "deployment-reverse-proxies",
         "http-default-responses",
-        "logging-overview",
-        "logging-writing-logs",
-        "logging-rotation-and-lifecycle",
-        "failure-overview",
-        "failure-handling-exceptions",
-        "failure-policies-and-reference"
+        "deployment-windows-server",
+        "deployment-linux",
+        "deployment-docker"
+      ],
+      "groups": [
+        {
+          "id": "deployment-preparation",
+          "title": {
+            "es": "Preparar la publicación",
+            "en": "Prepare a release"
+          },
+          "pageIds": [
+            "foundation-deployment-and-reference",
+            "deployment-reverse-proxies",
+            "http-default-responses"
+          ]
+        },
+        {
+          "id": "deployment-platforms",
+          "title": {
+            "es": "Guías por plataforma",
+            "en": "Platform guides"
+          },
+          "pageIds": [
+            "deployment-windows-server",
+            "deployment-linux",
+            "deployment-docker"
+          ]
+        }
       ]
     },
     {

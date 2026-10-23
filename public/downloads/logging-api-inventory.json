@@ -1,0 +1,1063 @@
+{
+  "scope": "Own public Logging and logging-configuration declarations, constructors, Logger destruction protocol, facade accessor, dataclass fields, level enum members and exported validator callables. Contracts and implementations count separately. Private helpers, dataclass validation hooks/generated methods, inherited standard-library/container APIs and lazy export machinery are excluded; their relevant behavior is described in the guides. Auxiliary integrations are hashed without claiming their entire API as Logging API.",
+  "sourceRoots": [
+    "orionis/logging",
+    "orionis/foundation/config/logging"
+  ],
+  "publicFiles": [
+    "config/logging.py",
+    "orionis/support/facades/logger.py"
+  ],
+  "auxiliaryFiles": [
+    "orionis/support/facades/logger.pyi",
+    "orionis/container/facades/facade.py",
+    "orionis/container/facades/meta.py",
+    "orionis/foundation/application.py",
+    "orionis/foundation/core_paths.py",
+    "orionis/failure/base/handler.py",
+    "orionis/support/facades/datetime.py"
+  ],
+  "exports": {
+    "orionis/foundation/config/logging/__init__.py": [
+      "Channels",
+      "Chunked",
+      "Daily",
+      "Hourly",
+      "Level",
+      "Logging",
+      "Monthly",
+      "Stack",
+      "Weekly"
+    ],
+    "orionis/foundation/config/logging/enums/__init__.py": [
+      "Level"
+    ],
+    "orionis/foundation/config/logging/validators/__init__.py": [
+      "IsValidLevel",
+      "IsValidPath"
+    ],
+    "orionis/logging/__init__.py": [
+      "Logger"
+    ],
+    "orionis/logging/contracts/__init__.py": [
+      "ILogger"
+    ]
+  },
+  "hashes": {
+    "config/logging.py": "34f7a9587b7f9a8ca218b4d00f2b92819196f6f3e102771c5d9ea8d8cf639aa7",
+    "orionis/foundation/config/logging/__init__.py": "6a0eedf670947ccfee4a8e724c49c0098e9ef2f16bb912050afd65e71cb993bf",
+    "orionis/foundation/config/logging/entities/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "orionis/foundation/config/logging/entities/channels.py": "57b31d6126d793d41a92951a9619fd4ffc3ab1a31236d8a6abef43aafb4044b3",
+    "orionis/foundation/config/logging/entities/chunked.py": "2960e131e773b1c114cbb53be5d6e84c4780f6b178e5026db08c698d886882db",
+    "orionis/foundation/config/logging/entities/daily.py": "34561e8320c49ca9d65b52a3907b47a110b788e7c7260077fa376cd5b7889aff",
+    "orionis/foundation/config/logging/entities/hourly.py": "eb0665f8419d94ea02e712c8c795ef7ed2b97034eea463e41602c7706c989b6d",
+    "orionis/foundation/config/logging/entities/logging.py": "aaf2440a1b743c672421c5fc2a4e1c95a01a75a35b0dbbc6cb20e2ae26952e0b",
+    "orionis/foundation/config/logging/entities/monthly.py": "9fef1ea204720aba6222a8137d472385f6b58b26669640a458ea87cad115ec75",
+    "orionis/foundation/config/logging/entities/stack.py": "e02eeca01cd348e032a14e5f344faac31ae5e2dfabf293ab87c79f3dcf8a0a4c",
+    "orionis/foundation/config/logging/entities/weekly.py": "b9fa1ee9226c0336885f8848beaf770a58ff9fddf73be9a49e31062bd00be177",
+    "orionis/foundation/config/logging/enums/__init__.py": "eeb3930b5b9e59c5959166d638540be521ced931611cb414e2ae4735674dcf9a",
+    "orionis/foundation/config/logging/enums/levels.py": "3312248cdf164d7c66e99c506b1b40f1ead52d3dc428e0604b11014e1731a29a",
+    "orionis/foundation/config/logging/validators/__init__.py": "1436d4afd8613460aa9661f3d7cff0a80a871658f442ec2f05b3672ae7e49a85",
+    "orionis/foundation/config/logging/validators/level.py": "b56db5737a3dd780cf720dd005e9b4a6dffdbaa630a25fe6669b5da7500d816e",
+    "orionis/foundation/config/logging/validators/path.py": "7789ee187927bc9f29c54a1060c91c8c23cf1bad073372d810e183b70f00198d",
+    "orionis/logging/__init__.py": "62fe1dcd28c783316482407ecfbb80f4a9c8d437c97d048a295973b27b1f47b6",
+    "orionis/logging/contracts/__init__.py": "6bdecce4a3369b87db198bfef060813fe86701f46190c0b7b621bfd8343c5fa3",
+    "orionis/logging/contracts/logger.py": "1a52ff49a9d4991bb0d0f277ae154a3cc19b83cfad0dfec37f3c5157305a25d5",
+    "orionis/logging/contracts/suffix_resolver.py": "f4d7baa2f4db5a612511cdd5e2cd5ee27454eeaf4f728fee637960be569d2ac3",
+    "orionis/logging/handlers/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "orionis/logging/handlers/advanced_rotating_file_handler.py": "c28f368a5c85b535c8a680ab6c3b252f9946c2a00d2f3c4bc8bdce26e5699f15",
+    "orionis/logging/handlers/chunked_suffix_resolver.py": "aa5dfce07281accb957d60f14b411aadf002eb9e0dc448115fbc2c3f132c1168",
+    "orionis/logging/handlers/daily_suffix_resolver.py": "917272f6d2a34ffc229b60e209aee18ad2d98fd0e7226cced5c8b76f96892c5b",
+    "orionis/logging/handlers/hourly_suffix_resolver.py": "9566fa2b7c4ec6e6d4f46cec8af2b4f54d87bafccf917db7b49a40c430a56fdd",
+    "orionis/logging/handlers/monthly_suffix_resolver.py": "58f9ae552ae172efdce30fcd4e289bb8cd3495de455fcf68025117f19eb8c196",
+    "orionis/logging/handlers/rotating_handler_factory.py": "9f61e70482d29c6dcf697d4bf35a5e5e78884ff8b72117f9bb22146aad52dbb8",
+    "orionis/logging/handlers/weekly_suffix_resolver.py": "ef0e8d12b862ccf4c5ff8a0412b1f078d4759d0c1c0dccd4cab12b8a6c6ff1dc",
+    "orionis/logging/logger.py": "604dfb36c58366a76f7ff448645b5594b02dc40a113811c9ed826247c09e549c",
+    "orionis/logging/provider.py": "d604b94a56b1fba5ddfa67541757e49f796f31dc0f03b2380123879cecee4a65",
+    "orionis/support/facades/logger.py": "b1067f990fed396114f89ac0bb5f7df1a3d5f35274b8416d12eb8edc7c050f16",
+    "orionis/support/facades/logger.pyi": "1670c18812fdeda0ef6fc9ea98769f8c640534acc77beb9e0cc28423113cc1db",
+    "orionis/container/facades/facade.py": "85b9d448f4da31eb8a8f0c0131b3a7cd4b04f511c6e1b74a996ce59ca0e5e909",
+    "orionis/container/facades/meta.py": "87cac316a12e6462a8c811a8ad7a82885b64be754ab9e68d3050b6986d970b03",
+    "orionis/foundation/application.py": "b1c27ec023a3d4ad5087f34d4c7616b678b2f098cda5192e00c55212cee5dfb9",
+    "orionis/foundation/core_paths.py": "53fecb1c56549949d02177b8e3793fc08cd4ca3ffca4568adffe8c01a6cbdfb8",
+    "orionis/failure/base/handler.py": "768ecee7366dd7719b973dec3bdb0ccac989a534d187aff130f2ca91de8e8074",
+    "orionis/support/facades/datetime.py": "3df0811976fef9e17f521a602180c0030cd2e02fe17eaf9088c41e9ec5b61065"
+  },
+  "entries": [
+    {
+      "source": "config/logging.py",
+      "symbol": "BootstrapLogging",
+      "kind": "class",
+      "line": 11,
+      "signature": "class BootstrapLogging(Logging)",
+      "reference": "/services/logging/configuration#logging-configuration"
+    },
+    {
+      "source": "config/logging.py",
+      "symbol": "BootstrapLogging.default",
+      "kind": "field",
+      "line": 18,
+      "signature": "default: str = field(default_factory=lambda: Env.get('LOG_CHANNEL', 'stack'))",
+      "reference": "/services/logging/configuration#logging-configuration"
+    },
+    {
+      "source": "config/logging.py",
+      "symbol": "BootstrapLogging.channels",
+      "kind": "field",
+      "line": 28,
+      "signature": "channels: Channels | dict = field(default_factory=lambda: Channels(stack=Stack(path=Env.get('LOG_PATH', 'storage/logs/stack.log') if Env.get('LOG_CHANNEL', 'stack') == 'stack' else 'storage/logs/stack.log', level=Env.get('LOG_LEVEL', Level.INFO)), hourly=Hourly(path=Env.get('LOG_PATH', 'storage/logs/hourly_{suffix}.log') if Env.get('LOG_CHANNEL', 'stack') == 'hourly' else 'storage/logs/hourly_{suffix}.log', level=Env.get('LOG_LEVEL', Level.INFO), retention_hours=Env.get('LOG_RETENTION', 24) if Env.get('LOG_CHANNEL', 'stack') == 'hourly' else 24), daily=Daily(path=Env.get('LOG_PATH', 'storage/logs/daily_{suffix}.log') if Env.get('LOG_CHANNEL', 'stack') == 'daily' else 'storage/logs/daily_{suffix}.log', level=Env.get('LOG_LEVEL', Level.INFO), retention_days=Env.get('LOG_RETENTION', 7) if Env.get('LOG_CHANNEL', 'stack') == 'daily' else 7, at=Env.get('LOG_ROTATION_TIME', time(hour=0, minute=0, second=0))), weekly=Weekly(path=Env.get('LOG_PATH', 'storage/logs/weekly_{suffix}.log') if Env.get('LOG_CHANNEL', 'stack') == 'weekly' else 'storage/logs/weekly_{suffix}.log', level=Env.get('LOG_LEVEL', Level.INFO), retention_weeks=Env.get('LOG_RETENTION', 4) if Env.get('LOG_CHANNEL', 'stack') == 'weekly' else 4), monthly=Monthly(path=Env.get('LOG_PATH', 'storage/logs/monthly_{suffix}.log') if Env.get('LOG_CHANNEL', 'stack') == 'monthly' else 'storage/logs/monthly_{suffix}.log', level=Env.get('LOG_LEVEL', Level.INFO), retention_months=Env.get('LOG_RETENTION', 4) if Env.get('LOG_CHANNEL', 'stack') == 'monthly' else 4), chunked=Chunked(path=Env.get('LOG_PATH', 'storage/logs/chunked_{suffix}.log') if Env.get('LOG_CHANNEL', 'stack') == 'chunked' else 'storage/logs/chunked_{suffix}.log', level=Env.get('LOG_LEVEL', Level.INFO), mb_size=Env.get('LOG_MB_SIZE', 10), files=Env.get('LOG_FILES', 5))))",
+      "reference": "/services/logging/configuration#logging-configuration"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/channels.py",
+      "symbol": "Channels",
+      "kind": "class",
+      "line": 21,
+      "signature": "class Channels(BaseEntity)",
+      "reference": "/services/logging/configuration#logging-channels"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/channels.py",
+      "symbol": "Channels.stack",
+      "kind": "field",
+      "line": 41,
+      "signature": "stack: Stack | dict = field(default_factory=Stack, metadata={'description': 'Configuration for stack log channel.', 'default': lambda: Stack().toDict()})",
+      "reference": "/services/logging/configuration#logging-channels"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/channels.py",
+      "symbol": "Channels.hourly",
+      "kind": "field",
+      "line": 49,
+      "signature": "hourly: Hourly | dict = field(default_factory=Hourly, metadata={'description': 'Configuration for hourly log rotation.', 'default': lambda: Hourly().toDict()})",
+      "reference": "/services/logging/configuration#logging-channels"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/channels.py",
+      "symbol": "Channels.daily",
+      "kind": "field",
+      "line": 57,
+      "signature": "daily: Daily | dict = field(default_factory=Daily, metadata={'description': 'Configuration for daily log rotation.', 'default': lambda: Daily().toDict()})",
+      "reference": "/services/logging/configuration#logging-channels"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/channels.py",
+      "symbol": "Channels.weekly",
+      "kind": "field",
+      "line": 65,
+      "signature": "weekly: Weekly | dict = field(default_factory=Weekly, metadata={'description': 'Configuration for weekly log rotation.', 'default': lambda: Weekly().toDict()})",
+      "reference": "/services/logging/configuration#logging-channels"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/channels.py",
+      "symbol": "Channels.monthly",
+      "kind": "field",
+      "line": 73,
+      "signature": "monthly: Monthly | dict = field(default_factory=Monthly, metadata={'description': 'Configuration for monthly log rotation.', 'default': lambda: Monthly().toDict()})",
+      "reference": "/services/logging/configuration#logging-channels"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/channels.py",
+      "symbol": "Channels.chunked",
+      "kind": "field",
+      "line": 81,
+      "signature": "chunked: Chunked | dict = field(default_factory=Chunked, metadata={'description': 'Configuration for chunked log file storage.', 'default': lambda: Chunked().toDict()})",
+      "reference": "/services/logging/configuration#logging-channels"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/chunked.py",
+      "symbol": "Chunked",
+      "kind": "class",
+      "line": 11,
+      "signature": "class Chunked(BaseEntity)",
+      "reference": "/services/logging/configuration#logging-channels"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/chunked.py",
+      "symbol": "Chunked.path",
+      "kind": "field",
+      "line": 34,
+      "signature": "path: str = field(default_factory=lambda: Env.get('LOG_PATH', _DEFAULT_PATH) if Env.get('LOG_CHANNEL', 'stack') == 'chunked' else _DEFAULT_PATH, metadata={'description': 'The file path where the log is stored.', 'default': _DEFAULT_PATH})",
+      "reference": "/services/logging/configuration#logging-paths"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/chunked.py",
+      "symbol": "Chunked.level",
+      "kind": "field",
+      "line": 46,
+      "signature": "level: int | str | Level = field(default_factory=lambda: Env.get('LOG_LEVEL', Level.INFO), metadata={'description': 'The logging level (e.g., DEBUG, INFO, WARNING, ERROR, CRITICAL).', 'default': 'INFO'})",
+      "reference": "/services/logging/configuration#logging-levels"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/chunked.py",
+      "symbol": "Chunked.mb_size",
+      "kind": "field",
+      "line": 56,
+      "signature": "mb_size: int = field(default_factory=lambda: Env.get('LOG_MB_SIZE', 10), metadata={'description': 'Maximum size (in MB) of a log file before chunking.', 'default': 10})",
+      "reference": "/services/logging/configuration#logging-retention-options"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/chunked.py",
+      "symbol": "Chunked.files",
+      "kind": "field",
+      "line": 64,
+      "signature": "files: int = field(default_factory=lambda: Env.get('LOG_FILES', 5), metadata={'description': 'Maximum number of log files to retain.', 'default': 5})",
+      "reference": "/services/logging/configuration#logging-retention-options"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/daily.py",
+      "symbol": "Daily",
+      "kind": "class",
+      "line": 12,
+      "signature": "class Daily(BaseEntity)",
+      "reference": "/services/logging/configuration#logging-channels"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/daily.py",
+      "symbol": "Daily.path",
+      "kind": "field",
+      "line": 28,
+      "signature": "path: str = field(default_factory=lambda: Env.get('LOG_PATH', _DEFAULT_PATH) if Env.get('LOG_CHANNEL', 'stack') == 'daily' else _DEFAULT_PATH, metadata={'description': 'The file path where the log is stored.', 'default': _DEFAULT_PATH})",
+      "reference": "/services/logging/configuration#logging-paths"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/daily.py",
+      "symbol": "Daily.level",
+      "kind": "field",
+      "line": 40,
+      "signature": "level: int | str | Level = field(default_factory=lambda: Env.get('LOG_LEVEL', Level.INFO), metadata={'description': 'The logging level (e.g., DEBUG, INFO, WARNING, ERROR, CRITICAL).', 'default': 'INFO'})",
+      "reference": "/services/logging/configuration#logging-levels"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/daily.py",
+      "symbol": "Daily.retention_days",
+      "kind": "field",
+      "line": 50,
+      "signature": "retention_days: int = field(default_factory=lambda: Env.get('LOG_RETENTION', 7) if Env.get('LOG_CHANNEL', 'stack') == 'daily' else 7, metadata={'description': 'The number of days to retain log files before deletion.', 'default': 7})",
+      "reference": "/services/logging/configuration#logging-retention-options"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/daily.py",
+      "symbol": "Daily.at",
+      "kind": "field",
+      "line": 61,
+      "signature": "at: time | str = field(default_factory=lambda: Env.get('LOG_ROTATION_TIME', time(hour=0, minute=0, second=0)), metadata={'description': 'The time of day when the log rotation should occur.', 'default': time(hour=0, minute=0, second=0)})",
+      "reference": "/services/logging/configuration#logging-retention-options"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/hourly.py",
+      "symbol": "Hourly",
+      "kind": "class",
+      "line": 11,
+      "signature": "class Hourly(BaseEntity)",
+      "reference": "/services/logging/configuration#logging-channels"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/hourly.py",
+      "symbol": "Hourly.path",
+      "kind": "field",
+      "line": 30,
+      "signature": "path: str = field(default_factory=lambda: Env.get('LOG_PATH', _DEFAULT_PATH) if Env.get('LOG_CHANNEL', 'stack') == 'hourly' else _DEFAULT_PATH, metadata={'description': 'The file path where the log is stored.', 'default': _DEFAULT_PATH})",
+      "reference": "/services/logging/configuration#logging-paths"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/hourly.py",
+      "symbol": "Hourly.level",
+      "kind": "field",
+      "line": 42,
+      "signature": "level: int | str | Level = field(default_factory=lambda: Env.get('LOG_LEVEL', Level.INFO), metadata={'description': 'The logging level (e.g., DEBUG, INFO, WARNING, ERROR, CRITICAL).', 'default': 'INFO'})",
+      "reference": "/services/logging/configuration#logging-levels"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/hourly.py",
+      "symbol": "Hourly.retention_hours",
+      "kind": "field",
+      "line": 52,
+      "signature": "retention_hours: int = field(default_factory=lambda: Env.get('LOG_RETENTION', 24) if Env.get('LOG_CHANNEL', 'stack') == 'hourly' else 24, metadata={'description': 'The number of hours to retain log files before deletion.', 'default': 24})",
+      "reference": "/services/logging/configuration#logging-retention-options"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/logging.py",
+      "symbol": "Logging",
+      "kind": "class",
+      "line": 11,
+      "signature": "class Logging(BaseEntity)",
+      "reference": "/services/logging/configuration#logging-configuration"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/logging.py",
+      "symbol": "Logging.default",
+      "kind": "field",
+      "line": 23,
+      "signature": "default: str = field(default_factory=lambda: Env.get('LOG_CHANNEL', 'stack'), metadata={'description': 'The default logging channel to use.', 'default': 'stack'})",
+      "reference": "/services/logging/configuration#logging-configuration"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/logging.py",
+      "symbol": "Logging.channels",
+      "kind": "field",
+      "line": 31,
+      "signature": "channels: Channels | dict = field(default_factory=Channels, metadata={'description': 'A collection of available logging channels.', 'default': lambda: Channels().toDict()})",
+      "reference": "/services/logging/configuration#logging-configuration"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/monthly.py",
+      "symbol": "Monthly",
+      "kind": "class",
+      "line": 11,
+      "signature": "class Monthly(BaseEntity)",
+      "reference": "/services/logging/configuration#logging-channels"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/monthly.py",
+      "symbol": "Monthly.path",
+      "kind": "field",
+      "line": 25,
+      "signature": "path: str = field(default_factory=lambda: Env.get('LOG_PATH', _DEFAULT_PATH) if Env.get('LOG_CHANNEL', 'stack') == 'monthly' else _DEFAULT_PATH, metadata={'description': 'The file path where the log is stored.', 'default': _DEFAULT_PATH})",
+      "reference": "/services/logging/configuration#logging-paths"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/monthly.py",
+      "symbol": "Monthly.level",
+      "kind": "field",
+      "line": 37,
+      "signature": "level: int | str | Level = field(default_factory=lambda: Env.get('LOG_LEVEL', Level.INFO), metadata={'description': 'The logging level (e.g., DEBUG, INFO, WARNING, ERROR, CRITICAL).', 'default': 'INFO'})",
+      "reference": "/services/logging/configuration#logging-levels"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/monthly.py",
+      "symbol": "Monthly.retention_months",
+      "kind": "field",
+      "line": 47,
+      "signature": "retention_months: int = field(default_factory=lambda: Env.get('LOG_RETENTION', 4) if Env.get('LOG_CHANNEL', 'stack') == 'monthly' else 4, metadata={'description': 'The number of months to retain log files before deletion.', 'default': 4})",
+      "reference": "/services/logging/configuration#logging-retention-options"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/stack.py",
+      "symbol": "Stack",
+      "kind": "class",
+      "line": 11,
+      "signature": "class Stack(BaseEntity)",
+      "reference": "/services/logging/configuration#logging-channels"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/stack.py",
+      "symbol": "Stack.path",
+      "kind": "field",
+      "line": 30,
+      "signature": "path: str = field(default_factory=lambda: Env.get('LOG_PATH', _DEFAULT_PATH) if Env.get('LOG_CHANNEL', 'stack') == 'stack' else _DEFAULT_PATH, metadata={'description': 'The file path where the log is stored.', 'default': _DEFAULT_PATH})",
+      "reference": "/services/logging/configuration#logging-paths"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/stack.py",
+      "symbol": "Stack.level",
+      "kind": "field",
+      "line": 42,
+      "signature": "level: int | str | Level = field(default_factory=lambda: Env.get('LOG_LEVEL', Level.INFO), metadata={'description': 'The logging level (e.g., DEBUG, INFO, WARNING, ERROR, CRITICAL).', 'default': 'INFO'})",
+      "reference": "/services/logging/configuration#logging-levels"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/weekly.py",
+      "symbol": "Weekly",
+      "kind": "class",
+      "line": 11,
+      "signature": "class Weekly(BaseEntity)",
+      "reference": "/services/logging/configuration#logging-channels"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/weekly.py",
+      "symbol": "Weekly.path",
+      "kind": "field",
+      "line": 25,
+      "signature": "path: str = field(default_factory=lambda: Env.get('LOG_PATH', _DEFAULT_PATH) if Env.get('LOG_CHANNEL', 'stack') == 'weekly' else _DEFAULT_PATH, metadata={'description': 'The file path where the log is stored.', 'default': _DEFAULT_PATH})",
+      "reference": "/services/logging/configuration#logging-paths"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/weekly.py",
+      "symbol": "Weekly.level",
+      "kind": "field",
+      "line": 37,
+      "signature": "level: int | str | Level = field(default_factory=lambda: Env.get('LOG_LEVEL', Level.INFO), metadata={'description': 'The logging level (e.g., DEBUG, INFO, WARNING, ERROR, CRITICAL).', 'default': 'INFO'})",
+      "reference": "/services/logging/configuration#logging-levels"
+    },
+    {
+      "source": "orionis/foundation/config/logging/entities/weekly.py",
+      "symbol": "Weekly.retention_weeks",
+      "kind": "field",
+      "line": 47,
+      "signature": "retention_weeks: int = field(default_factory=lambda: Env.get('LOG_RETENTION', 4) if Env.get('LOG_CHANNEL', 'stack') == 'weekly' else 4, metadata={'description': 'The number of weeks to retain log files before deletion.', 'default': 4})",
+      "reference": "/services/logging/configuration#logging-retention-options"
+    },
+    {
+      "source": "orionis/foundation/config/logging/enums/levels.py",
+      "symbol": "Level",
+      "kind": "class",
+      "line": 4,
+      "signature": "class Level(Enum)",
+      "reference": "/services/logging/configuration#logging-levels"
+    },
+    {
+      "source": "orionis/foundation/config/logging/enums/levels.py",
+      "symbol": "Level.DEBUG",
+      "kind": "enum-member",
+      "line": 34,
+      "signature": "DEBUG = logging.DEBUG",
+      "reference": "/services/logging/configuration#logging-levels"
+    },
+    {
+      "source": "orionis/foundation/config/logging/enums/levels.py",
+      "symbol": "Level.INFO",
+      "kind": "enum-member",
+      "line": 35,
+      "signature": "INFO = logging.INFO",
+      "reference": "/services/logging/configuration#logging-levels"
+    },
+    {
+      "source": "orionis/foundation/config/logging/enums/levels.py",
+      "symbol": "Level.WARNING",
+      "kind": "enum-member",
+      "line": 36,
+      "signature": "WARNING = logging.WARNING",
+      "reference": "/services/logging/configuration#logging-levels"
+    },
+    {
+      "source": "orionis/foundation/config/logging/enums/levels.py",
+      "symbol": "Level.ERROR",
+      "kind": "enum-member",
+      "line": 37,
+      "signature": "ERROR = logging.ERROR",
+      "reference": "/services/logging/configuration#logging-levels"
+    },
+    {
+      "source": "orionis/foundation/config/logging/enums/levels.py",
+      "symbol": "Level.CRITICAL",
+      "kind": "enum-member",
+      "line": 38,
+      "signature": "CRITICAL = logging.CRITICAL",
+      "reference": "/services/logging/configuration#logging-levels"
+    },
+    {
+      "source": "orionis/foundation/config/logging/validators/level.py",
+      "symbol": "IsValidLevel",
+      "kind": "callable-instance",
+      "line": 97,
+      "signature": "IsValidLevel(value: Level | int | str) -> None",
+      "reference": "/services/logging/configuration#logging-validators"
+    },
+    {
+      "source": "orionis/foundation/config/logging/validators/level.py",
+      "symbol": "IsValidLevel.normalize",
+      "kind": "method",
+      "line": 25,
+      "signature": "normalize(value: Level | int | str) -> int",
+      "decorators": [],
+      "reference": "/services/logging/configuration#logging-validators"
+    },
+    {
+      "source": "orionis/foundation/config/logging/validators/path.py",
+      "symbol": "IsValidPath",
+      "kind": "callable-instance",
+      "line": 59,
+      "signature": "IsValidPath(value: str, *, suffix: bool=False) -> None",
+      "reference": "/services/logging/configuration#logging-validators"
+    },
+    {
+      "source": "orionis/logging/contracts/logger.py",
+      "symbol": "ILogger",
+      "kind": "class",
+      "line": 8,
+      "signature": "class ILogger(ABC)",
+      "reference": "/services/logging/writing-logs#logger-injection"
+    },
+    {
+      "source": "orionis/logging/contracts/logger.py",
+      "symbol": "ILogger.name",
+      "kind": "method",
+      "line": 12,
+      "signature": "name(self) -> str",
+      "decorators": [
+        "property",
+        "abstractmethod"
+      ],
+      "reference": "/services/logging/writing-logs#logger-inspection"
+    },
+    {
+      "source": "orionis/logging/contracts/logger.py",
+      "symbol": "ILogger.info",
+      "kind": "method",
+      "line": 23,
+      "signature": "info(self, message: str) -> None",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "reference": "/services/logging/writing-logs#logger-write-methods"
+    },
+    {
+      "source": "orionis/logging/contracts/logger.py",
+      "symbol": "ILogger.error",
+      "kind": "method",
+      "line": 39,
+      "signature": "error(self, message: str) -> None",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "reference": "/services/logging/writing-logs#logger-write-methods"
+    },
+    {
+      "source": "orionis/logging/contracts/logger.py",
+      "symbol": "ILogger.warning",
+      "kind": "method",
+      "line": 55,
+      "signature": "warning(self, message: str) -> None",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "reference": "/services/logging/writing-logs#logger-write-methods"
+    },
+    {
+      "source": "orionis/logging/contracts/logger.py",
+      "symbol": "ILogger.debug",
+      "kind": "method",
+      "line": 71,
+      "signature": "debug(self, message: str) -> None",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "reference": "/services/logging/writing-logs#logger-write-methods"
+    },
+    {
+      "source": "orionis/logging/contracts/logger.py",
+      "symbol": "ILogger.critical",
+      "kind": "method",
+      "line": 87,
+      "signature": "critical(self, message: str) -> None",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "reference": "/services/logging/writing-logs#logger-write-methods"
+    },
+    {
+      "source": "orionis/logging/contracts/logger.py",
+      "symbol": "ILogger.getLogger",
+      "kind": "method",
+      "line": 103,
+      "signature": "getLogger(self) -> logging.Logger",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "reference": "/services/logging/writing-logs#logger-standard"
+    },
+    {
+      "source": "orionis/logging/contracts/logger.py",
+      "symbol": "ILogger.reloadConfiguration",
+      "kind": "method",
+      "line": 119,
+      "signature": "reloadConfiguration(self) -> None",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "reference": "/services/logging/writing-logs#logger-reload"
+    },
+    {
+      "source": "orionis/logging/contracts/logger.py",
+      "symbol": "ILogger.switchChannel",
+      "kind": "method",
+      "line": 133,
+      "signature": "switchChannel(self, channel_name: str) -> bool",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "reference": "/services/logging/writing-logs#logger-switch-channel"
+    },
+    {
+      "source": "orionis/logging/contracts/logger.py",
+      "symbol": "ILogger.close",
+      "kind": "method",
+      "line": 153,
+      "signature": "close(self) -> None",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "reference": "/services/logging/writing-logs#logger-close"
+    },
+    {
+      "source": "orionis/logging/contracts/logger.py",
+      "symbol": "ILogger.getActiveChannels",
+      "kind": "method",
+      "line": 167,
+      "signature": "getActiveChannels(self) -> list[str]",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "reference": "/services/logging/writing-logs#logger-inspection"
+    },
+    {
+      "source": "orionis/logging/contracts/logger.py",
+      "symbol": "ILogger.getActiveChannel",
+      "kind": "method",
+      "line": 178,
+      "signature": "getActiveChannel(self) -> str | None",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "reference": "/services/logging/writing-logs#logger-inspection"
+    },
+    {
+      "source": "orionis/logging/contracts/logger.py",
+      "symbol": "ILogger.getAvailableChannels",
+      "kind": "method",
+      "line": 189,
+      "signature": "getAvailableChannels(self) -> list[str]",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "reference": "/services/logging/writing-logs#logger-inspection"
+    },
+    {
+      "source": "orionis/logging/contracts/suffix_resolver.py",
+      "symbol": "SuffixResolver",
+      "kind": "class",
+      "line": 8,
+      "signature": "class SuffixResolver(ABC)",
+      "reference": "/services/logging/rotation-and-lifecycle#suffix-resolvers"
+    },
+    {
+      "source": "orionis/logging/contracts/suffix_resolver.py",
+      "symbol": "SuffixResolver.getSuffix",
+      "kind": "method",
+      "line": 13,
+      "signature": "getSuffix(self, dt: datetime | None=None) -> str",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "reference": "/services/logging/rotation-and-lifecycle#suffix-resolvers"
+    },
+    {
+      "source": "orionis/logging/contracts/suffix_resolver.py",
+      "symbol": "SuffixResolver.getNextRotationTime",
+      "kind": "method",
+      "line": 29,
+      "signature": "getNextRotationTime(self, current_time: datetime) -> datetime",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "reference": "/services/logging/rotation-and-lifecycle#suffix-resolvers"
+    },
+    {
+      "source": "orionis/logging/handlers/advanced_rotating_file_handler.py",
+      "symbol": "AdvancedRotatingFileHandler",
+      "kind": "class",
+      "line": 14,
+      "signature": "class AdvancedRotatingFileHandler(Handler)",
+      "reference": "/services/logging/rotation-and-lifecycle#handler-api"
+    },
+    {
+      "source": "orionis/logging/handlers/advanced_rotating_file_handler.py",
+      "symbol": "AdvancedRotatingFileHandler.__init__",
+      "kind": "constructor",
+      "line": 18,
+      "signature": "__init__(self, path_template: str, suffix_resolver: SuffixResolver, max_bytes: int | None=None, backup_count: int=5, encoding: str='utf-8', *, delay: bool=True, compress_rotated: bool=False, app_root: str='.') -> None",
+      "decorators": [],
+      "reference": "/services/logging/rotation-and-lifecycle#handler-api"
+    },
+    {
+      "source": "orionis/logging/handlers/advanced_rotating_file_handler.py",
+      "symbol": "AdvancedRotatingFileHandler.emit",
+      "kind": "method",
+      "line": 285,
+      "signature": "emit(self, record: LogRecord) -> None",
+      "decorators": [],
+      "reference": "/services/logging/rotation-and-lifecycle#handler-api"
+    },
+    {
+      "source": "orionis/logging/handlers/advanced_rotating_file_handler.py",
+      "symbol": "AdvancedRotatingFileHandler.close",
+      "kind": "method",
+      "line": 317,
+      "signature": "close(self) -> None",
+      "decorators": [],
+      "reference": "/services/logging/rotation-and-lifecycle#handler-api"
+    },
+    {
+      "source": "orionis/logging/handlers/chunked_suffix_resolver.py",
+      "symbol": "ChunkedSuffixResolver",
+      "kind": "class",
+      "line": 7,
+      "signature": "class ChunkedSuffixResolver(SuffixResolver)",
+      "reference": "/services/logging/rotation-and-lifecycle#suffix-resolvers"
+    },
+    {
+      "source": "orionis/logging/handlers/chunked_suffix_resolver.py",
+      "symbol": "ChunkedSuffixResolver.__init__",
+      "kind": "constructor",
+      "line": 11,
+      "signature": "__init__(self) -> None",
+      "decorators": [],
+      "reference": "/services/logging/rotation-and-lifecycle#suffix-resolvers"
+    },
+    {
+      "source": "orionis/logging/handlers/chunked_suffix_resolver.py",
+      "symbol": "ChunkedSuffixResolver.getSuffix",
+      "kind": "method",
+      "line": 26,
+      "signature": "getSuffix(self, dt: datetime | None=None) -> str",
+      "decorators": [],
+      "reference": "/services/logging/rotation-and-lifecycle#size-rotation"
+    },
+    {
+      "source": "orionis/logging/handlers/chunked_suffix_resolver.py",
+      "symbol": "ChunkedSuffixResolver.getNextRotationTime",
+      "kind": "method",
+      "line": 48,
+      "signature": "getNextRotationTime(self, current_time: datetime) -> datetime",
+      "decorators": [],
+      "reference": "/services/logging/rotation-and-lifecycle#suffix-resolvers"
+    },
+    {
+      "source": "orionis/logging/handlers/daily_suffix_resolver.py",
+      "symbol": "DailySuffixResolver",
+      "kind": "class",
+      "line": 6,
+      "signature": "class DailySuffixResolver(SuffixResolver)",
+      "reference": "/services/logging/rotation-and-lifecycle#suffix-resolvers"
+    },
+    {
+      "source": "orionis/logging/handlers/daily_suffix_resolver.py",
+      "symbol": "DailySuffixResolver.__init__",
+      "kind": "constructor",
+      "line": 10,
+      "signature": "__init__(self, at_time: time | None=None) -> None",
+      "decorators": [],
+      "reference": "/services/logging/rotation-and-lifecycle#suffix-resolvers"
+    },
+    {
+      "source": "orionis/logging/handlers/daily_suffix_resolver.py",
+      "symbol": "DailySuffixResolver.getSuffix",
+      "kind": "method",
+      "line": 27,
+      "signature": "getSuffix(self, dt: datetime | None=None) -> str",
+      "decorators": [],
+      "reference": "/services/logging/rotation-and-lifecycle#suffix-resolvers"
+    },
+    {
+      "source": "orionis/logging/handlers/daily_suffix_resolver.py",
+      "symbol": "DailySuffixResolver.getNextRotationTime",
+      "kind": "method",
+      "line": 47,
+      "signature": "getNextRotationTime(self, current_time: datetime) -> datetime",
+      "decorators": [],
+      "reference": "/services/logging/rotation-and-lifecycle#suffix-resolvers"
+    },
+    {
+      "source": "orionis/logging/handlers/hourly_suffix_resolver.py",
+      "symbol": "HourlySuffixResolver",
+      "kind": "class",
+      "line": 6,
+      "signature": "class HourlySuffixResolver(SuffixResolver)",
+      "reference": "/services/logging/rotation-and-lifecycle#suffix-resolvers"
+    },
+    {
+      "source": "orionis/logging/handlers/hourly_suffix_resolver.py",
+      "symbol": "HourlySuffixResolver.__init__",
+      "kind": "constructor",
+      "line": 10,
+      "signature": "__init__(self) -> None",
+      "decorators": [],
+      "reference": "/services/logging/rotation-and-lifecycle#suffix-resolvers"
+    },
+    {
+      "source": "orionis/logging/handlers/hourly_suffix_resolver.py",
+      "symbol": "HourlySuffixResolver.getSuffix",
+      "kind": "method",
+      "line": 21,
+      "signature": "getSuffix(self, dt: datetime | None=None) -> str",
+      "decorators": [],
+      "reference": "/services/logging/rotation-and-lifecycle#suffix-resolvers"
+    },
+    {
+      "source": "orionis/logging/handlers/hourly_suffix_resolver.py",
+      "symbol": "HourlySuffixResolver.getNextRotationTime",
+      "kind": "method",
+      "line": 41,
+      "signature": "getNextRotationTime(self, current_time: datetime) -> datetime",
+      "decorators": [],
+      "reference": "/services/logging/rotation-and-lifecycle#suffix-resolvers"
+    },
+    {
+      "source": "orionis/logging/handlers/monthly_suffix_resolver.py",
+      "symbol": "MonthlySuffixResolver",
+      "kind": "class",
+      "line": 6,
+      "signature": "class MonthlySuffixResolver(SuffixResolver)",
+      "reference": "/services/logging/rotation-and-lifecycle#suffix-resolvers"
+    },
+    {
+      "source": "orionis/logging/handlers/monthly_suffix_resolver.py",
+      "symbol": "MonthlySuffixResolver.__init__",
+      "kind": "constructor",
+      "line": 12,
+      "signature": "__init__(self, at_time: time | None=None) -> None",
+      "decorators": [],
+      "reference": "/services/logging/rotation-and-lifecycle#suffix-resolvers"
+    },
+    {
+      "source": "orionis/logging/handlers/monthly_suffix_resolver.py",
+      "symbol": "MonthlySuffixResolver.getSuffix",
+      "kind": "method",
+      "line": 28,
+      "signature": "getSuffix(self, dt: datetime | None=None) -> str",
+      "decorators": [],
+      "reference": "/services/logging/rotation-and-lifecycle#suffix-resolvers"
+    },
+    {
+      "source": "orionis/logging/handlers/monthly_suffix_resolver.py",
+      "symbol": "MonthlySuffixResolver.getNextRotationTime",
+      "kind": "method",
+      "line": 47,
+      "signature": "getNextRotationTime(self, current_time: datetime) -> datetime",
+      "decorators": [],
+      "reference": "/services/logging/rotation-and-lifecycle#suffix-resolvers"
+    },
+    {
+      "source": "orionis/logging/handlers/rotating_handler_factory.py",
+      "symbol": "RotatingHandlerFactory",
+      "kind": "class",
+      "line": 236,
+      "signature": "class RotatingHandlerFactory",
+      "reference": "/services/logging/rotation-and-lifecycle#handler-extension"
+    },
+    {
+      "source": "orionis/logging/handlers/rotating_handler_factory.py",
+      "symbol": "RotatingHandlerFactory.createHandler",
+      "kind": "method",
+      "line": 239,
+      "signature": "createHandler(channel_name: str, channel_config: dict, app_root: str) -> Handler | None",
+      "decorators": [
+        "staticmethod"
+      ],
+      "reference": "/services/logging/rotation-and-lifecycle#handler-extension"
+    },
+    {
+      "source": "orionis/logging/handlers/weekly_suffix_resolver.py",
+      "symbol": "WeeklySuffixResolver",
+      "kind": "class",
+      "line": 6,
+      "signature": "class WeeklySuffixResolver(SuffixResolver)",
+      "reference": "/services/logging/rotation-and-lifecycle#suffix-resolvers"
+    },
+    {
+      "source": "orionis/logging/handlers/weekly_suffix_resolver.py",
+      "symbol": "WeeklySuffixResolver.__init__",
+      "kind": "constructor",
+      "line": 10,
+      "signature": "__init__(self, at_time: time | None=None) -> None",
+      "decorators": [],
+      "reference": "/services/logging/rotation-and-lifecycle#suffix-resolvers"
+    },
+    {
+      "source": "orionis/logging/handlers/weekly_suffix_resolver.py",
+      "symbol": "WeeklySuffixResolver.getSuffix",
+      "kind": "method",
+      "line": 26,
+      "signature": "getSuffix(self, dt: datetime | None=None) -> str",
+      "decorators": [],
+      "reference": "/services/logging/rotation-and-lifecycle#suffix-resolvers"
+    },
+    {
+      "source": "orionis/logging/handlers/weekly_suffix_resolver.py",
+      "symbol": "WeeklySuffixResolver.getNextRotationTime",
+      "kind": "method",
+      "line": 46,
+      "signature": "getNextRotationTime(self, current_time: datetime) -> datetime",
+      "decorators": [],
+      "reference": "/services/logging/rotation-and-lifecycle#suffix-resolvers"
+    },
+    {
+      "source": "orionis/logging/logger.py",
+      "symbol": "Logger",
+      "kind": "class",
+      "line": 11,
+      "signature": "class Logger(ILogger)",
+      "reference": "/services/logging/writing-logs#logger-injection"
+    },
+    {
+      "source": "orionis/logging/logger.py",
+      "symbol": "Logger.name",
+      "kind": "field",
+      "line": 16,
+      "signature": "name: ClassVar[str] = '__orionis__'",
+      "reference": "/services/logging/writing-logs#logger-inspection"
+    },
+    {
+      "source": "orionis/logging/logger.py",
+      "symbol": "Logger.__init__",
+      "kind": "constructor",
+      "line": 21,
+      "signature": "__init__(self, app: IApplication) -> None",
+      "decorators": [],
+      "reference": "/services/logging/writing-logs#logger-constructor"
+    },
+    {
+      "source": "orionis/logging/logger.py",
+      "symbol": "Logger.info",
+      "kind": "method",
+      "line": 249,
+      "signature": "info(self, message: str) -> None",
+      "decorators": [],
+      "reference": "/services/logging/writing-logs#logger-write-methods"
+    },
+    {
+      "source": "orionis/logging/logger.py",
+      "symbol": "Logger.error",
+      "kind": "method",
+      "line": 268,
+      "signature": "error(self, message: str) -> None",
+      "decorators": [],
+      "reference": "/services/logging/writing-logs#logger-write-methods"
+    },
+    {
+      "source": "orionis/logging/logger.py",
+      "symbol": "Logger.warning",
+      "kind": "method",
+      "line": 286,
+      "signature": "warning(self, message: str) -> None",
+      "decorators": [],
+      "reference": "/services/logging/writing-logs#logger-write-methods"
+    },
+    {
+      "source": "orionis/logging/logger.py",
+      "symbol": "Logger.debug",
+      "kind": "method",
+      "line": 304,
+      "signature": "debug(self, message: str) -> None",
+      "decorators": [],
+      "reference": "/services/logging/writing-logs#logger-write-methods"
+    },
+    {
+      "source": "orionis/logging/logger.py",
+      "symbol": "Logger.critical",
+      "kind": "method",
+      "line": 322,
+      "signature": "critical(self, message: str) -> None",
+      "decorators": [],
+      "reference": "/services/logging/writing-logs#logger-write-methods"
+    },
+    {
+      "source": "orionis/logging/logger.py",
+      "symbol": "Logger.getLogger",
+      "kind": "method",
+      "line": 340,
+      "signature": "getLogger(self) -> logging.Logger",
+      "decorators": [],
+      "reference": "/services/logging/writing-logs#logger-standard"
+    },
+    {
+      "source": "orionis/logging/logger.py",
+      "symbol": "Logger.reloadConfiguration",
+      "kind": "method",
+      "line": 357,
+      "signature": "reloadConfiguration(self) -> None",
+      "decorators": [],
+      "reference": "/services/logging/writing-logs#logger-reload"
+    },
+    {
+      "source": "orionis/logging/logger.py",
+      "symbol": "Logger.switchChannel",
+      "kind": "method",
+      "line": 398,
+      "signature": "switchChannel(self, channel_name: str) -> bool",
+      "decorators": [],
+      "reference": "/services/logging/writing-logs#logger-switch-channel"
+    },
+    {
+      "source": "orionis/logging/logger.py",
+      "symbol": "Logger.close",
+      "kind": "method",
+      "line": 463,
+      "signature": "close(self) -> None",
+      "decorators": [],
+      "reference": "/services/logging/writing-logs#logger-close"
+    },
+    {
+      "source": "orionis/logging/logger.py",
+      "symbol": "Logger.getActiveChannels",
+      "kind": "method",
+      "line": 500,
+      "signature": "getActiveChannels(self) -> list[str]",
+      "decorators": [],
+      "reference": "/services/logging/writing-logs#logger-inspection"
+    },
+    {
+      "source": "orionis/logging/logger.py",
+      "symbol": "Logger.getActiveChannel",
+      "kind": "method",
+      "line": 512,
+      "signature": "getActiveChannel(self) -> str | None",
+      "decorators": [],
+      "reference": "/services/logging/writing-logs#logger-inspection"
+    },
+    {
+      "source": "orionis/logging/logger.py",
+      "symbol": "Logger.getAvailableChannels",
+      "kind": "method",
+      "line": 525,
+      "signature": "getAvailableChannels(self) -> list[str]",
+      "decorators": [],
+      "reference": "/services/logging/writing-logs#logger-inspection"
+    },
+    {
+      "source": "orionis/logging/logger.py",
+      "symbol": "Logger.__del__",
+      "kind": "method",
+      "line": 537,
+      "signature": "__del__(self) -> None",
+      "decorators": [],
+      "reference": "/services/logging/writing-logs#logger-close"
+    },
+    {
+      "source": "orionis/logging/provider.py",
+      "symbol": "LoggerProvider",
+      "kind": "class",
+      "line": 7,
+      "signature": "class LoggerProvider(ServiceProvider)",
+      "reference": "/services/logging/writing-logs#logger-provider"
+    },
+    {
+      "source": "orionis/logging/provider.py",
+      "symbol": "LoggerProvider.register",
+      "kind": "method",
+      "line": 9,
+      "signature": "register(self) -> None",
+      "decorators": [],
+      "reference": "/services/logging/writing-logs#logger-provider"
+    },
+    {
+      "source": "orionis/logging/provider.py",
+      "symbol": "LoggerProvider.boot",
+      "kind": "method",
+      "line": 26,
+      "signature": "async boot(self) -> None",
+      "decorators": [],
+      "reference": "/services/logging/writing-logs#logger-provider"
+    },
+    {
+      "source": "orionis/support/facades/logger.py",
+      "symbol": "Log",
+      "kind": "class",
+      "line": 3,
+      "signature": "class Log(Facade)",
+      "reference": "/services/logging/writing-logs#logger-facade-api"
+    },
+    {
+      "source": "orionis/support/facades/logger.py",
+      "symbol": "Log.getFacadeAccessor",
+      "kind": "method",
+      "line": 6,
+      "signature": "getFacadeAccessor(cls) -> str",
+      "decorators": [
+        "classmethod"
+      ],
+      "reference": "/services/logging/writing-logs#logger-facade-api"
+    }
+  ]
+}

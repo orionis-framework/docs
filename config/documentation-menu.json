@@ -121,12 +121,12 @@
       "id": "foundation-deployment-and-reference",
       "kind": "doc",
       "title": {
-        "es": "Despliegue, diagnóstico y referencia de Application",
-        "en": "Deployment, diagnostics, and Application reference"
+        "es": "Preparar un despliegue",
+        "en": "Prepare a deployment"
       },
       "label": {
-        "en": "Deployment and reference",
-        "es": "Despliegue y referencia"
+        "es": "Preparación",
+        "en": "Preparation"
       },
       "slug": {
         "es": "/es/getting-started/deployment-and-reference",
@@ -269,8 +269,8 @@
         "en": "/en/architecture/exception-handling"
       },
       "label": {
-        "en": "General exception handling",
-        "es": "Gestión general de excepciones"
+        "es": "Introducción y registro",
+        "en": "Introduction and registration"
       }
     },
     {
@@ -281,12 +281,28 @@
         "en": "Reporting and handling exceptions"
       },
       "label": {
-        "en": "Reporting and handling exceptions",
-        "es": "Reportar y manejar excepciones"
+        "es": "Personalizar el handler",
+        "en": "Customize the handler"
       },
       "slug": {
         "es": "/es/architecture/exception-handling/handling-exceptions",
         "en": "/en/architecture/exception-handling/handling-exceptions"
+      }
+    },
+    {
+      "id": "failure-contexts-and-transports",
+      "kind": "doc",
+      "title": {
+        "es": "Excepciones por contexto y transporte",
+        "en": "Exceptions by context and transport"
+      },
+      "label": {
+        "es": "Contextos y transportes",
+        "en": "Contexts and transports"
+      },
+      "slug": {
+        "es": "/es/architecture/exception-handling/contexts-and-transports",
+        "en": "/en/architecture/exception-handling/contexts-and-transports"
       }
     },
     {
@@ -297,8 +313,8 @@
         "en": "Error policies and reference"
       },
       "label": {
-        "en": "Error policies",
-        "es": "Políticas de errores"
+        "es": "Políticas y referencia",
+        "en": "Policies and reference"
       },
       "slug": {
         "es": "/es/architecture/exception-handling/policies-and-reference",
@@ -1809,16 +1825,32 @@
       "id": "logging-overview",
       "kind": "doc",
       "title": {
-        "es": "Logging",
-        "en": "Logging"
+        "es": "Logs de aplicación",
+        "en": "Application logs"
       },
       "label": {
-        "en": "Logging",
-        "es": "Registro de eventos"
+        "es": "Introducción",
+        "en": "Introduction"
       },
       "slug": {
         "es": "/es/services/logging",
         "en": "/en/services/logging"
+      }
+    },
+    {
+      "id": "logging-configuration",
+      "kind": "doc",
+      "title": {
+        "es": "Canales y configuración de logs",
+        "en": "Log channels and configuration"
+      },
+      "label": {
+        "es": "Canales y configuración",
+        "en": "Channels and configuration"
+      },
+      "slug": {
+        "es": "/es/services/logging/configuration",
+        "en": "/en/services/logging/configuration"
       }
     },
     {
@@ -3251,6 +3283,70 @@
       "slug": {
         "es": "/es/architecture/service-container/facades",
         "en": "/en/architecture/service-container/facades"
+      }
+    },
+    {
+      "id": "deployment-reverse-proxies",
+      "kind": "doc",
+      "title": {
+        "es": "Proxies, HTTPS y conexiones persistentes",
+        "en": "Proxies, HTTPS and persistent connections"
+      },
+      "label": {
+        "es": "Proxies y HTTPS",
+        "en": "Proxies and HTTPS"
+      },
+      "slug": {
+        "es": "/es/getting-started/deployment/reverse-proxies",
+        "en": "/en/getting-started/deployment/reverse-proxies"
+      }
+    },
+    {
+      "id": "deployment-windows-server",
+      "kind": "doc",
+      "title": {
+        "es": "Desplegar en Windows Server",
+        "en": "Deploy on Windows Server"
+      },
+      "label": {
+        "es": "Windows Server",
+        "en": "Windows Server"
+      },
+      "slug": {
+        "es": "/es/getting-started/deployment/windows-server",
+        "en": "/en/getting-started/deployment/windows-server"
+      }
+    },
+    {
+      "id": "deployment-linux",
+      "kind": "doc",
+      "title": {
+        "es": "Desplegar en Linux",
+        "en": "Deploy on Linux"
+      },
+      "label": {
+        "es": "Linux",
+        "en": "Linux"
+      },
+      "slug": {
+        "es": "/es/getting-started/deployment/linux",
+        "en": "/en/getting-started/deployment/linux"
+      }
+    },
+    {
+      "id": "deployment-docker",
+      "kind": "doc",
+      "title": {
+        "es": "Desplegar con Docker",
+        "en": "Deploy with Docker"
+      },
+      "label": {
+        "es": "Docker",
+        "en": "Docker"
+      },
+      "slug": {
+        "es": "/es/getting-started/deployment/docker",
+        "en": "/en/getting-started/deployment/docker"
       }
     }
   ]

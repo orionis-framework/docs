@@ -6,8 +6,8 @@ import { root, validateCatalog, within, stripFrontmatter, markdownLinks, heading
 import { createSidebar, flattenSidebar, documentationCatalog, documentationNavigation, navigationSections, resolveNavigation, sitePages, documentationPages, getPageBySlug, getTranslations } from '../src/utils/documentation-menu.mjs';
 
 const groupedBuildSections = ['getting-started', 'http', 'realtime', 'mcp', 'views', 'localization', 'authentication', 'sessions', 'cryptography', 'validation'];
-const groupedSections = new Set([...groupedBuildSections, 'database', 'orm', 'faker', 'storage', 'cache', 'mail', 'queues', 'console', 'environment', 'application']);
-const flatSections = ['deployment', 'testing', 'utilities', 'contribute'];
+const groupedSections = new Set([...groupedBuildSections, 'database', 'orm', 'faker', 'storage', 'cache', 'mail', 'queues', 'console', 'environment', 'application', 'logging', 'exceptions', 'deployment']);
+const flatSections = ['testing', 'utilities', 'contribute'];
 const buildPageIds = {
   'getting-started': ['foundation-overview', 'foundation-installation', 'foundation-getting-started', 'foundation-architecture-and-lifecycle'],
   http: ['http-overview', 'http-routing', 'http-middleware-and-security', 'http-request-lifecycle', 'http-requests-and-validation', 'http-forms-and-uploads', 'http-responses', 'http-exceptions'],
@@ -70,7 +70,7 @@ test('diagram fallback keeps markup inert and leaves ordinary code fences intact
   assert.ok(!tree.children[0].value.includes('<script>'));
   assert.deepEqual(tree.children[1], ordinaryCode);
 });
-test('navigation groups all ten build capabilities and data guides while keeping other categories flat', () => {
+test('navigation groups completed capabilities while keeping unfinished categories flat', () => {
   const sidebar = createSidebar();
   assert.deepEqual(navigationSections.filter((section) => section.band === 'build').map((section) => section.id), groupedBuildSections);
   assert.deepEqual(navigationSections.filter((section) => section.groups).map((section) => section.id), [...groupedSections]);
@@ -98,7 +98,7 @@ test('capability navigation rejects unknown, duplicate, or omitted pages and inv
   const cases = [
     [(copy) => { copy.sections[0].pageIds[0] = 'missing-page'; }, /Unknown navigation page/],
     [(copy) => { copy.sections[1].pageIds.push(copy.sections[0].pageIds[0]); }, /Duplicate navigation page/],
-    [(copy) => { copy.sections.find((section) => section.id === 'deployment').pageIds.shift(); }, /Pages without navigation/],
+    [(copy) => { copy.sections.find((section) => section.id === 'testing').pageIds.shift(); }, /Pages without navigation/],
     [(copy) => { copy.sections[0].band = 'missing-band'; }, /Invalid navigation band\/order/],
     [(copy) => { copy.bands.push(structuredClone(copy.bands[0])); }, /Duplicate navigation band/],
     [(copy) => { copy.sections[0].band = copy.bands[1].id; }, /Invalid navigation band\/order/],
@@ -147,7 +147,7 @@ test('navigation rejects malformed, duplicated, missing, reordered, and unsuppor
   const database = (copy) => copy.sections.find((section) => section.id === 'database');
   const groupError = /navigation subgroup|navigation groups/i;
   const cases = [
-    [(copy) => { const section = copy.sections.find((entry) => entry.id === 'deployment'); section.groups = [{ id: 'unsupported', title: { en: 'Unsupported', es: 'No permitido' }, pageIds: [...section.pageIds] }]; }, groupError],
+    [(copy) => { const section = copy.sections.find((entry) => entry.id === 'testing'); section.groups = [{ id: 'unsupported', title: { en: 'Unsupported', es: 'No permitido' }, pageIds: [...section.pageIds] }]; }, groupError],
     [(copy) => { database(copy).groups = []; }, groupError],
     [(copy) => { delete database(copy).groups; }, groupError],
     [(copy) => { database(copy).groups[0].id = ''; }, groupError],
@@ -177,7 +177,7 @@ test('navigation rejects malformed, duplicated, missing, reordered, and unsuppor
 });
 test('regrouping navigation preserves page IDs, page records, and both locale routes', () => {
   const copy = structuredClone(documentationNavigation);
-  const index = copy.sections.findIndex((section) => section.id === 'deployment');
+  const index = copy.sections.findIndex((section) => section.id === 'testing');
   copy.sections[index].pageIds.reverse();
   const resolved = resolveNavigation(copy);
   assert.deepEqual(resolved[index].pages.map((page) => page.id), copy.sections[index].pageIds);
@@ -199,6 +199,60 @@ test('retained contribution pages switch languages through their stable IDs', ()
   const page = getPageBySlug('/es/contribute/contributors');
   assert.equal(page.id, 'community-contributors');
   assert.deepEqual(getTranslations(page.id).map((item) => item.slug), ['/en/contribute/contributors', '/es/contribute/contributors']);
+});
+
+test('Logs has an independent menu and preserves the previous logging URLs', () => {
+  const logs = navigationSections.find((section) => section.id === 'logging');
+  assert.equal(logs.title.es, 'Logs');
+  assert.equal(logs.band, 'operate');
+  assert.deepEqual(logs.pageIds, ['logging-overview', 'logging-configuration', 'logging-writing-logs', 'logging-rotation-and-lifecycle']);
+  assert.deepEqual(logs.groups.map((group) => group.pageIds.length), [2, 2]);
+  for (const section of navigationSections.filter((entry) => entry.id !== 'logging')) {
+    assert.ok(section.pageIds.every((id) => !id.startsWith('logging-')), section.id);
+  }
+  for (const locale of ['es', 'en']) {
+    for (const suffix of ['', '/writing-logs', '/rotation-and-lifecycle']) {
+      assert.ok(logs.pageIds.includes(getPageBySlug(`/${locale}/services/logging${suffix}`).id));
+    }
+  }
+  assert.equal(navigationSections.find((section) => section.id === 'deployment').title.es, 'Despliegue');
+});
+
+test('Exceptions has an independent menu while HTTP exceptions retain their specific chapter', () => {
+  const exceptions = navigationSections.find((section) => section.id === 'exceptions');
+  assert.equal(exceptions.title.es, 'Exceptions');
+  assert.equal(exceptions.title.en, 'Exceptions');
+  assert.equal(exceptions.band, 'operate');
+  assert.deepEqual(exceptions.pageIds, ['failure-overview', 'failure-handling-exceptions', 'failure-contexts-and-transports', 'failure-policies-and-reference']);
+  assert.deepEqual(exceptions.groups.map((group) => group.pageIds.length), [2, 2]);
+  for (const section of navigationSections.filter((entry) => entry.id !== 'exceptions')) {
+    assert.ok(section.pageIds.every((id) => !id.startsWith('failure-')), section.id);
+  }
+  assert.ok(navigationSections.find((section) => section.id === 'http').pageIds.includes('http-exceptions'));
+  assert.equal(navigationSections.find((section) => section.id === 'deployment').title.es, 'Despliegue');
+  for (const locale of ['es', 'en']) {
+    for (const suffix of ['', '/handling-exceptions', '/policies-and-reference']) {
+      assert.ok(exceptions.pageIds.includes(getPageBySlug(`/${locale}/architecture/exception-handling${suffix}`).id));
+    }
+  }
+});
+
+test('Deployment exposes preparation and three platform guides as peers in its own category', () => {
+  const deployment = navigationSections.find((section) => section.id === 'deployment');
+  assert.equal(deployment.title.es, 'Despliegue');
+  assert.equal(deployment.band, 'operate');
+  assert.deepEqual(deployment.groups.map((group) => group.id), ['deployment-preparation', 'deployment-platforms']);
+  assert.deepEqual(deployment.groups[1].pageIds, ['deployment-windows-server', 'deployment-linux', 'deployment-docker']);
+  assert.equal(deployment.pageIds.length, 6);
+  for (const section of navigationSections.filter((entry) => entry.id !== 'deployment')) {
+    assert.ok(section.pageIds.every((id) => !deployment.pageIds.includes(id)), section.id);
+  }
+  for (const locale of ['es', 'en']) {
+    assert.equal(getPageBySlug(`/${locale}/getting-started/deployment-and-reference`).id, 'foundation-deployment-and-reference');
+    for (const platform of ['windows-server', 'linux', 'docker']) {
+      assert.ok(deployment.pageIds.includes(getPageBySlug(`/${locale}/getting-started/deployment/${platform}`).id));
+    }
+  }
 });
 
 test('Database, ORM, and Faker have independent trees in data order with stable page IDs', () => {

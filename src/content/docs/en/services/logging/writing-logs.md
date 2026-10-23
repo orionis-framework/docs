@@ -1,138 +1,324 @@
 ---
 title: "Recording application events"
-description: "The logger records application events in UTF-8 files with one active channel and severity filtering."
+description: "Record events with Log or ILogger, inspect channels, and use the logging service's complete synchronous API."
 editUrl: true
 lastUpdated: false
 ---
 
-The logger records application events in UTF-8 files with one active channel and severity filtering.
+The `Log` facade and `ILogger` contract access the application logger. Use them from controllers, commands, jobs, services, or other components: [logging configuration](/en/services/logging/configuration) determines where records go and which levels are accepted.
 
-## Requirements
+<a id="logger-facade"></a>
 
-- Python 3.14 or newer.
-- A writable application log directory for configured file channels.
-- A valid `logging` configuration mapping, normally built by `config/logging.py`.
-- A booted Orionis application when using `orionis.support.facades.Log`.
+## Record events with the Log facade
 
-## Log from the application
+Import the facade from the public module. During normal application operation, its writing methods are **synchronous**, including inside an `async def` action:
 
-The default `stack` channel writes to `storage/logs/stack.log`. Run this function from an application controller, command, or service after bootstrap. The directory must be writable and the configured level must include `INFO`:
+```python
+from orionis.http import JSONResponse
+from orionis.support.facades import Log
+
+
+class ImportStatusController:
+    async def __call__(self, import_id: int) -> JSONResponse:
+        Log.info(f"event=import-status-requested import_id={import_id}")
+        return JSONResponse({"import_id": import_id, "status": "ready"})
+```
+
+Save the controller in `app/http/controllers/import_status_controller.py` and register its endpoint, for example in `routes/api.py`:
+
+```python
+from app.http.controllers.import_status_controller import ImportStatusController
+from orionis.support.facades import Route
+
+Route.get("/imports/{import_id:int}/status", ImportStatusController)
+```
+
+With the default configuration, the `INFO` event reaches `storage/logs/stack.log`. Do not add `await` to `Log.info(...)` after normal startup: the method returns `None`. Writing and rotation run in the calling thread; an asynchronous action does not turn file access into asynchronous I/O.
+
+<a id="logger-provider"></a>
+
+### How the service is obtained
+
+The native provider registers `ILogger → Logger` as a **singleton**, with the `x-orionis-ILogger` alias. Its asynchronous `boot()` executes `await Log.pin()`, retaining that same service on the facade. HTTP and CLI startup await this stage before executing application components; you do not need to register the provider manually.
+
+`app.create()` can leave asynchronous provider boot pending. If you integrate Orionis through a custom entry point, await `app.boot()` before using the facade as above. You can also resolve and call `ILogger` directly, as shown below. The service methods remain synchronous in both cases.
+
+<a id="logger-injection"></a>
+
+## Constructor and method injection
+
+Import the contract from `orionis.logging.contracts.logger`. Use constructor injection when several actions need to record events:
+
+```python
+from orionis.http import JSONResponse
+from orionis.logging.contracts.logger import ILogger
+
+
+class OrderAuditController:
+    def __init__(self, logger: ILogger) -> None:
+        self.logger = logger
+
+    async def show(self, order_id: int) -> JSONResponse:
+        self.logger.info(f"event=order-viewed order_id={order_id}")
+        return JSONResponse({"order_id": order_id})
+```
+
+If only one action needs the service, declare it on the method:
+
+```python
+from orionis.http import JSONResponse
+from orionis.logging.contracts.logger import ILogger
+
+
+class HealthLogController:
+    async def __call__(self, logger: ILogger) -> JSONResponse:
+        logger.debug("event=health-checked")
+        return JSONResponse({"ok": True})
+```
+
+Register these actions through the [routing API](/en/http/routing). The container supplies `ILogger`; it is not a payload field. The same contract works in services, commands, and other components that the framework constructs or invokes through its container. A direct Python call does not inject arguments automatically.
+
+In a provider or another component with access to `IApplication`, explicit resolution is asynchronous and subsequent use is synchronous:
+
+```python
+from orionis.foundation.contracts.application import IApplication
+from orionis.logging.contracts.logger import ILogger
+
+
+async def record_startup_check(app: IApplication) -> None:
+    logger = await app.make(ILogger)
+    logger.info("event=startup-check-completed")
+```
+
+The returned implementation is `Logger`, exported by `orionis.logging`. Receive **`ILogger` as your dependency** to reuse the provider singleton. Injecting the concrete `Logger` class can autoconstruct a different wrapper because the native binding is registered by contract. Both wrappers target the standard logger `__orionis__`: initializing a new one closes and replaces the previous instance's handlers. Do not construct a logger per request.
+
+<a id="logger-write-methods"></a>
+
+## Writing methods
+
+These are the service's five public writing signatures; the pinned facade exposes the same operations:
+
+```text
+debug(message: str) -> None
+info(message: str) -> None
+warning(message: str) -> None
+error(message: str) -> None
+critical(message: str) -> None
+```
+
+| Method | When to use it |
+| --- | --- |
+| `debug` | Diagnostic details about an operation: identifiers, stages, or decisions. |
+| `info` | Normal events worth retaining, such as a completed import. |
+| `warning` | An unusual condition from which the application can still recover. |
+| `error` | An operation failed, although the process can continue handling others. |
+| `critical` | A serious failure compromises an essential application function. |
 
 ```python
 from orionis.support.facades import Log
 
 
-def record_import(import_id: int, row_count: int) -> None:
-    Log.info(f"event=import-completed import={import_id} rows={row_count}")
+def record_import_events(import_id: int, row_count: int) -> None:
+    Log.debug(f"event=import-started import_id={import_id}")
+    Log.info(f"event=import-completed import_id={import_id} rows={row_count}")
+    Log.warning(f"event=import-retry-scheduled import_id={import_id}")
+    Log.error(f"event=import-failed import_id={import_id}")
+    Log.critical("event=import-storage-unavailable")
 ```
 
-Call `record_import(42, 100)` in that application context, then inspect the selected log file for the event. `Log.info()` receives one string and is synchronous.
+The snippet illustrates all five levels; select the one matching the actual outcome of your operation. Records below the channel threshold are discarded. A `None` result does not confirm a record was written: it might have been filtered.
 
-## Add logging to a service
+Each method accepts **one message only**. It does not accept the standard logger's `*args`, `extra`, `exc_info`, or `stack_info` arguments. Build the string before calling, or use [`getLogger()`](#logger-standard) for advanced options. This contract has no native `Log.log()`, `Log.notice()`, or `Log.exception()` methods.
 
-Use `from orionis.support.facades import Log` after application initialization, or inject `ILogger` from `orionis.logging.contracts.logger`. Its synchronous methods accept a single `str` message: `info`, `warning`, `error`, `debug`, and `critical`. Do not add `await` or pass interpolation arguments as with the standard logger.
+Messages are forwarded without trimming, sanitization, or automatic request context. The caller is responsible for selecting fields and handling sensitive information while constructing the message. The built-in format is `date [LEVEL]: message`, with the date format `%Y-%m-%d %H:%M:%S`.
 
-Include an operation identifier and a stable event, for example `Log.info("invoice=42 event=sent")`. Retain complete errors only where needed and remove secrets before constructing messages. Automatic redaction, request context, and a JSON formatter are not supplied. User-controlled newlines can make records ambiguous; normalize untrusted data before interpolation.
+<a id="logger-inspection"></a>
 
-For exception tracebacks, obtain the standard logger with `getLogger()` and use its normal APIs, such as `.exception(...)` inside an `except` block. This uses the same file and shared handlers. The Orionis logger disables propagation: root logger handlers do not automatically receive these records.
+## Inspect names and channels
 
-Every wrapper uses the global name `__orionis__`. Initializing two isolated wrappers in one process can replace each other's handlers; applications should use the provider singleton. Examples with application doubles are isolated scenarios, not a recommendation to create one logger per request.
+```text
+name: str
+getAvailableChannels() -> list[str]
+getActiveChannels() -> list[str]
+getActiveChannel() -> str | None
+```
 
+`name` is `"__orionis__"`: the shared standard logger identifier, **not** the file channel name. `ILogger` declares a property; `Logger` implements it with a class attribute.
 
-### Logger and channel
+| Query | Result and effect |
+| --- | --- |
+| `getAvailableChannels()` | A new list of keys from `logging.channels`, in configuration order. Does not check whether each channel can be constructed. |
+| `getActiveChannels()` | A new list containing the names of handlers registered in the wrapper. Normally contains one name. |
+| `getActiveChannel()` | The first active name, or `None` when no handlers are registered. |
 
-`Logger` wraps the standard logger named `__orionis__`, disables propagation, and sets the logger itself to `DEBUG`; the active handler enforces the configured threshold. A channel describes one handler and path policy. Only one channel is active at a time, even though several may be configured.
-
-### Lazy initialization
-
-Constructing `Logger` performs no filesystem work. The first message or `getLogger()` initializes under a lock with double checking. Formatter instances are shared by format/date-format key. `close()` removes and closes every owned handler and resets the wrapper so later use can initialize again.
-
-### Standalone file example
-
-This separate demonstration uses a temporary directory and a minimal configuration object; it is not how application code obtains its logger.
+These queries do not initialize the logger or open files. A newly constructed service can report available channels while also returning `[]` and `None` for active state. The first message or `getLogger()` performs initialization. A fallback can appear as `fallback` even though it is absent from configured channels.
 
 ```python
-from pathlib import Path
-from tempfile import TemporaryDirectory
-from orionis.logging import Logger
+from orionis.http import JSONResponse
+from orionis.logging.contracts.logger import ILogger
 
 
-class App:
-    def __init__(self, root: str) -> None:
-        self.root = root
+class LoggingStatusController:
+    async def __call__(self, logger: ILogger) -> JSONResponse:
+        return JSONResponse({
+            "logger": logger.name,
+            "available": logger.getAvailableChannels(),
+            "active": logger.getActiveChannel(),
+            "active_channels": logger.getActiveChannels(),
+        })
+```
 
-    def config(self, name: str) -> dict:
-        assert name == "logging"
-        return {
-            "default": "stack",
-            "channels": {"stack": {"path": "app.log", "level": "INFO"}},
-        }
+This inspection example is intended for an internal tool. Active state describes the wrapper; manually changing standard logger handlers does not update its cache of names.
 
-    def path(self, name: str) -> str:
-        assert name == "root"
-        return self.root
+<a id="logger-switch-channel"></a>
+
+## Change the active channel
+
+```text
+switchChannel(channel_name: str) -> bool
+```
+
+Accepts an exact key from `logging.channels`, such as `"daily"`. When present, it initializes the logger if needed, closes and removes current handlers, then constructs the target handler. Returns `True` when the new handler is attached; it also attempts to record `Successfully switched to channel: daily` at `INFO`, subject to the new channel filter.
+
+```python
+from orionis.support.facades import Log
 
 
-with TemporaryDirectory() as root:
-    logger = Logger(App(root))
-    logger.info("Orionis is ready")
+def select_daily_logging() -> bool:
+    if not Log.switchChannel("daily"):
+        return False
+    Log.info("event=logging-channel-selected channel=daily")
+    return True
+```
+
+Selection affects **every operation using the service in that process**, including concurrent requests. It does not create a request-local channel context and is not restored when a function exits. It also leaves `logging.default` unchanged: `reloadConfiguration()` or reconstruction after `close()` returns to the default.
+
+An unconfigured name returns `False` before changing state. A construction failure after handlers were removed can return `False` and leave the logger **without an active channel**: the previous handler is not restored automatically. The method contains `OSError`, `RuntimeError`, and `ValueError`; it does not guarantee catching every error type from modified configuration. Check the result and state before depending on an operational channel change.
+
+<a id="logger-reload"></a>
+
+## Reload configuration
+
+```text
+reloadConfiguration() -> None
+```
+
+Closes handlers, clears the channel cache, rereads `app.config("logging")`, and reconstructs the default channel. Finally emits `Logger configuration reloaded successfully` at `INFO`; the threshold may filter it. Any exception during this process is raised as `RuntimeError`, preserving its original cause.
+
+The method rereads **application runtime configuration**. It does not execute `config/logging.py` again, reload `.env`, or change bootstrap cache. Use [application configuration](/en/getting-started/application-api#application-config) mechanisms for deliberate runtime changes:
+
+```python
+from orionis.foundation.contracts.application import IApplication
+from orionis.http import JSONResponse
+from orionis.logging.contracts.logger import ILogger
+
+
+class LoggingLevelController:
+    async def __call__(self, app: IApplication, logger: ILogger) -> JSONResponse:
+        app.config("logging.channels.stack.level", "WARNING")
+        app.config("logging.default", "stack")
+        logger.reloadConfiguration()
+        logger.warning("event=logging-threshold-changed level=WARNING")
+        return JSONResponse({"active": logger.getActiveChannel()})
+```
+
+This administrative example changes shared process state and returns to `stack`. The change is not sent to other workers and does not persist by itself after an application restart. A failed reload can leave handlers detached; configuration replacement is not transactional.
+
+<a id="logger-close"></a>
+
+## Close and release files
+
+```text
+close() -> None
+```
+
+Removes and closes handlers, clears the cache, and resets the internal logger reference. Contains `OSError`, `RuntimeError`, and `ValueError` during cleanup. It may be called repeatedly. `__del__()` also attempts to close a destroyed wrapper, but does not replace explicit cleanup when resources must be released at a particular time.
+
+`close()` does not unregister the singleton or unpin `Log`. A later message or `getLogger()` reconstructs the default channel using the configuration retained by the wrapper. Consequently, do not call it after every request.
+
+To close explicitly during the lifecycle of a custom integration, register a callback with DI in `bootstrap/lifespan.py`:
+
+```python
+from orionis.foundation.contracts.application import IApplication
+from orionis.foundation.enums.lifespan import Lifespan
+from orionis.logging.contracts.logger import ILogger
+
+
+def close_application_logger(logger: ILogger) -> None:
     logger.close()
-    assert "Orionis is ready" in (Path(root) / "app.log").read_text(encoding="utf-8")
-    print(Logger.name)
+
+
+def register_logger_shutdown(app: IApplication) -> None:
+    app.on(Lifespan.SHUTDOWN, close_application_logger)
 ```
 
-### Inspect configured channels without opening files
+Call `register_logger_shutdown(app)` from `bootstrap/app.py`. Callback registration order is not guaranteed: another callback writing afterward can reopen the logger. See the [application lifecycle](/en/getting-started/application-lifecycle) when coordinating cleanup across services.
+
+<a id="logger-standard"></a>
+
+## Access the standard logger and record tracebacks
+
+```text
+getLogger() -> logging.Logger
+```
+
+Initializes the service and returns the configured standard logger, not a copy. Use it for capabilities outside the five simple writing methods, such as recording the traceback of a caught exception:
 
 ```python
-from orionis.logging import Logger
+from orionis.logging.contracts.logger import ILogger
 
 
-class App:
-    def config(self, name: str) -> dict:
-        return {
-            "default": "stack",
-            "channels": {
-                "stack": {"path": "storage/logs/stack.log", "level": "INFO"},
-                "daily": {"path": "storage/logs/daily_{suffix}.log", "level": "WARNING"},
-            },
-        }
+class IntegerParser:
+    def __init__(self, logger: ILogger) -> None:
+        self.logger = logger
 
-
-logger = Logger(App())
-assert logger.getAvailableChannels() == ["stack", "daily"]
-assert logger.getActiveChannel() is None
-logger.close()
-print("configuration inspected")
+    def parse(self, raw_value: str) -> int:
+        try:
+            return int(raw_value)
+        except ValueError:
+            self.logger.getLogger().exception("event=integer-parse-failed")
+            raise
 ```
 
-### Use the application facade
+`logger.error("...")` alone does not attach the traceback; `.exception(...)` belongs to the object returned by `getLogger()`. Catching and recording an exception does not alter its propagation: this example raises it again. If the global handler also records it, there will be two records; choose which component is responsible for reporting it.
 
-```python
-from orionis.support.facades import Log
+You can also use standard logger interpolation: `logger.getLogger().info("event=order-viewed order_id=%s", order_id)`. Its handlers are the same ones used by the facade. The logger is set to `DEBUG`, the handler applies the channel threshold, and `propagate` is `False`; records are not automatically forwarded to root logger handlers. Changing its levels or handlers affects other consumers in the process.
 
-Log.info("Request completed")
-Log.warning("Retry budget is low")
-Log.error("Job failed")
+<a id="logger-constructor"></a>
+
+## Construction, initialization, and errors
+
+```text
+Logger(app: IApplication) -> None
 ```
 
-## Integration with Orionis
+The constructor captures `app.config("logging")`. It does not create files yet. The first writing call or `getLogger()` initializes the logger using a double-checked lock, creates the required directory, and configures its handler and formatter. File selection and policies are explained in [rotation and lifecycle](/en/services/logging/rotation-and-lifecycle).
 
-`LoggerProvider` binds `ILogger` to `Logger` as a singleton with alias `x-orionis-ILogger`, then pins `Log` during boot. Failure handling injects `ILogger`; background tasks use the facade to report success/failure. Other framework code can depend on the contract without knowing rotation details.
+<a id="logger-errors"></a>
 
-The standard logger name is shared process-wide. Creating or initializing another Orionis `Logger` closes and replaces handlers on that same logger, so application code should use the provider singleton.
+| Situation | Behavior |
+| --- | --- |
+| Configuration cannot be obtained when constructing `Logger` | The exception from `app.config(...)` propagates. |
+| Initialization fails: inaccessible directory, locked file, or invalid data | Writing methods and `getLogger()` receive `RuntimeError` with the original cause. |
+| The default name is absent from `channels` | Creates `storage/logs/default.log` with active name `fallback`. |
+| The name exists but has no channel implementation | Initialization can finish without handlers; this does not trigger fallback. |
+| A channel change or reload fails | Return and exception rules are explained with each method. |
 
+Service initialization does not guarantee every subsequent writing operation succeeds. Handlers follow their own emission and I/O error rules; the service does not provide a retry queue or per-message delivery acknowledgment.
 
+<a id="logger-facade-api"></a>
 
-### `Logger(app)`
+## Facade API and infrastructure
 
-- `info(message)`, `error(message)`, `warning(message)`, `debug(message)`, and `critical(message)` forward strings to the standard logger.
-- `getLogger()` returns the configured `logging.Logger` for advanced standard-library features.
-- `switchChannel(name)` replaces the handler and returns whether it succeeded.
-- `reloadConfiguration()` closes handlers, rereads `app.config("logging")`, rebuilds, and records a success message.
-- `close()` releases file handles and permits later lazy reconstruction.
-- `getActiveChannels()` / `getActiveChannel()` report handler-cache state.
-- `getAvailableChannels()` reports names in configuration without initializing I/O.
+`Log` exposes the twelve `ILogger` methods above and `name` after an instance is pinned. It also retains infrastructure methods inherited from `Facade`:
 
----
+| Signature | Use and result |
+| --- | --- |
+| `Log.getFacadeAccessor() -> str` | Returns `"x-orionis-ILogger"`. Does not initialize the logger. |
+| `await Log.resolve(*args: object, **kwargs: object) -> object` | Resolves the registered service. Requires a created application; does not itself pin the instance on the facade. Arguments are forwarded to the container. |
+| `await Log.pin() -> None` | Resolves and retains the instance for direct calls; the native provider already does this. |
+| `Log.unpin() -> None` | Removes the pinned reference. Does not close files or remove the service binding. |
 
-[Index](/en/services/logging) · [foundation](/en/getting-started) · [failure](/en/architecture/exception-handling)
+**Without a pinned instance**, `Log.info(...)` and other service accesses return a deferred operation: they must be awaited to execute. In that state, `await Log.info("...")` is valid; after pinning, use the synchronous call. Do not switch between these states during normal requests. For code that must work independently of pinning, receive `ILogger` or use `logger = await Log.resolve()` followed by `logger.info(...)`.
+
+Resolution before application creation raises `RuntimeError`; container construction and resolution errors can also propagate. General dispatch behavior is explained in [synchronous and asynchronous facades](/en/architecture/service-container/facades#facade-dispatch).

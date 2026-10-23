@@ -11,6 +11,9 @@ import './validate-queues-coverage.mjs';
 import './validate-console-coverage.mjs';
 import './validate-environment-coverage.mjs';
 import './validate-application-container-coverage.mjs';
+import './validate-logging-coverage.mjs';
+import './validate-exceptions-coverage.mjs';
+import './validate-deployment-coverage.mjs';
 
 const catalog = documentationCatalog;
 const pages = validateCatalog(catalog);
@@ -20,8 +23,8 @@ const errors = [], routeMap = new Map();
 const normalize = (pathname) => decodeURI(pathname).replace(/\/+$/, '') || '/';
 function check(condition, message) { if (!condition) errors.push(message); }
 const groupedBuildSectionIds = ['getting-started', 'http', 'realtime', 'mcp', 'views', 'localization', 'authentication', 'sessions', 'cryptography', 'validation'];
-const groupedSectionIds = new Set([...groupedBuildSectionIds, 'database', 'orm', 'faker', 'storage', 'cache', 'mail', 'queues', 'console', 'environment', 'application']);
-const flatSectionIds = ['deployment', 'testing', 'utilities', 'contribute'];
+const groupedSectionIds = new Set([...groupedBuildSectionIds, 'database', 'orm', 'faker', 'storage', 'cache', 'mail', 'queues', 'console', 'environment', 'application', 'logging', 'exceptions', 'deployment']);
+const flatSectionIds = ['testing', 'utilities', 'contribute'];
 
 const robots = (await fs.readFile(path.join(root, 'public/robots.txt'), 'utf8')).replaceAll('\r\n', '\n');
 const robotsGroups = robots.trim().split(/\n\s*\n/);
@@ -78,7 +81,7 @@ const pageSections = new Map(navigationSections.flatMap((section) => section.pag
 check(JSON.stringify(menuIds) === JSON.stringify(expectedMenuIds), 'Sidebar misses pages or changes the capability navigation order.');
 check(menuIds.length === sitePages.length && new Set(menuIds).size === sitePages.length && sitePages.every((page) => menuIds.includes(page.id)), 'Every published page must occur exactly once in primary navigation.');
 check(JSON.stringify(navigationSections.filter((section) => section.band === 'build').map((section) => section.id)) === JSON.stringify(groupedBuildSectionIds), 'The ten application-build categories must retain their identities and order.');
-check(JSON.stringify(navigationSections.filter((section) => section.groups).map((section) => section.id)) === JSON.stringify([...groupedSectionIds]), 'All ten application-build categories and Database, ORM, Faker, Storage, Cache, Mail, Queues, Console, Environment and Application must use subgroups.');
+check(JSON.stringify(navigationSections.filter((section) => section.groups).map((section) => section.id)) === JSON.stringify([...groupedSectionIds]), 'All ten application-build categories and Database, ORM, Faker, Storage, Cache, Mail, Queues, Console, Environment, Application, Logs, Exceptions and Deployment must use subgroups.');
 check(JSON.stringify(navigationSections.filter((section) => !section.groups).map((section) => section.id)) === JSON.stringify(flatSectionIds), 'Unrelated navigation categories must retain their flat structure and order.');
 for (const section of navigationSections) {
   const group = sidebar.find((item) => item.items && flattenSidebar(item.items).some((child) => child.attrs?.['data-nav-group'] === section.id));

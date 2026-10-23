@@ -1,0 +1,196 @@
+{
+  "scope": "Documentation verification using isolated fixtures, not production server installation",
+  "frameworkRevision": "3342f87f6813af8adb112c7acef6132d0a5cb7f0",
+  "nativeTests": {
+    "serve": 5,
+    "trustedProxies": 4
+  },
+  "windows": {
+    "scope": "Temporary Windows processes; no services, ACL changes, system trust, firewall changes or production ACME issuance",
+    "checks": [
+      {
+        "name": "HTTPS proxy health route",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "Direct ASGI backend",
+        "passed": true,
+        "detail": {
+          "ip": "127.0.0.1",
+          "scheme": "http",
+          "url": "http://app.example.test/probe"
+        }
+      },
+      {
+        "name": "TLS forwarding scheme and public URL",
+        "passed": true,
+        "detail": {
+          "ip": "127.0.0.1",
+          "scheme": "https",
+          "url": "https://app.example.test:19443/probe"
+        }
+      },
+      {
+        "name": "Caddy overwrites untrusted forwarding headers",
+        "passed": true,
+        "detail": {
+          "ip": "127.0.0.1",
+          "scheme": "https",
+          "url": "https://app.example.test:19443/probe"
+        }
+      },
+      {
+        "name": "Public static mount through HTTPS proxy",
+        "passed": true,
+        "detail": "b'Orionis public file\\r\\n'"
+      },
+      {
+        "name": "SSE first event streams before delayed second event",
+        "passed": true,
+        "detail": {
+          "firstEventSeconds": 0.032,
+          "contentType": "text/event-stream; charset=utf-8"
+        }
+      },
+      {
+        "name": "WSS upgrade through Caddy",
+        "passed": true,
+        "detail": "HTTP/1.1 101 Switching Protocols\r\nAlt-Svc: h3=\":19443\"; ma=2592000\r\nConnection: Upgrade\r\nDate: Fri, 23 Oct 2026 19:35:48 GMT\r\nSec-WebSocket-Accept: tWJZ0YAhzIXA462AE3RvxMDW02c=\r\nServer: Caddy\r\nUpgrade: websocket\r\n\r\n"
+      },
+      {
+        "name": "WSS handshake accept",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "name": "WSS echo through TLS and proxy",
+        "passed": true,
+        "detail": "Orionis production proxy proof"
+      }
+    ],
+    "status": "passed",
+    "processesCleaned": true
+  },
+  "docker": {
+    "checks": [
+      {
+        "check": "compose schema",
+        "passed": true,
+        "details": null
+      },
+      {
+        "check": "TLS verified with local CA; public Host; health",
+        "passed": true,
+        "details": null
+      },
+      {
+        "check": "trusted proxy normalizes HTTPS and rejects spoofed client",
+        "passed": true,
+        "details": {
+          "scheme": "https",
+          "ip": "172.30.50.1",
+          "forwarded": {
+            "client": "172.30.50.1",
+            "proxies": [],
+            "chain": [
+              "172.30.50.1"
+            ]
+          },
+          "name": "Orionis Application"
+        }
+      },
+      {
+        "check": "native static mount through reverse proxy",
+        "passed": true,
+        "details": null
+      },
+      {
+        "check": "private storage is outside public mount",
+        "passed": true,
+        "details": null
+      },
+      {
+        "check": "untrusted direct request ignores forwarding headers",
+        "passed": true,
+        "details": {
+          "scheme": "http",
+          "ip": "127.0.0.1",
+          "forwarded": {},
+          "name": "Orionis Application"
+        }
+      },
+      {
+        "check": "non-root runtime; persistent SQLite; empty image dotenv",
+        "passed": true,
+        "details": null
+      },
+      {
+        "check": "Caddy configuration validation",
+        "passed": true,
+        "details": null
+      },
+      {
+        "check": "recreation applies environment without reusing bootstrap cache",
+        "passed": true,
+        "details": {
+          "scheme": "https",
+          "ip": "172.30.50.1",
+          "forwarded": {
+            "client": "172.30.50.1",
+            "proxies": [],
+            "chain": [
+              "172.30.50.1"
+            ]
+          },
+          "name": "Orionis Deployment Updated"
+        }
+      },
+      {
+        "check": "public file survives app recreation",
+        "passed": true,
+        "details": null
+      },
+      {
+        "check": "all five writable data paths survive recreation",
+        "passed": true,
+        "details": null
+      },
+      {
+        "check": "SIGTERM shuts down ASGI without forced kill",
+        "passed": true,
+        "details": {
+          "exitCode": 0
+        }
+      }
+    ],
+    "source": "skeleton-slim-api with local current framework path dependency; generated lockfile; test-only Caddy internal CA and loopback ports"
+  },
+  "linux": {
+    "scope": "Linux guide static and dependency checks on Windows; no Linux service installation or Linux systemd execution",
+    "checks": [
+      "ES/EN bash blocks identical (10)",
+      "ES/EN dotenv blocks identical (1)",
+      "ES/EN ini blocks identical (1)",
+      "ES/EN nginx blocks identical (1)",
+      "20 Bash command blocks pass bash -n (syntax only)",
+      "Granian Click parser accepts exact unit flags and baseline values (static directory substituted with existing temporary directory)",
+      "Granian Click parser accepts documented RSGI alternative",
+      "Real DotEnv parses production flags, trusted proxy, allowed hosts and secure session settings from documented snippet",
+      "Nginx 1.22 -t accepts full TLS/proxy configuration, temporary certificate paths only; no server started"
+    ],
+    "count": 9
+  },
+  "exampleValidation": {
+    "powershellBlocks": 24,
+    "xmlDocuments": 4,
+    "bashBlocks": 20,
+    "granianArgumentParser": "Windows/Linux guide commands accepted; Docker command executed in image"
+  },
+  "limits": [
+    "No Windows services were installed; production ACLs and firewall rules were not applied.",
+    "No systemd service was run on a Debian/Ubuntu host.",
+    "TLS tests used a verified temporary/local CA; public DNS and production ACME issuance were not tested.",
+    "Docker application fixture used skeleton-slim-api and the local framework source with a generated lockfile, not a published package installation."
+  ]
+}

@@ -36,7 +36,7 @@ Foundation also defines frozen configuration entities for every major subsystem,
 - [Application architecture and lifecycle](/en/getting-started/architecture-and-lifecycle)
 - [Application lifecycle and resource ownership](/en/getting-started/application-lifecycle)
 - [Typed configuration and runtime values](/en/getting-started/configuration)
-- [Deployment, diagnostics, and Application reference](/en/getting-started/deployment-and-reference)
+- [Prepare a deployment](/en/getting-started/deployment-and-reference)
 - [Creating and starting an application](/en/getting-started/getting-started)
 - [Directories and bootstrap caching](/en/getting-started/paths-and-caching)
 

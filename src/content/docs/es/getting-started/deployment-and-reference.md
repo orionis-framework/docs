@@ -1,92 +1,122 @@
 ---
-title: "Despliegue, diagnóstico y referencia de Application"
-description: "Usa la raíz del proyecto generado, conserva uv.lock y proporciona el .env de producción y la APP_KEY privada existente. Configura APP_ENV=production y APP_DEBUG=bool:false…"
+title: "Preparar un despliegue"
+description: "Prepara Orionis para producción y elige Windows Server, Linux o Docker con supervisión, HTTPS y proxy inverso."
 editUrl: true
 lastUpdated: false
 ---
 
-## Preparar una versión de la aplicación
+Publica el **proyecto completo de tu aplicación**: código, `bootstrap/`, `config/`, `routes/`, `resources/`, `database/`, `reactor`, `pyproject.toml` y `uv.lock`, además de los artefactos de frontend que utilice. Instalar únicamente el paquete del framework no publica tu aplicación.
 
-Usa la raíz del proyecto generado, conserva `uv.lock` y proporciona el `.env` de producción y la `APP_KEY` privada existente. Configura `APP_ENV=production` y `APP_DEBUG=bool:false` mediante la configuración de la aplicación. Los directorios de almacenamiento y logs deben permitir escritura al proceso de aplicación; revisa las migraciones de base de datos antes de aplicarlas.
+Las guías parten de una aplicación instalada y probada. Sustituye el dominio de ejemplo `app.example.com`, las rutas y las credenciales por los de tu entorno.
 
-```shell
-uv sync --frozen --python 3.14
-uv run python -B reactor about
-uv run python -B reactor route:list
-uv run python -B reactor serve --export
+| Escenario | Proceso de aplicación | Proxy y HTTPS |
+| --- | --- | --- |
+| [Windows Server](/es/getting-started/deployment/windows-server) | Servicio Windows mediante WinSW | Caddy como servicio independiente |
+| [Linux](/es/getting-started/deployment/linux) | Servicio systemd sin privilegios | Nginx con certificado TLS |
+| [Docker](/es/getting-started/deployment/docker) | Contenedor sin privilegios | Caddy y red privada de Compose |
+
+## Arquitectura de publicación
+
+```mermaid
+flowchart TD
+    accTitle: Publicación de una aplicación Orionis
+    B["Cliente"] -->|"HTTPS / WSS :443"| P["Proxy inverso"]
+    P -->|"HTTP / WebSocket privado :8000"| G["Granian · ASGI · un worker"]
+    G --> A["bootstrap.app:app"]
+    A --> K["Kernel HTTP · rutas · middleware"]
+    K --> S["Servicios y almacenamiento"]
+    Q["Worker de colas / scheduler"] --> S
+    M["Supervisor del sistema o Docker"] --> G
+    M --> Q
 ```
 
-`serve --export` muestra el comando Granian resuelto sin iniciar el servidor. Ese comando refleja el entorno, el protocolo, la plataforma y el puerto actuales; revísalo al configurar tu supervisor de procesos. `serve` usa `127.0.0.1` en desarrollo y `0.0.0.0` en producción, con puerto 8000 si no indicas otro. En producción, coloca el servidor detrás de la configuración TLS/proxy de tu aplicación y supervisa por separado los procesos HTTP, los workers de colas y el scheduler.
+Granian ya forma parte de las dependencias de Orionis. El objeto `app` creado en `bootstrap/app.py` implementa **ASGI** y **RSGI**. Estas guías seleccionan ASGI explícitamente, con su ciclo de inicio y cierre habilitado, y un worker como punto de partida. Consulta [Aplicación y Contenedor](/es/getting-started/application-overview) para personalizar el bootstrap.
 
-La ruta `/up` predeterminada confirma que responde la ruta HTTP de la aplicación. Añade una comprobación propia cuando la disponibilidad dependa también de una base de datos o servicio externo. Tras cambiar código o configuración de arranque, actualiza las cachés afectadas y reinicia todos los procesos persistentes; [los grupos Realtime](/es/asynchronous/realtime/groups-and-deployment), [las sesiones](/es/http/sessions/stores-and-concurrency) y [los eventos MCP](/es/protocols/mcp/advanced-workflows) tienen límites explícitos por worker.
+## Preparar dependencias y configuración
 
-## API pública
+Los ejemplos utilizan Python **3.14**. Comprueba `requires-python`, `.python-version` y el lockfile de tu aplicación antes de elegir otra versión. Resuelve y prueba las dependencias y extras necesarios en desarrollo; distribuye el `uv.lock` resultante. Desde la raíz del proyecto en el servidor:
 
-### `Application(base_path=Path.cwd())`
+```shell
+uv sync --locked --no-default-groups --python 3.14
+```
 
-`orionis.Application` es singleton thread-safe por subclase concreta. `Application.current()` devuelve instancia existente sin crear. Propiedades exponen rutas, inicio, caché compilada, health, readiness, debug/producción y mantenimiento.
+`--locked` exige que el lockfile corresponda al proyecto; si falla, corrígelo antes de publicar. `--no-default-groups` excluye los grupos predeterminados, incluido `dev`; las dependencias de producción deben estar declaradas fuera de esos grupos. Los servicios ejecutarán después el Python de `.venv` directamente, sin resolver paquetes en cada arranque. [Referencia de uv](https://docs.astral.sh/uv/reference/cli/#uv-sync).
 
-### Métodos de bootstrap
+Proporciona el `.env` privado **antes de importar la aplicación o ejecutar Reactor**. Fija el directorio de trabajo del servicio en la raíz del proyecto: el componente de entorno toma esa ubicación para leer el archivo. Sus valores se consumen desde `config/`. Consulta [Entorno](/es/architecture/environment).
 
-- `compile(path=None, invalidation_paths=None)` activa caché de bootstrap.
-- `withRouting(api, web, console, health, ai, websocket=...)` registra archivos validados.
-- `withProviders(*classes)` y `withMiddleware(*classes)` registran extensiones.
-- `withExceptionHandler(cls)` y `withScheduler(cls)` reemplazan defaults.
-- `withConfigApp/Auth/Cache/Http/Database/Filesystems/Logging/Mail/Mcp/Queue/Session/Testing(**values)` aporta overrides.
-- `withConfigPaths(**paths)` resuelve el mapa completo.
-- `on(lifespan, *callbacks, runtime=None)` registra hooks globales o específicos.
+```dotenv
+APP_ENV=production
+APP_DEBUG=bool:false
+ALLOWED_HOSTS=list:["app.example.com"]
+TRUSTED_PROXIES=list:["127.0.0.1"]
+SESSION_DRIVER=file
+SESSION_SECURE=bool:true
+```
 
-`with...` y `on(...)` retornan la aplicación para encadenar y rechazan cambios tras creación. `compile(...)` devuelve `None` y requiere una instrucción independiente. En hit válido de caché compilada, la metadata cacheada prevalece y registros/configuraciones se vuelven no-op intencionalmente.
+Conserva las demás variables, especialmente **la `APP_KEY` existente** y las conexiones. Este fragmento supone un proxy en el mismo servidor y sesiones de archivo en una instancia; Docker usa otra IP de proxy. Configurar sesiones no las añade a las rutas API.
 
-### Métodos runtime
+Para una instalación nueva sin clave, `python -B reactor key:generate` crea una y la guarda en `.env`; sin `--force` conserva una existente. Provisiona la clave una sola vez y reutilízala en todos los procesos de la misma aplicación. No la regeneres por despliegue: los datos previamente cifrados dependen de ella.
 
-`create()` registra/configura síncronamente. `boot()` prepara providers async para procesos headless. `handleCommand(args=None)` ejecuta kernel CLI dentro de hooks. `config()`, `path()` y `routingPaths()` exponen config runtime, rutas bootstrap inmutables y listas descongeladas.
+En Linux utiliza `.venv/bin/python`; en Windows, `.venv\Scripts\python.exe`. Los comandos abreviados con `python` suponen ese entorno activo:
 
-`getExceptionHandler()` y `getScheduler()` construyen perezosamente clases configuradas tras creación. Métodos heredados del contenedor aportan binding, resolución, scopes e invocación.
+```shell
+python -B reactor about
+python -B reactor route:list
+python -B reactor serve --interface asgi --export
+```
 
-### `Directory`
+Ejecuta las comprobaciones con la identidad y el directorio del servicio. `serve --export` muestra el comando resuelto y termina sin iniciar el servidor.
 
-`Directory(app)` toma una instantánea de `app.path()` y ofrece métodos como `root()`, `appModels()`, `databaseMigrations()`, `resourcesViews()` y `storageLogs()`. Reemplazar luego el mapa no cambia el snapshot.
+## Servidor y archivos públicos
 
-## Errores y casos límite
+```shell
+python -B reactor serve --interface asgi --port 8000 --log
+```
 
-- `config`, `path`, flags, handler y scheduler rechazan uso previo a creación donde corresponde.
-- Mutar bootstrap tras creación lanza `RuntimeError`; clases provider/middleware/handler/scheduler inválidas lanzan `TypeError`.
-- Routing rechaza archivos faltantes, tipos inválidos y archivos sin import de fachada permitido.
-- Entidades inválidas detienen creación con su error original, envuelto solo cuando discovery lo requiere.
-- La aplicación es singleton por subclase: argumentos posteriores no reinicializan una instancia existente.
-- Config runtime es mutable y mappings retornados están vivos; `resetRuntimeConfig()` restaura baseline.
-- Claves de path/routing desconocidas retornan `None`; health predeterminado es `/up`.
-- Marcador de mantenimiento corrupto/ilegible activa mantenimiento deliberadamente.
+También puedes usar `orionis serve --interface asgi --port 8000 --log`. Reactor admite `--interface` (`rsgi` por defecto o `asgi`), `--port` (8000), `--log` y `--export`; **no expone `--host`, `--workers` ni `--reload`**.
 
-## Rendimiento y concurrencia
+| Decisión | `serve` | Servicios de estas guías |
+| --- | --- | --- |
+| Dirección | Loopback en desarrollo; `0.0.0.0` en producción | Loopback en Windows/Linux; red privada en Docker |
+| Workers | Uno en Windows; número de CPU en Unix | Uno explícito |
+| Recarga | Solo fuera de producción | Deshabilitada explícitamente |
+| Archivos públicos | Lee el disco `public` | Montaje equivalente configurado en Granian |
 
-Modo compilado guarda bootstrap en `FileBasedCache` e invalida por archivos/directorios. Providers y entidades core usan imports lazy. Claves dot notation usan LRU de 256; flags producción/debug se precalculan.
+Las guías llaman a `python -B -m granian` para fijar esas decisiones. El destino es `bootstrap.app:app`, sin `--factory`. Para RSGI puedes seleccionar `--interface rsgi` con el mismo objeto. No uses `wsgi` ni `asginl`: el primero no corresponde al contrato de Orionis y el segundo omite el lifespan ASGI. [Interfaces de Granian](https://github.com/emmett-framework/granian).
 
-Boot de providers e inicialización de kernels CLI/HTTP usan locks async para compartir un startup. Mantenimiento usa lock de hilo. Scopes/resolución son context-local, pero no hay garantía sobre estado mutable entre loops o hilos arbitrarios.
+El disco público predeterminado es `storage/app/public`, publicado como `/static`. Si cambias `PUBLIC_PATH` o `PUBLIC_URL`, actualiza también los argumentos de montaje del servidor directo. Granian atiende ese montaje antes del kernel: los archivos públicos no pasan por los middleware de Orionis. Nunca publiques la raíz del proyecto ni `storage/app/private`.
 
-Monitoreo opcional de desconexión HTTP usa cola ASGI limitada —ocho mensajes y uno retenido por productor— o watcher RSGI, cancelando trabajo al desconectar. WebSockets omiten ese monitoreo de body.
+## Permisos, cachés y datos persistentes
 
-## Compatibilidad
+El proceso necesita leer el código y escribir en los directorios que use: bootstrap, logs, vistas compiladas, sesiones, temporales y archivos de aplicación. Las guías conceden escritura en `storage/`. SQLite necesita además escritura en el **directorio** de su archivo para crear archivos auxiliares; configura esa ruta y sus permisos. Consulta [drivers de base de datos](/es/database/drivers).
 
-Foundation apunta a Python 3.14+ e implementa ASGI HTTP/WebSocket/lifespan, Granian RSGI y Reactor CLI.
+`app.compile(...)` habilita la persistencia de configuración, comandos y rutas conforme se preparan durante el arranque, habitualmente en `storage/framework/bootstrap`. La caché contiene configuración resuelta, rutas absolutas y posiblemente secretos. Protégela como el `.env`; no la copies desde desarrollo ni entre versiones con diferentes rutas de código.
 
-## Estructura del módulo
+La invalidación comprueba las rutas declaradas en el bootstrap. Cambiar solo variables del proceso no garantiza invalidar una caché existente. Con la versión detenida, elimina su caché de bootstrap o ejecuta `python -B reactor optimize:clear` conociendo su alcance: también limpia bytecode y directorios Python `build`/`dist`. Reinicia después todos los procesos persistentes. Consulta la [configuración de aplicación](/es/getting-started/configuration).
 
-| Área | Responsabilidad |
-|---|---|
-| `application.py` | Bootstrap, protocolos, kernels, providers, routing, config, rutas, mantenimiento. |
-| `contracts/` | Interfaces `IApplication` e `IDirectory`. |
-| `directory.py`, `core_paths.py` | Snapshot de rutas y árbol predeterminado. |
-| `config/` | Entidades congeladas, enums, normalización y helpers de entorno. |
-| `core_config.py` | Defaults core independientes construidos perezosamente. |
-| `core_providers.py`, `core_kernels.py` | Clases provider lazy y metadata de kernels. |
-| `core_exception_handler.py`, `core_scheduler.py` | Metadata de extensiones predeterminadas. |
-| `enums/` | `Lifespan` y `Runtime`. |
-| `lifespan/` | Paneles debug y resumen de uptime. |
+Conserva fuera de releases desechables los archivos subidos, bases SQLite, sesiones y colas persistentes que necesites. Docker utiliza volúmenes. Un directorio local no se comparte automáticamente entre servidores.
 
-## Referencia y próximos pasos
+## Datos y procesos auxiliares
 
-[application.py](https://github.com/orionis-framework/framework/blob/470229f78a5db61263ce887bcdd16bc98f9141db/orionis/foundation/application.py) · [application.py](https://github.com/orionis-framework/framework/blob/470229f78a5db61263ce887bcdd16bc98f9141db/orionis/foundation/contracts/application.py) · [core_providers.py](https://github.com/orionis-framework/framework/blob/470229f78a5db61263ce887bcdd16bc98f9141db/orionis/foundation/core_providers.py)
+Respalda y revisa las migraciones antes de aplicarlas. Ejecútalas una vez por despliegue, con la configuración de producción:
 
-[Volver al índice del módulo](/es/getting-started).
+```shell
+python -B reactor migrate:status
+python -B reactor migrate
+```
+
+`migrate` admite `--database` para otra conexión; no tiene un flag `--force`. No ejecutes `migrate:fresh`, `db:wipe` ni seeders de demostración como paso habitual de publicación. Consulta [comandos de base de datos](/es/database/commands).
+
+HTTP no inicia automáticamente workers de colas persistentes ni un scheduler CLI. Si los utilizas, crea servicios independientes con el mismo código, configuración y clave; sigue las guías de [colas](/es/asynchronous/queues/workers-and-failures) y [consola y tareas](/es/console). Reinícialos también al actualizar código.
+
+## Concurrencia y verificación
+
+Un worker no hace duradero el estado de memoria. Antes de aumentar workers o réplicas, revisa [sesiones](/es/http/sessions/stores-and-concurrency), [grupos Realtime](/es/asynchronous/realtime/groups-and-deployment), [eventos MCP](/es/protocols/mcp/advanced-workflows), [caché](/es/services/cache) y [logs](/es/services/logging/rotation-and-lifecycle). Un almacén compartido no sustituye por sí solo el registro de conexiones Realtime.
+
+Verifica el backend privado y después el dominio público. `/up`, si conservas la ruta predeterminada, devuelve 200 normalmente y 503 durante mantenimiento; no comprueba automáticamente bases de datos. Prueba una ruta real, archivos públicos, sesión segura y WebSocket/SSE si existen. [Salud y respuestas predeterminadas](/es/http/default-responses).
+
+Para una interrupción programada, `python -B reactor down` escribe el marcador de mantenimiento para los procesos que comparten su almacenamiento; no interrumpe operaciones ya iniciadas. Detén los procesos, publica y verifica; `python -B reactor up` restaura disponibilidad. Investiga fallos de arranque en el supervisor y [Logs](/es/services/logging).
+
+Continúa con [Windows Server](/es/getting-started/deployment/windows-server), [Linux](/es/getting-started/deployment/linux) o [Docker](/es/getting-started/deployment/docker), y revisa [el contrato del proxy](/es/getting-started/deployment/reverse-proxies).
+
+La [trazabilidad del despliegue](/downloads/deployment-source-inventory.json) relaciona los puntos de integración documentados con los archivos de configuración, implementación y pruebas revisados.

@@ -1,0 +1,681 @@
+{
+  "scope": "Own public Failure declarations, explicit constructors, Throwable fields, kernel enum members, project ExceptionHandler, Catch facade accessor and the two Application registration/retrieval methods with their contracts. Contracts and implementations count separately. Private helpers, generated dataclass methods, inherited container/facade/standard-library API and lazy exports are excluded. Transport sources are hashed as reviewed integrations without claiming their entire public API as Exceptions API.",
+  "sourceRoot": "orionis/failure",
+  "publicFiles": [
+    "app/exceptions/handler.py",
+    "orionis/support/facades/catch.py",
+    "orionis/foundation/core_exception_handler.py"
+  ],
+  "applicationFiles": [
+    "orionis/foundation/application.py",
+    "orionis/foundation/contracts/application.py"
+  ],
+  "applicationMethods": [
+    "getExceptionHandler",
+    "withExceptionHandler"
+  ],
+  "auxiliaryFiles": [
+    "bootstrap/app.py",
+    "orionis/background/task.py",
+    "orionis/background/tasks.py",
+    "orionis/console/core/reactor.py",
+    "orionis/console/entities/task_event.py",
+    "orionis/console/enums/events.py",
+    "orionis/console/kernel.py",
+    "orionis/console/output/console.py",
+    "orionis/console/tasks/schedule.py",
+    "orionis/container/container.py",
+    "orionis/container/facades/facade.py",
+    "orionis/container/facades/meta.py",
+    "orionis/foundation/application.py",
+    "orionis/http/adapters/response/asgi.py",
+    "orionis/http/adapters/response/rsgi.py",
+    "orionis/http/adapters/response/streams.py",
+    "orionis/http/adapters/websocket/asgi.py",
+    "orionis/http/adapters/websocket/rsgi.py",
+    "orionis/http/default/responses.py",
+    "orionis/http/kernel.py",
+    "orionis/http/layer/web/start_session.py",
+    "orionis/http/responses.py",
+    "orionis/http/validation.py",
+    "orionis/http/websocket.py",
+    "orionis/logging/logger.py",
+    "orionis/mcp/dispatcher.py",
+    "orionis/mcp/exceptions.py",
+    "orionis/mcp/responses.py",
+    "orionis/mcp/streams.py",
+    "orionis/mcp/transport/http.py",
+    "orionis/mcp/transport/policy.py",
+    "orionis/mcp/transport/stdio.py",
+    "orionis/queues/context.py",
+    "orionis/queues/drivers/sync.py",
+    "orionis/queues/job.py",
+    "orionis/queues/manager.py",
+    "orionis/queues/pending.py",
+    "orionis/queues/worker.py",
+    "orionis/realtime/connection.py",
+    "orionis/realtime/errors.py",
+    "orionis/realtime/metadata.py",
+    "orionis/realtime/protocol.py",
+    "orionis/realtime/runtime.py",
+    "orionis/support/facades/catch.pyi"
+  ],
+  "hashes": {
+    "app/exceptions/handler.py": "8d225ddf0be8800d7ecfae78a75948e3d55b79421613035ea64d6eea5ff3bcf4",
+    "orionis/failure/__init__.py": "daafe488ad432f60c38694ad55da9bd1976b90d8bf14400958024147515a71e1",
+    "orionis/failure/base/__init__.py": "b8576d013483cf2a20bc2ad852341374f88ae98c00429e888b3c885e5d603f02",
+    "orionis/failure/base/handler.py": "768ecee7366dd7719b973dec3bdb0ccac989a534d187aff130f2ca91de8e8074",
+    "orionis/failure/catch.py": "2f5dbd61cdd4b6d477101e72a17bdf7f0ff03320d493721991081f9aed9ac22d",
+    "orionis/failure/contracts/__init__.py": "31c78d02fa3f8c5e8c78cd2ef0c4cf8cfa083e7923c06519cdf27ed08ed40f1a",
+    "orionis/failure/contracts/catch.py": "4deeaf6a4a67ec29e48f986d167e63ab868e04bf51fb3fac44f65cccd902a9ef",
+    "orionis/failure/contracts/handler.py": "ff96260ad6f5764f60164725378a3e4034c7d461f5b2deb266b8b21a69702797",
+    "orionis/failure/entities/__init__.py": "c72d80d84e630288420ada0725fffdb7961aa8500440875de006e3f4e9f4cd1f",
+    "orionis/failure/entities/throwable.py": "c8741e084d445fb691ae0537c2a19475bdc2e381f5ed16026ec3bda081432ef4",
+    "orionis/failure/enums/__init__.py": "fa32c06c76519acfed3aa9341cbff1bae836cc51b505c96e855b8ca11643e062",
+    "orionis/failure/enums/kernel_type.py": "b2b0cd0f60e0f59ca3cd48fdc5f0474376325a3964eb2394ded6a9cc1bae1aea",
+    "orionis/failure/provider.py": "dad2d1b306612fc0dbffb7d8f10b2dfc8f9e3bd86dd19d80f0f87963d4f938d4",
+    "orionis/foundation/application.py": "b1c27ec023a3d4ad5087f34d4c7616b678b2f098cda5192e00c55212cee5dfb9",
+    "orionis/foundation/contracts/application.py": "efd745b6c5b098e6b46efc596b1f667e417ad10bfef5eb1329922a117458b3f8",
+    "orionis/foundation/core_exception_handler.py": "8aae70394eb1a8a64221956b4c957a2289cb100b18514b8ddd2f9d15e4392539",
+    "orionis/support/facades/catch.py": "76186ef88cc1796c5a7ca815145c0e12b453652a9af3e92675a83eb1ba3918c2",
+    "bootstrap/app.py": "9ebcd6ae03c6c90be8a2a456db3c6ffd1df1b8a5d4139d647dbbed60aece9daf",
+    "orionis/background/task.py": "dd4d796a70143377268f406f2b8bb5593725b0e4633fb46feedbd8f7770d4253",
+    "orionis/background/tasks.py": "fd7423984066c485778db539f1e0d7934abd24e3906cc5ad91ce5abf1112f3ec",
+    "orionis/console/core/reactor.py": "f3e90c3e2210e781d03473931418d9294057e969bf8d546124936e12cb70961e",
+    "orionis/console/entities/task_event.py": "2fad23c352f0d6814a27f245e18942d71db2e2aaa6e64704da04980fe63783e1",
+    "orionis/console/enums/events.py": "dab5808a5a23489755b2ede67361ab5565e94c182884bcbed57e88ca0ccd3c6c",
+    "orionis/console/kernel.py": "19cade0b166194d969feda868cc31d0d79023d2462daae119703d1de81c03848",
+    "orionis/console/output/console.py": "b82faf6357407f3b11af3562b1ba07a28743d8fbf75922100c430608fef20543",
+    "orionis/console/tasks/schedule.py": "21d91d6af000a4451be57f0699a693ac1c09297a0e8aef6acd917c289b7508ce",
+    "orionis/container/container.py": "a5cecd54238512e6c80819c352ac093f926793fafb56dcfb997783b0718e6c37",
+    "orionis/container/facades/facade.py": "85b9d448f4da31eb8a8f0c0131b3a7cd4b04f511c6e1b74a996ce59ca0e5e909",
+    "orionis/container/facades/meta.py": "87cac316a12e6462a8c811a8ad7a82885b64be754ab9e68d3050b6986d970b03",
+    "orionis/http/adapters/response/asgi.py": "3d1bac4b8b37c6307447fa59bbe52128d6087fe224155f4717dbe9dbc04989af",
+    "orionis/http/adapters/response/rsgi.py": "0151080ead64532647ca8d24bfa5f735ba2d76b8d8f884413c72188a5aaad26e",
+    "orionis/http/adapters/response/streams.py": "73131761afaed9186f85e94b8359868e21ac3952df1cce13513ab8cdf6fccf3e",
+    "orionis/http/adapters/websocket/asgi.py": "19df5b936c143ea3c9fab9747b7dba124cc405e82ddf6cf63b1596bc88fbcd73",
+    "orionis/http/adapters/websocket/rsgi.py": "a6576d97251a106452dcbda259aae439fc93c909c71e61ec79af3595e3afbb9f",
+    "orionis/http/default/responses.py": "a29923558d28755d856df2cf8de942324101d45c4c0ec7900abc0fbac4b23f52",
+    "orionis/http/kernel.py": "4298750a6ea64d8f1b46abfdc16685d9a2ee3b09b93e4f7d11d53d86b1faff24",
+    "orionis/http/layer/web/start_session.py": "a9e24f52e9dfd18cbc58ecb4e79eb64de3098fab45224a2b8fdc3803d9d0b520",
+    "orionis/http/responses.py": "72aa6de6485bfc87b158303567c8568ad7dd859a4182e15f9ea0a20ff6cbcf8f",
+    "orionis/http/validation.py": "3a92ae0a3a05c699cb87cf4bb2f4805be291ccc557940e78b1ef11622794cd90",
+    "orionis/http/websocket.py": "7725c7674bba3ed72e0c0ce84cfffa1ffd4b9f5b2b954bc5e06f267716322f81",
+    "orionis/logging/logger.py": "604dfb36c58366a76f7ff448645b5594b02dc40a113811c9ed826247c09e549c",
+    "orionis/mcp/dispatcher.py": "0127b513e2a09f6bfb54a75b67c05362e48ce8b4bc2e220ad227e3665416b5c9",
+    "orionis/mcp/exceptions.py": "1435c47761bc795c9dbaed7c09fe65f55fec764f97f25f4cb109602f14fe7634",
+    "orionis/mcp/responses.py": "955f0b7115debbb5fa780fc15b11b15d878f635e66dbf4abc108b6d014508858",
+    "orionis/mcp/streams.py": "14ffb82763ec1925c9d17545119bbb269e2f14550e360db008df565e6c8cbaa7",
+    "orionis/mcp/transport/http.py": "d234315d56a9e0172d0c86e39a0e79199da48670f78c2d713389721981c40220",
+    "orionis/mcp/transport/policy.py": "68be098a4d3dc6e6729454b8b34bfcb8ea3b46f01ce3022f650cd9da8c41ab30",
+    "orionis/mcp/transport/stdio.py": "e394a224d822d432bc8a60fa1927bbbc3ee7c5eeea3886c7ed37a199017d7630",
+    "orionis/queues/context.py": "963a8bff83b970efa2090b5b03658d5faf4a2c67dea3ef9c1e9e43d164a56d5c",
+    "orionis/queues/drivers/sync.py": "c247ddff2df1a422d3c0f40172c820457b6ef57b94fe3513dfd3bed282bf4309",
+    "orionis/queues/job.py": "384048c5b3a533a684f4dc8a1882ce93694609c4532dd20f3beafbe8ac30d1f1",
+    "orionis/queues/manager.py": "89fd7b511f301306de390c91e4ad71bc2114ec2b826348bcd33f78c3ee4dcc70",
+    "orionis/queues/pending.py": "1ae9c4a2eeac879336afc8e4a719d51eef2e5f00efaa1768a0c6b614182a3858",
+    "orionis/queues/worker.py": "e89d93dad82293793ad7de52340b694c4fb921ceb4f5521491d905c673044ff7",
+    "orionis/realtime/connection.py": "b69afe4fecd246f67cf858acb02c295dc4188d20d68b3a425d5acf5fa9624b1b",
+    "orionis/realtime/errors.py": "26c8a52fd530a37ca1918b7023837acb29a8854915fded8b1e2499cae8826527",
+    "orionis/realtime/metadata.py": "10d9d3f357855c09684e03affeddd1b37933386a1fb3c157f1dea718106edeb1",
+    "orionis/realtime/protocol.py": "2e1e8d41d23cac6fe2368c78e2744152291a2e2045d92ec6e2687a7632155443",
+    "orionis/realtime/runtime.py": "f016b2388a742d130bd4509120731f0d08bcaca83ab56a8b494599f85a435447",
+    "orionis/support/facades/catch.pyi": "27d7e734fb522d0432823c8b81011579fb8320eac6608305be07acd870f60b5d"
+  },
+  "exports": {
+    "orionis/failure/__init__.py": [
+      "Catch"
+    ],
+    "orionis/failure/base/__init__.py": [
+      "BaseExceptionHandler"
+    ],
+    "orionis/failure/contracts/__init__.py": [
+      "ICatch"
+    ],
+    "orionis/failure/entities/__init__.py": [
+      "Throwable"
+    ],
+    "orionis/failure/enums/__init__.py": [
+      "KernelContext"
+    ]
+  },
+  "integrations": [
+    {
+      "source": "orionis/background/task.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-response-delivery"
+    },
+    {
+      "source": "orionis/background/tasks.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-response-delivery"
+    },
+    {
+      "source": "orionis/console/core/reactor.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-cli"
+    },
+    {
+      "source": "orionis/console/entities/task_event.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-scheduler"
+    },
+    {
+      "source": "orionis/console/enums/events.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-scheduler"
+    },
+    {
+      "source": "orionis/console/kernel.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-cli"
+    },
+    {
+      "source": "orionis/console/tasks/schedule.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-scheduler"
+    },
+    {
+      "source": "orionis/container/container.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-startup-and-cancellation"
+    },
+    {
+      "source": "orionis/foundation/application.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-startup-and-cancellation"
+    },
+    {
+      "source": "orionis/http/adapters/response/asgi.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-response-delivery"
+    },
+    {
+      "source": "orionis/http/adapters/response/rsgi.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-response-delivery"
+    },
+    {
+      "source": "orionis/http/adapters/response/streams.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-response-delivery"
+    },
+    {
+      "source": "orionis/http/adapters/websocket/asgi.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-websocket"
+    },
+    {
+      "source": "orionis/http/adapters/websocket/rsgi.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-websocket"
+    },
+    {
+      "source": "orionis/http/kernel.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-http"
+    },
+    {
+      "source": "orionis/http/layer/web/start_session.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-http"
+    },
+    {
+      "source": "orionis/http/responses.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-response-delivery"
+    },
+    {
+      "source": "orionis/http/validation.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-http"
+    },
+    {
+      "source": "orionis/http/websocket.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-websocket"
+    },
+    {
+      "source": "orionis/mcp/dispatcher.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-mcp"
+    },
+    {
+      "source": "orionis/mcp/exceptions.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-mcp"
+    },
+    {
+      "source": "orionis/mcp/responses.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-mcp"
+    },
+    {
+      "source": "orionis/mcp/streams.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-mcp"
+    },
+    {
+      "source": "orionis/mcp/transport/http.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-mcp"
+    },
+    {
+      "source": "orionis/mcp/transport/policy.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-mcp"
+    },
+    {
+      "source": "orionis/mcp/transport/stdio.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-mcp"
+    },
+    {
+      "source": "orionis/queues/context.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-queues"
+    },
+    {
+      "source": "orionis/queues/drivers/sync.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-queues"
+    },
+    {
+      "source": "orionis/queues/job.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-queues"
+    },
+    {
+      "source": "orionis/queues/manager.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-queues"
+    },
+    {
+      "source": "orionis/queues/pending.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-queues"
+    },
+    {
+      "source": "orionis/queues/worker.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-queues"
+    },
+    {
+      "source": "orionis/realtime/connection.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-realtime"
+    },
+    {
+      "source": "orionis/realtime/errors.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-realtime"
+    },
+    {
+      "source": "orionis/realtime/metadata.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-realtime"
+    },
+    {
+      "source": "orionis/realtime/protocol.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-realtime"
+    },
+    {
+      "source": "orionis/realtime/runtime.py",
+      "reference": "/architecture/exception-handling/contexts-and-transports#context-realtime"
+    }
+  ],
+  "entries": [
+    {
+      "source": "app/exceptions/handler.py",
+      "symbol": "ExceptionHandler",
+      "kind": "class",
+      "line": 8,
+      "signature": "class ExceptionHandler(BaseExceptionHandler)",
+      "reference": "/architecture/exception-handling/handling-exceptions#handler-application"
+    },
+    {
+      "source": "app/exceptions/handler.py",
+      "symbol": "ExceptionHandler.dont_catch",
+      "kind": "field",
+      "line": 11,
+      "signature": "dont_catch: ClassVar[frozenset[type[BaseException]]] = frozenset()",
+      "reference": "/architecture/exception-handling/handling-exceptions#handler-ignore"
+    },
+    {
+      "source": "app/exceptions/handler.py",
+      "symbol": "ExceptionHandler.report",
+      "kind": "method",
+      "line": 13,
+      "signature": "async report(self, exception: Exception, log: ILogger) -> Throwable | None",
+      "decorators": [],
+      "reference": "/architecture/exception-handling/handling-exceptions#handler-reporting"
+    },
+    {
+      "source": "app/exceptions/handler.py",
+      "symbol": "ExceptionHandler.handleCLI",
+      "kind": "method",
+      "line": 36,
+      "signature": "async handleCLI(self, exception: Exception, console: Console) -> None",
+      "decorators": [],
+      "reference": "/architecture/exception-handling/handling-exceptions#handler-cli"
+    },
+    {
+      "source": "app/exceptions/handler.py",
+      "symbol": "ExceptionHandler.handleHTTP",
+      "kind": "method",
+      "line": 59,
+      "signature": "async handleHTTP(self, exception: Exception, request: Request) -> Response | None",
+      "decorators": [],
+      "reference": "/architecture/exception-handling/handling-exceptions#handler-domain-policy"
+    },
+    {
+      "source": "orionis/failure/base/handler.py",
+      "symbol": "BaseExceptionHandler",
+      "kind": "class",
+      "line": 33,
+      "signature": "class BaseExceptionHandler(IBaseExceptionHandler)",
+      "reference": "/architecture/exception-handling/handling-exceptions#handler-contract"
+    },
+    {
+      "source": "orionis/failure/base/handler.py",
+      "symbol": "BaseExceptionHandler.dont_catch",
+      "kind": "field",
+      "line": 38,
+      "signature": "dont_catch: ClassVar[frozenset[type[BaseException]]] = frozenset()",
+      "reference": "/architecture/exception-handling/handling-exceptions#handler-ignore"
+    },
+    {
+      "source": "orionis/failure/base/handler.py",
+      "symbol": "BaseExceptionHandler.__init__",
+      "kind": "constructor",
+      "line": 40,
+      "signature": "__init__(self, default_responses: DefaultResponses, application: IApplication) -> None",
+      "decorators": [],
+      "reference": "/architecture/exception-handling/handling-exceptions#handler-injection"
+    },
+    {
+      "source": "orionis/failure/base/handler.py",
+      "symbol": "BaseExceptionHandler.toThrowable",
+      "kind": "method",
+      "line": 64,
+      "signature": "toThrowable(self, exception: BaseException) -> Throwable",
+      "decorators": [],
+      "reference": "/architecture/exception-handling/handling-exceptions#handler-throwable"
+    },
+    {
+      "source": "orionis/failure/base/handler.py",
+      "symbol": "BaseExceptionHandler.isExceptionIgnored",
+      "kind": "method",
+      "line": 94,
+      "signature": "isExceptionIgnored(self, exception: BaseException) -> bool",
+      "decorators": [],
+      "reference": "/architecture/exception-handling/handling-exceptions#handler-ignore"
+    },
+    {
+      "source": "orionis/failure/base/handler.py",
+      "symbol": "BaseExceptionHandler.report",
+      "kind": "method",
+      "line": 121,
+      "signature": "async report(self, exception: BaseException, log: ILogger) -> Throwable | None",
+      "decorators": [],
+      "reference": "/architecture/exception-handling/handling-exceptions#handler-reporting"
+    },
+    {
+      "source": "orionis/failure/base/handler.py",
+      "symbol": "BaseExceptionHandler.handleCLI",
+      "kind": "method",
+      "line": 161,
+      "signature": "async handleCLI(self, exception: BaseException, console: Console) -> None",
+      "decorators": [],
+      "reference": "/architecture/exception-handling/handling-exceptions#handler-cli"
+    },
+    {
+      "source": "orionis/failure/base/handler.py",
+      "symbol": "BaseExceptionHandler.handleHTTP",
+      "kind": "method",
+      "line": 188,
+      "signature": "async handleHTTP(self, exception: BaseException, request: Request | TransportAdapter) -> Response | None",
+      "decorators": [],
+      "reference": "/architecture/exception-handling/handling-exceptions#handler-domain-policy"
+    },
+    {
+      "source": "orionis/failure/catch.py",
+      "symbol": "Catch",
+      "kind": "class",
+      "line": 13,
+      "signature": "class Catch(ICatch)",
+      "reference": "/architecture/exception-handling/policies-and-reference#catch-service"
+    },
+    {
+      "source": "orionis/failure/catch.py",
+      "symbol": "Catch.__init__",
+      "kind": "constructor",
+      "line": 17,
+      "signature": "__init__(self, app: IApplication) -> None",
+      "decorators": [],
+      "reference": "/architecture/exception-handling/policies-and-reference#catch-service"
+    },
+    {
+      "source": "orionis/failure/catch.py",
+      "symbol": "Catch.exception",
+      "kind": "method",
+      "line": 35,
+      "signature": "async exception(self, exception: BaseException, request: Request | TransportAdapter | None=None) -> Response | None",
+      "decorators": [],
+      "reference": "/architecture/exception-handling/policies-and-reference#catch-service"
+    },
+    {
+      "source": "orionis/failure/contracts/catch.py",
+      "symbol": "ICatch",
+      "kind": "class",
+      "line": 10,
+      "signature": "class ICatch(ABC)",
+      "reference": "/architecture/exception-handling/policies-and-reference#catch-service"
+    },
+    {
+      "source": "orionis/failure/contracts/catch.py",
+      "symbol": "ICatch.exception",
+      "kind": "method",
+      "line": 13,
+      "signature": "async exception(self, exception: BaseException, request: Request | TransportAdapter | None=None) -> Response | None",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "reference": "/architecture/exception-handling/policies-and-reference#catch-service"
+    },
+    {
+      "source": "orionis/failure/contracts/handler.py",
+      "symbol": "IBaseExceptionHandler",
+      "kind": "class",
+      "line": 13,
+      "signature": "class IBaseExceptionHandler(ABC)",
+      "reference": "/architecture/exception-handling/handling-exceptions#handler-contract"
+    },
+    {
+      "source": "orionis/failure/contracts/handler.py",
+      "symbol": "IBaseExceptionHandler.toThrowable",
+      "kind": "method",
+      "line": 16,
+      "signature": "toThrowable(self, exception: BaseException) -> Throwable",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "reference": "/architecture/exception-handling/handling-exceptions#handler-throwable"
+    },
+    {
+      "source": "orionis/failure/contracts/handler.py",
+      "symbol": "IBaseExceptionHandler.isExceptionIgnored",
+      "kind": "method",
+      "line": 36,
+      "signature": "isExceptionIgnored(self, exception: BaseException) -> bool",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "reference": "/architecture/exception-handling/handling-exceptions#handler-ignore"
+    },
+    {
+      "source": "orionis/failure/contracts/handler.py",
+      "symbol": "IBaseExceptionHandler.report",
+      "kind": "method",
+      "line": 55,
+      "signature": "async report(self, exception: BaseException, log: ILogger) -> Throwable | None",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "reference": "/architecture/exception-handling/handling-exceptions#handler-reporting"
+    },
+    {
+      "source": "orionis/failure/contracts/handler.py",
+      "symbol": "IBaseExceptionHandler.handleCLI",
+      "kind": "method",
+      "line": 77,
+      "signature": "async handleCLI(self, exception: BaseException, console: IConsole) -> None",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "reference": "/architecture/exception-handling/handling-exceptions#handler-cli"
+    },
+    {
+      "source": "orionis/failure/contracts/handler.py",
+      "symbol": "IBaseExceptionHandler.handleHTTP",
+      "kind": "method",
+      "line": 99,
+      "signature": "async handleHTTP(self, exception: BaseException, request: Request | TransportAdapter) -> Response | None",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "reference": "/architecture/exception-handling/handling-exceptions#handler-domain-policy"
+    },
+    {
+      "source": "orionis/failure/entities/throwable.py",
+      "symbol": "Throwable",
+      "kind": "class",
+      "line": 9,
+      "signature": "class Throwable",
+      "reference": "/architecture/exception-handling/policies-and-reference#failure-throwable"
+    },
+    {
+      "source": "orionis/failure/entities/throwable.py",
+      "symbol": "Throwable.classtype",
+      "kind": "field",
+      "line": 32,
+      "signature": "classtype: type",
+      "reference": "/architecture/exception-handling/policies-and-reference#failure-throwable"
+    },
+    {
+      "source": "orionis/failure/entities/throwable.py",
+      "symbol": "Throwable.message",
+      "kind": "field",
+      "line": 35,
+      "signature": "message: str",
+      "reference": "/architecture/exception-handling/policies-and-reference#failure-throwable"
+    },
+    {
+      "source": "orionis/failure/entities/throwable.py",
+      "symbol": "Throwable.args",
+      "kind": "field",
+      "line": 38,
+      "signature": "args: tuple",
+      "reference": "/architecture/exception-handling/policies-and-reference#failure-throwable"
+    },
+    {
+      "source": "orionis/failure/entities/throwable.py",
+      "symbol": "Throwable.traceback",
+      "kind": "field",
+      "line": 41,
+      "signature": "traceback: TracebackType | None = None",
+      "reference": "/architecture/exception-handling/policies-and-reference#failure-throwable"
+    },
+    {
+      "source": "orionis/failure/enums/kernel_type.py",
+      "symbol": "KernelContext",
+      "kind": "class",
+      "line": 3,
+      "signature": "class KernelContext(Enum)",
+      "reference": "/architecture/exception-handling/policies-and-reference#catch-context"
+    },
+    {
+      "source": "orionis/failure/enums/kernel_type.py",
+      "symbol": "KernelContext.CONSOLE",
+      "kind": "enum-member",
+      "line": 21,
+      "signature": "CONSOLE = auto()",
+      "reference": "/architecture/exception-handling/policies-and-reference#catch-context"
+    },
+    {
+      "source": "orionis/failure/enums/kernel_type.py",
+      "symbol": "KernelContext.HTTP",
+      "kind": "enum-member",
+      "line": 24,
+      "signature": "HTTP = auto()",
+      "reference": "/architecture/exception-handling/policies-and-reference#catch-context"
+    },
+    {
+      "source": "orionis/failure/provider.py",
+      "symbol": "CatchProvider",
+      "kind": "class",
+      "line": 7,
+      "signature": "class CatchProvider(ServiceProvider)",
+      "reference": "/architecture/exception-handling/policies-and-reference#catch-provider"
+    },
+    {
+      "source": "orionis/failure/provider.py",
+      "symbol": "CatchProvider.register",
+      "kind": "method",
+      "line": 9,
+      "signature": "register(self) -> None",
+      "decorators": [],
+      "reference": "/architecture/exception-handling/policies-and-reference#catch-provider"
+    },
+    {
+      "source": "orionis/failure/provider.py",
+      "symbol": "CatchProvider.boot",
+      "kind": "method",
+      "line": 32,
+      "signature": "async boot(self) -> None",
+      "decorators": [],
+      "reference": "/architecture/exception-handling/policies-and-reference#catch-provider"
+    },
+    {
+      "source": "orionis/foundation/application.py",
+      "symbol": "Application.withExceptionHandler",
+      "kind": "method",
+      "line": 2074,
+      "signature": "withExceptionHandler(self, handler: type[IBaseExceptionHandler]) -> Self",
+      "decorators": [],
+      "reference": "/architecture/exception-handling#exception-bootstrap"
+    },
+    {
+      "source": "orionis/foundation/application.py",
+      "symbol": "Application.getExceptionHandler",
+      "kind": "method",
+      "line": 2132,
+      "signature": "async getExceptionHandler(self) -> IBaseExceptionHandler",
+      "decorators": [],
+      "reference": "/architecture/exception-handling#exception-dependencies"
+    },
+    {
+      "source": "orionis/foundation/contracts/application.py",
+      "symbol": "IApplication.withExceptionHandler",
+      "kind": "method",
+      "line": 334,
+      "signature": "withExceptionHandler(self, handler: type[IBaseExceptionHandler]) -> Self",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "reference": "/architecture/exception-handling#exception-bootstrap"
+    },
+    {
+      "source": "orionis/foundation/contracts/application.py",
+      "symbol": "IApplication.getExceptionHandler",
+      "kind": "method",
+      "line": 365,
+      "signature": "async getExceptionHandler(self) -> IBaseExceptionHandler",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "reference": "/architecture/exception-handling#exception-dependencies"
+    },
+    {
+      "source": "orionis/foundation/core_exception_handler.py",
+      "symbol": "get_core_exception_handler_mapping",
+      "kind": "function",
+      "line": 3,
+      "signature": "get_core_exception_handler_mapping() -> MappingProxyType",
+      "decorators": [],
+      "reference": "/architecture/exception-handling#exception-bootstrap"
+    },
+    {
+      "source": "orionis/foundation/core_exception_handler.py",
+      "symbol": "CORE_EXCEPTION_HANDLER",
+      "kind": "constant",
+      "line": 17,
+      "signature": "CORE_EXCEPTION_HANDLER: MappingProxyType = get_core_exception_handler_mapping()",
+      "reference": "/architecture/exception-handling#exception-bootstrap"
+    },
+    {
+      "source": "orionis/support/facades/catch.py",
+      "symbol": "Catch",
+      "kind": "class",
+      "line": 3,
+      "signature": "class Catch(Facade)",
+      "reference": "/architecture/exception-handling/policies-and-reference#catch-facade"
+    },
+    {
+      "source": "orionis/support/facades/catch.py",
+      "symbol": "Catch.getFacadeAccessor",
+      "kind": "method",
+      "line": 6,
+      "signature": "getFacadeAccessor(cls) -> str",
+      "decorators": [
+        "classmethod"
+      ],
+      "reference": "/architecture/exception-handling/policies-and-reference#catch-facade"
+    }
+  ]
+}

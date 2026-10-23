@@ -42,6 +42,8 @@ Un `except Exception: pass` elimina esa propagación sin producir una recuperaci
 
 `Catch` reporta primero y después invoca la presentación correspondiente. La [guía de personalización](/es/architecture/exception-handling/handling-exceptions) muestra cómo cambiar una de esas responsabilidades conservando la otra.
 
+<a id="exception-registration"></a>
+
 ## Registrar el handler de aplicación
 
 ### Dónde vive la clase
@@ -62,6 +64,8 @@ class ExceptionHandler(BaseExceptionHandler):
 
 El proyecto también puede mostrar sobrescrituras delegadoras de `report()`, `handleCLI()` y `handleHTTP()`. Si sólo llaman a `super()`, mantienen el mismo comportamiento. Consulta los [ejemplos completos del handler](/es/architecture/exception-handling/handling-exceptions).
 
+<a id="exception-bootstrap"></a>
+
 ### Registro desde bootstrap/app.py
 
 Registra la clase **después de crear la instancia Application y antes de `app.create()`**, que arranca la aplicación. En el bootstrap existente:
@@ -77,7 +81,7 @@ Conserva las demás configuraciones de tu bootstrap y su llamada final a `app.cr
 
 | Aspecto | Comportamiento real |
 | --- | --- |
-| Método | `app.withExceptionHandler(handler)`, síncrono. |
+| Método | `app.withExceptionHandler(handler: type[IBaseExceptionHandler]) -> Self`, síncrono. |
 | Argumento | Una clase, no una instancia, función ni nombre de texto. |
 | Contrato | La clase debe heredar de `IBaseExceptionHandler`. Extender `BaseExceptionHandler` es la opción práctica para reutilizar sus métodos. |
 | Retorno | La misma aplicación; permite encadenar configuración. |
@@ -89,6 +93,8 @@ La clase debe ser importable desde su módulo. El registro no instancia el handl
 
 `IBaseExceptionHandler` se importa desde `orionis.failure.contracts.handler`. El método comprueba ese contrato; no exige que todas las implementaciones personalizadas hereden necesariamente de la clase base concreta.
 
+<a id="exception-dependencies"></a>
+
 ### Por qué se registra una clase
 
 El contenedor construye el handler y resuelve las dependencias anotadas de su constructor y métodos. Por ejemplo, el constructor base recibe `DefaultResponses` e `IApplication`; `report()` recibe `ILogger` y `handleCLI()` recibe `Console`.
@@ -96,6 +102,10 @@ El contenedor construye el handler y resuelve las dependencias anotadas de su co
 Esto permite usar los servicios configurados de la aplicación sin crearlos dentro del handler. Cuando personalices un método, conserva la firma y las anotaciones que necesita su inyección.
 
 El servicio `Catch` reutiliza el handler resuelto. Guarda el estado de cada fallo en variables locales: atributos como `self.current_request` o `self.current_exception` compartirían información mutable entre ejecuciones concurrentes.
+
+`await app.getExceptionHandler() -> IBaseExceptionHandler` exige una aplicación creada. Conserva la clase importada y construye una instancia nueva mediante `build()` en cada llamada. `Catch`, en cambio, retiene la primera instancia que obtiene y coordina esa resolución con un lock asíncrono. Son alcances distintos; no utilices el handler compartido como almacenamiento de la petición.
+
+<a id="exception-flow"></a>
 
 ## Recorrido completo de failure
 
@@ -116,6 +126,19 @@ Cuando una excepción llega al servicio:
 5. Si es `KernelContext.HTTP`, invoca `handleHTTP()`, pasando la petición o el adaptador.
 6. Para otro valor de contexto, termina después del reporte.
 
+```mermaid
+flowchart TD
+    accTitle: Delegación de una excepción al handler de aplicación
+    A[Componente captura el fallo y llama a Catch] --> B[Resolver y conservar el handler]
+    B --> C{¿Hay scope y contexto kernel?}
+    C -->|No| D[RuntimeError: falta contexto]
+    C -->|Sí| E[Invocar report mediante DI]
+    E --> F{Contexto}
+    F -->|HTTP| G[handleHTTP: Response o None]
+    F -->|CONSOLE| H[handleCLI: salida de consola]
+    F -->|Otro valor| I[Terminar después del reporte]
+```
+
 `report()` termina antes de presentar el error. Su valor de retorno no decide por sí solo si se debe renderizar: retornar `None` no cancela la llamada posterior a `handleHTTP()` o `handleCLI()`. Una excepción durante el reporte, en cambio, interrumpe ese recorrido.
 
 No hay métodos `shouldReport()`, `shouldRender()` ni un `render()` genérico en este contrato. Las extensiones utilizan los métodos reales descritos a continuación.
@@ -134,6 +157,8 @@ No hay métodos `shouldReport()`, `shouldRender()` ni un `render()` genérico en
 
 La [referencia del módulo](/es/architecture/exception-handling/policies-and-reference) describe sus firmas, imports, valores de retorno y condiciones de uso.
 
+<a id="exception-default-handler"></a>
+
 ## Los cinco métodos del handler
 
 | Método | Tipo | Propósito |
@@ -144,9 +169,11 @@ La [referencia del módulo](/es/architecture/exception-handling/policies-and-ref
 | `handleCLI(exception, console)` | Asíncrono | Presentarlo en consola. |
 | `handleHTTP(exception, request)` | Asíncrono | Construir una respuesta HTTP o devolver `None` conforme al contrato. |
 
-El tratamiento base registra `[ClassName] message` con `log.error()`. Su conversión a Throwable toma como mensaje el primer argumento de la excepción convertido a texto y conserva los demás argumentos, también como texto, junto al traceback nativo.
+El tratamiento base utiliza `log.getLogger().error(...)` con `exc_info=(type(exception), exception, throwable.traceback)`. Registra `[ClassName] message` junto al traceback, incluidas las causas encadenadas y notas de Python, también cuando se reporta fuera del bloque `except` original.
 
-Eso no implica que el log base incluya todo el traceback o todas las variables de una operación. Si necesitas otro formato de reporte, personaliza `report()` y selecciona explícitamente la información.
+La conversión a `Throwable` toma el primer argumento como mensaje y convierte todos los argumentos a cadenas; una excepción sin argumentos utiliza `("",)`. No se recopilan automáticamente todas las variables de una operación. Para cambiar el formato o seleccionar qué errores registrar, personaliza `report()` sin confundirlo con la respuesta pública.
+
+Sin una personalización, `handleCLI()` presenta el fallo con `Console.exception()`. `handleHTTP()` conserva los estados de las excepciones HTTP conocidas; para otras devuelve un `500` genérico con debug desactivado y el diagnóstico HTML detallado con debug activado. La selección JSON/HTML y los casos resueltos directamente por el kernel se explican en [Excepciones HTTP](/es/http/exceptions). Un handler no decide por sí solo el código de salida de Reactor ni el formato de error de un protocolo.
 
 ### Throwable no es una respuesta
 
@@ -166,6 +193,8 @@ La estrategia habitual es extender `BaseExceptionHandler` y sobrescribir la deci
 
 Para los casos que no especialices, delega con `super()`. Los ejemplos de [reporte, dominio y presentación](/es/architecture/exception-handling/handling-exceptions) muestran estas alternativas sin reemplazar toda la política nativa.
 
+<a id="exception-runtime-boundaries"></a>
+
 ## Qué significa que el handler sea global
 
 El registro es compartido por la aplicación, pero **no instala un capturador universal de Python**. No reemplaza `sys.excepthook` ni convierte cualquier excepción de un hilo, tarea independiente o integración en una respuesta HTTP.
@@ -182,7 +211,7 @@ La coordinación depende del componente que captura y entrega el fallo:
 | Workers de colas | Administran logging, reintentos y registros de fallos mediante su flujo de worker. |
 | Background de una respuesta | Se ejecuta después de la entrega; un error allí no puede sustituir el estado HTTP ya enviado. |
 
-La [matriz detallada por contexto](/es/architecture/exception-handling/policies-and-reference#alcance-real-por-punto-de-entrada) distingue estos casos. El estado HTTP no define cómo fallará una herramienta MCP o una operación en cola.
+La [matriz detallada por contexto](/es/architecture/exception-handling/contexts-and-transports) distingue estos casos. El estado HTTP no define cómo fallará una herramienta MCP o una operación en cola.
 
 Los límites de captura también importan: que el contrato acepte `BaseException` no significa que los kernels capturen siempre `KeyboardInterrupt`, `SystemExit` o cancelaciones. Conserva las señales de finalización del runtime en lugar de tratarlas indiscriminadamente como errores de negocio.
 
@@ -193,6 +222,8 @@ Los límites de captura también importan: que el contrato acepte `BaseException
 En HTTP, ignorar un error que no tiene otra respuesta puede dejar el flujo sin un Response válido. Para conservar una respuesta pública y omitir sólo su log, especializa `report()`; para resolverlo, define `handleHTTP()` o una recuperación local. Las [políticas de ignorados](/es/architecture/exception-handling/policies-and-reference) explican las diferencias.
 
 La comprobación de ignorados utiliza el tipo exacto. El mapeo de estados HTTP, por su parte, recorre la jerarquía de clases y reconoce subclases. Son decisiones diferentes.
+
+<a id="exception-bootstrap-cache"></a>
 
 ## Configuración compilada y procesos activos
 
@@ -214,6 +245,8 @@ python -B reactor optimize:clear
 
 Este comando elimina cachés compiladas de configuración, rutas y comandos, además de bytecode y artefactos de build. Aplícalo como parte de la actualización de esos artefactos; no configura el handler por sí mismo.
 
+<a id="exception-debug"></a>
+
 ## Debug y mensajes públicos
 
 La política HTTP base usa `app.debug` para los errores que no reconoce. En producción, configura `APP_DEBUG=bool:false` para obtener el mensaje público genérico y conservar el reporte interno.
@@ -224,6 +257,9 @@ La [página de excepciones HTTP](/es/http/exceptions) explica qué contiene el d
 
 ## Continuar con la implementación
 
-1. [Reportar y gestionar excepciones](/es/architecture/exception-handling/handling-exceptions): clase de aplicación, errores de dominio, logging, CLI, inyección y Catch manual.
-2. [Políticas de errores y referencia](/es/architecture/exception-handling/policies-and-reference): contratos completos, Throwable, ignorados, contextos, concurrencia y verificación.
-3. [Excepciones HTTP](/es/http/exceptions): diagnóstico, respuestas públicas y límites de una petición.
+El [inventario verificable de Exceptions](/downloads/exceptions-api-inventory.json) relaciona las declaraciones de `failure`, el handler del proyecto y su registro en la aplicación con sus guías. Las integraciones de cada transporte se revisan por separado; no se presentan como una captura universal del proceso.
+
+1. [Reportar y gestionar excepciones](/es/architecture/exception-handling/handling-exceptions): clase de aplicación, errores de dominio, logging, CLI e inyección de servicios.
+2. [Contextos y transportes](/es/architecture/exception-handling/contexts-and-transports): captura y respuesta real en HTTP, CLI, WebSocket, Realtime, MCP, colas y tareas.
+3. [Políticas de errores y referencia](/es/architecture/exception-handling/policies-and-reference): contratos completos, Throwable, ignorados, contextos, concurrencia y verificación.
+4. [Excepciones HTTP](/es/http/exceptions): diagnóstico, respuestas públicas y límites de una petición.

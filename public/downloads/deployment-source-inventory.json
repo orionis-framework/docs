@@ -1,0 +1,164 @@
+{
+  "scope": "Deployment integration, not a public API inventory of the entire framework",
+  "frameworkRevision": "3342f87f6813af8adb112c7acef6132d0a5cb7f0",
+  "areas": [
+    {
+      "area": "application-entrypoints-and-bootstrap",
+      "reference": "/getting-started/deployment-and-reference",
+      "sources": [
+        "bootstrap/app.py",
+        "orionis/foundation/application.py"
+      ]
+    },
+    {
+      "area": "python-and-server-dependencies",
+      "reference": "/getting-started/deployment-and-reference",
+      "sources": [
+        "pyproject.toml",
+        ".python-version"
+      ]
+    },
+    {
+      "area": "native-serve-command",
+      "reference": "/getting-started/deployment-and-reference",
+      "sources": [
+        "orionis/console/commands/serve/serve.py"
+      ]
+    },
+    {
+      "area": "environment-and-key",
+      "reference": "/getting-started/deployment-and-reference",
+      "sources": [
+        "config/app.py",
+        "orionis/environment/core/dot_env.py",
+        "orionis/environment/dynamic/caster.py",
+        "orionis/console/commands/support/key_generate.py"
+      ]
+    },
+    {
+      "area": "bootstrap-cache-invalidation",
+      "reference": "/getting-started/deployment-and-reference",
+      "sources": [
+        "orionis/console/commands/support/optimize_clear.py"
+      ]
+    },
+    {
+      "area": "public-disk",
+      "reference": "/getting-started/deployment-and-reference",
+      "sources": [
+        "config/filesystems.py"
+      ]
+    },
+    {
+      "area": "maintenance",
+      "reference": "/getting-started/deployment-and-reference",
+      "sources": [
+        "orionis/console/commands/support/maintenance.py",
+        "orionis/console/commands/support/down.py",
+        "orionis/console/commands/support/up.py"
+      ]
+    },
+    {
+      "area": "migration-cli",
+      "reference": "/getting-started/deployment-and-reference",
+      "sources": [
+        "orionis/console/commands/migrate/base.py",
+        "orionis/console/commands/migrate/migrate.py",
+        "orionis/console/commands/migrate/status.py"
+      ]
+    },
+    {
+      "area": "session-persistence",
+      "reference": "/getting-started/deployment-and-reference",
+      "sources": [
+        "config/session.py"
+      ]
+    },
+    {
+      "area": "trusted-proxies",
+      "reference": "/getting-started/deployment/reverse-proxies",
+      "sources": [
+        "orionis/http/layer/shared/proxies.py",
+        "orionis/foundation/config/http/entitites/proxies.py",
+        "config/http.py"
+      ]
+    },
+    {
+      "area": "request-client-and-url",
+      "reference": "/getting-started/deployment/reverse-proxies",
+      "sources": [
+        "orionis/http/request.py"
+      ]
+    },
+    {
+      "area": "http-security-and-payload-limits",
+      "reference": "/getting-started/deployment/reverse-proxies",
+      "sources": [
+        "orionis/http/kernel.py",
+        "orionis/foundation/config/http/entitites/body.py",
+        "orionis/foundation/config/http/entitites/security.py"
+      ]
+    },
+    {
+      "area": "websocket-origins",
+      "reference": "/getting-started/deployment/reverse-proxies",
+      "sources": [
+        "orionis/foundation/config/http/entitites/websocket.py"
+      ]
+    },
+    {
+      "area": "health-and-default-responses",
+      "reference": "/http/default-responses",
+      "sources": [
+        "orionis/http/default/responses.py",
+        "orionis/http/routes/router.py"
+      ]
+    },
+    {
+      "area": "native-serve-tests",
+      "reference": "/getting-started/deployment-and-reference",
+      "sources": [
+        "tests/console/commands/serve/test_serve_command.py"
+      ]
+    },
+    {
+      "area": "native-proxy-tests",
+      "reference": "/getting-started/deployment/reverse-proxies",
+      "sources": [
+        "tests/http/layer/shared/test_proxies.py"
+      ]
+    }
+  ],
+  "hashes": {
+    "bootstrap/app.py": "9ebcd6ae03c6c90be8a2a456db3c6ffd1df1b8a5d4139d647dbbed60aece9daf",
+    "orionis/foundation/application.py": "b1c27ec023a3d4ad5087f34d4c7616b678b2f098cda5192e00c55212cee5dfb9",
+    "pyproject.toml": "f75ddffad374d129b214763ab0ca263a789ba475307d58a50675117018d18df6",
+    ".python-version": "a876e0b10411037a012498b9fe18d9bc1df32ed8b722a13564dc944ddcfd9135",
+    "orionis/console/commands/serve/serve.py": "b37c6e97f5d44fbf688e0f23ff41ce5dc9e82c461348b7cdb589904e33d81d73",
+    "config/app.py": "c01401ddab256c488404efda8b12a8846f933dce5b9da3a734b2e1c285d7ab38",
+    "orionis/environment/core/dot_env.py": "245ad9310295370a9b285e5ea315e26369ece9fdc390b443a6544d770c48e5c0",
+    "orionis/environment/dynamic/caster.py": "b36d1dcb57569107e78b521035175b1da2406cf0a42b5559e1d19bfbdbf463fd",
+    "orionis/console/commands/support/key_generate.py": "4a2366f40c6f2cdb4b0cfab918982e0ee45df4b81ace971611e3d8f9bb4f2482",
+    "orionis/console/commands/support/optimize_clear.py": "be94d7d9a3678fbd4537787152a51f6a5bac04b6ef67a4a7dd03bf3ea87b8199",
+    "config/filesystems.py": "6a0d879346cd3333c3b6cb9b75dbd40ef6555974d15a52ab0ea6c5a15ed47686",
+    "orionis/console/commands/support/maintenance.py": "a502688286ef7a100353350a5aff550ba4f5b2f4849c8448f8ab14ed55cd7d34",
+    "orionis/console/commands/support/down.py": "ac3a166828c216b8e835fa2bddc6339bb138bd9dca866feb951c5f7018e6fdac",
+    "orionis/console/commands/support/up.py": "de16ab8a75d04430157b71e33982ba9d4f148514183696e54948117595b46190",
+    "orionis/console/commands/migrate/base.py": "07063299222d6ef3877160417c543e02ceb92e3ede2118858daf1fd65fa99eb8",
+    "orionis/console/commands/migrate/migrate.py": "c3eb83f7c512e50d69cbebe790061c856968b140d618063c62d37d297a7d8e85",
+    "orionis/console/commands/migrate/status.py": "d8456728878ca0a7005cabcfc7060894619e82373dd09d9e1087c57346e6ef7d",
+    "config/session.py": "42129fd849ad481caacfd7c9dd77be67583532a296b92e119c982e81c64a7ebf",
+    "orionis/http/layer/shared/proxies.py": "5b075a18d92acc2a08c50ecbec95dc16d2366ff05aee29bd8a3492ec0cb2cf82",
+    "orionis/foundation/config/http/entitites/proxies.py": "380053dd11aae2dcc017b95bfe8a8de779d557520bc2b6c32dee0d2e54f73858",
+    "config/http.py": "1013fe4dceb4ff1e81b03ed2e5ccecf22daeb06b25d98e452a7d9ff90ebb11d9",
+    "orionis/http/request.py": "e986c245e7dae606855c96aa500e0d55a207a0551bf3cccb5d92807e9f2cc24a",
+    "orionis/http/kernel.py": "4298750a6ea64d8f1b46abfdc16685d9a2ee3b09b93e4f7d11d53d86b1faff24",
+    "orionis/foundation/config/http/entitites/body.py": "bcc30b8c070cd80dd981659611553ae9242ed5b4203f8736a75621c88dc38785",
+    "orionis/foundation/config/http/entitites/security.py": "7dc9973311d0ce39c8b9696dd9eb8596cadc05f06409ebfe97db58d97e727741",
+    "orionis/foundation/config/http/entitites/websocket.py": "f9737a16c4d551c7a496ba7e1048b52465e1d1dcb3fed8c0124d911db073ed53",
+    "orionis/http/default/responses.py": "a29923558d28755d856df2cf8de942324101d45c4c0ec7900abc0fbac4b23f52",
+    "orionis/http/routes/router.py": "9060c3c3c0401ca9dee39e70a766a59b1d59b51a2a8204db731e20632cd91b6e",
+    "tests/console/commands/serve/test_serve_command.py": "f2106c738613f40afcc4ab5c37750b99c70eddfc0f6554601d1a021ebf27dbdb",
+    "tests/http/layer/shared/test_proxies.py": "a064559b35c46ca3130c3bef30b274b51ddaa2a6a138812c9c891071e851906a"
+  }
+}

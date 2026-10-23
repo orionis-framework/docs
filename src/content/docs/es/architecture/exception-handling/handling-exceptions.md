@@ -11,6 +11,8 @@ El handler de aplicación reúne esa política. No sustituye la validación de d
 
 Esta guía desarrolla la personalización del handler. Para la página que aparece durante una petición y las diferencias entre desarrollo y producción, consulta [Excepciones HTTP](/es/http/exceptions). El [índice general](/es/architecture/exception-handling) explica el registro y la arquitectura del módulo.
 
+<a id="handler-application"></a>
+
 ## Partir del handler de la aplicación
 
 El proyecto utiliza `app/exceptions/handler.py`. Heredar de `BaseExceptionHandler` permite modificar una parte de la política y delegar las demás mediante `super()`:
@@ -67,6 +69,76 @@ La variable `app` es la instancia ya creada en ese archivo. Se registra una **cl
 
 No hace falta sobrescribir todos los métodos: puedes conservar únicamente el método que cambies. Si defines tu propio constructor, conserva las dependencias que requiere la clase base y llama a `super().__init__(...)`.
 
+<a id="handler-contract"></a>
+
+### Contrato y puntos de extensión
+
+Estas son las firmas de `BaseExceptionHandler`. El contrato `IBaseExceptionHandler` declara los mismos cinco métodos; en `handleCLI()` anota el servicio de salida como `IConsole`, mientras que la implementación recibe `Console`.
+
+```python
+def __init__(
+    self,
+    default_responses: DefaultResponses,
+    application: IApplication,
+) -> None: ...
+
+def toThrowable(self, exception: BaseException) -> Throwable: ...
+
+def isExceptionIgnored(self, exception: BaseException) -> bool: ...
+
+async def report(
+    self, exception: BaseException, log: ILogger,
+) -> Throwable | None: ...
+
+async def handleCLI(
+    self, exception: BaseException, console: Console,
+) -> None: ...
+
+async def handleHTTP(
+    self, exception: BaseException, request: Request | TransportAdapter,
+) -> Response | None: ...
+```
+
+Este bloque es una referencia de firmas, no otro handler para copiar. Ninguno de estos parámetros tiene valor predeterminado. Sobrescribe `report()` para cambiar el registro, los métodos `handle...()` para cambiar la presentación y los dos auxiliares para modificar la conversión o la política de exclusión.
+
+<a id="handler-injection"></a>
+
+### Inyectar dependencias en el constructor y los métodos
+
+La aplicación construye el handler mediante `await app.build(...)`: puede resolver dependencias anotadas en su constructor. Por ejemplo, define un servicio concreto en `app/services/failure_messages.py`:
+
+```python
+class FailureMessages:
+    def orderConflict(self) -> str:
+        return "The order has already been processed."
+```
+
+Esta variante de `app/exceptions/handler.py` recibe ese servicio junto con las dependencias de la clase base:
+
+```python
+from app.services.failure_messages import FailureMessages
+from orionis.failure.base import BaseExceptionHandler
+from orionis.foundation.contracts.application import IApplication
+from orionis.http.default.responses import DefaultResponses
+
+
+class ExceptionHandler(BaseExceptionHandler):
+    def __init__(
+        self,
+        default_responses: DefaultResponses,
+        application: IApplication,
+        messages: FailureMessages,
+    ) -> None:
+        super().__init__(default_responses, application)
+        self.messages = messages
+```
+
+`FailureMessages` es una clase concreta sin dependencias y se puede construir automáticamente. Para una interfaz o una implementación con configuración propia, registra el servicio en un [proveedor](/es/architecture/service-container/providers-and-facades). No añadas argumentos obligatorios sin tipo esperando que el contenedor adivine su valor.
+
+Los métodos también admiten dependencias adicionales anotadas: por ejemplo, puedes añadir `messages: FailureMessages` a `handleCLI()` y usar `messages.orderConflict()`. `Catch` invoca los métodos mediante `app.call()`, por lo que la inyección ocurre en cada llamada. Una invocación directa como `await handler.handleCLI(error, console)` no inyecta argumentos adicionales: debes proporcionarlos tú.
+
+<a id="handler-dispatch"></a>
+
 ## Separar reporte y presentación
 
 Cuando `Catch.exception()` recibe una excepción en un scope válido, ejecuta:
@@ -77,9 +149,13 @@ Cuando `Catch.exception()` recibe una excepción en un scope válido, ejecuta:
 
 El resultado de `report()` no controla el segundo paso. Retornar `None` desde ese método **no impide** que se llame a `handleHTTP()` o `handleCLI()`.
 
-La implementación predeterminada registra un mensaje de nivel error con el formato `[ExceptionClass] message`. El logging y la presentación son operaciones distintas: un log no es la respuesta del cliente, y generar una respuesta no garantiza por sí mismo que se haya registrado el fallo.
+La implementación predeterminada obtiene el logger estándar con `log.getLogger()` y escribe un único registro de nivel error con el formato `[ExceptionClass] message`. Entrega además `exc_info=(type(exception), exception, throwable.traceback)`: conserva el traceback original, las excepciones encadenadas y las notas incluso fuera del bloque `except` que recibió el error. El formato final y la conservación del archivo corresponden a [Logs](/es/services/logging).
+
+El logging y la presentación son operaciones distintas: un log no es la respuesta del cliente, y generar una respuesta no garantiza por sí mismo que se haya registrado el fallo. Las anotaciones de retorno describen el contrato; `Catch` no verifica que tu sobrescritura haya devuelto realmente un `Throwable` o un `Response`.
 
 El contenedor invoca estos métodos mediante `app.call(...)`. Proporciona `exception` y, en HTTP, `request` explícitamente; las anotaciones de `ILogger` y `Console` permiten resolver los demás argumentos. Usa esas firmas en tus sobrescrituras y pasa las dependencias explícitamente cuando llames a `super()`.
+
+<a id="handler-domain-policy"></a>
 
 ## Convertir un conflicto de dominio en una respuesta
 
@@ -147,6 +223,8 @@ Route.post("/orders/{order_id:int}/confirm", [OrderController, "confirm"])
 
 En este ejemplo didáctico, `POST /orders/42/confirm` devuelve 409 y `{"message": "Order already processed"}`. Para otros identificadores devuelve 200. El handler heredado todavía reporta el conflicto antes de construir el JSON.
 
+<a id="handler-reporting"></a>
+
 ## Cambiar el reporte conservando la respuesta
 
 Para tratar un conflicto esperado como advertencia, sobrescribe `report()`. Esta variante sustituye el reporte del caso conocido y delega el resto:
@@ -181,7 +259,22 @@ También puedes omitir únicamente el log de una excepción esperada: retorna `N
 
 `ILogger.error(message)` y `ILogger.warning(message)` son métodos síncronos; no llevan `await` ni aceptan un diccionario de contexto como segundo argumento. El destino y el nivel efectivo dependen de la [configuración de logging](/es/services/logging), no de `app.debug`.
 
+El ejemplo de advertencia anterior escribe solo un mensaje. Si necesitas conservar el traceback también en esa rama, utiliza el logger estándar que expone el servicio:
+
+```python
+log.getLogger().warning(
+    "[%s] %s",
+    throwable.classtype.__name__,
+    throwable.message,
+    exc_info=(type(exception), exception, throwable.traceback),
+)
+```
+
+Sustituye la llamada `log.warning(...)` dentro de la rama que ya define `throwable`; el resto de `report()` permanece igual. El mismo logger se puede obtener con `Log.getLogger()` importando la fachada desde `orionis.support.facades`. No cambies el canal compartido para una sola excepción: eso altera el logger utilizado por otras operaciones.
+
 Si `report()` lanza otra excepción, `Catch` no alcanza la presentación. Cuando agregues un servicio externo de observabilidad, define qué hacer si ese servicio falla; no permitas que sustituya involuntariamente el error original.
+
+<a id="handler-cli"></a>
 
 ## Personalizar la salida de consola
 
@@ -189,6 +282,7 @@ El mismo error de dominio puede tener una representación breve en consola:
 
 ```python
 from app.exceptions.order_conflict import OrderConflict
+from app.services.failure_messages import FailureMessages
 from orionis.console import Console
 from orionis.failure.base import BaseExceptionHandler
 
@@ -198,12 +292,13 @@ class ExceptionHandler(BaseExceptionHandler):
         self,
         exception: BaseException,
         console: Console,
+        messages: FailureMessages,
     ) -> None:
         if self.isExceptionIgnored(exception):
             return
 
         if isinstance(exception, OrderConflict):
-            console.warning("The order has already been processed.")
+            console.warning(messages.orderConflict())
             return
 
         await super().handleCLI(exception, console)
@@ -228,7 +323,53 @@ class CheckOrderCommand(BaseCommand):
 
 `orionis orders:check` y `python -B reactor orders:check` ejecutan ese comando. Reactor registra que la ejecución falló, llama al servicio `Catch` y devuelve código 1. El reporte general del handler puede producir otra entrada además del mensaje propio de Reactor.
 
-La implementación base de `handleCLI()` utiliza `Console.exception()` para mostrar tipo, mensaje y contexto de traceback con Rich; no muestra variables locales. Los errores controlados por tu rama personalizada pueden tener una presentación distinta.
+La implementación base de `handleCLI()` utiliza `Console.exception()` para mostrar tipo, mensaje y contexto del traceback; configura un máximo de un frame, una línea adicional de código y no muestra variables locales. Los errores controlados por tu rama personalizada pueden tener una presentación distinta.
+
+Aunque el contrato del handler acepta `BaseException`, `Console.exception()` exige una instancia de `Exception`. Una llamada manual con `SystemExit`, `KeyboardInterrupt` u otra subclase directa de `BaseException` no obtiene por ello una presentación CLI válida: puede producir `TypeError`. La captura del flujo habitual de comandos usa `except Exception`.
+
+<a id="handler-ignore"></a>
+
+## Excluir un tipo o una familia de excepciones
+
+`dont_catch` es un atributo de clase cuyo valor inicial es `frozenset()`. La implementación de `isExceptionIgnored()` valida que recibió una instancia de `BaseException` y consulta **la clase exacta**:
+
+```python
+from typing import ClassVar
+
+from app.exceptions.order_conflict import OrderConflict
+from orionis.failure.base import BaseExceptionHandler
+
+
+class ExceptionHandler(BaseExceptionHandler):
+    dont_catch: ClassVar[frozenset[type[BaseException]]] = frozenset({
+        OrderConflict,
+    })
+```
+
+Con esta clase, los métodos heredados omiten tanto el reporte como la presentación de `OrderConflict`. `report()` y `handleHTTP()` devuelven `None`; `handleCLI()` termina sin imprimir. Una subclase de `OrderConflict` **no queda excluida** automáticamente.
+
+Esto no vuelve a lanzar la excepción ni modifica los bloques `except` del kernel. Tampoco garantiza una respuesta HTTP exitosa: el componente que llamó a `Catch` decide cómo trata el retorno `None`. Úsalo cuando conozcas el comportamiento de ese límite de ejecución; para omitir solo el log, personaliza únicamente `report()`.
+
+Si deliberadamente quieres excluir una familia completa, sobrescribe el auxiliar en lugar de depender de la pertenencia exacta:
+
+```python
+from app.exceptions.order_conflict import OrderConflict
+from orionis.failure.base import BaseExceptionHandler
+
+
+class ExceptionHandler(BaseExceptionHandler):
+    def isExceptionIgnored(self, exception: BaseException) -> bool:
+        return (
+            super().isExceptionIgnored(exception)
+            or isinstance(exception, OrderConflict)
+        )
+```
+
+Esta variante conserva la validación de entrada y las exclusiones exactas de la clase base, y añade las subclases de `OrderConflict`. Las ramas personalizadas de `report()` y `handle...()` deben llamar al auxiliar si quieres que respeten esa política: `Catch` no aplica un filtro externo antes de invocarlas.
+
+La búsqueda de estados HTTP nativos tiene una regla diferente: recorre el MRO y admite subclases de las excepciones reconocidas. Por eso heredar de una excepción nativa puede conservar su estado HTTP sin quedar excluido por un `dont_catch` que solo contiene la clase padre.
+
+<a id="handler-throwable"></a>
 
 ## Trabajar con Throwable
 
@@ -242,6 +383,24 @@ La implementación base de `handleCLI()` utiliza `Console.exception()` para most
 | `traceback` | Traceback nativo de Python, o `None` si no existe. |
 
 La dataclass es congelada, usa slots y requiere argumentos por nombre. `traceback` no es una cadena JSON ni se formatea automáticamente. `Throwable.message` puede diferir de `str(exception)` cuando la excepción tiene varios argumentos o personaliza su representación.
+
+```python
+from orionis.failure.base import BaseExceptionHandler
+from orionis.failure.entities import Throwable
+
+
+class ExceptionHandler(BaseExceptionHandler):
+    def toThrowable(self, exception: BaseException) -> Throwable:
+        original = super().toThrowable(exception)
+        return Throwable(
+            classtype=original.classtype,
+            message=f"Application failure: {original.message}",
+            args=original.args,
+            traceback=original.traceback,
+        )
+```
+
+Esta variante cambia el resumen que usa el reporte heredado; no cambia la excepción original ni la respuesta HTTP o CLI que se construye a partir de ella. Tampoco es un mecanismo de anonimización: el traceback y los argumentos originales pueden seguir conteniendo información interna.
 
 Puedes usar la conversión desde un servicio para preparar tu propio resumen:
 
@@ -268,6 +427,8 @@ class FailureSummaryService:
 
 Invoca este método mediante el contenedor, o pasa `app` explícitamente. Para `ValueError("invalid value", 7)`, el resumen contiene `message="invalid value"` y `arguments=["invalid value", "7"]`. Conserva esos datos para diagnósticos internos: convertirlos no elimina información sensible.
 
+<a id="handler-recovered-errors"></a>
+
 ## Reportar un error ya recuperado
 
 Cuando tu código ya resolvió un fallo y solo necesita notificarlo, llama únicamente a `report()` mediante el contenedor:
@@ -288,49 +449,17 @@ class FailureReporter:
 
 Esto requiere la aplicación iniciada y sus dependencias disponibles, pero no selecciona un renderer ni consulta el valor `kernel`. Resulta útil en un servicio con recuperación local. No vuelvas a reportar el mismo error si luego vas a propagarlo hacia otro componente que ya lo reporta.
 
-## Delegar manualmente en Catch
+<a id="handler-concurrency"></a>
 
-Normalmente basta con dejar que el error alcance el kernel. Si estás implementando un límite de ejecución propio dentro de una petición, puedes delegar una excepción al servicio mediante su contrato:
+## Mantener el handler seguro entre operaciones
 
-```python
-from orionis.failure.contracts import ICatch
-from orionis.http import Request, Response
+`await app.getExceptionHandler()` conserva la clase resuelta y construye una nueva instancia con cada llamada. En cambio, el servicio `Catch` es singleton y conserva el primer handler que obtiene; utiliza un lock para evitar construir varios durante su primera resolución concurrente.
 
+Por eso el handler utilizado por el flujo normal puede atender varias peticiones o comandos concurrentes. Mantén la excepción, la petición y los resultados de cada operación en variables locales. No asignes `self.request`, `self.exception` o un `Throwable` por operación a una instancia compartida. Las dependencias guardadas en el constructor también deben ser adecuadas para ese tiempo de vida; recibir una dependencia scoped en el constructor no vuelve scoped al handler retenido por `Catch`.
 
-class FailureBoundary:
-    async def respond(
-        self,
-        exception: Exception,
-        request: Request,
-        catch: ICatch,
-    ) -> Response:
-        response = await catch.exception(exception, request)
-        if response is None:
-            raise exception
-        return response
-```
+Usa inyección en los métodos para dependencias que deben resolverse en el scope de la llamada actual. Pasar directamente `exception` y `request` evita conservar datos de otra petición. No hay un reinicio automático de los atributos personalizados entre errores.
 
-Orionis inyecta `ICatch` cuando invoca `respond()` mediante el contenedor. `exception` y `request` deben ser los del fallo actual. El retorno `None` no es una respuesta HTTP válida; la rama del ejemplo vuelve a propagar el error en ese caso.
-
-La fachada ofrece el mismo servicio en una aplicación iniciada:
-
-```python
-from orionis.http import Request, Response
-from orionis.support.facades import Catch
-
-
-async def present_failure(
-    exception: Exception,
-    request: Request,
-) -> Response | None:
-    return await Catch.exception(exception, request)
-```
-
-Importa la fachada desde `orionis.support.facades`. El símbolo `Catch` de `orionis.failure` es la implementación concreta y requiere la aplicación en su constructor.
-
-Ambas variantes de `exception()` requieren un scope activo con contexto `kernel`. En HTTP, proporciona siempre un `Request` o `TransportAdapter` utilizable. La fachada no crea por sí sola ese contexto ni instala un capturador global de Python.
-
-El servicio reutiliza el handler resuelto. Mantén la excepción, la petición y cualquier dato por operación en variables locales; almacenarlos en atributos del handler puede mezclar peticiones concurrentes.
+<a id="handler-boundaries"></a>
 
 ## Decidir dónde gestionar el fallo
 
@@ -338,4 +467,4 @@ Captura una excepción cerca de la operación cuando puedes recuperarte, aplicar
 
 Las extensiones verificadas son `report()`, `handleCLI()`, `handleHTTP()`, `toThrowable()` e `isExceptionIgnored()`. No hay un método genérico `render()` ni hooks `shouldReport()` o `shouldRender()` en este contrato.
 
-Consulta [Políticas de errores y referencia](/es/architecture/exception-handling/policies-and-reference) para `dont_catch`, límites de captura, contextos de protocolo y el inventario de clases. [Excepciones HTTP](/es/http/exceptions) desarrolla los errores de petición y la página de diagnóstico sin extender esas reglas a otros transportes.
+La [API de Catch y las políticas de errores](/es/architecture/exception-handling/policies-and-reference) incluye la delegación manual, los requisitos de scope y el inventario de clases. Consulta [Contextos y transportes](/es/architecture/exception-handling/contexts-and-transports) para las diferencias entre HTTP, CLI, WebSocket, Realtime, MCP y trabajos en segundo plano. [Excepciones HTTP](/es/http/exceptions) desarrolla los errores de petición y la página de diagnóstico sin extender esas reglas a otros transportes.

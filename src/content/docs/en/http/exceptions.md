@@ -7,7 +7,7 @@ lastUpdated: false
 
 An exception can interrupt body reading, middleware, dependency resolution, or a controller action. The HTTP layers and kernel turn failures they can handle into a response for the client. The result depends on the exception type, debug mode, and when the failure occurs.
 
-This page focuses on **HTTP requests and responses**. The [general exception guide](/en/architecture/exception-handling), under **Deployment, logs, and errors**, explains `app.withExceptionHandler(ExceptionHandler)`, the `failure` contracts, reporting, and the framework's other contexts.
+This page focuses on **HTTP requests and responses**. The [general exception guide](/en/architecture/exception-handling), in the independent **Exceptions** section, explains `app.withExceptionHandler(ExceptionHandler)`, the `failure` contracts, reporting, and the framework's other contexts.
 
 ## From an exception to an HTTP response
 

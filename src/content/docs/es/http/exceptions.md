@@ -7,7 +7,7 @@ lastUpdated: false
 
 Una excepción puede interrumpir la lectura del cuerpo, un middleware, la resolución de dependencias o una acción del controlador. Las capas HTTP y el kernel transforman los fallos que pueden manejar en una respuesta para el cliente. El resultado depende del tipo de excepción, del modo debug y del momento en que ocurre.
 
-Esta página se centra en **peticiones y respuestas HTTP**. La [guía general de excepciones](/es/architecture/exception-handling), ubicada en **Despliegue, logs y errores**, explica `app.withExceptionHandler(ExceptionHandler)`, los contratos de `failure`, el reporte y los demás contextos del framework.
+Esta página se centra en **peticiones y respuestas HTTP**. La [guía general de excepciones](/es/architecture/exception-handling), ubicada en la sección independiente **Exceptions**, explica `app.withExceptionHandler(ExceptionHandler)`, los contratos de `failure`, el reporte y los demás contextos del framework.
 
 ## De la excepción a la respuesta HTTP
 

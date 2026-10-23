@@ -1,39 +1,85 @@
 ---
-title: "Logging"
-description: "Record application events through Log so you can trace a request, investigate a job failure, or inspect an import. The built-in logger writes UTF-8 text files with severity…"
+title: "Application logs"
+description: "Record events through Log or ILogger, select a channel, and understand how Orionis writes and retains its files."
 editUrl: true
 lastUpdated: false
 ---
 
-Record application events through `Log` so you can trace a request, investigate a job failure, or inspect an import. The built-in logger writes UTF-8 text files with severity filtering and one active channel.
+Logs let you follow the behavior of a request, command, or job through events with different severity levels. Orionis includes the `Logger` service, the `ILogger` contract, and the `Log` facade: all three access paths belong to the same component.
 
-## Record an event from your application
+The service writes UTF-8 text files and uses one active channel per process. Configuration provides six channels: `stack`, `hourly`, `daily`, `weekly`, `monthly`, and `chunked`. **`stack` is a single file**, rather than a channel aggregation. The component requires no additional driver installation.
 
-Configure `.env` before startup, for example:
+## Start recording
+
+Select the channel and severity threshold in your project's `.env`:
 
 ```dotenv
 LOG_CHANNEL=daily
 LOG_LEVEL=INFO
-LOG_RETENTION=7
+LOG_RETENTION=int:7
 ```
 
-The standard daily channel writes under `storage/logs` with names such as `daily_2026-10-14.log`. Ensure that directory is writable. Retention limits matching files; it is not a timer that deletes data at an exact age.
+The `config/logging.py` file reads these variables during configuration. Do not use `Env` from controllers to configure the logger: consume the service that the application has already prepared. [Channels and configuration](/en/services/logging/configuration) explains every variable, its defaults, and file locations.
 
-After bootstrap, in a controller, command, job, or service:
+After application startup, use the facade from a controller:
 
 ```python
+from orionis.http import JSONResponse
 from orionis.support.facades import Log
 
 
-async def record_import(import_id: int, row_count: int) -> None:
-    Log.info(f"event=import-completed import={import_id} rows={row_count}")
+class ReportStatusController:
+    async def index(self) -> JSONResponse:
+        Log.info("event=report-status-read")
+        return JSONResponse({"status": "ready"})
 ```
 
-`Log.info()` is synchronous: do not add `await`. Messages below `LOG_LEVEL` are filtered. The wrapper accepts one string rather than a dictionary or interpolation arguments; structured JSON output and automatic secret redaction are not built in.
+In your API route file:
 
-## Choose the next step
+```python
+from app.http.controllers.report_status_controller import ReportStatusController
+from orionis.support.facades import Route
 
-1. [Record application events](/en/services/logging/writing-logs): facade/injection, severity, standard-logger access, and tracebacks.
-2. [Configure rotation and lifecycle](/en/services/logging/rotation-and-lifecycle): paths, retention, multiple workers, and configuration changes.
 
-Use the application's singleton logger. Creating another `Logger` per request can replace the process-wide handlers. See [exception handling](/en/architecture/exception-handling) for reporting failures through the application policy.
+Route.get("/reports/status", [ReportStatusController, "index"])
+```
+
+Save the controller as `app/http/controllers/report_status_controller.py`. With the daily channel, an example record looks like:
+
+```text
+2026-10-23 10:30:00 [INFO]: event=report-status-read
+```
+
+The file follows `storage/logs/daily_YYYY-MM-DD.log`, relative to the project root. The provider pins the facade during its asynchronous boot; after that startup completes, `Log.info()` is a **synchronous** call, including inside an `async` method. Do not add `await`. For integrations accessing it before that boot, see [facade dispatch](/en/services/logging/writing-logs#logger-facade).
+
+## From the component to the file
+
+```mermaid
+flowchart TD
+    accTitle: Application log record flow
+    A[config/logging.py: channel, level, and file] --> B[Provider: ILogger singleton and Log facade]
+    B --> C[Controller, command, job, or service]
+    C --> D[Log or ILogger: synchronous write]
+    D --> E[Lazy logger and handler initialization]
+    E --> F{Does the level meet the effective threshold?}
+    F -->|Yes| G[Format the UTF-8 record]
+    F -->|No| H[Filter the record]
+    G --> I[Handler: check rotation and retention]
+    I --> J[Write the line]
+```
+
+Rotating handlers check rotation before writing the line; there is no independent process rotating files at a fixed time. The process's standard logger is named `__orionis__` and does not propagate records to Python's root logger.
+
+## Choose a guide
+
+| Need | Guide |
+| --- | --- |
+| Select a channel, level, and directory | [Channels and configuration](/en/services/logging/configuration). |
+| Use every method, inject ILogger, or record an exception | [Writing logs](/en/services/logging/writing-logs). |
+| Understand suffixes, retention, compression, shutdown, and multiple workers | [Rotation and lifecycle](/en/services/logging/rotation-and-lifecycle). |
+
+Retention limits **file counts**, including settings named `retention_days` or `retention_hours`; it does not delete a file when it reaches an exact age. The `chunked` implementation generates a new suffix for every record and can rotate before reaching `mb_size`. Review [policy behavior](/en/services/logging/rotation-and-lifecycle) before choosing one.
+
+Exception handling and presentation are documented in [Exceptions](/en/architecture/exception-handling). That section explains when the handler reports an error; these guides explain how that record is written and retained.
+
+The [verifiable Logs inventory](/downloads/logging-api-inventory.json) maps its public declarations to these guides.
