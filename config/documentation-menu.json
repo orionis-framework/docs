@@ -1543,6 +1543,10 @@
       "slug": {
         "es": "/es/services/cache",
         "en": "/en/services/cache"
+      },
+      "label": {
+        "en": "Introduction",
+        "es": "Introducción"
       }
     },
     {
@@ -1565,12 +1569,12 @@
       "id": "cache-stores-and-locks",
       "kind": "doc",
       "title": {
-        "es": "Configurar stores y coordinar regeneraciones",
-        "en": "Configuring stores and coordinating regeneration"
+        "es": "Drivers y almacenes de caché",
+        "en": "Cache drivers and stores"
       },
       "label": {
-        "en": "Cache stores and locks",
-        "es": "Almacenes de caché y bloqueos"
+        "en": "Drivers and stores",
+        "es": "Drivers y almacenes"
       },
       "slug": {
         "es": "/es/services/cache/stores-and-locks",
@@ -1591,6 +1595,70 @@
       "slug": {
         "es": "/es/services/cache/source-artifacts",
         "en": "/en/services/cache/source-artifacts"
+      }
+    },
+    {
+      "id": "cache-configuration",
+      "kind": "doc",
+      "title": {
+        "es": "Configuración de caché",
+        "en": "Cache configuration"
+      },
+      "label": {
+        "es": "Configuración",
+        "en": "Configuration"
+      },
+      "slug": {
+        "es": "/es/services/cache/configuration",
+        "en": "/en/services/cache/configuration"
+      }
+    },
+    {
+      "id": "cache-locks",
+      "kind": "doc",
+      "title": {
+        "es": "Bloqueos y concurrencia",
+        "en": "Locks and concurrency"
+      },
+      "label": {
+        "es": "Bloqueos y concurrencia",
+        "en": "Locks and concurrency"
+      },
+      "slug": {
+        "es": "/es/services/cache/locks",
+        "en": "/en/services/cache/locks"
+      }
+    },
+    {
+      "id": "cache-manager-and-injection",
+      "kind": "doc",
+      "title": {
+        "es": "Fachada e inyección de Cache",
+        "en": "Cache facade and injection"
+      },
+      "label": {
+        "es": "Fachada e inyección",
+        "en": "Facade and injection"
+      },
+      "slug": {
+        "es": "/es/services/cache/manager-and-injection",
+        "en": "/en/services/cache/manager-and-injection"
+      }
+    },
+    {
+      "id": "cache-api-reference",
+      "kind": "doc",
+      "title": {
+        "es": "Referencia técnica de caché",
+        "en": "Cache technical reference"
+      },
+      "label": {
+        "es": "Referencia técnica",
+        "en": "Technical reference"
+      },
+      "slug": {
+        "es": "/es/services/cache/api-reference",
+        "en": "/en/services/cache/api-reference"
       }
     },
     {

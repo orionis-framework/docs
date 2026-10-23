@@ -1,13 +1,13 @@
 ---
 title: "Caché"
-description: "Guarda en caché resultados que tu aplicación pueda reconstruir, como resúmenes del catálogo, datos de consulta o cálculos costosos. Conserva los datos permanentes en la base de…"
+description: "Almacenes, fachada, inyección, expiración y bloqueos del sistema de caché de Orionis."
 editUrl: true
 lastUpdated: false
 ---
 
-Guarda en caché resultados que tu aplicación pueda reconstruir, como resúmenes del catálogo, datos de consulta o cálculos costosos. Conserva los datos permanentes en la base de datos; decide cuánto tiempo puede quedar desactualizado un resultado y cuándo invalidarlo.
+Utiliza la caché para resultados que puedes reconstruir: consultas frecuentes, resúmenes o cálculos costosos. Define cuánto tiempo puede quedar desactualizado un valor y cuándo invalidarlo. La base de datos conserva la información permanente; la caché evita repetir trabajo.
 
-## Usar la caché configurada en tu aplicación
+## Primera operación desde un controlador
 
 Empieza con el almacenamiento en archivos incluido en la instalación normal. Configura estos valores en el `.env` de tu aplicación antes del arranque:
 
@@ -18,30 +18,54 @@ CACHE_PREFIX=my-app
 
 El directorio predeterminado es `storage/framework/cache/data` y el proceso de la aplicación debe poder escribir allí. Este almacenamiento no requiere Redis ni un paquete adicional de caché. `config/cache.py` define los almacenes disponibles y sus opciones.
 
-Invoca la fachada `Cache` desde un controlador, comando, job o servicio async después de iniciar la aplicación:
+Importa la fachada desde `orionis.support.facades`. Este controlador guarda un resumen durante cinco minutos y recupera el valor:
 
 ```python
+from orionis.http import JSONResponse
 from orionis.support.facades import Cache
 
 
-async def remember_preferences(user_id: int, preferences: dict) -> dict:
-    key = f"user:{user_id}:preferences:v1"
-    await Cache.set(key, preferences, ttl=300)
-    return await Cache.get(key)
-
-
-async def invalidate_preferences(user_id: int) -> None:
-    await Cache.delete(f"user:{user_id}:preferences:v1")
+class CacheExampleController:
+    async def __call__(self) -> JSONResponse:
+        key = "catalog:summary:v1"
+        await Cache.set(key, {"products": 42}, ttl=300)
+        return JSONResponse(await Cache.get(key))
 ```
 
-La primera función guarda un diccionario compatible con JSON durante 300 segundos y lo devuelve inmediatamente. Tras expirar o invalidarse, `get()` devuelve `None`. Autoriza al usuario y guarda los cambios permanentes antes de almacenarlos en caché; este ejemplo solo muestra las operaciones de caché.
+Registra la acción en el archivo de rutas configurado:
 
-Para calcular únicamente cuando falta un resultado, usa `await Cache.remember(key, 300, resolver)`: el resolver no recibe argumentos y puede ser async. Varias solicitudes simultáneas todavía pueden ejecutarlo más de una vez. Consulta la [guía de regeneración](/es/services/cache/stores-and-locks) cuando debas reducir ese trabajo duplicado.
+```python
+from app.http.controllers.cache_example_controller import CacheExampleController
+from orionis.support.facades import Route
+
+Route.get("/cache-example", CacheExampleController)
+```
+
+Guarda el controlador en `app/http/controllers/cache_example_controller.py`. Tras expirar o eliminarse la entrada, `get()` devuelve `None`. Para calcular solo cuando falta el valor, utiliza `remember()` en la [guía de operaciones](/es/services/cache/caching-values#repository-remember).
+
+## Cómo se organiza el servicio
+
+```mermaid
+flowchart TD
+  accTitle: Acceso a la caché de Orionis
+  Config["config/cache.py"] --> Manager["CacheManager singleton"]
+  Access["Cache o inyección ICacheManager"] --> Manager
+  Manager --> Repo["CacheRepository: aplica el prefijo"]
+  Repo --> Backend["Driver seleccionado"]
+  Repo --> Locks["CacheLock"]
+  Backend --> Values["Lecturas y escrituras async"]
+```
+
+El manager selecciona uno de los cinco almacenes nativos y conserva su repositorio. La fachada delega al mismo servicio que resuelve el contenedor. Las operaciones de valores son asíncronas; las factorías `store()` y `lock()` son síncronas. Cuando tu primera operación con la fachada sea seleccionar un almacén, resuelve antes `cache = await Cache.resolve()` y después usa `cache.store("memory")`. El provider es diferido: importar `Cache` o iniciar la aplicación no garantiza haberlo resuelto. Los métodos asíncronos como `await Cache.get(...)` hacen esa resolución al esperarse.
+
+`FileBasedCache` es una API síncrona independiente para artefactos derivados de archivos fuente. No es el driver `file` ni utiliza su TTL o prefijo.
 
 ## Elegir el siguiente paso
 
-1. [Guardar y regenerar datos](/es/services/cache/caching-values): claves, TTL en segundos, cálculo ante una ausencia, lotes y contadores.
-2. [Configurar almacenes y locks](/es/services/cache/stores-and-locks): elegir memoria, archivos, Redis, Memcached o base de datos según dónde deban compartirse los valores.
-3. [Cachear artefactos derivados de código](/es/services/cache/source-artifacts): la API síncrona e independiente `FileBasedCache` para diccionarios compilados desde archivos fuente.
-
-Usa `FileBasedCache` para artefactos compilados y la fachada `Cache` para valores habituales de tu aplicación. Ambas APIs tienen reglas diferentes de serialización e invalidación.
+- [Drivers y dependencias](/es/services/cache/stores-and-locks): ventajas, límites y servicios externos de las cinco opciones.
+- [Configuración](/es/services/cache/configuration): todas las propiedades, variables de entorno y valores predeterminados.
+- [Guardar y regenerar valores](/es/services/cache/caching-values): API completa del repositorio, TTL, lotes y contadores.
+- [Bloqueos y concurrencia](/es/services/cache/locks): contextos, espera y garantías de cada backend.
+- [Artefactos de código fuente](/es/services/cache/source-artifacts): invalidación por fuentes y serialización enriquecida.
+- [Fachada e inyección](/es/services/cache/manager-and-injection): uso en controladores, servicios y providers.
+- [Referencia técnica](/es/services/cache/api-reference): contratos, backends, factorías, errores e inventario verificable.

@@ -1,47 +1,69 @@
 ---
 title: "Cache"
-description: "Cache application results that can be rebuilt, such as catalog summaries, lookup data, or expensive calculations. Keep the permanent data in your database; decide how long a…"
+description: "Stores, facade, dependency injection, expiration and locks in Orionis caching."
 editUrl: true
 lastUpdated: false
 ---
 
-Cache application results that can be rebuilt, such as catalog summaries, lookup data, or expensive calculations. Keep the permanent data in your database; decide how long a cached result may be stale and when to invalidate it.
+Cache results you can reconstruct: frequent queries, summaries or expensive calculations. Decide how long a value may become stale and when to invalidate it. The database keeps permanent information; caching avoids repeated work.
 
-## Use the configured cache in your application
+## First operation from a controller
 
-Start with the file store included in a normal installation. Set these values in your application's `.env` before bootstrap:
+The default file store works with the normal Orionis installation. Set these application environment values before startup:
 
 ```dotenv
 CACHE_STORE=file
 CACHE_PREFIX=my-app
 ```
 
-The default directory is `storage/framework/cache/data` and must be writable by the application process. You do not need Redis or a separate cache package for this store. `config/cache.py` defines the configured stores and their options.
-
-Call the `Cache` facade from an async controller, command, job, or service after the application has booted:
+Its default directory is `storage/framework/cache/data`; the application process needs write access there. No Redis server or additional Python cache package is needed. Import the facade from `orionis.support.facades`. Save this controller in `app/http/controllers/cache_example_controller.py`:
 
 ```python
+from orionis.http import JSONResponse
 from orionis.support.facades import Cache
 
 
-async def remember_preferences(user_id: int, preferences: dict) -> dict:
-    key = f"user:{user_id}:preferences:v1"
-    await Cache.set(key, preferences, ttl=300)
-    return await Cache.get(key)
-
-
-async def invalidate_preferences(user_id: int) -> None:
-    await Cache.delete(f"user:{user_id}:preferences:v1")
+class CacheExampleController:
+    async def __call__(self) -> JSONResponse:
+        key = "catalog:summary:v1"
+        await Cache.set(key, {"products": 42}, ttl=300)
+        return JSONResponse(await Cache.get(key))
 ```
 
-The first function stores a JSON-compatible dictionary for 300 seconds and immediately returns it. After expiry or invalidation, `get()` returns `None`. Authorize the user and persist preference changes before caching them; this example only demonstrates cache operations.
+Register its action in the configured route file:
 
-For cache-aside, use `await Cache.remember(key, 300, resolver)`: the zero-argument resolver runs only on a miss and may be async. Concurrent misses can still invoke it more than once. Use the [regeneration guidance](/en/services/cache/stores-and-locks) when duplicate computation matters.
+```python
+from app.http.controllers.cache_example_controller import CacheExampleController
+from orionis.support.facades import Route
 
-## Choose the next step
+Route.get("/cache-example", CacheExampleController)
+```
 
-1. [Store and regenerate values](/en/services/cache/caching-values): keys, TTL in seconds, cache-aside, batches, and counters.
-2. [Configure stores and locks](/en/services/cache/stores-and-locks): choose memory, file, Redis, Memcached, or database according to sharing requirements.
-3. [Cache source-derived artifacts](/en/services/cache/source-artifacts): the separate synchronous `FileBasedCache` API for dictionaries compiled from source files.
+The dictionary is cached for five minutes. Once expired or deleted, `get()` returns `None`. To calculate only on a miss, use `remember()` in the [operations guide](/en/services/cache/caching-values#repository-remember).
 
-`FileBasedCache` is for compiled artifacts; use the `Cache` facade for everyday application values. The two APIs have different serialization and invalidation rules.
+## Service architecture
+
+```mermaid
+flowchart TD
+  accTitle: Accessing the Orionis cache
+  Config["config/cache.py"] --> Manager["CacheManager singleton"]
+  Access["Cache or ICacheManager injection"] --> Manager
+  Manager --> Repo["CacheRepository: applies the prefix"]
+  Repo --> Backend["Selected driver"]
+  Repo --> Locks["CacheLock"]
+  Backend --> Values["Async reads and writes"]
+```
+
+The manager selects one of five native stores and retains its repository. The facade delegates to the same service resolved by the container. Value operations are asynchronous; the `store()` and `lock()` factories are synchronous. If your first facade operation selects a store, resolve `cache = await Cache.resolve()` first, then call `cache.store("memory")`. Its provider is deferred: importing `Cache` or booting the application does not guarantee resolution. Asynchronous calls such as `await Cache.get(...)` resolve it when awaited.
+
+`FileBasedCache` is a separate synchronous API for artifacts derived from source files. It is not the `file` driver and does not use its TTL or prefix.
+
+## Continue with the guides
+
+- [Drivers and dependencies](/en/services/cache/stores-and-locks): advantages, limits and external services for all five options.
+- [Configuration](/en/services/cache/configuration): every property, environment variable and default.
+- [Storing and regenerating values](/en/services/cache/caching-values): complete repository API, TTL, batches and counters.
+- [Locks and concurrency](/en/services/cache/locks): contexts, waiting and each backend's guarantees.
+- [Source-derived artifacts](/en/services/cache/source-artifacts): source invalidation and enriched serialization.
+- [Facade and injection](/en/services/cache/manager-and-injection): controllers, services and providers.
+- [Technical reference](/en/services/cache/api-reference): contracts, backends, factories, errors and verifiable inventory.

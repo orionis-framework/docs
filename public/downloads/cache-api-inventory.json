@@ -1,0 +1,1409 @@
+{
+  "scope": "Own public declarations in Cache, cache configuration and its facade; constructors and async context protocols included. Contracts and backend overrides are separate lexical declarations. Four bulk-method aliases are included. Private implementation, export plumbing, inherited third-party APIs and generated dataclass methods are excluded.",
+  "sourceRoots": [
+    "orionis/cache",
+    "orionis/foundation/config/cache"
+  ],
+  "sourceFiles": [
+    "config/cache.py",
+    "orionis/support/facades/cache.py"
+  ],
+  "hashes": {
+    "config/cache.py": "081091f088a6637f6fbd40b588345ba9920aab0f051aec9edef39406b947755a",
+    "orionis/cache/__init__.py": "d15ea141f458e27a1e12e99728d5ab46c3f4ef198aaffecbce1600463bcbf8ec",
+    "orionis/cache/cache_manager.py": "bad3f25078e0abff7ea9cacc2b7b465b59268db4891359c43b82c1cc0153c2e3",
+    "orionis/cache/contracts/__init__.py": "27e36ca3d06c395e5820cdd7e93d7df838709242ce2a93c9931f6dc04a5b307a",
+    "orionis/cache/contracts/cache_manager.py": "8118b046e47e5b8683f97ece3b0538356438993e33233a861d0f55cdc7fe94fd",
+    "orionis/cache/contracts/file_based_cache.py": "a75146636a6db0720d67d9e3544a75a82eb4f88ee4fb7f80c5997639de67bf48",
+    "orionis/cache/contracts/repository.py": "eff28e63ab5563634e7b8e37d341bb43a9d0611d86308b8356c1f371180a92dc",
+    "orionis/cache/exceptions.py": "56a83afe8ab5db3b669ddcf7665ef9531670f1d0a15aa931fa40627dfc9aede3",
+    "orionis/cache/file_based_cache.py": "f49cbffc95303661e724f7b2bcb3bd5be47c9aac346fdfe08d2aefcca682b51d",
+    "orionis/cache/locks/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "orionis/cache/locks/lock.py": "7a60017b9dc48b2933f910caf3b32a5a7aedf93e1bdaa3c73d1d761aa0c8aaee",
+    "orionis/cache/provider.py": "4679569a37e78abf4ccfcd516b1a0d741c1a58964afd490301baf294801a22bb",
+    "orionis/cache/repository.py": "c692eae41b92b81d537f7216136a4a7d8da2120e3820e4481803766746af366d",
+    "orionis/cache/serializer.py": "4b6d2683765d03d0b44ed7a222437fbc120915c60d775a0eabbc978009e1146a",
+    "orionis/cache/serializers/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "orionis/cache/serializers/json.py": "cf30f768583d0b8e052d0c872d86b16731585ab01e6fff8d4d27d534f4972e9c",
+    "orionis/cache/stores/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "orionis/cache/stores/database.py": "d938a4b9258109b2299a25b9773fb4da9821147a1d6081b94317fecdca50f5ff",
+    "orionis/cache/stores/file.py": "6d49a10c0f712aab1a5c4909bb628f103c24ada042956d6e3ef8b41a499afd10",
+    "orionis/cache/stores/memcached.py": "ce336857198ef980580e13d00150d3c83e392c659144a1346180042fa6de69c6",
+    "orionis/cache/stores/memory.py": "a8737a9fcf6df92e8eedbaa4e5c877be42843249136e6ff5ad8ea3aa28fb3ad1",
+    "orionis/cache/stores/redis.py": "00c6003ebdab811702b7245f8f57fb7f8cfad1e0cd57a5deee55ca4ed50e7bcc",
+    "orionis/foundation/config/cache/__init__.py": "aec87049fbda9ba9dd82ab097e35c1de87f556cbcff6ba3edf2698703197838e",
+    "orionis/foundation/config/cache/entities/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "orionis/foundation/config/cache/entities/cache.py": "92e245601e79fe431160a5c45b814454891a84d5cc12a2f936d5fbafe8dbab5f",
+    "orionis/foundation/config/cache/entities/database.py": "d31732a5737d1df620aeb3a62303b98462f00e775ec65c9d1a23af5d33609e80",
+    "orionis/foundation/config/cache/entities/file.py": "a4eae3c693f51f3598869d9da447d0698f811a49e54d929356a320c89b3a1b3d",
+    "orionis/foundation/config/cache/entities/memcached.py": "918bc835db2ba92ea679b98ada790bcdc6b71a848300a102118f5d3168bae37e",
+    "orionis/foundation/config/cache/entities/memory.py": "336b2ed04023dcfac7cb22a6b0e6a7ca8f9728f0a5081d407f4165dea68d21cb",
+    "orionis/foundation/config/cache/entities/redis.py": "6352396d516649a531ea0cc9a0b3fddc9324302c08f169b83d730e8bca0fa9f1",
+    "orionis/foundation/config/cache/entities/stores.py": "5e11759a9e594e5cd0a9670462f6bdc50146d7e88bf008500c2de0ed5de85064",
+    "orionis/foundation/config/cache/enums/__init__.py": "b78d35a574c04921e11494bff024a25179ad50322ccaf8c23228bc6499b0b2a2",
+    "orionis/foundation/config/cache/enums/drivers.py": "acd5a5960cadd2041ad22a3fc7d613b2a29a9a70aee3e47088358330961b07d9",
+    "orionis/support/facades/cache.py": "5d506a950d68f8b845ab5fa0f7fc38a721d7f101a14d8eb4dbd9cf79c733533c"
+  },
+  "entries": [
+    {
+      "source": "config/cache.py",
+      "symbol": "BootstrapCache",
+      "kind": "class",
+      "line": 9,
+      "signature": "class BootstrapCache",
+      "reference": "/services/cache/configuration#config-cache"
+    },
+    {
+      "source": "config/cache.py",
+      "symbol": "BootstrapCache.default",
+      "kind": "field",
+      "line": 16,
+      "signature": "default: Drivers | str = field(default_factory=lambda: Env.get('CACHE_STORE', Drivers.FILE))",
+      "reference": "/services/cache/configuration#config-cache"
+    },
+    {
+      "source": "config/cache.py",
+      "symbol": "BootstrapCache.prefix",
+      "kind": "field",
+      "line": 24,
+      "signature": "prefix: str = field(default_factory=lambda: Env.get('CACHE_PREFIX', ''))",
+      "reference": "/services/cache/configuration#config-cache"
+    },
+    {
+      "source": "config/cache.py",
+      "symbol": "BootstrapCache.stores",
+      "kind": "field",
+      "line": 32,
+      "signature": "stores: Stores | dict = field(default_factory=lambda: Stores(file=File(path=Env.get('CACHE_FILE_PATH', 'storage/framework/cache/data')), memory=Memory(), redis=Redis(endpoint=Env.get('REDIS_HOST', '127.0.0.1'), port=Env.get('REDIS_PORT', 6379), db=Env.get('REDIS_DB', 0), password=Env.get('REDIS_PASSWORD', None)), memcached=Memcached(endpoint=Env.get('MEMCACHED_HOST', '127.0.0.1'), port=Env.get('MEMCACHED_PORT', 11211)), database=Database(connection=Env.get('DB_CACHE_CONNECTION', None), table=Env.get('DB_CACHE_TABLE', 'cache'), lock_table=Env.get('DB_CACHE_LOCK_TABLE', 'cache_locks'))))",
+      "reference": "/services/cache/configuration#config-cache"
+    },
+    {
+      "source": "orionis/cache/cache_manager.py",
+      "symbol": "CacheManager",
+      "kind": "class",
+      "line": 13,
+      "signature": "class CacheManager",
+      "reference": "/services/cache/manager-and-injection#manager-construction"
+    },
+    {
+      "source": "orionis/cache/cache_manager.py",
+      "symbol": "CacheManager.__init__",
+      "kind": "method",
+      "line": 26,
+      "signature": "__init__(self, app: IApplication) -> None",
+      "reference": "/services/cache/manager-and-injection#manager-construction"
+    },
+    {
+      "source": "orionis/cache/cache_manager.py",
+      "symbol": "CacheManager.store",
+      "kind": "method",
+      "line": 56,
+      "signature": "store(self, name: str | None=None) -> CacheRepository",
+      "reference": "/services/cache/manager-and-injection#manager-store"
+    },
+    {
+      "source": "orionis/cache/cache_manager.py",
+      "symbol": "CacheManager.get",
+      "kind": "method",
+      "line": 194,
+      "signature": "async get(self, key: str) -> Any",
+      "reference": "/services/cache/caching-values#repository-get"
+    },
+    {
+      "source": "orionis/cache/cache_manager.py",
+      "symbol": "CacheManager.set",
+      "kind": "method",
+      "line": 210,
+      "signature": "async set(self, key: str, value: Any, ttl: float | None=None) -> bool",
+      "reference": "/services/cache/caching-values#repository-set"
+    },
+    {
+      "source": "orionis/cache/cache_manager.py",
+      "symbol": "CacheManager.has",
+      "kind": "method",
+      "line": 230,
+      "signature": "async has(self, key: str) -> bool",
+      "reference": "/services/cache/caching-values#repository-has"
+    },
+    {
+      "source": "orionis/cache/cache_manager.py",
+      "symbol": "CacheManager.delete",
+      "kind": "method",
+      "line": 246,
+      "signature": "async delete(self, key: str) -> bool",
+      "reference": "/services/cache/caching-values#repository-delete"
+    },
+    {
+      "source": "orionis/cache/cache_manager.py",
+      "symbol": "CacheManager.clear",
+      "kind": "method",
+      "line": 262,
+      "signature": "async clear(self) -> bool",
+      "reference": "/services/cache/caching-values#repository-clear"
+    },
+    {
+      "source": "orionis/cache/cache_manager.py",
+      "symbol": "CacheManager.getMany",
+      "kind": "method",
+      "line": 273,
+      "signature": "async getMany(self, keys: list[str]) -> dict[str, Any]",
+      "reference": "/services/cache/caching-values#repository-getmany"
+    },
+    {
+      "source": "orionis/cache/cache_manager.py",
+      "symbol": "CacheManager.setMany",
+      "kind": "method",
+      "line": 289,
+      "signature": "async setMany(self, values: dict[str, Any], ttl: float | None=None) -> bool",
+      "reference": "/services/cache/caching-values#repository-setmany"
+    },
+    {
+      "source": "orionis/cache/cache_manager.py",
+      "symbol": "CacheManager.remember",
+      "kind": "method",
+      "line": 311,
+      "signature": "async remember(self, key: str, ttl: float | None, resolver: Callable) -> Any",
+      "reference": "/services/cache/caching-values#repository-remember"
+    },
+    {
+      "source": "orionis/cache/cache_manager.py",
+      "symbol": "CacheManager.rememberForever",
+      "kind": "method",
+      "line": 336,
+      "signature": "async rememberForever(self, key: str, resolver: Callable) -> Any",
+      "reference": "/services/cache/caching-values#repository-rememberforever"
+    },
+    {
+      "source": "orionis/cache/cache_manager.py",
+      "symbol": "CacheManager.pull",
+      "kind": "method",
+      "line": 354,
+      "signature": "async pull(self, key: str) -> Any",
+      "reference": "/services/cache/caching-values#repository-pull"
+    },
+    {
+      "source": "orionis/cache/cache_manager.py",
+      "symbol": "CacheManager.add",
+      "kind": "method",
+      "line": 370,
+      "signature": "async add(self, key: str, value: Any, ttl: float | None=None) -> bool",
+      "reference": "/services/cache/caching-values#repository-add"
+    },
+    {
+      "source": "orionis/cache/cache_manager.py",
+      "symbol": "CacheManager.increment",
+      "kind": "method",
+      "line": 390,
+      "signature": "async increment(self, key: str, amount: int=1) -> int",
+      "reference": "/services/cache/caching-values#repository-increment"
+    },
+    {
+      "source": "orionis/cache/cache_manager.py",
+      "symbol": "CacheManager.decrement",
+      "kind": "method",
+      "line": 408,
+      "signature": "async decrement(self, key: str, amount: int=1) -> int",
+      "reference": "/services/cache/caching-values#repository-decrement"
+    },
+    {
+      "source": "orionis/cache/cache_manager.py",
+      "symbol": "CacheManager.lock",
+      "kind": "method",
+      "line": 426,
+      "signature": "lock(self, key: str, timeout: float | None=None) -> Any",
+      "reference": "/services/cache/caching-values#repository-lock"
+    },
+    {
+      "source": "orionis/cache/contracts/cache_manager.py",
+      "symbol": "ICacheManager",
+      "kind": "class",
+      "line": 9,
+      "signature": "class ICacheManager",
+      "reference": "/services/cache/manager-and-injection#manager-construction"
+    },
+    {
+      "source": "orionis/cache/contracts/cache_manager.py",
+      "symbol": "ICacheManager.store",
+      "kind": "method",
+      "line": 14,
+      "signature": "store(self, name: str | None=None) -> ICacheRepository",
+      "reference": "/services/cache/manager-and-injection#manager-store"
+    },
+    {
+      "source": "orionis/cache/contracts/cache_manager.py",
+      "symbol": "ICacheManager.get",
+      "kind": "method",
+      "line": 30,
+      "signature": "async get(self, key: str) -> Any",
+      "reference": "/services/cache/caching-values#repository-get"
+    },
+    {
+      "source": "orionis/cache/contracts/cache_manager.py",
+      "symbol": "ICacheManager.set",
+      "kind": "method",
+      "line": 46,
+      "signature": "async set(self, key: str, value: Any, ttl: float | None=None) -> bool",
+      "reference": "/services/cache/caching-values#repository-set"
+    },
+    {
+      "source": "orionis/cache/contracts/cache_manager.py",
+      "symbol": "ICacheManager.has",
+      "kind": "method",
+      "line": 66,
+      "signature": "async has(self, key: str) -> bool",
+      "reference": "/services/cache/caching-values#repository-has"
+    },
+    {
+      "source": "orionis/cache/contracts/cache_manager.py",
+      "symbol": "ICacheManager.delete",
+      "kind": "method",
+      "line": 82,
+      "signature": "async delete(self, key: str) -> bool",
+      "reference": "/services/cache/caching-values#repository-delete"
+    },
+    {
+      "source": "orionis/cache/contracts/cache_manager.py",
+      "symbol": "ICacheManager.clear",
+      "kind": "method",
+      "line": 98,
+      "signature": "async clear(self) -> bool",
+      "reference": "/services/cache/caching-values#repository-clear"
+    },
+    {
+      "source": "orionis/cache/contracts/cache_manager.py",
+      "symbol": "ICacheManager.getMany",
+      "kind": "method",
+      "line": 109,
+      "signature": "async getMany(self, keys: list[str]) -> dict[str, Any]",
+      "reference": "/services/cache/caching-values#repository-getmany"
+    },
+    {
+      "source": "orionis/cache/contracts/cache_manager.py",
+      "symbol": "ICacheManager.setMany",
+      "kind": "method",
+      "line": 125,
+      "signature": "async setMany(self, values: dict[str, Any], ttl: float | None=None) -> bool",
+      "reference": "/services/cache/caching-values#repository-setmany"
+    },
+    {
+      "source": "orionis/cache/contracts/cache_manager.py",
+      "symbol": "ICacheManager.remember",
+      "kind": "method",
+      "line": 147,
+      "signature": "async remember(self, key: str, ttl: float | None, resolver: Callable) -> Any",
+      "reference": "/services/cache/caching-values#repository-remember"
+    },
+    {
+      "source": "orionis/cache/contracts/cache_manager.py",
+      "symbol": "ICacheManager.rememberForever",
+      "kind": "method",
+      "line": 172,
+      "signature": "async rememberForever(self, key: str, resolver: Callable) -> Any",
+      "reference": "/services/cache/caching-values#repository-rememberforever"
+    },
+    {
+      "source": "orionis/cache/contracts/cache_manager.py",
+      "symbol": "ICacheManager.pull",
+      "kind": "method",
+      "line": 190,
+      "signature": "async pull(self, key: str) -> Any",
+      "reference": "/services/cache/caching-values#repository-pull"
+    },
+    {
+      "source": "orionis/cache/contracts/cache_manager.py",
+      "symbol": "ICacheManager.add",
+      "kind": "method",
+      "line": 206,
+      "signature": "async add(self, key: str, value: Any, ttl: float | None=None) -> bool",
+      "reference": "/services/cache/caching-values#repository-add"
+    },
+    {
+      "source": "orionis/cache/contracts/cache_manager.py",
+      "symbol": "ICacheManager.increment",
+      "kind": "method",
+      "line": 226,
+      "signature": "async increment(self, key: str, amount: int=1) -> int",
+      "reference": "/services/cache/caching-values#repository-increment"
+    },
+    {
+      "source": "orionis/cache/contracts/cache_manager.py",
+      "symbol": "ICacheManager.decrement",
+      "kind": "method",
+      "line": 244,
+      "signature": "async decrement(self, key: str, amount: int=1) -> int",
+      "reference": "/services/cache/caching-values#repository-decrement"
+    },
+    {
+      "source": "orionis/cache/contracts/file_based_cache.py",
+      "symbol": "IFileBasedCache",
+      "kind": "class",
+      "line": 4,
+      "signature": "class IFileBasedCache",
+      "reference": "/services/cache/source-artifacts#artifact-construction"
+    },
+    {
+      "source": "orionis/cache/contracts/file_based_cache.py",
+      "symbol": "IFileBasedCache.get",
+      "kind": "method",
+      "line": 7,
+      "signature": "get(self) -> dict | None",
+      "reference": "/services/cache/source-artifacts#artifact-get"
+    },
+    {
+      "source": "orionis/cache/contracts/file_based_cache.py",
+      "symbol": "IFileBasedCache.save",
+      "kind": "method",
+      "line": 18,
+      "signature": "save(self, data: dict) -> tuple[int, str]",
+      "reference": "/services/cache/source-artifacts#artifact-save"
+    },
+    {
+      "source": "orionis/cache/contracts/file_based_cache.py",
+      "symbol": "IFileBasedCache.clear",
+      "kind": "method",
+      "line": 34,
+      "signature": "clear(self) -> bool",
+      "reference": "/services/cache/source-artifacts#artifact-clear"
+    },
+    {
+      "source": "orionis/cache/contracts/repository.py",
+      "symbol": "ICacheRepository",
+      "kind": "class",
+      "line": 7,
+      "signature": "class ICacheRepository",
+      "reference": "/services/cache/caching-values#repository-construction"
+    },
+    {
+      "source": "orionis/cache/contracts/repository.py",
+      "symbol": "ICacheRepository.replace",
+      "kind": "method",
+      "line": 14,
+      "signature": "async replace(self, key: str, value: Any, ttl: float | None=None) -> bool",
+      "reference": "/services/cache/caching-values#repository-replace"
+    },
+    {
+      "source": "orionis/cache/contracts/repository.py",
+      "symbol": "ICacheRepository.get",
+      "kind": "method",
+      "line": 33,
+      "signature": "async get(self, key: str) -> Any",
+      "reference": "/services/cache/caching-values#repository-get"
+    },
+    {
+      "source": "orionis/cache/contracts/repository.py",
+      "symbol": "ICacheRepository.set",
+      "kind": "method",
+      "line": 49,
+      "signature": "async set(self, key: str, value: Any, ttl: float | None=None) -> bool",
+      "reference": "/services/cache/caching-values#repository-set"
+    },
+    {
+      "source": "orionis/cache/contracts/repository.py",
+      "symbol": "ICacheRepository.has",
+      "kind": "method",
+      "line": 69,
+      "signature": "async has(self, key: str) -> bool",
+      "reference": "/services/cache/caching-values#repository-has"
+    },
+    {
+      "source": "orionis/cache/contracts/repository.py",
+      "symbol": "ICacheRepository.delete",
+      "kind": "method",
+      "line": 85,
+      "signature": "async delete(self, key: str) -> bool",
+      "reference": "/services/cache/caching-values#repository-delete"
+    },
+    {
+      "source": "orionis/cache/contracts/repository.py",
+      "symbol": "ICacheRepository.clear",
+      "kind": "method",
+      "line": 101,
+      "signature": "async clear(self) -> bool",
+      "reference": "/services/cache/caching-values#repository-clear"
+    },
+    {
+      "source": "orionis/cache/contracts/repository.py",
+      "symbol": "ICacheRepository.getMany",
+      "kind": "method",
+      "line": 112,
+      "signature": "async getMany(self, keys: list[str]) -> dict[str, Any]",
+      "reference": "/services/cache/caching-values#repository-getmany"
+    },
+    {
+      "source": "orionis/cache/contracts/repository.py",
+      "symbol": "ICacheRepository.setMany",
+      "kind": "method",
+      "line": 128,
+      "signature": "async setMany(self, values: dict[str, Any], ttl: float | None=None) -> bool",
+      "reference": "/services/cache/caching-values#repository-setmany"
+    },
+    {
+      "source": "orionis/cache/contracts/repository.py",
+      "symbol": "ICacheRepository.remember",
+      "kind": "method",
+      "line": 150,
+      "signature": "async remember(self, key: str, ttl: float | None, resolver: Callable) -> Any",
+      "reference": "/services/cache/caching-values#repository-remember"
+    },
+    {
+      "source": "orionis/cache/contracts/repository.py",
+      "symbol": "ICacheRepository.rememberForever",
+      "kind": "method",
+      "line": 175,
+      "signature": "async rememberForever(self, key: str, resolver: Callable) -> Any",
+      "reference": "/services/cache/caching-values#repository-rememberforever"
+    },
+    {
+      "source": "orionis/cache/contracts/repository.py",
+      "symbol": "ICacheRepository.pull",
+      "kind": "method",
+      "line": 193,
+      "signature": "async pull(self, key: str) -> Any",
+      "reference": "/services/cache/caching-values#repository-pull"
+    },
+    {
+      "source": "orionis/cache/contracts/repository.py",
+      "symbol": "ICacheRepository.add",
+      "kind": "method",
+      "line": 209,
+      "signature": "async add(self, key: str, value: Any, ttl: float | None=None) -> bool",
+      "reference": "/services/cache/caching-values#repository-add"
+    },
+    {
+      "source": "orionis/cache/contracts/repository.py",
+      "symbol": "ICacheRepository.increment",
+      "kind": "method",
+      "line": 229,
+      "signature": "async increment(self, key: str, amount: int=1) -> int",
+      "reference": "/services/cache/caching-values#repository-increment"
+    },
+    {
+      "source": "orionis/cache/contracts/repository.py",
+      "symbol": "ICacheRepository.decrement",
+      "kind": "method",
+      "line": 247,
+      "signature": "async decrement(self, key: str, amount: int=1) -> int",
+      "reference": "/services/cache/caching-values#repository-decrement"
+    },
+    {
+      "source": "orionis/cache/exceptions.py",
+      "symbol": "CacheException",
+      "kind": "class",
+      "line": 3,
+      "signature": "class CacheException",
+      "reference": "/services/cache/api-reference#exceptions"
+    },
+    {
+      "source": "orionis/cache/exceptions.py",
+      "symbol": "CacheStoreException",
+      "kind": "class",
+      "line": 6,
+      "signature": "class CacheStoreException",
+      "reference": "/services/cache/api-reference#exceptions"
+    },
+    {
+      "source": "orionis/cache/file_based_cache.py",
+      "symbol": "FileBasedCache",
+      "kind": "class",
+      "line": 8,
+      "signature": "class FileBasedCache",
+      "reference": "/services/cache/source-artifacts#artifact-construction"
+    },
+    {
+      "source": "orionis/cache/file_based_cache.py",
+      "symbol": "FileBasedCache.CACHE_VERSION",
+      "kind": "constant",
+      "line": 21,
+      "signature": "CACHE_VERSION = 1",
+      "reference": "/services/cache/source-artifacts#artifact-version"
+    },
+    {
+      "source": "orionis/cache/file_based_cache.py",
+      "symbol": "FileBasedCache.__init__",
+      "kind": "method",
+      "line": 23,
+      "signature": "__init__(self, path: Path, filename: str, monitored_dirs: list[Path] | None=None, monitored_files: list[Path] | None=None) -> None",
+      "reference": "/services/cache/source-artifacts#artifact-construction"
+    },
+    {
+      "source": "orionis/cache/file_based_cache.py",
+      "symbol": "FileBasedCache.get",
+      "kind": "method",
+      "line": 70,
+      "signature": "get(self) -> dict | None",
+      "reference": "/services/cache/source-artifacts#artifact-get"
+    },
+    {
+      "source": "orionis/cache/file_based_cache.py",
+      "symbol": "FileBasedCache.save",
+      "kind": "method",
+      "line": 99,
+      "signature": "save(self, data: dict) -> tuple[int, str]",
+      "reference": "/services/cache/source-artifacts#artifact-save"
+    },
+    {
+      "source": "orionis/cache/file_based_cache.py",
+      "symbol": "FileBasedCache.clear",
+      "kind": "method",
+      "line": 146,
+      "signature": "clear(self) -> bool",
+      "reference": "/services/cache/source-artifacts#artifact-clear"
+    },
+    {
+      "source": "orionis/cache/locks/lock.py",
+      "symbol": "CacheLock",
+      "kind": "class",
+      "line": 45,
+      "signature": "class CacheLock",
+      "reference": "/services/cache/locks#lock-construction"
+    },
+    {
+      "source": "orionis/cache/locks/lock.py",
+      "symbol": "CacheLock.__init__",
+      "kind": "method",
+      "line": 51,
+      "signature": "__init__(self, backend: Any, key: str, timeout: float | None=None) -> None",
+      "reference": "/services/cache/locks#lock-construction"
+    },
+    {
+      "source": "orionis/cache/locks/lock.py",
+      "symbol": "CacheLock.__aenter__",
+      "kind": "method",
+      "line": 80,
+      "signature": "async __aenter__(self) -> Self",
+      "reference": "/services/cache/locks#lock-context"
+    },
+    {
+      "source": "orionis/cache/locks/lock.py",
+      "symbol": "CacheLock.__aexit__",
+      "kind": "method",
+      "line": 150,
+      "signature": "async __aexit__(self, exc_type: type[BaseException] | None, exc_val: BaseException | None, exc_tb: types.TracebackType | None) -> None",
+      "reference": "/services/cache/locks#lock-context"
+    },
+    {
+      "source": "orionis/cache/provider.py",
+      "symbol": "CacheProvider",
+      "kind": "class",
+      "line": 6,
+      "signature": "class CacheProvider",
+      "reference": "/services/cache/api-reference#provider"
+    },
+    {
+      "source": "orionis/cache/provider.py",
+      "symbol": "CacheProvider.provides",
+      "kind": "method",
+      "line": 18,
+      "signature": "provides(cls) -> list[type]",
+      "reference": "/services/cache/api-reference#provider"
+    },
+    {
+      "source": "orionis/cache/provider.py",
+      "symbol": "CacheProvider.register",
+      "kind": "method",
+      "line": 29,
+      "signature": "register(self) -> None",
+      "reference": "/services/cache/api-reference#provider"
+    },
+    {
+      "source": "orionis/cache/provider.py",
+      "symbol": "CacheProvider.boot",
+      "kind": "method",
+      "line": 41,
+      "signature": "async boot(self) -> None",
+      "reference": "/services/cache/api-reference#provider"
+    },
+    {
+      "source": "orionis/cache/repository.py",
+      "symbol": "CacheRepository",
+      "kind": "class",
+      "line": 13,
+      "signature": "class CacheRepository",
+      "reference": "/services/cache/caching-values#repository-construction"
+    },
+    {
+      "source": "orionis/cache/repository.py",
+      "symbol": "CacheRepository.__init__",
+      "kind": "method",
+      "line": 24,
+      "signature": "__init__(self, backend: Any, prefix: str='') -> None",
+      "reference": "/services/cache/caching-values#repository-construction"
+    },
+    {
+      "source": "orionis/cache/repository.py",
+      "symbol": "CacheRepository.replace",
+      "kind": "method",
+      "line": 65,
+      "signature": "async replace(self, key: str, value: Any, ttl: float | None=None) -> bool",
+      "reference": "/services/cache/caching-values#repository-replace"
+    },
+    {
+      "source": "orionis/cache/repository.py",
+      "symbol": "CacheRepository.get",
+      "kind": "method",
+      "line": 107,
+      "signature": "async get(self, key: str) -> Any",
+      "reference": "/services/cache/caching-values#repository-get"
+    },
+    {
+      "source": "orionis/cache/repository.py",
+      "symbol": "CacheRepository.set",
+      "kind": "method",
+      "line": 124,
+      "signature": "async set(self, key: str, value: Any, ttl: float | None=None) -> bool",
+      "reference": "/services/cache/caching-values#repository-set"
+    },
+    {
+      "source": "orionis/cache/repository.py",
+      "symbol": "CacheRepository.has",
+      "kind": "method",
+      "line": 150,
+      "signature": "async has(self, key: str) -> bool",
+      "reference": "/services/cache/caching-values#repository-has"
+    },
+    {
+      "source": "orionis/cache/repository.py",
+      "symbol": "CacheRepository.delete",
+      "kind": "method",
+      "line": 167,
+      "signature": "async delete(self, key: str) -> bool",
+      "reference": "/services/cache/caching-values#repository-delete"
+    },
+    {
+      "source": "orionis/cache/repository.py",
+      "symbol": "CacheRepository.clear",
+      "kind": "method",
+      "line": 184,
+      "signature": "async clear(self) -> bool",
+      "reference": "/services/cache/caching-values#repository-clear"
+    },
+    {
+      "source": "orionis/cache/repository.py",
+      "symbol": "CacheRepository.getMany",
+      "kind": "method",
+      "line": 196,
+      "signature": "async getMany(self, keys: list[str]) -> dict[str, Any]",
+      "reference": "/services/cache/caching-values#repository-getmany"
+    },
+    {
+      "source": "orionis/cache/repository.py",
+      "symbol": "CacheRepository.setMany",
+      "kind": "method",
+      "line": 215,
+      "signature": "async setMany(self, values: dict[str, Any], ttl: float | None=None) -> bool",
+      "reference": "/services/cache/caching-values#repository-setmany"
+    },
+    {
+      "source": "orionis/cache/repository.py",
+      "symbol": "CacheRepository.remember",
+      "kind": "method",
+      "line": 239,
+      "signature": "async remember(self, key: str, ttl: float | None, resolver: Callable) -> Any",
+      "reference": "/services/cache/caching-values#repository-remember"
+    },
+    {
+      "source": "orionis/cache/repository.py",
+      "symbol": "CacheRepository.rememberForever",
+      "kind": "method",
+      "line": 281,
+      "signature": "async rememberForever(self, key: str, resolver: Callable) -> Any",
+      "reference": "/services/cache/caching-values#repository-rememberforever"
+    },
+    {
+      "source": "orionis/cache/repository.py",
+      "symbol": "CacheRepository.pull",
+      "kind": "method",
+      "line": 300,
+      "signature": "async pull(self, key: str) -> Any",
+      "reference": "/services/cache/caching-values#repository-pull"
+    },
+    {
+      "source": "orionis/cache/repository.py",
+      "symbol": "CacheRepository.add",
+      "kind": "method",
+      "line": 322,
+      "signature": "async add(self, key: str, value: Any, ttl: float | None=None) -> bool",
+      "reference": "/services/cache/caching-values#repository-add"
+    },
+    {
+      "source": "orionis/cache/repository.py",
+      "symbol": "CacheRepository.increment",
+      "kind": "method",
+      "line": 353,
+      "signature": "async increment(self, key: str, amount: int=1) -> int",
+      "reference": "/services/cache/caching-values#repository-increment"
+    },
+    {
+      "source": "orionis/cache/repository.py",
+      "symbol": "CacheRepository.decrement",
+      "kind": "method",
+      "line": 372,
+      "signature": "async decrement(self, key: str, amount: int=1) -> int",
+      "reference": "/services/cache/caching-values#repository-decrement"
+    },
+    {
+      "source": "orionis/cache/repository.py",
+      "symbol": "CacheRepository.lock",
+      "kind": "method",
+      "line": 391,
+      "signature": "lock(self, key: str, timeout: float | None=None) -> CacheLock",
+      "reference": "/services/cache/caching-values#repository-lock"
+    },
+    {
+      "source": "orionis/cache/serializer.py",
+      "symbol": "Serializer",
+      "kind": "class",
+      "line": 394,
+      "signature": "class Serializer",
+      "reference": "/services/cache/source-artifacts#serializer-dumps"
+    },
+    {
+      "source": "orionis/cache/serializer.py",
+      "symbol": "Serializer.dumps",
+      "kind": "method",
+      "line": 399,
+      "signature": "dumps(data: Any, indent: int | None=None) -> str",
+      "reference": "/services/cache/source-artifacts#serializer-dumps"
+    },
+    {
+      "source": "orionis/cache/serializer.py",
+      "symbol": "Serializer.loads",
+      "kind": "method",
+      "line": 421,
+      "signature": "loads(raw: str | bytes) -> Any",
+      "reference": "/services/cache/source-artifacts#serializer-loads"
+    },
+    {
+      "source": "orionis/cache/serializer.py",
+      "symbol": "Serializer.dumpToFile",
+      "kind": "method",
+      "line": 438,
+      "signature": "dumpToFile(data: Any, file_path: Path) -> None",
+      "reference": "/services/cache/source-artifacts#serializer-dumptofile"
+    },
+    {
+      "source": "orionis/cache/serializer.py",
+      "symbol": "Serializer.loadFromFile",
+      "kind": "method",
+      "line": 471,
+      "signature": "loadFromFile(file_path: Path) -> Any",
+      "reference": "/services/cache/source-artifacts#serializer-loadfromfile"
+    },
+    {
+      "source": "orionis/cache/serializers/json.py",
+      "symbol": "MsgspecSerializer",
+      "kind": "class",
+      "line": 6,
+      "signature": "class MsgspecSerializer",
+      "reference": "/services/cache/api-reference#msgspec-serializer"
+    },
+    {
+      "source": "orionis/cache/serializers/json.py",
+      "symbol": "MsgspecSerializer.DEFAULT_ENCODING",
+      "kind": "constant",
+      "line": 10,
+      "signature": "DEFAULT_ENCODING = None",
+      "reference": "/services/cache/api-reference#msgspec-serializer"
+    },
+    {
+      "source": "orionis/cache/serializers/json.py",
+      "symbol": "MsgspecSerializer.dumps",
+      "kind": "method",
+      "line": 12,
+      "signature": "dumps(self, value: Any) -> bytes",
+      "reference": "/services/cache/api-reference#msgspec-dumps"
+    },
+    {
+      "source": "orionis/cache/serializers/json.py",
+      "symbol": "MsgspecSerializer.loads",
+      "kind": "method",
+      "line": 28,
+      "signature": "loads(self, data: bytes | str | float | None) -> Any",
+      "reference": "/services/cache/api-reference#msgspec-loads"
+    },
+    {
+      "source": "orionis/cache/stores/database.py",
+      "symbol": "DatabaseCacheBackend",
+      "kind": "class",
+      "line": 97,
+      "signature": "class DatabaseCacheBackend",
+      "reference": "/services/cache/api-reference#backend-database"
+    },
+    {
+      "source": "orionis/cache/stores/database.py",
+      "symbol": "DatabaseCacheBackend.__init__",
+      "kind": "method",
+      "line": 116,
+      "signature": "__init__(self, connection: IConnection, table: str, lock_table: str | None=None) -> None",
+      "reference": "/services/cache/api-reference#backend-database"
+    },
+    {
+      "source": "orionis/cache/stores/database.py",
+      "symbol": "DatabaseCacheBackend.get",
+      "kind": "method",
+      "line": 216,
+      "signature": "async get(self, key: str, default: Any=None) -> Any",
+      "reference": "/services/cache/api-reference#backend-get"
+    },
+    {
+      "source": "orionis/cache/stores/database.py",
+      "symbol": "DatabaseCacheBackend.set",
+      "kind": "method",
+      "line": 254,
+      "signature": "async set(self, key: str, value: Any, ttl: float | None=None) -> bool",
+      "reference": "/services/cache/api-reference#backend-set"
+    },
+    {
+      "source": "orionis/cache/stores/database.py",
+      "symbol": "DatabaseCacheBackend.replace",
+      "kind": "method",
+      "line": 334,
+      "signature": "async replace(self, key: str, value: Any, ttl: float | None=None) -> bool",
+      "reference": "/services/cache/api-reference#backend-replace"
+    },
+    {
+      "source": "orionis/cache/stores/database.py",
+      "symbol": "DatabaseCacheBackend.exists",
+      "kind": "method",
+      "line": 373,
+      "signature": "async exists(self, key: str) -> bool",
+      "reference": "/services/cache/api-reference#backend-exists"
+    },
+    {
+      "source": "orionis/cache/stores/database.py",
+      "symbol": "DatabaseCacheBackend.delete",
+      "kind": "method",
+      "line": 388,
+      "signature": "async delete(self, key: str) -> int",
+      "reference": "/services/cache/api-reference#backend-delete"
+    },
+    {
+      "source": "orionis/cache/stores/database.py",
+      "symbol": "DatabaseCacheBackend.clear",
+      "kind": "method",
+      "line": 410,
+      "signature": "async clear(self) -> bool",
+      "reference": "/services/cache/api-reference#backend-clear"
+    },
+    {
+      "source": "orionis/cache/stores/database.py",
+      "symbol": "DatabaseCacheBackend.multiGet",
+      "kind": "method",
+      "line": 423,
+      "signature": "async multiGet(self, keys: list[str], default: Any=None) -> list[Any]",
+      "reference": "/services/cache/api-reference#backend-multiget"
+    },
+    {
+      "source": "orionis/cache/stores/database.py",
+      "symbol": "DatabaseCacheBackend.multiSet",
+      "kind": "method",
+      "line": 440,
+      "signature": "async multiSet(self, pairs: list[tuple[str, Any]], ttl: float | None=None) -> bool",
+      "reference": "/services/cache/api-reference#backend-multiset"
+    },
+    {
+      "source": "orionis/cache/stores/database.py",
+      "symbol": "DatabaseCacheBackend.multi_get",
+      "kind": "alias",
+      "line": 465,
+      "signature": "multi_get = multiGet",
+      "reference": "/services/cache/api-reference#backend-multiget"
+    },
+    {
+      "source": "orionis/cache/stores/database.py",
+      "symbol": "DatabaseCacheBackend.multi_set",
+      "kind": "alias",
+      "line": 466,
+      "signature": "multi_set = multiSet",
+      "reference": "/services/cache/api-reference#backend-multiset"
+    },
+    {
+      "source": "orionis/cache/stores/database.py",
+      "symbol": "DatabaseCacheBackend.add",
+      "kind": "method",
+      "line": 468,
+      "signature": "async add(self, key: str, value: Any, ttl: float | None=None) -> bool",
+      "reference": "/services/cache/api-reference#backend-add"
+    },
+    {
+      "source": "orionis/cache/stores/database.py",
+      "symbol": "DatabaseCacheBackend.increment",
+      "kind": "method",
+      "line": 530,
+      "signature": "async increment(self, key: str, delta: int=1) -> int",
+      "reference": "/services/cache/api-reference#backend-increment"
+    },
+    {
+      "source": "orionis/cache/stores/database.py",
+      "symbol": "DatabaseCacheBackend.acquireLock",
+      "kind": "method",
+      "line": 626,
+      "signature": "async acquireLock(self, key: str, owner: str, lease: float) -> bool",
+      "reference": "/services/cache/api-reference#backend-acquirelock"
+    },
+    {
+      "source": "orionis/cache/stores/database.py",
+      "symbol": "DatabaseCacheBackend.releaseLock",
+      "kind": "method",
+      "line": 679,
+      "signature": "async releaseLock(self, key: str, owner: str) -> None",
+      "reference": "/services/cache/api-reference#backend-releaselock"
+    },
+    {
+      "source": "orionis/cache/stores/database.py",
+      "symbol": "build",
+      "kind": "function",
+      "line": 706,
+      "signature": "build(connection: IConnection, table: str, lock_table: str | None=None) -> DatabaseCacheBackend",
+      "reference": "/services/cache/api-reference#backend-database"
+    },
+    {
+      "source": "orionis/cache/stores/file.py",
+      "symbol": "FileCacheBackend",
+      "kind": "class",
+      "line": 24,
+      "signature": "class FileCacheBackend",
+      "reference": "/services/cache/api-reference#backend-file"
+    },
+    {
+      "source": "orionis/cache/stores/file.py",
+      "symbol": "FileCacheBackend.__init__",
+      "kind": "method",
+      "line": 30,
+      "signature": "__init__(self, path: Path) -> None",
+      "reference": "/services/cache/api-reference#backend-file"
+    },
+    {
+      "source": "orionis/cache/stores/file.py",
+      "symbol": "FileCacheBackend.lockNamespace",
+      "kind": "method",
+      "line": 57,
+      "signature": "lockNamespace(self) -> Path",
+      "reference": "/services/cache/api-reference#backend-locknamespace"
+    },
+    {
+      "source": "orionis/cache/stores/file.py",
+      "symbol": "FileCacheBackend.get",
+      "kind": "method",
+      "line": 320,
+      "signature": "async get(self, key: str, default: Any=None) -> Any",
+      "reference": "/services/cache/api-reference#backend-get"
+    },
+    {
+      "source": "orionis/cache/stores/file.py",
+      "symbol": "FileCacheBackend.replace",
+      "kind": "method",
+      "line": 345,
+      "signature": "async replace(self, key: str, value: Any, ttl: float | None=None) -> bool",
+      "reference": "/services/cache/api-reference#backend-replace"
+    },
+    {
+      "source": "orionis/cache/stores/file.py",
+      "symbol": "FileCacheBackend.set",
+      "kind": "method",
+      "line": 370,
+      "signature": "async set(self, key: str, value: Any, ttl: float | None=None) -> bool",
+      "reference": "/services/cache/api-reference#backend-set"
+    },
+    {
+      "source": "orionis/cache/stores/file.py",
+      "symbol": "FileCacheBackend.exists",
+      "kind": "method",
+      "line": 396,
+      "signature": "async exists(self, key: str) -> bool",
+      "reference": "/services/cache/api-reference#backend-exists"
+    },
+    {
+      "source": "orionis/cache/stores/file.py",
+      "symbol": "FileCacheBackend.delete",
+      "kind": "method",
+      "line": 411,
+      "signature": "async delete(self, key: str) -> int",
+      "reference": "/services/cache/api-reference#backend-delete"
+    },
+    {
+      "source": "orionis/cache/stores/file.py",
+      "symbol": "FileCacheBackend.clear",
+      "kind": "method",
+      "line": 428,
+      "signature": "async clear(self) -> bool",
+      "reference": "/services/cache/api-reference#backend-clear"
+    },
+    {
+      "source": "orionis/cache/stores/file.py",
+      "symbol": "FileCacheBackend.multiGet",
+      "kind": "method",
+      "line": 460,
+      "signature": "async multiGet(self, keys: list[str], default: Any=None) -> list[Any]",
+      "reference": "/services/cache/api-reference#backend-multiget"
+    },
+    {
+      "source": "orionis/cache/stores/file.py",
+      "symbol": "FileCacheBackend.multiSet",
+      "kind": "method",
+      "line": 477,
+      "signature": "async multiSet(self, pairs: list[tuple[str, Any]], ttl: float | None=None) -> bool",
+      "reference": "/services/cache/api-reference#backend-multiset"
+    },
+    {
+      "source": "orionis/cache/stores/file.py",
+      "symbol": "FileCacheBackend.multi_get",
+      "kind": "alias",
+      "line": 502,
+      "signature": "multi_get = multiGet",
+      "reference": "/services/cache/api-reference#backend-multiget"
+    },
+    {
+      "source": "orionis/cache/stores/file.py",
+      "symbol": "FileCacheBackend.multi_set",
+      "kind": "alias",
+      "line": 503,
+      "signature": "multi_set = multiSet",
+      "reference": "/services/cache/api-reference#backend-multiset"
+    },
+    {
+      "source": "orionis/cache/stores/file.py",
+      "symbol": "FileCacheBackend.add",
+      "kind": "method",
+      "line": 505,
+      "signature": "async add(self, key: str, value: Any, ttl: float | None=None) -> bool",
+      "reference": "/services/cache/api-reference#backend-add"
+    },
+    {
+      "source": "orionis/cache/stores/file.py",
+      "symbol": "FileCacheBackend.increment",
+      "kind": "method",
+      "line": 549,
+      "signature": "async increment(self, key: str, delta: int=1) -> int",
+      "reference": "/services/cache/api-reference#backend-increment"
+    },
+    {
+      "source": "orionis/cache/stores/memcached.py",
+      "symbol": "build",
+      "kind": "function",
+      "line": 5,
+      "signature": "build(endpoint: str='127.0.0.1', port: int=11211) -> MemcachedCache",
+      "reference": "/services/cache/api-reference#backend-memcached"
+    },
+    {
+      "source": "orionis/cache/stores/memory.py",
+      "symbol": "build",
+      "kind": "function",
+      "line": 5,
+      "signature": "build() -> SimpleMemoryCache",
+      "reference": "/services/cache/api-reference#backend-memory"
+    },
+    {
+      "source": "orionis/cache/stores/redis.py",
+      "symbol": "build",
+      "kind": "function",
+      "line": 5,
+      "signature": "build(endpoint: str='127.0.0.1', port: int=6379, db: int=0, password: str | None=None) -> RedisCache",
+      "reference": "/services/cache/api-reference#backend-redis"
+    },
+    {
+      "source": "orionis/foundation/config/cache/entities/cache.py",
+      "symbol": "Cache",
+      "kind": "class",
+      "line": 12,
+      "signature": "class Cache",
+      "reference": "/services/cache/configuration#config-cache"
+    },
+    {
+      "source": "orionis/foundation/config/cache/entities/cache.py",
+      "symbol": "Cache.default",
+      "kind": "field",
+      "line": 30,
+      "signature": "default: Drivers | str = field(default_factory=lambda: Env.get('CACHE_STORE', Drivers.FILE.value), metadata={'description': \"The default cache storage type. Can be a member of the Drivers enum or a string (e.g., 'memory', 'file').\", 'default': Drivers.FILE.value})",
+      "reference": "/services/cache/configuration#config-cache"
+    },
+    {
+      "source": "orionis/foundation/config/cache/entities/cache.py",
+      "symbol": "Cache.prefix",
+      "kind": "field",
+      "line": 41,
+      "signature": "prefix: str = field(default_factory=lambda: Env.get('CACHE_PREFIX', 'orionis'), metadata={'description': 'Global key prefix applied to all cache entries.', 'default': 'orionis'})",
+      "reference": "/services/cache/configuration#config-cache"
+    },
+    {
+      "source": "orionis/foundation/config/cache/entities/cache.py",
+      "symbol": "Cache.stores",
+      "kind": "field",
+      "line": 49,
+      "signature": "stores: Stores | dict = field(default_factory=Stores, metadata={'description': 'The configuration for available cache stores. Defaults to a file store at the specified path.', 'default': lambda: Stores().toDict()})",
+      "reference": "/services/cache/configuration#config-cache"
+    },
+    {
+      "source": "orionis/foundation/config/cache/entities/database.py",
+      "symbol": "Database",
+      "kind": "class",
+      "line": 11,
+      "signature": "class Database",
+      "reference": "/services/cache/configuration#config-database"
+    },
+    {
+      "source": "orionis/foundation/config/cache/entities/database.py",
+      "symbol": "Database.driver",
+      "kind": "field",
+      "line": 39,
+      "signature": "driver: str = field(default='database', metadata={'description': \"The driver type for the cache store. Defaults to 'database'.\", 'default': 'database'})",
+      "reference": "/services/cache/configuration#config-database"
+    },
+    {
+      "source": "orionis/foundation/config/cache/entities/database.py",
+      "symbol": "Database.connection",
+      "kind": "field",
+      "line": 49,
+      "signature": "connection: str | None = field(default_factory=lambda: Env.get('DB_CACHE_CONNECTION'), metadata={'description': \"The database connection name used to store cache entries. Defaults to the 'DB_CACHE_CONNECTION' environment variable or None to use the application's default connection.\", 'default': None})",
+      "reference": "/services/cache/configuration#config-database"
+    },
+    {
+      "source": "orionis/foundation/config/cache/entities/database.py",
+      "symbol": "Database.table",
+      "kind": "field",
+      "line": 61,
+      "signature": "table: str = field(default_factory=lambda: Env.get('DB_CACHE_TABLE', 'cache'), metadata={'description': \"The database table name used to store cache entries. Defaults to the 'DB_CACHE_TABLE' environment variable or 'cache'.\", 'default': 'cache'})",
+      "reference": "/services/cache/configuration#config-database"
+    },
+    {
+      "source": "orionis/foundation/config/cache/entities/database.py",
+      "symbol": "Database.lock_table",
+      "kind": "field",
+      "line": 73,
+      "signature": "lock_table: str | None = field(default_factory=lambda: Env.get('DB_CACHE_LOCK_TABLE', 'cache_locks'), metadata={'description': \"The database table name used to store cache locks. Defaults to the 'DB_CACHE_LOCK_TABLE' environment variable or None.\", 'default': 'cache_locks'})",
+      "reference": "/services/cache/configuration#config-database"
+    },
+    {
+      "source": "orionis/foundation/config/cache/entities/file.py",
+      "symbol": "File",
+      "kind": "class",
+      "line": 7,
+      "signature": "class File",
+      "reference": "/services/cache/configuration#config-file"
+    },
+    {
+      "source": "orionis/foundation/config/cache/entities/file.py",
+      "symbol": "File.driver",
+      "kind": "field",
+      "line": 20,
+      "signature": "driver: str = field(default='file', metadata={'description': \"The driver type for the cache store. Defaults to 'file'.\", 'default': 'file'})",
+      "reference": "/services/cache/configuration#config-file"
+    },
+    {
+      "source": "orionis/foundation/config/cache/entities/file.py",
+      "symbol": "File.path",
+      "kind": "field",
+      "line": 28,
+      "signature": "path: str = field(default_factory=lambda: Env.get('CACHE_FILE_PATH', 'storage/framework/cache/data'), metadata={'description': \"The filesystem path where cache data will be stored. Defaults to 'storage/framework/cache/data'.\", 'default': 'storage/framework/cache/data'})",
+      "reference": "/services/cache/configuration#config-file"
+    },
+    {
+      "source": "orionis/foundation/config/cache/entities/memcached.py",
+      "symbol": "Memcached",
+      "kind": "class",
+      "line": 10,
+      "signature": "class Memcached",
+      "reference": "/services/cache/configuration#config-memcached"
+    },
+    {
+      "source": "orionis/foundation/config/cache/entities/memcached.py",
+      "symbol": "Memcached.driver",
+      "kind": "field",
+      "line": 26,
+      "signature": "driver: str = field(default='memcached', metadata={'description': \"The driver type for the cache store. Defaults to 'memcached'.\", 'default': 'memcached'})",
+      "reference": "/services/cache/configuration#config-memcached"
+    },
+    {
+      "source": "orionis/foundation/config/cache/entities/memcached.py",
+      "symbol": "Memcached.endpoint",
+      "kind": "field",
+      "line": 36,
+      "signature": "endpoint: str | None = field(default_factory=lambda: Env.get('MEMCACHED_HOST', '127.0.0.1'), metadata={'description': 'Memcached host address.', 'default': '127.0.0.1'})",
+      "reference": "/services/cache/configuration#config-memcached"
+    },
+    {
+      "source": "orionis/foundation/config/cache/entities/memcached.py",
+      "symbol": "Memcached.port",
+      "kind": "field",
+      "line": 44,
+      "signature": "port: int = field(default_factory=lambda: Env.get('MEMCACHED_PORT', 11211), metadata={'description': 'Memcached port.', 'default': 11211})",
+      "reference": "/services/cache/configuration#config-memcached"
+    },
+    {
+      "source": "orionis/foundation/config/cache/entities/memory.py",
+      "symbol": "Memory",
+      "kind": "class",
+      "line": 6,
+      "signature": "class Memory",
+      "reference": "/services/cache/configuration#config-memory"
+    },
+    {
+      "source": "orionis/foundation/config/cache/entities/memory.py",
+      "symbol": "Memory.driver",
+      "kind": "field",
+      "line": 16,
+      "signature": "driver: str = field(default='memory', metadata={'description': \"The driver type for the cache store. Defaults to 'memory'.\", 'default': 'memory'})",
+      "reference": "/services/cache/configuration#config-memory"
+    },
+    {
+      "source": "orionis/foundation/config/cache/entities/redis.py",
+      "symbol": "Redis",
+      "kind": "class",
+      "line": 10,
+      "signature": "class Redis",
+      "reference": "/services/cache/configuration#config-redis"
+    },
+    {
+      "source": "orionis/foundation/config/cache/entities/redis.py",
+      "symbol": "Redis.driver",
+      "kind": "field",
+      "line": 32,
+      "signature": "driver: str = field(default='redis', metadata={'description': \"The driver type for the cache store. Defaults to 'redis'.\", 'default': 'redis'})",
+      "reference": "/services/cache/configuration#config-redis"
+    },
+    {
+      "source": "orionis/foundation/config/cache/entities/redis.py",
+      "symbol": "Redis.endpoint",
+      "kind": "field",
+      "line": 42,
+      "signature": "endpoint: str | None = field(default_factory=lambda: Env.get('REDIS_HOST', '127.0.0.1'), metadata={'description': 'Redis host address.', 'default': '127.0.0.1'})",
+      "reference": "/services/cache/configuration#config-redis"
+    },
+    {
+      "source": "orionis/foundation/config/cache/entities/redis.py",
+      "symbol": "Redis.port",
+      "kind": "field",
+      "line": 50,
+      "signature": "port: int = field(default_factory=lambda: Env.get('REDIS_PORT', 6379), metadata={'description': 'Redis port.', 'default': 6379})",
+      "reference": "/services/cache/configuration#config-redis"
+    },
+    {
+      "source": "orionis/foundation/config/cache/entities/redis.py",
+      "symbol": "Redis.db",
+      "kind": "field",
+      "line": 58,
+      "signature": "db: int = field(default_factory=lambda: Env.get('REDIS_DB', 0), metadata={'description': 'Redis database index.', 'default': 0})",
+      "reference": "/services/cache/configuration#config-redis"
+    },
+    {
+      "source": "orionis/foundation/config/cache/entities/redis.py",
+      "symbol": "Redis.password",
+      "kind": "field",
+      "line": 66,
+      "signature": "password: str | None = field(default_factory=lambda: Env.get('REDIS_PASSWORD'), metadata={'description': 'Redis password.', 'default': None})",
+      "reference": "/services/cache/configuration#config-redis"
+    },
+    {
+      "source": "orionis/foundation/config/cache/entities/stores.py",
+      "symbol": "Stores",
+      "kind": "class",
+      "line": 11,
+      "signature": "class Stores",
+      "reference": "/services/cache/configuration#config-stores"
+    },
+    {
+      "source": "orionis/foundation/config/cache/entities/stores.py",
+      "symbol": "Stores.file",
+      "kind": "field",
+      "line": 30,
+      "signature": "file: File | dict = field(default_factory=File, metadata={'description': 'File-based cache storage configuration.', 'default': lambda: File().toDict()})",
+      "reference": "/services/cache/configuration#config-stores"
+    },
+    {
+      "source": "orionis/foundation/config/cache/entities/stores.py",
+      "symbol": "Stores.memory",
+      "kind": "field",
+      "line": 38,
+      "signature": "memory: Memory | dict | None = field(default_factory=Memory, metadata={'description': 'In-memory cache storage configuration.', 'default': lambda: Memory().toDict()})",
+      "reference": "/services/cache/configuration#config-stores"
+    },
+    {
+      "source": "orionis/foundation/config/cache/entities/stores.py",
+      "symbol": "Stores.redis",
+      "kind": "field",
+      "line": 46,
+      "signature": "redis: Redis | dict | None = field(default_factory=Redis, metadata={'description': 'Redis cache storage configuration.', 'default': lambda: Redis().toDict()})",
+      "reference": "/services/cache/configuration#config-stores"
+    },
+    {
+      "source": "orionis/foundation/config/cache/entities/stores.py",
+      "symbol": "Stores.memcached",
+      "kind": "field",
+      "line": 54,
+      "signature": "memcached: Memcached | dict | None = field(default_factory=Memcached, metadata={'description': 'Memcached cache storage configuration.', 'default': lambda: Memcached().toDict()})",
+      "reference": "/services/cache/configuration#config-stores"
+    },
+    {
+      "source": "orionis/foundation/config/cache/entities/stores.py",
+      "symbol": "Stores.database",
+      "kind": "field",
+      "line": 62,
+      "signature": "database: Database | dict | None = field(default_factory=Database, metadata={'description': 'Database-backed cache storage configuration.', 'default': lambda: Database().toDict()})",
+      "reference": "/services/cache/configuration#config-stores"
+    },
+    {
+      "source": "orionis/foundation/config/cache/enums/drivers.py",
+      "symbol": "Drivers",
+      "kind": "class",
+      "line": 3,
+      "signature": "class Drivers",
+      "reference": "/services/cache/configuration#config-drivers"
+    },
+    {
+      "source": "orionis/foundation/config/cache/enums/drivers.py",
+      "symbol": "Drivers.FILE",
+      "kind": "constant",
+      "line": 22,
+      "signature": "FILE = 'file'",
+      "reference": "/services/cache/configuration#config-drivers"
+    },
+    {
+      "source": "orionis/foundation/config/cache/enums/drivers.py",
+      "symbol": "Drivers.MEMCACHED",
+      "kind": "constant",
+      "line": 23,
+      "signature": "MEMCACHED = 'memcached'",
+      "reference": "/services/cache/configuration#config-drivers"
+    },
+    {
+      "source": "orionis/foundation/config/cache/enums/drivers.py",
+      "symbol": "Drivers.MEMORY",
+      "kind": "constant",
+      "line": 24,
+      "signature": "MEMORY = 'memory'",
+      "reference": "/services/cache/configuration#config-drivers"
+    },
+    {
+      "source": "orionis/foundation/config/cache/enums/drivers.py",
+      "symbol": "Drivers.REDIS",
+      "kind": "constant",
+      "line": 25,
+      "signature": "REDIS = 'redis'",
+      "reference": "/services/cache/configuration#config-drivers"
+    },
+    {
+      "source": "orionis/foundation/config/cache/enums/drivers.py",
+      "symbol": "Drivers.DATABASE",
+      "kind": "constant",
+      "line": 26,
+      "signature": "DATABASE = 'database'",
+      "reference": "/services/cache/configuration#config-drivers"
+    },
+    {
+      "source": "orionis/support/facades/cache.py",
+      "symbol": "Cache",
+      "kind": "class",
+      "line": 4,
+      "signature": "class Cache",
+      "reference": "/services/cache/manager-and-injection#facade"
+    },
+    {
+      "source": "orionis/support/facades/cache.py",
+      "symbol": "Cache.getFacadeAccessor",
+      "kind": "method",
+      "line": 22,
+      "signature": "getFacadeAccessor(cls) -> type",
+      "reference": "/services/cache/api-reference#facade-accessor"
+    }
+  ]
+}

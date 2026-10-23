@@ -1,141 +1,199 @@
 ---
-title: "Configuring stores and coordinating regeneration"
-description: "Store selection determines where cache data is shared and what a lock means."
+title: "Cache drivers and stores"
+description: "Choose file, memory, Redis, Memcached, or database according to the sharing, expiration, and coordination you need."
 editUrl: true
 lastUpdated: false
 ---
 
-Store selection determines where cache data is shared and what a lock means.
+A **store** is the repository selected through `manager.store("redis")`. Its **backend** implements operations using files, memory, Redis, Memcached, or database tables. The included configuration maps five fixed names to implementations; each entity's `driver` field confirms its type rather than arbitrarily converting one store into another.
 
-## Choose a backend by its scope
+## Choose by scope
 
-| Store | Persistence and scope | Coordination |
+| Store | Where data is shared | Uses and considerations |
 |---|---|---|
-| `memory` | This instance/process only; lost on restart | RedLock on the same backend; does not coordinate workers. |
-| `file` | JSON in a local shared directory | File-locked writes and replacement; `cache.lock()` coordinates only the same loop and directory. |
-| `redis` | Configured Redis service | aiocache RedLock lease; not a business transaction. |
-| `memcached` | Memcached service, subject to eviction | RedLock lease with backend-specific guarantees. |
-| `database` | Tables in an Orionis connection | Unique rows and leases; requires enforced unique constraints. |
+| `file` | Processes accessing the same filesystem directory. | Requires no cache server. Adds I/O and coordination files; monotonic expirations are not durable persistence. |
+| `memory` | Only consumers of the same backend instance. | Tests and ephemeral process-local data. Does not share results across workers or survive loss of the instance. |
+| `redis` | Clients of the same Redis database. | Shared cache across processes and servers. Requires an accessible service; lifecycle and capacity depend on its configuration. |
+| `memcached` | Clients of the same Memcached service. | Shared cache with server-managed temporary storage. Prefixes do not isolate clearing. |
+| `database` | Clients of the same tables in a Database connection. | Reuses an existing connection. Adds queries and tables; requires enforced unique constraints. |
 
-The manager accepts built-in names `memory`, `file`, `redis`, `memcached`, and `database`; it has no `extend()` registry for named stores. For a custom backend, construct `CacheRepository(backend, prefix)` with the aiocache API used by the repository, or replace `ICacheManager` through the container. A store entity's `driver` property does not arbitrarily select another implementation.
+All stores hold regenerable data. Orionis provides no automatic failover between them: Redis failure does not redirect writes to `file` or `memory`. Backend, serialization, network, and database errors may propagate.
 
-Stores serialize through msgspec JSON: keep value contracts JSON-compatible and test round trips when using dates, tuples, or custom types. The rich `Serializer` described under [artifacts](/en/services/cache/source-artifacts) is not used by these stores. Dates may return as strings and tuples as lists; do not assume type identity.
+## Included dependencies and external services
 
-The database store creates entry and lock tables lazily; its connection needs table-creation permissions. It rejects connections lacking enforced unique constraints, such as Redshift. It does not require a dedicated cache migration. Keep table names exclusive to your application. The file store uses monotonic-clock expirations; do not treat it as durable persistence or share its files across machines with different monotonic clocks.
+The framework declares `aiocache[redis,memcached]`, `redis[hiredis]`, `msgspec`, and `filelock` as normal dependencies. The `aiomcache` client is included through aiocache's Memcached support. **No Orionis extras are required for these stores**; you do not need `reactor packages` to enable Redis or Memcached.
 
-### Avoid simultaneous regeneration
+Python clients do not include their servers. Before using `redis` or `memcached`, provide the corresponding service and configure it in [config/cache.py](/en/services/cache/configuration). The `database` backend uses the Database system; when choosing an engine with an optional database driver, apply [that engine's requirements](/en/database/drivers).
 
-`remember()` alone can run several resolvers for the same miss. Acquire a lock and check again inside the critical section before computing. The meaning of `timeout` varies by store: file uses it as an acquisition deadline; database also uses it as the lease; RedLock uses it as the lease duration. Lease expiry does not cancel your code and may admit another writer while you are still inside.
+## Select a store from a component
 
-Use cache locks to reduce duplicate work. For balance, inventory, or uniqueness invariants, use transactions or constraints in the persistent system. Automatic lease renewal and fencing tokens are not provided.
-
-
-### Coordinate cache regeneration
-
-This standalone memory example rechecks the cache inside the lock through `remember()`. In an application, replace `build_summary` with an async read or calculation that returns regenerable data.
+This service receives `ICacheManager` through injection. `store()` returns a repository synchronously; data operations are asynchronous:
 
 ```python
-import asyncio
-from orionis.cache import CacheRepository
-from orionis.cache.stores.memory import build
+from orionis.cache.contracts import ICacheManager
 
 
-async def build_summary() -> dict:
-    return {"published_products": 42}
+class CatalogCache:
+    def __init__(self, cache: ICacheManager) -> None:
+        self.cache = cache
 
-
-async def main() -> None:
-    cache = CacheRepository(build())
-    async with cache.lock("catalog:v1:rebuild", timeout=2):
-        summary = await cache.remember("catalog:v1", 60, build_summary)
-    print(summary)  # {'published_products': 42}
-
-
-asyncio.run(main())
+    async def save_snapshot(self) -> dict:
+        store = self.cache.store("file")
+        snapshot = {"published_products": 42}
+        await store.set("catalog:summary", snapshot, ttl=60)
+        return await store.get("catalog:summary")
 ```
 
-Memory uses aiocache's lease-based `RedLock` and coordinates only users of that same backend instance. This is a duplicate-work optimization, not inventory or balance protection. Select a shared backend when several processes need the cached result, and account for the lease limits above.
+Replace `"file"` with another configured name to use it for that operation. `self.cache.store()` without an argument selects `CACHE_STORE`. The manager reuses each named repository; do not create a new repository per request to represent the same memory store.
 
-## Configuration
-
-| Key | Environment variable | Default |
-|---|---|---|
-| `cache.default` | `CACHE_STORE` | `file` |
-| `cache.prefix` | `CACHE_PREFIX` | empty |
-| `cache.stores.file.path` | `CACHE_FILE_PATH` | `storage/framework/cache/data` |
-| `cache.stores.redis.endpoint/port/db/password` | `REDIS_HOST`, `REDIS_PORT`, `REDIS_DB`, `REDIS_PASSWORD` | `127.0.0.1`, `6379`, `0`, `None` |
-| `cache.stores.memcached.endpoint/port` | `MEMCACHED_HOST`, `MEMCACHED_PORT` | `127.0.0.1`, `11211` |
-| `cache.stores.database.connection` | `DB_CACHE_CONNECTION` | default DB connection |
-| `cache.stores.database.table` | `DB_CACHE_TABLE` | `cache` |
-| `cache.stores.database.lock_table` | `DB_CACHE_LOCK_TABLE` | `cache_locks` |
-
-Relative file paths resolve against `app.basePath`. Configuration entities validate driver names and store options during application setup.
-
-
-The shipped `BootstrapCache` uses an empty prefix; the base `Cache` entity defaults to `orionis` when constructed without an override. Check which configuration your application builds.
-
-
-## Integration with Orionis
-
-`CacheProvider` is deferrable: the container registers the singleton manager when `ICacheManager` is needed, then pins the `Cache` facade. The database store obtains its connection through `ConnectionResolver`. File and database stores use msgspec JSON encoding.
-
-The cache package is also used by framework compilation and other modules that need cached state. Importing `orionis.cache` alone does not build a backend or connect to a service.
-
-
-
-## Errors and edge cases
-
-- Missing and stored `None` are indistinguishable through `get`, but `remember` distinguishes them internally.
-- `clear()` flushes the backend namespace and does not filter by repository prefix.
-- `pull` is a read followed by delete, not one backend atomic primitive.
-- Concurrent `remember` misses can run the resolver more than once.
-- Invalid store names and unavailable store configuration raise `CacheStoreException`; connection, serializer, and backend exceptions may propagate.
-- `add` converts the backend's duplicate-key `ValueError` to `False`; it does not suppress unrelated exception types.
-- File/database lock acquisition with a finite timeout may raise `TimeoutError`. Leases can expire while a long critical section is still running.
-- `FileBasedCache.save` accepts only dictionaries and its invalidation hash is refreshed on a short internal interval (0.5 seconds).
-
-
-
-## Performance and concurrency
-
-Repository creation is lazy and cached per manager. Memory is process-local; file storage offloads blocking file operations and uses file locks/atomic replacement; Redis and Memcached delegate network behavior to aiocache; database storage ensures its schema lazily and uses database operations for shared coordination.
-
-File-cache async locks are shared only within the same event loop and cache directory. Database locks poll every 0.05 seconds and use a default 10-second lease when no timeout is supplied. Other backends use a 10-second default RedLock lease. Batch methods delegate to backend multi-operations rather than looping in the repository.
-
-
-
-### `Cache` facade and `CacheManager`
-
-Use `from orionis.support.facades.cache import Cache` in a booted application. `CacheProvider` registers `ICacheManager` as a singleton and pins the facade. `store(name=None)` is synchronous and returns a repository; all other manager methods proxy to the default store:
+You can also resolve the manager through the facade inside a controller:
 
 ```python
+from orionis.http import JSONResponse
 from orionis.support.facades import Cache
 
 
-async def cache_example() -> None:
-    repo = Cache.store("redis")
-    value = await repo.get("key")
-    await repo.set("key", value, ttl=60)
+class CacheStatusController:
+    async def index(self) -> JSONResponse:
+        manager = await Cache.resolve()
+        store = manager.store("memory")
+        await store.set("status:ready", {"ready": True}, ttl=30)
+        return JSONResponse(await store.get("status:ready"))
 ```
 
-Supported configured names are `file`, `memory`, `redis`, `memcached`, and `database`. An unknown or absent store raises `CacheStoreException`.
+Explicit resolution returns the service before calling the synchronous `store()` method and supports its deferred provider. The [guide introduction](/en/services/cache) explains facades and application integration.
 
-### Extension API
+<a id="driver-file"></a>
 
-`ICacheManager`, `ICacheRepository`, and `IFileBasedCache` define replacement contracts. Custom key/value backends supplied to `CacheRepository` must provide the aiocache-style methods used by the repository (`get`, `set`, `exists`, `delete`, batch methods, `add`, and `increment`).
+## File: local files
 
-## Implementation reference for extensions
+Minimal configuration:
 
-| Area | Responsibility |
+```dotenv
+CACHE_STORE=file
+CACHE_FILE_PATH=storage/framework/cache/data
+```
+
+The manager resolves relative paths from the application root. The backend normalizes its path and creates the directory when constructed. Each complete key, including its prefix, becomes a SHA-256 `<digest>.json` filename rather than being used directly as a file path.
+
+Each JSON entry contains its value and expiration. The backend moves reads and writes to worker threads, uses striped file locks to coordinate access to the same directory, and publishes writes through unique temporary files and replacement. Increments coordinate the read and write under a file lock. These single-operation guarantees do not turn several calls into a transaction.
+
+Read errors or unreadable JSON are treated as a miss; expired entries are removed when read. Writes can propagate permission, serialization, and I/O errors. `clear()` deletes `.json` and `.tmp` files from that directory, rather than only the current prefix's keys. Reserve a dedicated directory for this backend.
+
+### Expiration and persistence
+
+TTLs use `time.monotonic()`, in seconds. `ttl=None` means no expiration; `ttl=0` makes the entry immediately expired. The monotonic clock is not a calendar date and does not define a durable expiration that you can move between machines or system restarts. Treat this store as regenerable local cache.
+
+There is no periodic cleanup worker or configured size limit. An expired entry can remain physically present until read or until you clear the store. The [public cache lock](/en/services/cache/locks) has a different scope: it coordinates the same event loop, directory, and key rather than all requests from separate processes.
+
+<a id="driver-memory"></a>
+
+## Memory: process-local data
+
+```dotenv
+CACHE_STORE=memory
+```
+
+The builder creates aiocache's `SimpleMemoryCache` with Orionis's JSON serializer. It requires no external connection and avoids disk or network I/O, although values are still serialized.
+
+The manager retains one instance per store; another manager or memory backend does not share its data. Each worker has its own cache and regenerations. There is no restart persistence or Orionis-configured capacity limit. Positive TTLs use event-loop timers; `None` and `0` do not schedule expiration.
+
+Use it for disposable process-local data and tests without servers. Choose a shared backend for results that workers must share.
+
+<a id="driver-redis"></a>
+
+## Redis: shared cache
+
+```dotenv
+CACHE_STORE=redis
+CACHE_PREFIX=shop
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+REDIS_DB=0
+```
+
+Set `REDIS_PASSWORD` when required. Orionis builds aiocache's `RedisCache` with endpoint, port, database, password, and its JSON serializer. The client uses RESP 2. The included configuration exposes no connection URL, TLS, ACL username, Sentinel, or Cluster; adding dictionary fields does not enable those options.
+
+Selecting the store constructs the client; it does not prove connectivity or valid credentials. Network operations can fail. Sharing, server persistence, and memory policies depend on your Redis deployment rather than `CACHE_STORE`.
+
+Fractional TTLs for individual writes are converted to milliseconds for the client; integer TTLs are passed as seconds. Use `None` for no expiration and positive TTLs for limited lifetimes. Orionis does not normalize every `0` TTL case: aiocache's single-write and batch-write paths use different commands.
+
+`clear()` flushes the selected Redis database; the Orionis prefix does not restrict its scope. Use a database or service suitable for that clearing policy rather than sharing it with unrelated data.
+
+<a id="driver-memcached"></a>
+
+## Memcached: shared temporary cache
+
+```dotenv
+CACHE_STORE=memcached
+CACHE_PREFIX=shop
+MEMCACHED_HOST=127.0.0.1
+MEMCACHED_PORT=11211
+```
+
+Orionis constructs aiocache's `MemcachedCache` with endpoint, port, and its JSON serializer. Provide the service separately. The entity exposes no authentication, TLS, or multiple endpoints.
+
+Use whole-second TTLs for this backend: its client validates `exptime` as an integer. `None` and `0` are sent as no expiration; fractional TTLs are not automatically converted and may raise `TypeError`. Server key, value-size, and capacity limits still apply; Orionis neither removes them nor provides persistence.
+
+Aiocache's key builder replaces spaces with underscores. Avoid keys differing only by these characters, as they can identify the same item. Prefixes also provide no isolation for `clear()`, which invokes the service's `flush_all`.
+
+<a id="driver-database"></a>
+
+## Database: cache and lock tables
+
+```dotenv
+CACHE_STORE=database
+DB_CACHE_TABLE=cache
+DB_CACHE_LOCK_TABLE=cache_locks
+```
+
+Without `DB_CACHE_CONNECTION`, the store uses Orionis's default connection resolution. For a specific connection, supply a name declared in `config/database.py`. The backend receives its connection from `ConnectionResolver`; it does not create an independent connection configuration.
+
+The first I/O operation lazily creates the entry and lock tables through the schema system. The connection must be able to create missing tables. Existing tables are retained rather than migrated to compatible structures. Names are logical names, so the Database connection's table prefix applies.
+
+| Table | Generated columns | Purpose |
+|---|---|---|
+| Entries: `table` | `cache_key`: String(255), primary key; `cache_value`: nullable Text; `expiration`: nullable Double. | Complete key, JSON, and expiration. |
+| Locks: `lock_table` | `cache_key`: String(255), primary key; `owner`: nullable String(255); `expiration`: nullable Double. | Temporary reservation by key and owner. |
+
+Tables must have different names dedicated to this cache. The connection must actually enforce unique keys; the constructor rejects engines such as Amazon Redshift with `QueryException`. Entries and locks use the same connection, with no separate lock-connection option.
+
+Expirations use `time.time()` and store fractional seconds. `None` means no expiration; `0` expires immediately. Reads lazily remove expired rows. There is no periodic scan of all rows. Batch operations iterate over entries rather than forming one batch transaction. Increments use compare-and-update with bounded retries under concurrency.
+
+This store shares data without a dedicated cache server at the cost of database reads and writes. `clear()` deletes every row in the entry table, preserving the table and lock rows. Connection, schema, and query errors may propagate.
+
+<a id="namespace"></a>
+
+## Prefixes, namespaces, and serialization
+
+`CACHE_PREFIX` transforms the backend key to `prefix:key` when nonempty, or leaves it as `key` otherwise. It creates neither a separate Redis/Memcached client namespace, a file subdirectory, nor a database table.
+
+| Backend | Scope of `clear()` |
 |---|---|
-| `cache_manager.py`, `provider.py` | Store construction, reuse, default-store proxy, and facade/container registration. |
-| `repository.py` | Uniform high-level async cache operations and prefixes. |
-| `stores/` | Memory, file, Redis, Memcached, and database backends. |
-| `locks/` | Backend-aware async lock context manager. |
-| `serializer.py`, `serializers/` | Rich JSON-compatible encoding and aiocache serializer. |
-| `file_based_cache.py` | Source-hash-aware single-file artifact cache. |
-| `contracts/`, `exceptions.py` | Extension interfaces and cache errors. |
+| File | JSON and temporary files in its directory. |
+| Memory | Every entry in that backend instance. |
+| Redis | The selected Redis database. |
+| Memcached | The Memcached service through `flush_all`. |
+| Database | Every row in the entry table. |
 
----
+All five backends use msgspec JSON: `MsgspecSerializer` for memory/Redis/Memcached and direct JSON encoding for file/database. A tuple returns as a list, and dates can return as text; the original Python type is not necessarily preserved. Unsupported objects fail on write.
 
-[Index](/en/services/cache) · [database](/en/database) · [orm](/en/database/orm)
+For shared results, prefer explicit JSON data contracts: dictionaries, lists, strings, numbers, booleans, and `None`. The rich `Serializer` described under [cache artifacts](/en/services/cache/source-artifacts) is not used by these backends.
+
+### Compare coordination
+
+| Store | Public lock scope |
+|---|---|
+| File | Same key, directory, and event loop; this context does not coordinate processes. |
+| Memory | RedLock on the same backend instance. |
+| Redis | RedLock lease on the shared service. |
+| Memcached | RedLock lease with backend-specific guarantees. |
+| Database | Row reservation and owner in the lock table. |
+
+See [locks and regeneration](/en/services/cache/locks) for `timeout` semantics, lease expiration, and complete examples. A cache lock does not replace transactions or constraints in the authoritative data system.
+
+## Custom backends and failures
+
+The manager recognizes five built-in names and reuses their repositories. It has no `extend()` registry for new names or common retry/fallback mechanism. Unconfigured Redis, Memcached, or database stores raise `CacheStoreException`; inaccessible services retain their backend's errors.
+
+You can construct `CacheRepository(backend, prefix)` using a compatible backend or replace `ICacheManager` through a provider. Implement the operations the repository actually uses, including the concurrency features you require; changing only a `driver` field does not register an implementation. The [technical reference](/en/services/cache/api-reference) documents contracts and builders.

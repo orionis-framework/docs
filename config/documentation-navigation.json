@@ -846,13 +846,54 @@
       "icon": "cache",
       "title": {
         "en": "Cache and locks",
-        "es": "Caché y locks"
+        "es": "Caché y bloqueos"
       },
       "pageIds": [
         "cache-overview",
-        "cache-caching-values",
         "cache-stores-and-locks",
-        "cache-source-artifacts"
+        "cache-configuration",
+        "cache-caching-values",
+        "cache-locks",
+        "cache-source-artifacts",
+        "cache-manager-and-injection",
+        "cache-api-reference"
+      ],
+      "groups": [
+        {
+          "id": "cache-setup",
+          "title": {
+            "es": "Almacenes y configuración",
+            "en": "Stores and configuration"
+          },
+          "pageIds": [
+            "cache-overview",
+            "cache-stores-and-locks",
+            "cache-configuration"
+          ]
+        },
+        {
+          "id": "cache-operations",
+          "title": {
+            "es": "Operaciones y concurrencia",
+            "en": "Operations and concurrency"
+          },
+          "pageIds": [
+            "cache-caching-values",
+            "cache-locks",
+            "cache-source-artifacts"
+          ]
+        },
+        {
+          "id": "cache-reference",
+          "title": {
+            "es": "Servicios y referencia",
+            "en": "Services and reference"
+          },
+          "pageIds": [
+            "cache-manager-and-injection",
+            "cache-api-reference"
+          ]
+        }
       ]
     },
     {
