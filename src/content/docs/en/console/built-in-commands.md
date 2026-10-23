@@ -109,4 +109,4 @@ Reactor returns the integer returned by `handle()`; a non-integer return is conv
 
 Not every command converts internal failures into an exception or status `1`: common generators print certain errors and return `None`. Their pages explain this limitation and command-specific statuses for `packages`, `test`, `db:wipe` and workers. Consider command output, exit status and the expected result together.
 
-For calling commands from code and injecting services, see [Reactor and programmatic execution](/en/console/output-and-programmatic-execution).
+For calling commands from code and injecting services, see [Reactor and programmatic execution](/en/console/reactor-and-injection).

@@ -18,7 +18,7 @@ Orionis testing integrates case discovery, the application container and asynchr
 | [Dependencies and isolation](/en/testing/dependency-injection) | Inject services, resolve them in fixtures and control scopes and persistent resources. |
 | [Results and configuration](/en/testing/results-and-reference) | Configure `config/testing.py`, choose verbosity, filter the suite and save JSON results. |
 
-[Database and ORM tests](/en/database/orm/testing) and [MCP tests](/en/testing/mcp-testing) retain dedicated guides in their respective component menus.
+[Database and ORM tests](/en/orm/testing) and [MCP tests](/en/mcp/testing) retain dedicated guides in their respective component menus.
 
 ## Execution flow
 

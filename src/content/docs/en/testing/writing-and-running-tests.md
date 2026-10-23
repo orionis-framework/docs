@@ -112,4 +112,4 @@ You can separate rules without I/O under `tests/unit` and integrations under `te
 
 The command uses application providers and configuration. It does not automatically change `APP_ENV`, database connections or drivers to an isolated environment. Configure test resources before bootstrap; review [injection and isolation](/en/testing/dependency-injection) before testing persistence.
 
-Continue with [lifecycle and decorators](/en/testing/cases-and-decorators). MCP component tests have their [own guide](/en/testing/mcp-testing).
+Continue with [lifecycle and decorators](/en/testing/cases-and-decorators). MCP component tests have their [own guide](/en/mcp/testing).

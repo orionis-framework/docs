@@ -1,0 +1,74 @@
+---
+title: "Entities and data structures"
+description: "Use a dataclass for an application result with known fields; BaseEntity adds recursive serialization and metadata. Use DotDict or StdClass when keys are determined at runtime.…"
+editUrl: true
+lastUpdated: false
+---
+
+See the [DotDict](/en/utilities/helpers/dot-dict), [StdClass](/en/utilities/helpers/std-class), [Sentinel](/en/utilities/helpers/sentinel) and [FreezeThaw](/en/utilities/helpers/freeze-thaw) references for all methods and limitations. This page retains entity integration examples.
+
+Use a dataclass for an application result with known fields; `BaseEntity` adds recursive serialization and metadata. Use `DotDict` or `StdClass` when keys are determined at runtime. These utilities do not validate untrusted input like a Schema. The examples are independent of one another.
+
+## Common workflows
+
+### Define a serializable entity
+
+```python
+from dataclasses import dataclass, field
+from enum import Enum
+
+from orionis.support.entities import BaseEntity
+
+class Status(Enum):
+    ACTIVE = "active"
+
+@dataclass
+class Account(BaseEntity):
+    name: str
+    status: Status = Status.ACTIVE
+    tags: list[str] = field(default_factory=list)
+
+account = Account("Ada", tags=["admin"])
+assert account.toDict() == {
+    "name": "Ada",
+    "status": "active",
+    "tags": ["admin"],
+}
+assert [item["name"] for item in account.getFields()] == ["name", "status", "tags"]
+```
+
+### Use attribute-oriented data
+
+```python
+from orionis.support.types import DotDict, StdClass
+
+settings = DotDict({"mail": {"driver": "smtp"}})
+assert settings.mail.driver == "smtp"
+assert settings.unknown is None
+
+user = StdClass(name="Ada", active=True)
+user.update(role="admin")
+assert user.toDict()["role"] == "admin"
+assert settings.export() == {"mail": {"driver": "smtp"}}
+```
+
+### Freeze configuration snapshots
+
+```python
+from types import MappingProxyType
+
+from orionis.support.structures.freezer import FreezeThaw
+
+source = {"hosts": ["a.example", "b.example"], "options": {"tls": True}}
+frozen = FreezeThaw.freeze(source)
+
+assert isinstance(frozen, MappingProxyType)
+assert frozen["hosts"] == ("a.example", "b.example")
+assert FreezeThaw.thaw(frozen) == source
+```
+
+## Reference and next steps
+
+[base.py](https://github.com/orionis-framework/framework/blob/470229f78a5db61263ce887bcdd16bc98f9141db/orionis/support/entities/base.py) · [dot_dict.py](https://github.com/orionis-framework/framework/blob/470229f78a5db61263ce887bcdd16bc98f9141db/orionis/support/types/dot_dict.py) · [std.py](https://github.com/orionis-framework/framework/blob/470229f78a5db61263ce887bcdd16bc98f9141db/orionis/support/types/std.py) · [freezer.py](https://github.com/orionis-framework/framework/blob/470229f78a5db61263ce887bcdd16bc98f9141db/orionis/support/structures/freezer.py)
+
+[Return to the module index](/en/utilities).

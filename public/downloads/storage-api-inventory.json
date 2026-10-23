@@ -59,7 +59,7 @@
       "kind": "class",
       "line": 9,
       "signature": "class BootstrapFilesystems",
-      "reference": "/services/storage/configuration#filesystems"
+      "reference": "/storage/configuration#filesystems"
     },
     {
       "source": "config/filesystems.py",
@@ -67,7 +67,7 @@
       "kind": "field",
       "line": 17,
       "signature": "default: DiskName | str = field(default_factory=lambda: Env.get('FILESYSTEM_DISK', DiskName.LOCAL))",
-      "reference": "/services/storage/configuration#filesystems"
+      "reference": "/storage/configuration#filesystems"
     },
     {
       "source": "config/filesystems.py",
@@ -75,7 +75,7 @@
       "kind": "field",
       "line": 27,
       "signature": "disks: Disks | dict = field(default_factory=lambda: Disks(local=Local(path=Env.get('LOCAL_PATH', 'storage/app/private')), public=Public(path=Env.get('PUBLIC_PATH', 'storage/app/public'), url=Env.get('PUBLIC_URL', '/static')), s3=S3(key=Env.get('S3_KEY', ''), secret=Env.get('S3_SECRET', ''), region=Env.get('S3_REGION', 'us-east-1'), bucket=Env.get('S3_BUCKET', ''), url=Env.get('S3_URL', None), endpoint=Env.get('S3_ENDPOINT', None), use_path_style_endpoint=Env.get('S3_USE_PATH_STYLE_ENDPOINT', False)), azure=Azure(connection_string=Env.get('AZURE_CONNECTION_STRING', ''), account_name=Env.get('AZURE_ACCOUNT_NAME', ''), account_key=Env.get('AZURE_ACCOUNT_KEY', ''), container=Env.get('AZURE_CONTAINER', ''), url=Env.get('AZURE_URL', None)), gcs=GCS(project_id=Env.get('GCS_PROJECT_ID', ''), key_file=Env.get('GCS_KEY_FILE', None), bucket=Env.get('GCS_BUCKET', ''), url=Env.get('GCS_URL', None))))",
-      "reference": "/services/storage/configuration#filesystems"
+      "reference": "/storage/configuration#filesystems"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/aws.py",
@@ -83,7 +83,7 @@
       "kind": "class",
       "line": 8,
       "signature": "class S3",
-      "reference": "/services/storage/configuration#s3"
+      "reference": "/storage/configuration#s3"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/aws.py",
@@ -91,7 +91,7 @@
       "kind": "field",
       "line": 37,
       "signature": "driver: str = field(default='aws', metadata={'description': 'The filesystem driver type.', 'default': 'aws'})",
-      "reference": "/services/storage/configuration#s3"
+      "reference": "/storage/configuration#s3"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/aws.py",
@@ -99,7 +99,7 @@
       "kind": "field",
       "line": 45,
       "signature": "key: str = field(default_factory=lambda: Env.get('S3_KEY', ''), metadata={'description': 'AWS access key ID.', 'default': ''})",
-      "reference": "/services/storage/configuration#s3"
+      "reference": "/storage/configuration#s3"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/aws.py",
@@ -107,7 +107,7 @@
       "kind": "field",
       "line": 53,
       "signature": "secret: str = field(default_factory=lambda: Env.get('S3_SECRET', ''), metadata={'description': 'AWS secret access key.', 'default': ''})",
-      "reference": "/services/storage/configuration#s3"
+      "reference": "/storage/configuration#s3"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/aws.py",
@@ -115,7 +115,7 @@
       "kind": "field",
       "line": 61,
       "signature": "region: str = field(default_factory=lambda: Env.get('S3_REGION', 'us-east-1'), metadata={'description': 'AWS region where the bucket is located.', 'default': 'us-east-1'})",
-      "reference": "/services/storage/configuration#s3"
+      "reference": "/storage/configuration#s3"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/aws.py",
@@ -123,7 +123,7 @@
       "kind": "field",
       "line": 69,
       "signature": "bucket: str = field(default_factory=lambda: Env.get('S3_BUCKET', ''), metadata={'description': 'The S3 bucket name.', 'default': ''})",
-      "reference": "/services/storage/configuration#s3"
+      "reference": "/storage/configuration#s3"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/aws.py",
@@ -131,7 +131,7 @@
       "kind": "field",
       "line": 77,
       "signature": "url: str | None = field(default_factory=lambda: Env.get('S3_URL', None), metadata={'description': 'The URL endpoint for accessing the S3 bucket.', 'default': None})",
-      "reference": "/services/storage/configuration#s3"
+      "reference": "/storage/configuration#s3"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/aws.py",
@@ -139,7 +139,7 @@
       "kind": "field",
       "line": 85,
       "signature": "endpoint: str | None = field(default_factory=lambda: Env.get('S3_ENDPOINT', None), metadata={'description': 'The AWS S3 endpoint URL.', 'default': None})",
-      "reference": "/services/storage/configuration#s3"
+      "reference": "/storage/configuration#s3"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/aws.py",
@@ -147,7 +147,7 @@
       "kind": "field",
       "line": 93,
       "signature": "use_path_style_endpoint: bool = field(default_factory=lambda: Env.get('S3_USE_PATH_STYLE_ENDPOINT', False), metadata={'description': 'Whether to use a path-style endpoint.', 'default': False})",
-      "reference": "/services/storage/configuration#s3"
+      "reference": "/storage/configuration#s3"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/azure.py",
@@ -155,7 +155,7 @@
       "kind": "class",
       "line": 8,
       "signature": "class Azure",
-      "reference": "/services/storage/configuration#azure"
+      "reference": "/storage/configuration#azure"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/azure.py",
@@ -163,7 +163,7 @@
       "kind": "field",
       "line": 37,
       "signature": "driver: str = field(default='azure', metadata={'description': 'The filesystem driver type.', 'default': 'azure'})",
-      "reference": "/services/storage/configuration#azure"
+      "reference": "/storage/configuration#azure"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/azure.py",
@@ -171,7 +171,7 @@
       "kind": "field",
       "line": 45,
       "signature": "connection_string: str = field(default_factory=lambda: Env.get('AZURE_CONNECTION_STRING', ''), metadata={'description': 'Azure storage connection string.', 'default': ''})",
-      "reference": "/services/storage/configuration#azure"
+      "reference": "/storage/configuration#azure"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/azure.py",
@@ -179,7 +179,7 @@
       "kind": "field",
       "line": 53,
       "signature": "account_name: str = field(default_factory=lambda: Env.get('AZURE_ACCOUNT_NAME', ''), metadata={'description': 'Azure storage account name.', 'default': ''})",
-      "reference": "/services/storage/configuration#azure"
+      "reference": "/storage/configuration#azure"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/azure.py",
@@ -187,7 +187,7 @@
       "kind": "field",
       "line": 61,
       "signature": "account_key: str = field(default_factory=lambda: Env.get('AZURE_ACCOUNT_KEY', ''), metadata={'description': 'Azure storage account key.', 'default': ''})",
-      "reference": "/services/storage/configuration#azure"
+      "reference": "/storage/configuration#azure"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/azure.py",
@@ -195,7 +195,7 @@
       "kind": "field",
       "line": 69,
       "signature": "container: str = field(default_factory=lambda: Env.get('AZURE_CONTAINER', ''), metadata={'description': 'The blob container name.', 'default': ''})",
-      "reference": "/services/storage/configuration#azure"
+      "reference": "/storage/configuration#azure"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/azure.py",
@@ -203,7 +203,7 @@
       "kind": "field",
       "line": 77,
       "signature": "url: str | None = field(default_factory=lambda: Env.get('AZURE_URL', None), metadata={'description': 'Public base URL used to build file URLs.', 'default': None})",
-      "reference": "/services/storage/configuration#azure"
+      "reference": "/storage/configuration#azure"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/disks.py",
@@ -211,7 +211,7 @@
       "kind": "class",
       "line": 19,
       "signature": "class Disks",
-      "reference": "/services/storage/configuration#disks"
+      "reference": "/storage/configuration#disks"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/disks.py",
@@ -219,7 +219,7 @@
       "kind": "field",
       "line": 37,
       "signature": "local: Local | dict = field(default_factory=Local, metadata={'description': 'The absolute or relative path where local files are stored.', 'default': lambda: Local().toDict()})",
-      "reference": "/services/storage/configuration#disks"
+      "reference": "/storage/configuration#disks"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/disks.py",
@@ -227,7 +227,7 @@
       "kind": "field",
       "line": 47,
       "signature": "public: Public | dict = field(default_factory=Public, metadata={'description': 'The absolute or relative path where public files are stored.', 'default': lambda: Public().toDict()})",
-      "reference": "/services/storage/configuration#disks"
+      "reference": "/storage/configuration#disks"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/disks.py",
@@ -235,7 +235,7 @@
       "kind": "field",
       "line": 57,
       "signature": "s3: S3 | dict = field(default_factory=S3, metadata={'description': 'The configuration for AWS S3 storage.', 'default': lambda: S3().toDict()})",
-      "reference": "/services/storage/configuration#disks"
+      "reference": "/storage/configuration#disks"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/disks.py",
@@ -243,7 +243,7 @@
       "kind": "field",
       "line": 65,
       "signature": "azure: Azure | dict = field(default_factory=Azure, metadata={'description': 'The configuration for Azure Blob Storage.', 'default': lambda: Azure().toDict()})",
-      "reference": "/services/storage/configuration#disks"
+      "reference": "/storage/configuration#disks"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/disks.py",
@@ -251,7 +251,7 @@
       "kind": "field",
       "line": 73,
       "signature": "gcs: GCS | dict = field(default_factory=GCS, metadata={'description': 'The configuration for Google Cloud Storage.', 'default': lambda: GCS().toDict()})",
-      "reference": "/services/storage/configuration#disks"
+      "reference": "/storage/configuration#disks"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/filesystems.py",
@@ -259,7 +259,7 @@
       "kind": "class",
       "line": 12,
       "signature": "class Filesystems",
-      "reference": "/services/storage/configuration#filesystems"
+      "reference": "/storage/configuration#filesystems"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/filesystems.py",
@@ -267,7 +267,7 @@
       "kind": "field",
       "line": 25,
       "signature": "default: DiskName | str = field(default_factory=lambda: Env.get('FILESYSTEM_DISK', DiskName.LOCAL.value), metadata={'description': \"The default filesystem disk name. Can be a member of the DiskName enum or a string (e.g., 'local', 's3').\", 'default': 'local'})",
-      "reference": "/services/storage/configuration#filesystems"
+      "reference": "/storage/configuration#filesystems"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/filesystems.py",
@@ -275,7 +275,7 @@
       "kind": "field",
       "line": 36,
       "signature": "disks: Disks | dict = field(default_factory=Disks, metadata={'description': 'A collection of available filesystem disks.', 'default': lambda: Disks().toDict()})",
-      "reference": "/services/storage/configuration#filesystems"
+      "reference": "/storage/configuration#filesystems"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/gcs.py",
@@ -283,7 +283,7 @@
       "kind": "class",
       "line": 8,
       "signature": "class GCS",
-      "reference": "/services/storage/configuration#gcs"
+      "reference": "/storage/configuration#gcs"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/gcs.py",
@@ -291,7 +291,7 @@
       "kind": "field",
       "line": 36,
       "signature": "driver: str = field(default='gcs', metadata={'description': 'The filesystem driver type.', 'default': 'gcs'})",
-      "reference": "/services/storage/configuration#gcs"
+      "reference": "/storage/configuration#gcs"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/gcs.py",
@@ -299,7 +299,7 @@
       "kind": "field",
       "line": 44,
       "signature": "project_id: str = field(default_factory=lambda: Env.get('GCS_PROJECT_ID', ''), metadata={'description': 'Google Cloud project identifier.', 'default': ''})",
-      "reference": "/services/storage/configuration#gcs"
+      "reference": "/storage/configuration#gcs"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/gcs.py",
@@ -307,7 +307,7 @@
       "kind": "field",
       "line": 52,
       "signature": "key_file: str | None = field(default_factory=lambda: Env.get('GCS_KEY_FILE', None), metadata={'description': 'Path to the service-account JSON key file.', 'default': None})",
-      "reference": "/services/storage/configuration#gcs"
+      "reference": "/storage/configuration#gcs"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/gcs.py",
@@ -315,7 +315,7 @@
       "kind": "field",
       "line": 60,
       "signature": "bucket: str = field(default_factory=lambda: Env.get('GCS_BUCKET', ''), metadata={'description': 'The GCS bucket name.', 'default': ''})",
-      "reference": "/services/storage/configuration#gcs"
+      "reference": "/storage/configuration#gcs"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/gcs.py",
@@ -323,7 +323,7 @@
       "kind": "field",
       "line": 68,
       "signature": "url: str | None = field(default_factory=lambda: Env.get('GCS_URL', None), metadata={'description': 'Public base URL used to build file URLs.', 'default': None})",
-      "reference": "/services/storage/configuration#gcs"
+      "reference": "/storage/configuration#gcs"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/local.py",
@@ -331,7 +331,7 @@
       "kind": "class",
       "line": 8,
       "signature": "class Local",
-      "reference": "/services/storage/configuration#local"
+      "reference": "/storage/configuration#local"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/local.py",
@@ -339,7 +339,7 @@
       "kind": "field",
       "line": 25,
       "signature": "driver: str = field(default='local', metadata={'description': 'The filesystem driver type.', 'default': 'local'})",
-      "reference": "/services/storage/configuration#local"
+      "reference": "/storage/configuration#local"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/local.py",
@@ -347,7 +347,7 @@
       "kind": "field",
       "line": 33,
       "signature": "path: str = field(default_factory=lambda: Env.get('LOCAL_PATH', 'storage/app/private'), metadata={'description': 'The absolute or relative path where local files are stored.', 'default': 'storage/app/private'})",
-      "reference": "/services/storage/configuration#local"
+      "reference": "/storage/configuration#local"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/public.py",
@@ -355,7 +355,7 @@
       "kind": "class",
       "line": 8,
       "signature": "class Public",
-      "reference": "/services/storage/configuration#public"
+      "reference": "/storage/configuration#public"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/public.py",
@@ -363,7 +363,7 @@
       "kind": "field",
       "line": 27,
       "signature": "driver: str = field(default='local', metadata={'description': 'The filesystem driver type.', 'default': 'local'})",
-      "reference": "/services/storage/configuration#public"
+      "reference": "/storage/configuration#public"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/public.py",
@@ -371,7 +371,7 @@
       "kind": "field",
       "line": 35,
       "signature": "path: str = field(default_factory=lambda: Env.get('PUBLIC_PATH', 'storage/app/public'), metadata={'description': 'The absolute or relative path where public files are stored.', 'default': 'storage/app/public'})",
-      "reference": "/services/storage/configuration#public"
+      "reference": "/storage/configuration#public"
     },
     {
       "source": "orionis/foundation/config/filesystems/entitites/public.py",
@@ -379,7 +379,7 @@
       "kind": "field",
       "line": 45,
       "signature": "url: str = field(default_factory=lambda: Env.get('PUBLIC_URL', '/static'), metadata={'description': 'The URL where the public files can be accessed.', 'default': '/static'})",
-      "reference": "/services/storage/configuration#public"
+      "reference": "/storage/configuration#public"
     },
     {
       "source": "orionis/foundation/config/filesystems/enums/disk_name.py",
@@ -387,7 +387,7 @@
       "kind": "class",
       "line": 3,
       "signature": "class DiskName",
-      "reference": "/services/storage/configuration#diskname"
+      "reference": "/storage/configuration#diskname"
     },
     {
       "source": "orionis/foundation/config/filesystems/enums/disk_name.py",
@@ -395,7 +395,7 @@
       "kind": "constant",
       "line": 26,
       "signature": "LOCAL = 'local'",
-      "reference": "/services/storage/configuration#diskname"
+      "reference": "/storage/configuration#diskname"
     },
     {
       "source": "orionis/foundation/config/filesystems/enums/disk_name.py",
@@ -403,7 +403,7 @@
       "kind": "constant",
       "line": 27,
       "signature": "PUBLIC = 'public'",
-      "reference": "/services/storage/configuration#diskname"
+      "reference": "/storage/configuration#diskname"
     },
     {
       "source": "orionis/foundation/config/filesystems/enums/disk_name.py",
@@ -411,7 +411,7 @@
       "kind": "constant",
       "line": 28,
       "signature": "S3 = 's3'",
-      "reference": "/services/storage/configuration#diskname"
+      "reference": "/storage/configuration#diskname"
     },
     {
       "source": "orionis/foundation/config/filesystems/enums/disk_name.py",
@@ -419,7 +419,7 @@
       "kind": "constant",
       "line": 29,
       "signature": "AZURE = 'azure'",
-      "reference": "/services/storage/configuration#diskname"
+      "reference": "/storage/configuration#diskname"
     },
     {
       "source": "orionis/foundation/config/filesystems/enums/disk_name.py",
@@ -427,7 +427,7 @@
       "kind": "constant",
       "line": 30,
       "signature": "GCS = 'gcs'",
-      "reference": "/services/storage/configuration#diskname"
+      "reference": "/storage/configuration#diskname"
     },
     {
       "source": "orionis/storage/contracts/directory.py",
@@ -435,7 +435,7 @@
       "kind": "class",
       "line": 8,
       "signature": "class IDirectory",
-      "reference": "/services/storage/files-and-directories#directory-construction"
+      "reference": "/storage/files-and-directories#directory-construction"
     },
     {
       "source": "orionis/storage/contracts/directory.py",
@@ -443,7 +443,7 @@
       "kind": "method",
       "line": 20,
       "signature": "path(self) -> str",
-      "reference": "/services/storage/files-and-directories#directory-path"
+      "reference": "/storage/files-and-directories#directory-path"
     },
     {
       "source": "orionis/storage/contracts/directory.py",
@@ -451,7 +451,7 @@
       "kind": "method",
       "line": 32,
       "signature": "async create(self) -> IDirectory",
-      "reference": "/services/storage/files-and-directories#directory-create"
+      "reference": "/storage/files-and-directories#directory-create"
     },
     {
       "source": "orionis/storage/contracts/directory.py",
@@ -459,7 +459,7 @@
       "kind": "method",
       "line": 43,
       "signature": "async delete(self) -> bool",
-      "reference": "/services/storage/files-and-directories#directory-delete"
+      "reference": "/storage/files-and-directories#directory-delete"
     },
     {
       "source": "orionis/storage/contracts/directory.py",
@@ -467,7 +467,7 @@
       "kind": "method",
       "line": 54,
       "signature": "async exists(self) -> bool",
-      "reference": "/services/storage/files-and-directories#directory-exists"
+      "reference": "/storage/files-and-directories#directory-exists"
     },
     {
       "source": "orionis/storage/contracts/directory.py",
@@ -475,7 +475,7 @@
       "kind": "method",
       "line": 65,
       "signature": "async files(self) -> list[IFile]",
-      "reference": "/services/storage/files-and-directories#directory-files"
+      "reference": "/storage/files-and-directories#directory-files"
     },
     {
       "source": "orionis/storage/contracts/directory.py",
@@ -483,7 +483,7 @@
       "kind": "method",
       "line": 76,
       "signature": "async allFiles(self) -> list[IFile]",
-      "reference": "/services/storage/files-and-directories#directory-allfiles"
+      "reference": "/storage/files-and-directories#directory-allfiles"
     },
     {
       "source": "orionis/storage/contracts/directory.py",
@@ -491,7 +491,7 @@
       "kind": "method",
       "line": 87,
       "signature": "async directories(self) -> list[IDirectory]",
-      "reference": "/services/storage/files-and-directories#directory-directories"
+      "reference": "/storage/files-and-directories#directory-directories"
     },
     {
       "source": "orionis/storage/contracts/directory.py",
@@ -499,7 +499,7 @@
       "kind": "method",
       "line": 99,
       "signature": "async allDirectories(self) -> list[IDirectory]",
-      "reference": "/services/storage/files-and-directories#directory-alldirectories"
+      "reference": "/storage/files-and-directories#directory-alldirectories"
     },
     {
       "source": "orionis/storage/contracts/disk.py",
@@ -507,7 +507,7 @@
       "kind": "class",
       "line": 9,
       "signature": "class IDisk",
-      "reference": "/services/storage/files-and-directories#disk-construction"
+      "reference": "/storage/files-and-directories#disk-construction"
     },
     {
       "source": "orionis/storage/contracts/disk.py",
@@ -515,7 +515,7 @@
       "kind": "method",
       "line": 23,
       "signature": "name(self) -> str",
-      "reference": "/services/storage/files-and-directories#disk-name"
+      "reference": "/storage/files-and-directories#disk-name"
     },
     {
       "source": "orionis/storage/contracts/disk.py",
@@ -523,7 +523,7 @@
       "kind": "method",
       "line": 34,
       "signature": "file(self, path: str) -> IFile",
-      "reference": "/services/storage/files-and-directories#disk-file"
+      "reference": "/storage/files-and-directories#disk-file"
     },
     {
       "source": "orionis/storage/contracts/disk.py",
@@ -531,7 +531,7 @@
       "kind": "method",
       "line": 50,
       "signature": "directory(self, path: str='') -> IDirectory",
-      "reference": "/services/storage/files-and-directories#disk-directory"
+      "reference": "/storage/files-and-directories#disk-directory"
     },
     {
       "source": "orionis/storage/contracts/disk.py",
@@ -539,7 +539,7 @@
       "kind": "method",
       "line": 67,
       "signature": "async put(self, path: str, contents: bytes | str, visibility: str | None=None) -> IFile",
-      "reference": "/services/storage/files-and-directories#disk-put"
+      "reference": "/storage/files-and-directories#disk-put"
     },
     {
       "source": "orionis/storage/contracts/disk.py",
@@ -547,7 +547,7 @@
       "kind": "method",
       "line": 92,
       "signature": "async exists(self, path: str) -> bool",
-      "reference": "/services/storage/files-and-directories#disk-exists"
+      "reference": "/storage/files-and-directories#disk-exists"
     },
     {
       "source": "orionis/storage/contracts/disk.py",
@@ -555,7 +555,7 @@
       "kind": "method",
       "line": 108,
       "signature": "async delete(self, path: str) -> bool",
-      "reference": "/services/storage/files-and-directories#disk-delete"
+      "reference": "/storage/files-and-directories#disk-delete"
     },
     {
       "source": "orionis/storage/contracts/disk.py",
@@ -563,7 +563,7 @@
       "kind": "method",
       "line": 124,
       "signature": "async copy(self, source: str, target: str) -> IFile",
-      "reference": "/services/storage/files-and-directories#disk-copy"
+      "reference": "/storage/files-and-directories#disk-copy"
     },
     {
       "source": "orionis/storage/contracts/disk.py",
@@ -571,7 +571,7 @@
       "kind": "method",
       "line": 147,
       "signature": "async move(self, source: str, target: str) -> IFile",
-      "reference": "/services/storage/files-and-directories#disk-move"
+      "reference": "/storage/files-and-directories#disk-move"
     },
     {
       "source": "orionis/storage/contracts/driver.py",
@@ -579,7 +579,7 @@
       "kind": "class",
       "line": 12,
       "signature": "class IStorageDriver",
-      "reference": "/services/storage/api-reference#driver-contract"
+      "reference": "/storage/api-reference#driver-contract"
     },
     {
       "source": "orionis/storage/contracts/driver.py",
@@ -587,7 +587,7 @@
       "kind": "method",
       "line": 28,
       "signature": "async read(self, path: str) -> bytes",
-      "reference": "/services/storage/api-reference#driver-read"
+      "reference": "/storage/api-reference#driver-read"
     },
     {
       "source": "orionis/storage/contracts/driver.py",
@@ -595,7 +595,7 @@
       "kind": "method",
       "line": 49,
       "signature": "readStream(self, path: str, chunk_size: int=65536) -> AsyncIterator[bytes]",
-      "reference": "/services/storage/api-reference#driver-readstream"
+      "reference": "/storage/api-reference#driver-readstream"
     },
     {
       "source": "orionis/storage/contracts/driver.py",
@@ -603,7 +603,7 @@
       "kind": "method",
       "line": 76,
       "signature": "async write(self, path: str, contents: bytes | str, visibility: str | None=None) -> None",
-      "reference": "/services/storage/api-reference#driver-write"
+      "reference": "/storage/api-reference#driver-write"
     },
     {
       "source": "orionis/storage/contracts/driver.py",
@@ -611,7 +611,7 @@
       "kind": "method",
       "line": 101,
       "signature": "async writeStream(self, path: str, stream: AsyncIterable[bytes], visibility: str | None=None) -> None",
-      "reference": "/services/storage/api-reference#driver-writestream"
+      "reference": "/storage/api-reference#driver-writestream"
     },
     {
       "source": "orionis/storage/contracts/driver.py",
@@ -619,7 +619,7 @@
       "kind": "method",
       "line": 125,
       "signature": "async delete(self, path: str) -> bool",
-      "reference": "/services/storage/api-reference#driver-delete"
+      "reference": "/storage/api-reference#driver-delete"
     },
     {
       "source": "orionis/storage/contracts/driver.py",
@@ -627,7 +627,7 @@
       "kind": "method",
       "line": 141,
       "signature": "async exists(self, path: str) -> bool",
-      "reference": "/services/storage/api-reference#driver-exists"
+      "reference": "/storage/api-reference#driver-exists"
     },
     {
       "source": "orionis/storage/contracts/driver.py",
@@ -635,7 +635,7 @@
       "kind": "method",
       "line": 157,
       "signature": "async copy(self, source: str, target: str) -> None",
-      "reference": "/services/storage/api-reference#driver-copy"
+      "reference": "/storage/api-reference#driver-copy"
     },
     {
       "source": "orionis/storage/contracts/driver.py",
@@ -643,7 +643,7 @@
       "kind": "method",
       "line": 179,
       "signature": "async move(self, source: str, target: str) -> None",
-      "reference": "/services/storage/api-reference#driver-move"
+      "reference": "/storage/api-reference#driver-move"
     },
     {
       "source": "orionis/storage/contracts/driver.py",
@@ -651,7 +651,7 @@
       "kind": "method",
       "line": 201,
       "signature": "async size(self, path: str) -> int",
-      "reference": "/services/storage/api-reference#driver-size"
+      "reference": "/storage/api-reference#driver-size"
     },
     {
       "source": "orionis/storage/contracts/driver.py",
@@ -659,7 +659,7 @@
       "kind": "method",
       "line": 222,
       "signature": "async mimeType(self, path: str) -> str | None",
-      "reference": "/services/storage/api-reference#driver-mimetype"
+      "reference": "/storage/api-reference#driver-mimetype"
     },
     {
       "source": "orionis/storage/contracts/driver.py",
@@ -667,7 +667,7 @@
       "kind": "method",
       "line": 238,
       "signature": "async lastModified(self, path: str) -> datetime",
-      "reference": "/services/storage/api-reference#driver-lastmodified"
+      "reference": "/storage/api-reference#driver-lastmodified"
     },
     {
       "source": "orionis/storage/contracts/driver.py",
@@ -675,7 +675,7 @@
       "kind": "method",
       "line": 259,
       "signature": "async createDirectory(self, path: str) -> None",
-      "reference": "/services/storage/api-reference#driver-createdirectory"
+      "reference": "/storage/api-reference#driver-createdirectory"
     },
     {
       "source": "orionis/storage/contracts/driver.py",
@@ -683,7 +683,7 @@
       "kind": "method",
       "line": 274,
       "signature": "async deleteDirectory(self, path: str) -> bool",
-      "reference": "/services/storage/api-reference#driver-deletedirectory"
+      "reference": "/storage/api-reference#driver-deletedirectory"
     },
     {
       "source": "orionis/storage/contracts/driver.py",
@@ -691,7 +691,7 @@
       "kind": "method",
       "line": 290,
       "signature": "async directoryExists(self, path: str) -> bool",
-      "reference": "/services/storage/api-reference#driver-directoryexists"
+      "reference": "/storage/api-reference#driver-directoryexists"
     },
     {
       "source": "orionis/storage/contracts/driver.py",
@@ -699,7 +699,7 @@
       "kind": "method",
       "line": 307,
       "signature": "async files(self, path: str='', *, recursive: bool=False) -> list[str]",
-      "reference": "/services/storage/api-reference#driver-files"
+      "reference": "/storage/api-reference#driver-files"
     },
     {
       "source": "orionis/storage/contracts/driver.py",
@@ -707,7 +707,7 @@
       "kind": "method",
       "line": 330,
       "signature": "async directories(self, path: str='', *, recursive: bool=False) -> list[str]",
-      "reference": "/services/storage/api-reference#driver-directories"
+      "reference": "/storage/api-reference#driver-directories"
     },
     {
       "source": "orionis/storage/contracts/driver.py",
@@ -715,7 +715,7 @@
       "kind": "method",
       "line": 353,
       "signature": "async url(self, path: str) -> str",
-      "reference": "/services/storage/api-reference#driver-url"
+      "reference": "/storage/api-reference#driver-url"
     },
     {
       "source": "orionis/storage/contracts/driver.py",
@@ -723,7 +723,7 @@
       "kind": "method",
       "line": 374,
       "signature": "async temporaryUrl(self, path: str, expires_in: int) -> str",
-      "reference": "/services/storage/api-reference#driver-temporaryurl"
+      "reference": "/storage/api-reference#driver-temporaryurl"
     },
     {
       "source": "orionis/storage/contracts/driver.py",
@@ -731,7 +731,7 @@
       "kind": "method",
       "line": 397,
       "signature": "async visibility(self, path: str) -> str",
-      "reference": "/services/storage/api-reference#driver-visibility"
+      "reference": "/storage/api-reference#driver-visibility"
     },
     {
       "source": "orionis/storage/contracts/driver.py",
@@ -739,7 +739,7 @@
       "kind": "method",
       "line": 418,
       "signature": "async setVisibility(self, path: str, visibility: str) -> None",
-      "reference": "/services/storage/api-reference#driver-setvisibility"
+      "reference": "/storage/api-reference#driver-setvisibility"
     },
     {
       "source": "orionis/storage/contracts/driver.py",
@@ -747,7 +747,7 @@
       "kind": "method",
       "line": 442,
       "signature": "async download(self, path: str, destination: str | Path) -> Path",
-      "reference": "/services/storage/api-reference#driver-download"
+      "reference": "/storage/api-reference#driver-download"
     },
     {
       "source": "orionis/storage/contracts/driver.py",
@@ -755,7 +755,7 @@
       "kind": "method",
       "line": 466,
       "signature": "async hash(self, path: str, algorithm: str='sha256') -> str",
-      "reference": "/services/storage/api-reference#driver-hash"
+      "reference": "/storage/api-reference#driver-hash"
     },
     {
       "source": "orionis/storage/contracts/driver.py",
@@ -763,7 +763,7 @@
       "kind": "method",
       "line": 489,
       "signature": "async info(self, path: str) -> FileInfo",
-      "reference": "/services/storage/api-reference#driver-info"
+      "reference": "/storage/api-reference#driver-info"
     },
     {
       "source": "orionis/storage/contracts/driver.py",
@@ -771,7 +771,7 @@
       "kind": "method",
       "line": 511,
       "signature": "open(self, path: str, mode: str='rb') -> IStorageStream",
-      "reference": "/services/storage/api-reference#driver-open"
+      "reference": "/storage/api-reference#driver-open"
     },
     {
       "source": "orionis/storage/contracts/file.py",
@@ -779,7 +779,7 @@
       "kind": "class",
       "line": 12,
       "signature": "class IFile",
-      "reference": "/services/storage/files-and-directories#file-construction"
+      "reference": "/storage/files-and-directories#file-construction"
     },
     {
       "source": "orionis/storage/contracts/file.py",
@@ -787,7 +787,7 @@
       "kind": "method",
       "line": 24,
       "signature": "path(self) -> str",
-      "reference": "/services/storage/files-and-directories#file-path"
+      "reference": "/storage/files-and-directories#file-path"
     },
     {
       "source": "orionis/storage/contracts/file.py",
@@ -795,7 +795,7 @@
       "kind": "method",
       "line": 35,
       "signature": "async read(self) -> bytes",
-      "reference": "/services/storage/files-and-directories#file-read"
+      "reference": "/storage/files-and-directories#file-read"
     },
     {
       "source": "orionis/storage/contracts/file.py",
@@ -803,7 +803,7 @@
       "kind": "method",
       "line": 51,
       "signature": "readStream(self, chunk_size: int=65536) -> AsyncIterator[bytes]",
-      "reference": "/services/storage/files-and-directories#file-readstream"
+      "reference": "/storage/files-and-directories#file-readstream"
     },
     {
       "source": "orionis/storage/contracts/file.py",
@@ -811,7 +811,7 @@
       "kind": "method",
       "line": 72,
       "signature": "async write(self, contents: bytes | str, visibility: str | None=None) -> IFile",
-      "reference": "/services/storage/files-and-directories#file-write"
+      "reference": "/storage/files-and-directories#file-write"
     },
     {
       "source": "orionis/storage/contracts/file.py",
@@ -819,7 +819,7 @@
       "kind": "method",
       "line": 94,
       "signature": "async writeStream(self, stream: AsyncIterable[bytes], visibility: str | None=None) -> IFile",
-      "reference": "/services/storage/files-and-directories#file-writestream"
+      "reference": "/storage/files-and-directories#file-writestream"
     },
     {
       "source": "orionis/storage/contracts/file.py",
@@ -827,7 +827,7 @@
       "kind": "method",
       "line": 116,
       "signature": "open(self, mode: str='rb') -> IStorageStream",
-      "reference": "/services/storage/files-and-directories#file-open"
+      "reference": "/storage/files-and-directories#file-open"
     },
     {
       "source": "orionis/storage/contracts/file.py",
@@ -835,7 +835,7 @@
       "kind": "method",
       "line": 133,
       "signature": "async delete(self) -> bool",
-      "reference": "/services/storage/files-and-directories#file-delete"
+      "reference": "/storage/files-and-directories#file-delete"
     },
     {
       "source": "orionis/storage/contracts/file.py",
@@ -843,7 +843,7 @@
       "kind": "method",
       "line": 144,
       "signature": "async exists(self) -> bool",
-      "reference": "/services/storage/files-and-directories#file-exists"
+      "reference": "/storage/files-and-directories#file-exists"
     },
     {
       "source": "orionis/storage/contracts/file.py",
@@ -851,7 +851,7 @@
       "kind": "method",
       "line": 155,
       "signature": "async copyTo(self, target: str) -> IFile",
-      "reference": "/services/storage/files-and-directories#file-copyto"
+      "reference": "/storage/files-and-directories#file-copyto"
     },
     {
       "source": "orionis/storage/contracts/file.py",
@@ -859,7 +859,7 @@
       "kind": "method",
       "line": 176,
       "signature": "async moveTo(self, target: str) -> IFile",
-      "reference": "/services/storage/files-and-directories#file-moveto"
+      "reference": "/storage/files-and-directories#file-moveto"
     },
     {
       "source": "orionis/storage/contracts/file.py",
@@ -867,7 +867,7 @@
       "kind": "method",
       "line": 197,
       "signature": "async rename(self, name: str) -> IFile",
-      "reference": "/services/storage/files-and-directories#file-rename"
+      "reference": "/storage/files-and-directories#file-rename"
     },
     {
       "source": "orionis/storage/contracts/file.py",
@@ -875,7 +875,7 @@
       "kind": "method",
       "line": 220,
       "signature": "async size(self) -> int",
-      "reference": "/services/storage/files-and-directories#file-size"
+      "reference": "/storage/files-and-directories#file-size"
     },
     {
       "source": "orionis/storage/contracts/file.py",
@@ -883,7 +883,7 @@
       "kind": "method",
       "line": 236,
       "signature": "async mimeType(self) -> str | None",
-      "reference": "/services/storage/files-and-directories#file-mimetype"
+      "reference": "/storage/files-and-directories#file-mimetype"
     },
     {
       "source": "orionis/storage/contracts/file.py",
@@ -891,7 +891,7 @@
       "kind": "method",
       "line": 247,
       "signature": "async lastModified(self) -> datetime",
-      "reference": "/services/storage/files-and-directories#file-lastmodified"
+      "reference": "/storage/files-and-directories#file-lastmodified"
     },
     {
       "source": "orionis/storage/contracts/file.py",
@@ -899,7 +899,7 @@
       "kind": "method",
       "line": 263,
       "signature": "async url(self) -> str",
-      "reference": "/services/storage/files-and-directories#file-url"
+      "reference": "/storage/files-and-directories#file-url"
     },
     {
       "source": "orionis/storage/contracts/file.py",
@@ -907,7 +907,7 @@
       "kind": "method",
       "line": 279,
       "signature": "async temporaryUrl(self, expires_in: int=3600) -> str",
-      "reference": "/services/storage/files-and-directories#file-temporaryurl"
+      "reference": "/storage/files-and-directories#file-temporaryurl"
     },
     {
       "source": "orionis/storage/contracts/file.py",
@@ -915,7 +915,7 @@
       "kind": "method",
       "line": 300,
       "signature": "async visibility(self) -> str",
-      "reference": "/services/storage/files-and-directories#file-visibility"
+      "reference": "/storage/files-and-directories#file-visibility"
     },
     {
       "source": "orionis/storage/contracts/file.py",
@@ -923,7 +923,7 @@
       "kind": "method",
       "line": 316,
       "signature": "async setVisibility(self, visibility: str) -> IFile",
-      "reference": "/services/storage/files-and-directories#file-setvisibility"
+      "reference": "/storage/files-and-directories#file-setvisibility"
     },
     {
       "source": "orionis/storage/contracts/file.py",
@@ -931,7 +931,7 @@
       "kind": "method",
       "line": 337,
       "signature": "async download(self, destination: str | Path) -> Path",
-      "reference": "/services/storage/files-and-directories#file-download"
+      "reference": "/storage/files-and-directories#file-download"
     },
     {
       "source": "orionis/storage/contracts/file.py",
@@ -939,7 +939,7 @@
       "kind": "method",
       "line": 359,
       "signature": "async hash(self, algorithm: str='sha256') -> str",
-      "reference": "/services/storage/files-and-directories#file-hash"
+      "reference": "/storage/files-and-directories#file-hash"
     },
     {
       "source": "orionis/storage/contracts/file.py",
@@ -947,7 +947,7 @@
       "kind": "method",
       "line": 380,
       "signature": "async info(self) -> FileInfo",
-      "reference": "/services/storage/files-and-directories#file-info"
+      "reference": "/storage/files-and-directories#file-info"
     },
     {
       "source": "orionis/storage/contracts/manager.py",
@@ -955,7 +955,7 @@
       "kind": "class",
       "line": 14,
       "signature": "class IStorageManager",
-      "reference": "/services/storage/manager-and-injection#manager-construction"
+      "reference": "/storage/manager-and-injection#manager-construction"
     },
     {
       "source": "orionis/storage/contracts/manager.py",
@@ -963,7 +963,7 @@
       "kind": "method",
       "line": 27,
       "signature": "disk(self, name: str | None=None) -> IDisk",
-      "reference": "/services/storage/manager-and-injection#manager-disk"
+      "reference": "/storage/manager-and-injection#manager-disk"
     },
     {
       "source": "orionis/storage/contracts/manager.py",
@@ -971,7 +971,7 @@
       "kind": "method",
       "line": 53,
       "signature": "default(self) -> IDisk",
-      "reference": "/services/storage/manager-and-injection#manager-default"
+      "reference": "/storage/manager-and-injection#manager-default"
     },
     {
       "source": "orionis/storage/contracts/manager.py",
@@ -979,7 +979,7 @@
       "kind": "method",
       "line": 69,
       "signature": "extend(self, driver: str, factory: Callable[[object], IStorageDriver]) -> None",
-      "reference": "/services/storage/manager-and-injection#manager-extend"
+      "reference": "/storage/manager-and-injection#manager-extend"
     },
     {
       "source": "orionis/storage/contracts/manager.py",
@@ -987,7 +987,7 @@
       "kind": "method",
       "line": 94,
       "signature": "uploaded(self, source: IHttpUploadedFile) -> IUploadedFile",
-      "reference": "/services/storage/manager-and-injection#manager-uploaded"
+      "reference": "/storage/manager-and-injection#manager-uploaded"
     },
     {
       "source": "orionis/storage/contracts/stream.py",
@@ -995,7 +995,7 @@
       "kind": "class",
       "line": 8,
       "signature": "class IStorageStream",
-      "reference": "/services/storage/streaming-and-uploads#stream-construction"
+      "reference": "/storage/streaming-and-uploads#stream-construction"
     },
     {
       "source": "orionis/storage/contracts/stream.py",
@@ -1003,7 +1003,7 @@
       "kind": "method",
       "line": 23,
       "signature": "async read(self, size: int=-1) -> bytes",
-      "reference": "/services/storage/streaming-and-uploads#stream-read"
+      "reference": "/storage/streaming-and-uploads#stream-read"
     },
     {
       "source": "orionis/storage/contracts/stream.py",
@@ -1011,7 +1011,7 @@
       "kind": "method",
       "line": 39,
       "signature": "async write(self, data: bytes) -> int",
-      "reference": "/services/storage/streaming-and-uploads#stream-write"
+      "reference": "/storage/streaming-and-uploads#stream-write"
     },
     {
       "source": "orionis/storage/contracts/stream.py",
@@ -1019,7 +1019,7 @@
       "kind": "method",
       "line": 55,
       "signature": "async seek(self, offset: int, whence: int=0) -> int",
-      "reference": "/services/storage/streaming-and-uploads#stream-seek"
+      "reference": "/storage/streaming-and-uploads#stream-seek"
     },
     {
       "source": "orionis/storage/contracts/stream.py",
@@ -1027,7 +1027,7 @@
       "kind": "method",
       "line": 73,
       "signature": "async close(self) -> None",
-      "reference": "/services/storage/streaming-and-uploads#stream-close"
+      "reference": "/storage/streaming-and-uploads#stream-close"
     },
     {
       "source": "orionis/storage/contracts/stream.py",
@@ -1035,7 +1035,7 @@
       "kind": "method",
       "line": 83,
       "signature": "async __aenter__(self) -> IStorageStream",
-      "reference": "/services/storage/streaming-and-uploads#stream-context"
+      "reference": "/storage/streaming-and-uploads#stream-context"
     },
     {
       "source": "orionis/storage/contracts/stream.py",
@@ -1043,7 +1043,7 @@
       "kind": "method",
       "line": 94,
       "signature": "async __aexit__(self, exc_type: type[BaseException] | None, exc: BaseException | None, traceback: TracebackType | None) -> None",
-      "reference": "/services/storage/streaming-and-uploads#stream-context"
+      "reference": "/storage/streaming-and-uploads#stream-context"
     },
     {
       "source": "orionis/storage/contracts/uploaded_file.py",
@@ -1051,7 +1051,7 @@
       "kind": "class",
       "line": 8,
       "signature": "class IUploadedFile",
-      "reference": "/services/storage/streaming-and-uploads#upload-construction"
+      "reference": "/storage/streaming-and-uploads#upload-construction"
     },
     {
       "source": "orionis/storage/contracts/uploaded_file.py",
@@ -1059,7 +1059,7 @@
       "kind": "method",
       "line": 20,
       "signature": "originalName(self) -> str",
-      "reference": "/services/storage/streaming-and-uploads#upload-originalname"
+      "reference": "/storage/streaming-and-uploads#upload-originalname"
     },
     {
       "source": "orionis/storage/contracts/uploaded_file.py",
@@ -1067,7 +1067,7 @@
       "kind": "method",
       "line": 31,
       "signature": "extension(self) -> str",
-      "reference": "/services/storage/streaming-and-uploads#upload-extension"
+      "reference": "/storage/streaming-and-uploads#upload-extension"
     },
     {
       "source": "orionis/storage/contracts/uploaded_file.py",
@@ -1075,7 +1075,7 @@
       "kind": "method",
       "line": 43,
       "signature": "size(self) -> int",
-      "reference": "/services/storage/streaming-and-uploads#upload-size"
+      "reference": "/storage/streaming-and-uploads#upload-size"
     },
     {
       "source": "orionis/storage/contracts/uploaded_file.py",
@@ -1083,7 +1083,7 @@
       "kind": "method",
       "line": 54,
       "signature": "mimeType(self) -> str | None",
-      "reference": "/services/storage/streaming-and-uploads#upload-mimetype"
+      "reference": "/storage/streaming-and-uploads#upload-mimetype"
     },
     {
       "source": "orionis/storage/contracts/uploaded_file.py",
@@ -1091,7 +1091,7 @@
       "kind": "method",
       "line": 65,
       "signature": "hashName(self) -> str",
-      "reference": "/services/storage/streaming-and-uploads#upload-hashname"
+      "reference": "/storage/streaming-and-uploads#upload-hashname"
     },
     {
       "source": "orionis/storage/contracts/uploaded_file.py",
@@ -1099,7 +1099,7 @@
       "kind": "method",
       "line": 79,
       "signature": "async read(self) -> bytes",
-      "reference": "/services/storage/streaming-and-uploads#upload-read"
+      "reference": "/storage/streaming-and-uploads#upload-read"
     },
     {
       "source": "orionis/storage/contracts/uploaded_file.py",
@@ -1107,7 +1107,7 @@
       "kind": "method",
       "line": 90,
       "signature": "async store(self, directory: str='', disk: str | None=None, visibility: str | None=None) -> IFile",
-      "reference": "/services/storage/streaming-and-uploads#upload-store"
+      "reference": "/storage/streaming-and-uploads#upload-store"
     },
     {
       "source": "orionis/storage/contracts/uploaded_file.py",
@@ -1115,7 +1115,7 @@
       "kind": "method",
       "line": 115,
       "signature": "async storeAs(self, directory: str, name: str, disk: str | None=None, visibility: str | None=None) -> IFile",
-      "reference": "/services/storage/streaming-and-uploads#upload-storeas"
+      "reference": "/storage/streaming-and-uploads#upload-storeas"
     },
     {
       "source": "orionis/storage/contracts/uploaded_file.py",
@@ -1123,7 +1123,7 @@
       "kind": "method",
       "line": 148,
       "signature": "async move(self, directory: str, name: str | None=None, disk: str | None=None) -> IFile",
-      "reference": "/services/storage/streaming-and-uploads#upload-move"
+      "reference": "/storage/streaming-and-uploads#upload-move"
     },
     {
       "source": "orionis/storage/contracts/uploaded_file.py",
@@ -1131,7 +1131,7 @@
       "kind": "method",
       "line": 174,
       "signature": "async copy(self, directory: str, name: str | None=None, disk: str | None=None) -> IFile",
-      "reference": "/services/storage/streaming-and-uploads#upload-copy"
+      "reference": "/storage/streaming-and-uploads#upload-copy"
     },
     {
       "source": "orionis/storage/directory.py",
@@ -1139,7 +1139,7 @@
       "kind": "class",
       "line": 11,
       "signature": "class Directory",
-      "reference": "/services/storage/files-and-directories#directory-construction"
+      "reference": "/storage/files-and-directories#directory-construction"
     },
     {
       "source": "orionis/storage/directory.py",
@@ -1147,7 +1147,7 @@
       "kind": "method",
       "line": 23,
       "signature": "__init__(self, driver: IStorageDriver, path: str='') -> None",
-      "reference": "/services/storage/files-and-directories#directory-construction"
+      "reference": "/storage/files-and-directories#directory-construction"
     },
     {
       "source": "orionis/storage/directory.py",
@@ -1155,7 +1155,7 @@
       "kind": "method",
       "line": 47,
       "signature": "path(self) -> str",
-      "reference": "/services/storage/files-and-directories#directory-path"
+      "reference": "/storage/files-and-directories#directory-path"
     },
     {
       "source": "orionis/storage/directory.py",
@@ -1163,7 +1163,7 @@
       "kind": "method",
       "line": 59,
       "signature": "async create(self) -> IDirectory",
-      "reference": "/services/storage/files-and-directories#directory-create"
+      "reference": "/storage/files-and-directories#directory-create"
     },
     {
       "source": "orionis/storage/directory.py",
@@ -1171,7 +1171,7 @@
       "kind": "method",
       "line": 71,
       "signature": "async delete(self) -> bool",
-      "reference": "/services/storage/files-and-directories#directory-delete"
+      "reference": "/storage/files-and-directories#directory-delete"
     },
     {
       "source": "orionis/storage/directory.py",
@@ -1179,7 +1179,7 @@
       "kind": "method",
       "line": 82,
       "signature": "async exists(self) -> bool",
-      "reference": "/services/storage/files-and-directories#directory-exists"
+      "reference": "/storage/files-and-directories#directory-exists"
     },
     {
       "source": "orionis/storage/directory.py",
@@ -1187,7 +1187,7 @@
       "kind": "method",
       "line": 93,
       "signature": "async files(self) -> list[IFile]",
-      "reference": "/services/storage/files-and-directories#directory-files"
+      "reference": "/storage/files-and-directories#directory-files"
     },
     {
       "source": "orionis/storage/directory.py",
@@ -1195,7 +1195,7 @@
       "kind": "method",
       "line": 105,
       "signature": "async allFiles(self) -> list[IFile]",
-      "reference": "/services/storage/files-and-directories#directory-allfiles"
+      "reference": "/storage/files-and-directories#directory-allfiles"
     },
     {
       "source": "orionis/storage/directory.py",
@@ -1203,7 +1203,7 @@
       "kind": "method",
       "line": 117,
       "signature": "async directories(self) -> list[IDirectory]",
-      "reference": "/services/storage/files-and-directories#directory-directories"
+      "reference": "/storage/files-and-directories#directory-directories"
     },
     {
       "source": "orionis/storage/directory.py",
@@ -1211,7 +1211,7 @@
       "kind": "method",
       "line": 130,
       "signature": "async allDirectories(self) -> list[IDirectory]",
-      "reference": "/services/storage/files-and-directories#directory-alldirectories"
+      "reference": "/storage/files-and-directories#directory-alldirectories"
     },
     {
       "source": "orionis/storage/disk.py",
@@ -1219,7 +1219,7 @@
       "kind": "class",
       "line": 12,
       "signature": "class Disk",
-      "reference": "/services/storage/files-and-directories#disk-construction"
+      "reference": "/storage/files-and-directories#disk-construction"
     },
     {
       "source": "orionis/storage/disk.py",
@@ -1227,7 +1227,7 @@
       "kind": "method",
       "line": 25,
       "signature": "__init__(self, name: str, driver: IStorageDriver) -> None",
-      "reference": "/services/storage/files-and-directories#disk-construction"
+      "reference": "/storage/files-and-directories#disk-construction"
     },
     {
       "source": "orionis/storage/disk.py",
@@ -1235,7 +1235,7 @@
       "kind": "method",
       "line": 43,
       "signature": "name(self) -> str",
-      "reference": "/services/storage/files-and-directories#disk-name"
+      "reference": "/storage/files-and-directories#disk-name"
     },
     {
       "source": "orionis/storage/disk.py",
@@ -1243,7 +1243,7 @@
       "kind": "method",
       "line": 56,
       "signature": "file(self, path: str) -> IFile",
-      "reference": "/services/storage/files-and-directories#disk-file"
+      "reference": "/storage/files-and-directories#disk-file"
     },
     {
       "source": "orionis/storage/disk.py",
@@ -1251,7 +1251,7 @@
       "kind": "method",
       "line": 77,
       "signature": "directory(self, path: str='') -> IDirectory",
-      "reference": "/services/storage/files-and-directories#disk-directory"
+      "reference": "/storage/files-and-directories#disk-directory"
     },
     {
       "source": "orionis/storage/disk.py",
@@ -1259,7 +1259,7 @@
       "kind": "method",
       "line": 101,
       "signature": "async put(self, path: str, contents: bytes | str, visibility: str | None=None) -> IFile",
-      "reference": "/services/storage/files-and-directories#disk-put"
+      "reference": "/storage/files-and-directories#disk-put"
     },
     {
       "source": "orionis/storage/disk.py",
@@ -1267,7 +1267,7 @@
       "kind": "method",
       "line": 126,
       "signature": "async exists(self, path: str) -> bool",
-      "reference": "/services/storage/files-and-directories#disk-exists"
+      "reference": "/storage/files-and-directories#disk-exists"
     },
     {
       "source": "orionis/storage/disk.py",
@@ -1275,7 +1275,7 @@
       "kind": "method",
       "line": 142,
       "signature": "async delete(self, path: str) -> bool",
-      "reference": "/services/storage/files-and-directories#disk-delete"
+      "reference": "/storage/files-and-directories#disk-delete"
     },
     {
       "source": "orionis/storage/disk.py",
@@ -1283,7 +1283,7 @@
       "kind": "method",
       "line": 158,
       "signature": "async copy(self, source: str, target: str) -> IFile",
-      "reference": "/services/storage/files-and-directories#disk-copy"
+      "reference": "/storage/files-and-directories#disk-copy"
     },
     {
       "source": "orionis/storage/disk.py",
@@ -1291,7 +1291,7 @@
       "kind": "method",
       "line": 181,
       "signature": "async move(self, source: str, target: str) -> IFile",
-      "reference": "/services/storage/files-and-directories#disk-move"
+      "reference": "/storage/files-and-directories#disk-move"
     },
     {
       "source": "orionis/storage/drivers/azure.py",
@@ -1299,7 +1299,7 @@
       "kind": "class",
       "line": 37,
       "signature": "class AzureStorageDriver",
-      "reference": "/services/storage/disks-and-drivers#driver-azure"
+      "reference": "/storage/disks-and-drivers#driver-azure"
     },
     {
       "source": "orionis/storage/drivers/azure.py",
@@ -1307,7 +1307,7 @@
       "kind": "method",
       "line": 69,
       "signature": "__init__(self, config: object) -> None",
-      "reference": "/services/storage/disks-and-drivers#driver-azure"
+      "reference": "/storage/disks-and-drivers#driver-azure"
     },
     {
       "source": "orionis/storage/drivers/azure.py",
@@ -1315,7 +1315,7 @@
       "kind": "method",
       "line": 315,
       "signature": "async read(self, path: str) -> bytes",
-      "reference": "/services/storage/api-reference#driver-read"
+      "reference": "/storage/api-reference#driver-read"
     },
     {
       "source": "orionis/storage/drivers/azure.py",
@@ -1323,7 +1323,7 @@
       "kind": "method",
       "line": 353,
       "signature": "async readStream(self, path: str, chunk_size: int=_CHUNK_SIZE) -> AsyncIterator[bytes]",
-      "reference": "/services/storage/api-reference#driver-readstream"
+      "reference": "/storage/api-reference#driver-readstream"
     },
     {
       "source": "orionis/storage/drivers/azure.py",
@@ -1331,7 +1331,7 @@
       "kind": "method",
       "line": 407,
       "signature": "async exists(self, path: str) -> bool",
-      "reference": "/services/storage/api-reference#driver-exists"
+      "reference": "/storage/api-reference#driver-exists"
     },
     {
       "source": "orionis/storage/drivers/azure.py",
@@ -1339,7 +1339,7 @@
       "kind": "method",
       "line": 428,
       "signature": "async write(self, path: str, contents: bytes | str, visibility: str | None=None) -> None",
-      "reference": "/services/storage/api-reference#driver-write"
+      "reference": "/storage/api-reference#driver-write"
     },
     {
       "source": "orionis/storage/drivers/azure.py",
@@ -1347,7 +1347,7 @@
       "kind": "method",
       "line": 481,
       "signature": "async writeStream(self, path: str, stream: AsyncIterable[bytes], visibility: str | None=None) -> None",
-      "reference": "/services/storage/api-reference#driver-writestream"
+      "reference": "/storage/api-reference#driver-writestream"
     },
     {
       "source": "orionis/storage/drivers/azure.py",
@@ -1355,7 +1355,7 @@
       "kind": "method",
       "line": 533,
       "signature": "async delete(self, path: str) -> bool",
-      "reference": "/services/storage/api-reference#driver-delete"
+      "reference": "/storage/api-reference#driver-delete"
     },
     {
       "source": "orionis/storage/drivers/azure.py",
@@ -1363,7 +1363,7 @@
       "kind": "method",
       "line": 567,
       "signature": "async copy(self, source: str, target: str) -> None",
-      "reference": "/services/storage/api-reference#driver-copy"
+      "reference": "/storage/api-reference#driver-copy"
     },
     {
       "source": "orionis/storage/drivers/azure.py",
@@ -1371,7 +1371,7 @@
       "kind": "method",
       "line": 626,
       "signature": "async move(self, source: str, target: str) -> None",
-      "reference": "/services/storage/api-reference#driver-move"
+      "reference": "/storage/api-reference#driver-move"
     },
     {
       "source": "orionis/storage/drivers/azure.py",
@@ -1379,7 +1379,7 @@
       "kind": "method",
       "line": 656,
       "signature": "async size(self, path: str) -> int",
-      "reference": "/services/storage/api-reference#driver-size"
+      "reference": "/storage/api-reference#driver-size"
     },
     {
       "source": "orionis/storage/drivers/azure.py",
@@ -1387,7 +1387,7 @@
       "kind": "method",
       "line": 679,
       "signature": "async mimeType(self, path: str) -> str | None",
-      "reference": "/services/storage/api-reference#driver-mimetype"
+      "reference": "/storage/api-reference#driver-mimetype"
     },
     {
       "source": "orionis/storage/drivers/azure.py",
@@ -1395,7 +1395,7 @@
       "kind": "method",
       "line": 706,
       "signature": "async lastModified(self, path: str) -> datetime",
-      "reference": "/services/storage/api-reference#driver-lastmodified"
+      "reference": "/storage/api-reference#driver-lastmodified"
     },
     {
       "source": "orionis/storage/drivers/azure.py",
@@ -1403,7 +1403,7 @@
       "kind": "method",
       "line": 729,
       "signature": "async visibility(self, path: str) -> str",
-      "reference": "/services/storage/api-reference#driver-visibility"
+      "reference": "/storage/api-reference#driver-visibility"
     },
     {
       "source": "orionis/storage/drivers/azure.py",
@@ -1411,7 +1411,7 @@
       "kind": "method",
       "line": 779,
       "signature": "async setVisibility(self, path: str, visibility: str) -> None",
-      "reference": "/services/storage/api-reference#driver-setvisibility"
+      "reference": "/storage/api-reference#driver-setvisibility"
     },
     {
       "source": "orionis/storage/drivers/azure.py",
@@ -1419,7 +1419,7 @@
       "kind": "method",
       "line": 812,
       "signature": "async hash(self, path: str, algorithm: str='sha256') -> str",
-      "reference": "/services/storage/api-reference#driver-hash"
+      "reference": "/storage/api-reference#driver-hash"
     },
     {
       "source": "orionis/storage/drivers/azure.py",
@@ -1427,7 +1427,7 @@
       "kind": "method",
       "line": 866,
       "signature": "async info(self, path: str) -> FileInfo",
-      "reference": "/services/storage/api-reference#driver-info"
+      "reference": "/storage/api-reference#driver-info"
     },
     {
       "source": "orionis/storage/drivers/azure.py",
@@ -1435,7 +1435,7 @@
       "kind": "method",
       "line": 932,
       "signature": "async createDirectory(self, path: str) -> None",
-      "reference": "/services/storage/api-reference#driver-createdirectory"
+      "reference": "/storage/api-reference#driver-createdirectory"
     },
     {
       "source": "orionis/storage/drivers/azure.py",
@@ -1443,7 +1443,7 @@
       "kind": "method",
       "line": 965,
       "signature": "async deleteDirectory(self, path: str) -> bool",
-      "reference": "/services/storage/api-reference#driver-deletedirectory"
+      "reference": "/storage/api-reference#driver-deletedirectory"
     },
     {
       "source": "orionis/storage/drivers/azure.py",
@@ -1451,7 +1451,7 @@
       "kind": "method",
       "line": 1000,
       "signature": "async directoryExists(self, path: str) -> bool",
-      "reference": "/services/storage/api-reference#driver-directoryexists"
+      "reference": "/storage/api-reference#driver-directoryexists"
     },
     {
       "source": "orionis/storage/drivers/azure.py",
@@ -1459,7 +1459,7 @@
       "kind": "method",
       "line": 1036,
       "signature": "async files(self, path: str='', *, recursive: bool=False) -> list[str]",
-      "reference": "/services/storage/api-reference#driver-files"
+      "reference": "/storage/api-reference#driver-files"
     },
     {
       "source": "orionis/storage/drivers/azure.py",
@@ -1467,7 +1467,7 @@
       "kind": "method",
       "line": 1062,
       "signature": "async directories(self, path: str='', *, recursive: bool=False) -> list[str]",
-      "reference": "/services/storage/api-reference#driver-directories"
+      "reference": "/storage/api-reference#driver-directories"
     },
     {
       "source": "orionis/storage/drivers/azure.py",
@@ -1475,7 +1475,7 @@
       "kind": "method",
       "line": 1090,
       "signature": "async url(self, path: str) -> str",
-      "reference": "/services/storage/api-reference#driver-url"
+      "reference": "/storage/api-reference#driver-url"
     },
     {
       "source": "orionis/storage/drivers/azure.py",
@@ -1483,7 +1483,7 @@
       "kind": "method",
       "line": 1107,
       "signature": "async temporaryUrl(self, path: str, expires_in: int) -> str",
-      "reference": "/services/storage/api-reference#driver-temporaryurl"
+      "reference": "/storage/api-reference#driver-temporaryurl"
     },
     {
       "source": "orionis/storage/drivers/azure.py",
@@ -1491,7 +1491,7 @@
       "kind": "method",
       "line": 1164,
       "signature": "async download(self, path: str, destination: str | Path) -> Path",
-      "reference": "/services/storage/api-reference#driver-download"
+      "reference": "/storage/api-reference#driver-download"
     },
     {
       "source": "orionis/storage/drivers/azure.py",
@@ -1499,7 +1499,7 @@
       "kind": "method",
       "line": 1209,
       "signature": "open(self, path: str, mode: str='rb') -> AsyncStream",
-      "reference": "/services/storage/api-reference#driver-open"
+      "reference": "/storage/api-reference#driver-open"
     },
     {
       "source": "orionis/storage/drivers/functions.py",
@@ -1507,7 +1507,7 @@
       "kind": "function",
       "line": 19,
       "signature": "import_driver_dependency(module: str, package: str, extra: str) -> ModuleType",
-      "reference": "/services/storage/api-reference#helper-import-driver-dependency"
+      "reference": "/storage/api-reference#helper-import-driver-dependency"
     },
     {
       "source": "orionis/storage/drivers/functions.py",
@@ -1515,7 +1515,7 @@
       "kind": "function",
       "line": 57,
       "signature": "assert_binary_mode(mode: str) -> None",
-      "reference": "/services/storage/api-reference#helper-assert-binary-mode"
+      "reference": "/storage/api-reference#helper-assert-binary-mode"
     },
     {
       "source": "orionis/storage/drivers/functions.py",
@@ -1523,7 +1523,7 @@
       "kind": "function",
       "line": 80,
       "signature": "resolve_download_target(normalized: str, destination: str | Path) -> Path",
-      "reference": "/services/storage/api-reference#helper-resolve-download-target"
+      "reference": "/storage/api-reference#helper-resolve-download-target"
     },
     {
       "source": "orionis/storage/drivers/functions.py",
@@ -1531,7 +1531,7 @@
       "kind": "function",
       "line": 108,
       "signature": "filter_files(keys: Iterable[str], base: str, *, recursive: bool) -> list[str]",
-      "reference": "/services/storage/api-reference#helper-filter-files"
+      "reference": "/storage/api-reference#helper-filter-files"
     },
     {
       "source": "orionis/storage/drivers/functions.py",
@@ -1539,7 +1539,7 @@
       "kind": "function",
       "line": 178,
       "signature": "derive_directories(keys: Iterable[str], base: str, *, recursive: bool) -> list[str]",
-      "reference": "/services/storage/api-reference#helper-derive-directories"
+      "reference": "/storage/api-reference#helper-derive-directories"
     },
     {
       "source": "orionis/storage/drivers/gcs.py",
@@ -1547,7 +1547,7 @@
       "kind": "class",
       "line": 48,
       "signature": "class GoogleStorageDriver",
-      "reference": "/services/storage/disks-and-drivers#driver-gcs"
+      "reference": "/storage/disks-and-drivers#driver-gcs"
     },
     {
       "source": "orionis/storage/drivers/gcs.py",
@@ -1555,7 +1555,7 @@
       "kind": "method",
       "line": 79,
       "signature": "__init__(self, config: object) -> None",
-      "reference": "/services/storage/disks-and-drivers#driver-gcs"
+      "reference": "/storage/disks-and-drivers#driver-gcs"
     },
     {
       "source": "orionis/storage/drivers/gcs.py",
@@ -1563,7 +1563,7 @@
       "kind": "method",
       "line": 324,
       "signature": "async read(self, path: str) -> bytes",
-      "reference": "/services/storage/api-reference#driver-read"
+      "reference": "/storage/api-reference#driver-read"
     },
     {
       "source": "orionis/storage/drivers/gcs.py",
@@ -1571,7 +1571,7 @@
       "kind": "method",
       "line": 362,
       "signature": "async readStream(self, path: str, chunk_size: int=_CHUNK_SIZE) -> AsyncIterator[bytes]",
-      "reference": "/services/storage/api-reference#driver-readstream"
+      "reference": "/storage/api-reference#driver-readstream"
     },
     {
       "source": "orionis/storage/drivers/gcs.py",
@@ -1579,7 +1579,7 @@
       "kind": "method",
       "line": 411,
       "signature": "async exists(self, path: str) -> bool",
-      "reference": "/services/storage/api-reference#driver-exists"
+      "reference": "/storage/api-reference#driver-exists"
     },
     {
       "source": "orionis/storage/drivers/gcs.py",
@@ -1587,7 +1587,7 @@
       "kind": "method",
       "line": 432,
       "signature": "async write(self, path: str, contents: bytes | str, visibility: str | None=None) -> None",
-      "reference": "/services/storage/api-reference#driver-write"
+      "reference": "/storage/api-reference#driver-write"
     },
     {
       "source": "orionis/storage/drivers/gcs.py",
@@ -1595,7 +1595,7 @@
       "kind": "method",
       "line": 485,
       "signature": "async writeStream(self, path: str, stream: AsyncIterable[bytes], visibility: str | None=None) -> None",
-      "reference": "/services/storage/api-reference#driver-writestream"
+      "reference": "/storage/api-reference#driver-writestream"
     },
     {
       "source": "orionis/storage/drivers/gcs.py",
@@ -1603,7 +1603,7 @@
       "kind": "method",
       "line": 540,
       "signature": "async delete(self, path: str) -> bool",
-      "reference": "/services/storage/api-reference#driver-delete"
+      "reference": "/storage/api-reference#driver-delete"
     },
     {
       "source": "orionis/storage/drivers/gcs.py",
@@ -1611,7 +1611,7 @@
       "kind": "method",
       "line": 574,
       "signature": "async copy(self, source: str, target: str) -> None",
-      "reference": "/services/storage/api-reference#driver-copy"
+      "reference": "/storage/api-reference#driver-copy"
     },
     {
       "source": "orionis/storage/drivers/gcs.py",
@@ -1619,7 +1619,7 @@
       "kind": "method",
       "line": 612,
       "signature": "async move(self, source: str, target: str) -> None",
-      "reference": "/services/storage/api-reference#driver-move"
+      "reference": "/storage/api-reference#driver-move"
     },
     {
       "source": "orionis/storage/drivers/gcs.py",
@@ -1627,7 +1627,7 @@
       "kind": "method",
       "line": 655,
       "signature": "async size(self, path: str) -> int",
-      "reference": "/services/storage/api-reference#driver-size"
+      "reference": "/storage/api-reference#driver-size"
     },
     {
       "source": "orionis/storage/drivers/gcs.py",
@@ -1635,7 +1635,7 @@
       "kind": "method",
       "line": 678,
       "signature": "async mimeType(self, path: str) -> str | None",
-      "reference": "/services/storage/api-reference#driver-mimetype"
+      "reference": "/storage/api-reference#driver-mimetype"
     },
     {
       "source": "orionis/storage/drivers/gcs.py",
@@ -1643,7 +1643,7 @@
       "kind": "method",
       "line": 704,
       "signature": "async lastModified(self, path: str) -> datetime",
-      "reference": "/services/storage/api-reference#driver-lastmodified"
+      "reference": "/storage/api-reference#driver-lastmodified"
     },
     {
       "source": "orionis/storage/drivers/gcs.py",
@@ -1651,7 +1651,7 @@
       "kind": "method",
       "line": 727,
       "signature": "async visibility(self, path: str) -> str",
-      "reference": "/services/storage/api-reference#driver-visibility"
+      "reference": "/storage/api-reference#driver-visibility"
     },
     {
       "source": "orionis/storage/drivers/gcs.py",
@@ -1659,7 +1659,7 @@
       "kind": "method",
       "line": 767,
       "signature": "async setVisibility(self, path: str, visibility: str) -> None",
-      "reference": "/services/storage/api-reference#driver-setvisibility"
+      "reference": "/storage/api-reference#driver-setvisibility"
     },
     {
       "source": "orionis/storage/drivers/gcs.py",
@@ -1667,7 +1667,7 @@
       "kind": "method",
       "line": 815,
       "signature": "async hash(self, path: str, algorithm: str='sha256') -> str",
-      "reference": "/services/storage/api-reference#driver-hash"
+      "reference": "/storage/api-reference#driver-hash"
     },
     {
       "source": "orionis/storage/drivers/gcs.py",
@@ -1675,7 +1675,7 @@
       "kind": "method",
       "line": 866,
       "signature": "async info(self, path: str) -> FileInfo",
-      "reference": "/services/storage/api-reference#driver-info"
+      "reference": "/storage/api-reference#driver-info"
     },
     {
       "source": "orionis/storage/drivers/gcs.py",
@@ -1683,7 +1683,7 @@
       "kind": "method",
       "line": 929,
       "signature": "async createDirectory(self, path: str) -> None",
-      "reference": "/services/storage/api-reference#driver-createdirectory"
+      "reference": "/storage/api-reference#driver-createdirectory"
     },
     {
       "source": "orionis/storage/drivers/gcs.py",
@@ -1691,7 +1691,7 @@
       "kind": "method",
       "line": 950,
       "signature": "async deleteDirectory(self, path: str) -> bool",
-      "reference": "/services/storage/api-reference#driver-deletedirectory"
+      "reference": "/storage/api-reference#driver-deletedirectory"
     },
     {
       "source": "orionis/storage/drivers/gcs.py",
@@ -1699,7 +1699,7 @@
       "kind": "method",
       "line": 985,
       "signature": "async directoryExists(self, path: str) -> bool",
-      "reference": "/services/storage/api-reference#driver-directoryexists"
+      "reference": "/storage/api-reference#driver-directoryexists"
     },
     {
       "source": "orionis/storage/drivers/gcs.py",
@@ -1707,7 +1707,7 @@
       "kind": "method",
       "line": 1021,
       "signature": "async files(self, path: str='', *, recursive: bool=False) -> list[str]",
-      "reference": "/services/storage/api-reference#driver-files"
+      "reference": "/storage/api-reference#driver-files"
     },
     {
       "source": "orionis/storage/drivers/gcs.py",
@@ -1715,7 +1715,7 @@
       "kind": "method",
       "line": 1047,
       "signature": "async directories(self, path: str='', *, recursive: bool=False) -> list[str]",
-      "reference": "/services/storage/api-reference#driver-directories"
+      "reference": "/storage/api-reference#driver-directories"
     },
     {
       "source": "orionis/storage/drivers/gcs.py",
@@ -1723,7 +1723,7 @@
       "kind": "method",
       "line": 1075,
       "signature": "async url(self, path: str) -> str",
-      "reference": "/services/storage/api-reference#driver-url"
+      "reference": "/storage/api-reference#driver-url"
     },
     {
       "source": "orionis/storage/drivers/gcs.py",
@@ -1731,7 +1731,7 @@
       "kind": "method",
       "line": 1092,
       "signature": "async temporaryUrl(self, path: str, expires_in: int) -> str",
-      "reference": "/services/storage/api-reference#driver-temporaryurl"
+      "reference": "/storage/api-reference#driver-temporaryurl"
     },
     {
       "source": "orionis/storage/drivers/gcs.py",
@@ -1739,7 +1739,7 @@
       "kind": "method",
       "line": 1137,
       "signature": "async download(self, path: str, destination: str | Path) -> Path",
-      "reference": "/services/storage/api-reference#driver-download"
+      "reference": "/storage/api-reference#driver-download"
     },
     {
       "source": "orionis/storage/drivers/gcs.py",
@@ -1747,7 +1747,7 @@
       "kind": "method",
       "line": 1180,
       "signature": "open(self, path: str, mode: str='rb') -> AsyncStream",
-      "reference": "/services/storage/api-reference#driver-open"
+      "reference": "/storage/api-reference#driver-open"
     },
     {
       "source": "orionis/storage/drivers/local.py",
@@ -1755,7 +1755,7 @@
       "kind": "class",
       "line": 43,
       "signature": "class LocalStorageDriver",
-      "reference": "/services/storage/disks-and-drivers#driver-local"
+      "reference": "/storage/disks-and-drivers#driver-local"
     },
     {
       "source": "orionis/storage/drivers/local.py",
@@ -1763,7 +1763,7 @@
       "kind": "method",
       "line": 57,
       "signature": "__init__(self, root: Path, base_url: str | None=None) -> None",
-      "reference": "/services/storage/disks-and-drivers#driver-local"
+      "reference": "/storage/disks-and-drivers#driver-local"
     },
     {
       "source": "orionis/storage/drivers/local.py",
@@ -1771,7 +1771,7 @@
       "kind": "method",
       "line": 618,
       "signature": "async read(self, path: str) -> bytes",
-      "reference": "/services/storage/api-reference#driver-read"
+      "reference": "/storage/api-reference#driver-read"
     },
     {
       "source": "orionis/storage/drivers/local.py",
@@ -1779,7 +1779,7 @@
       "kind": "method",
       "line": 640,
       "signature": "async readStream(self, path: str, chunk_size: int=_CHUNK_SIZE) -> AsyncIterator[bytes]",
-      "reference": "/services/storage/api-reference#driver-readstream"
+      "reference": "/storage/api-reference#driver-readstream"
     },
     {
       "source": "orionis/storage/drivers/local.py",
@@ -1787,7 +1787,7 @@
       "kind": "method",
       "line": 676,
       "signature": "async exists(self, path: str) -> bool",
-      "reference": "/services/storage/api-reference#driver-exists"
+      "reference": "/storage/api-reference#driver-exists"
     },
     {
       "source": "orionis/storage/drivers/local.py",
@@ -1795,7 +1795,7 @@
       "kind": "method",
       "line": 695,
       "signature": "async write(self, path: str, contents: bytes | str, visibility: str | None=None) -> None",
-      "reference": "/services/storage/api-reference#driver-write"
+      "reference": "/storage/api-reference#driver-write"
     },
     {
       "source": "orionis/storage/drivers/local.py",
@@ -1803,7 +1803,7 @@
       "kind": "method",
       "line": 728,
       "signature": "async writeStream(self, path: str, stream: AsyncIterable[bytes], visibility: str | None=None) -> None",
-      "reference": "/services/storage/api-reference#driver-writestream"
+      "reference": "/storage/api-reference#driver-writestream"
     },
     {
       "source": "orionis/storage/drivers/local.py",
@@ -1811,7 +1811,7 @@
       "kind": "method",
       "line": 772,
       "signature": "async delete(self, path: str) -> bool",
-      "reference": "/services/storage/api-reference#driver-delete"
+      "reference": "/storage/api-reference#driver-delete"
     },
     {
       "source": "orionis/storage/drivers/local.py",
@@ -1819,7 +1819,7 @@
       "kind": "method",
       "line": 793,
       "signature": "async copy(self, source: str, target: str) -> None",
-      "reference": "/services/storage/api-reference#driver-copy"
+      "reference": "/storage/api-reference#driver-copy"
     },
     {
       "source": "orionis/storage/drivers/local.py",
@@ -1827,7 +1827,7 @@
       "kind": "method",
       "line": 819,
       "signature": "async move(self, source: str, target: str) -> None",
-      "reference": "/services/storage/api-reference#driver-move"
+      "reference": "/storage/api-reference#driver-move"
     },
     {
       "source": "orionis/storage/drivers/local.py",
@@ -1835,7 +1835,7 @@
       "kind": "method",
       "line": 847,
       "signature": "async size(self, path: str) -> int",
-      "reference": "/services/storage/api-reference#driver-size"
+      "reference": "/storage/api-reference#driver-size"
     },
     {
       "source": "orionis/storage/drivers/local.py",
@@ -1843,7 +1843,7 @@
       "kind": "method",
       "line": 872,
       "signature": "async mimeType(self, path: str) -> str | None",
-      "reference": "/services/storage/api-reference#driver-mimetype"
+      "reference": "/storage/api-reference#driver-mimetype"
     },
     {
       "source": "orionis/storage/drivers/local.py",
@@ -1851,7 +1851,7 @@
       "kind": "method",
       "line": 891,
       "signature": "async lastModified(self, path: str) -> datetime",
-      "reference": "/services/storage/api-reference#driver-lastmodified"
+      "reference": "/storage/api-reference#driver-lastmodified"
     },
     {
       "source": "orionis/storage/drivers/local.py",
@@ -1859,7 +1859,7 @@
       "kind": "method",
       "line": 916,
       "signature": "async visibility(self, path: str) -> str",
-      "reference": "/services/storage/api-reference#driver-visibility"
+      "reference": "/storage/api-reference#driver-visibility"
     },
     {
       "source": "orionis/storage/drivers/local.py",
@@ -1867,7 +1867,7 @@
       "kind": "method",
       "line": 941,
       "signature": "async setVisibility(self, path: str, visibility: str) -> None",
-      "reference": "/services/storage/api-reference#driver-setvisibility"
+      "reference": "/storage/api-reference#driver-setvisibility"
     },
     {
       "source": "orionis/storage/drivers/local.py",
@@ -1875,7 +1875,7 @@
       "kind": "method",
       "line": 970,
       "signature": "async hash(self, path: str, algorithm: str='sha256') -> str",
-      "reference": "/services/storage/api-reference#driver-hash"
+      "reference": "/storage/api-reference#driver-hash"
     },
     {
       "source": "orionis/storage/drivers/local.py",
@@ -1883,7 +1883,7 @@
       "kind": "method",
       "line": 999,
       "signature": "async info(self, path: str) -> FileInfo",
-      "reference": "/services/storage/api-reference#driver-info"
+      "reference": "/storage/api-reference#driver-info"
     },
     {
       "source": "orionis/storage/drivers/local.py",
@@ -1891,7 +1891,7 @@
       "kind": "method",
       "line": 1026,
       "signature": "async createDirectory(self, path: str) -> None",
-      "reference": "/services/storage/api-reference#driver-createdirectory"
+      "reference": "/storage/api-reference#driver-createdirectory"
     },
     {
       "source": "orionis/storage/drivers/local.py",
@@ -1899,7 +1899,7 @@
       "kind": "method",
       "line": 1042,
       "signature": "async deleteDirectory(self, path: str) -> bool",
-      "reference": "/services/storage/api-reference#driver-deletedirectory"
+      "reference": "/storage/api-reference#driver-deletedirectory"
     },
     {
       "source": "orionis/storage/drivers/local.py",
@@ -1907,7 +1907,7 @@
       "kind": "method",
       "line": 1062,
       "signature": "async directoryExists(self, path: str) -> bool",
-      "reference": "/services/storage/api-reference#driver-directoryexists"
+      "reference": "/storage/api-reference#driver-directoryexists"
     },
     {
       "source": "orionis/storage/drivers/local.py",
@@ -1915,7 +1915,7 @@
       "kind": "method",
       "line": 1080,
       "signature": "async files(self, path: str='', *, recursive: bool=False) -> list[str]",
-      "reference": "/services/storage/api-reference#driver-files"
+      "reference": "/storage/api-reference#driver-files"
     },
     {
       "source": "orionis/storage/drivers/local.py",
@@ -1923,7 +1923,7 @@
       "kind": "method",
       "line": 1109,
       "signature": "async directories(self, path: str='', *, recursive: bool=False) -> list[str]",
-      "reference": "/services/storage/api-reference#driver-directories"
+      "reference": "/storage/api-reference#driver-directories"
     },
     {
       "source": "orionis/storage/drivers/local.py",
@@ -1931,7 +1931,7 @@
       "kind": "method",
       "line": 1140,
       "signature": "async url(self, path: str) -> str",
-      "reference": "/services/storage/api-reference#driver-url"
+      "reference": "/storage/api-reference#driver-url"
     },
     {
       "source": "orionis/storage/drivers/local.py",
@@ -1939,7 +1939,7 @@
       "kind": "method",
       "line": 1167,
       "signature": "async temporaryUrl(self, path: str, expires_in: int) -> str",
-      "reference": "/services/storage/api-reference#driver-temporaryurl"
+      "reference": "/storage/api-reference#driver-temporaryurl"
     },
     {
       "source": "orionis/storage/drivers/local.py",
@@ -1947,7 +1947,7 @@
       "kind": "method",
       "line": 1196,
       "signature": "async download(self, path: str, destination: str | Path) -> Path",
-      "reference": "/services/storage/api-reference#driver-download"
+      "reference": "/storage/api-reference#driver-download"
     },
     {
       "source": "orionis/storage/drivers/local.py",
@@ -1955,7 +1955,7 @@
       "kind": "method",
       "line": 1224,
       "signature": "open(self, path: str, mode: str='rb') -> AsyncStream",
-      "reference": "/services/storage/api-reference#driver-open"
+      "reference": "/storage/api-reference#driver-open"
     },
     {
       "source": "orionis/storage/drivers/memory.py",
@@ -1963,7 +1963,7 @@
       "kind": "class",
       "line": 66,
       "signature": "class MemoryStorageDriver",
-      "reference": "/services/storage/disks-and-drivers#driver-memory"
+      "reference": "/storage/disks-and-drivers#driver-memory"
     },
     {
       "source": "orionis/storage/drivers/memory.py",
@@ -1971,7 +1971,7 @@
       "kind": "method",
       "line": 88,
       "signature": "__init__(self, base_url: str | None=None) -> None",
-      "reference": "/services/storage/disks-and-drivers#driver-memory"
+      "reference": "/storage/disks-and-drivers#driver-memory"
     },
     {
       "source": "orionis/storage/drivers/memory.py",
@@ -1979,7 +1979,7 @@
       "kind": "method",
       "line": 296,
       "signature": "async read(self, path: str) -> bytes",
-      "reference": "/services/storage/api-reference#driver-read"
+      "reference": "/storage/api-reference#driver-read"
     },
     {
       "source": "orionis/storage/drivers/memory.py",
@@ -1987,7 +1987,7 @@
       "kind": "method",
       "line": 317,
       "signature": "async readStream(self, path: str, chunk_size: int=_CHUNK_SIZE) -> AsyncIterator[bytes]",
-      "reference": "/services/storage/api-reference#driver-readstream"
+      "reference": "/storage/api-reference#driver-readstream"
     },
     {
       "source": "orionis/storage/drivers/memory.py",
@@ -1995,7 +1995,7 @@
       "kind": "method",
       "line": 346,
       "signature": "async exists(self, path: str) -> bool",
-      "reference": "/services/storage/api-reference#driver-exists"
+      "reference": "/storage/api-reference#driver-exists"
     },
     {
       "source": "orionis/storage/drivers/memory.py",
@@ -2003,7 +2003,7 @@
       "kind": "method",
       "line": 364,
       "signature": "async write(self, path: str, contents: bytes | str, visibility: str | None=None) -> None",
-      "reference": "/services/storage/api-reference#driver-write"
+      "reference": "/storage/api-reference#driver-write"
     },
     {
       "source": "orionis/storage/drivers/memory.py",
@@ -2011,7 +2011,7 @@
       "kind": "method",
       "line": 393,
       "signature": "async writeStream(self, path: str, stream: AsyncIterable[bytes], visibility: str | None=None) -> None",
-      "reference": "/services/storage/api-reference#driver-writestream"
+      "reference": "/storage/api-reference#driver-writestream"
     },
     {
       "source": "orionis/storage/drivers/memory.py",
@@ -2019,7 +2019,7 @@
       "kind": "method",
       "line": 420,
       "signature": "async delete(self, path: str) -> bool",
-      "reference": "/services/storage/api-reference#driver-delete"
+      "reference": "/storage/api-reference#driver-delete"
     },
     {
       "source": "orionis/storage/drivers/memory.py",
@@ -2027,7 +2027,7 @@
       "kind": "method",
       "line": 436,
       "signature": "async copy(self, source: str, target: str) -> None",
-      "reference": "/services/storage/api-reference#driver-copy"
+      "reference": "/storage/api-reference#driver-copy"
     },
     {
       "source": "orionis/storage/drivers/memory.py",
@@ -2035,7 +2035,7 @@
       "kind": "method",
       "line": 462,
       "signature": "async move(self, source: str, target: str) -> None",
-      "reference": "/services/storage/api-reference#driver-move"
+      "reference": "/storage/api-reference#driver-move"
     },
     {
       "source": "orionis/storage/drivers/memory.py",
@@ -2043,7 +2043,7 @@
       "kind": "method",
       "line": 489,
       "signature": "async size(self, path: str) -> int",
-      "reference": "/services/storage/api-reference#driver-size"
+      "reference": "/storage/api-reference#driver-size"
     },
     {
       "source": "orionis/storage/drivers/memory.py",
@@ -2051,7 +2051,7 @@
       "kind": "method",
       "line": 510,
       "signature": "async mimeType(self, path: str) -> str | None",
-      "reference": "/services/storage/api-reference#driver-mimetype"
+      "reference": "/storage/api-reference#driver-mimetype"
     },
     {
       "source": "orionis/storage/drivers/memory.py",
@@ -2059,7 +2059,7 @@
       "kind": "method",
       "line": 526,
       "signature": "async lastModified(self, path: str) -> datetime",
-      "reference": "/services/storage/api-reference#driver-lastmodified"
+      "reference": "/storage/api-reference#driver-lastmodified"
     },
     {
       "source": "orionis/storage/drivers/memory.py",
@@ -2067,7 +2067,7 @@
       "kind": "method",
       "line": 547,
       "signature": "async visibility(self, path: str) -> str",
-      "reference": "/services/storage/api-reference#driver-visibility"
+      "reference": "/storage/api-reference#driver-visibility"
     },
     {
       "source": "orionis/storage/drivers/memory.py",
@@ -2075,7 +2075,7 @@
       "kind": "method",
       "line": 568,
       "signature": "async setVisibility(self, path: str, visibility: str) -> None",
-      "reference": "/services/storage/api-reference#driver-setvisibility"
+      "reference": "/storage/api-reference#driver-setvisibility"
     },
     {
       "source": "orionis/storage/drivers/memory.py",
@@ -2083,7 +2083,7 @@
       "kind": "method",
       "line": 600,
       "signature": "async hash(self, path: str, algorithm: str='sha256') -> str",
-      "reference": "/services/storage/api-reference#driver-hash"
+      "reference": "/storage/api-reference#driver-hash"
     },
     {
       "source": "orionis/storage/drivers/memory.py",
@@ -2091,7 +2091,7 @@
       "kind": "method",
       "line": 626,
       "signature": "async info(self, path: str) -> FileInfo",
-      "reference": "/services/storage/api-reference#driver-info"
+      "reference": "/storage/api-reference#driver-info"
     },
     {
       "source": "orionis/storage/drivers/memory.py",
@@ -2099,7 +2099,7 @@
       "kind": "method",
       "line": 662,
       "signature": "async createDirectory(self, path: str) -> None",
-      "reference": "/services/storage/api-reference#driver-createdirectory"
+      "reference": "/storage/api-reference#driver-createdirectory"
     },
     {
       "source": "orionis/storage/drivers/memory.py",
@@ -2107,7 +2107,7 @@
       "kind": "method",
       "line": 679,
       "signature": "async deleteDirectory(self, path: str) -> bool",
-      "reference": "/services/storage/api-reference#driver-deletedirectory"
+      "reference": "/storage/api-reference#driver-deletedirectory"
     },
     {
       "source": "orionis/storage/drivers/memory.py",
@@ -2115,7 +2115,7 @@
       "kind": "method",
       "line": 719,
       "signature": "async directoryExists(self, path: str) -> bool",
-      "reference": "/services/storage/api-reference#driver-directoryexists"
+      "reference": "/storage/api-reference#driver-directoryexists"
     },
     {
       "source": "orionis/storage/drivers/memory.py",
@@ -2123,7 +2123,7 @@
       "kind": "method",
       "line": 739,
       "signature": "async files(self, path: str='', *, recursive: bool=False) -> list[str]",
-      "reference": "/services/storage/api-reference#driver-files"
+      "reference": "/storage/api-reference#driver-files"
     },
     {
       "source": "orionis/storage/drivers/memory.py",
@@ -2131,7 +2131,7 @@
       "kind": "method",
       "line": 766,
       "signature": "async directories(self, path: str='', *, recursive: bool=False) -> list[str]",
-      "reference": "/services/storage/api-reference#driver-directories"
+      "reference": "/storage/api-reference#driver-directories"
     },
     {
       "source": "orionis/storage/drivers/memory.py",
@@ -2139,7 +2139,7 @@
       "kind": "method",
       "line": 795,
       "signature": "async url(self, path: str) -> str",
-      "reference": "/services/storage/api-reference#driver-url"
+      "reference": "/storage/api-reference#driver-url"
     },
     {
       "source": "orionis/storage/drivers/memory.py",
@@ -2147,7 +2147,7 @@
       "kind": "method",
       "line": 822,
       "signature": "async temporaryUrl(self, path: str, expires_in: int) -> str",
-      "reference": "/services/storage/api-reference#driver-temporaryurl"
+      "reference": "/storage/api-reference#driver-temporaryurl"
     },
     {
       "source": "orionis/storage/drivers/memory.py",
@@ -2155,7 +2155,7 @@
       "kind": "method",
       "line": 851,
       "signature": "async download(self, path: str, destination: str | Path) -> Path",
-      "reference": "/services/storage/api-reference#driver-download"
+      "reference": "/storage/api-reference#driver-download"
     },
     {
       "source": "orionis/storage/drivers/memory.py",
@@ -2163,7 +2163,7 @@
       "kind": "method",
       "line": 895,
       "signature": "open(self, path: str, mode: str='rb') -> AsyncStream",
-      "reference": "/services/storage/api-reference#driver-open"
+      "reference": "/storage/api-reference#driver-open"
     },
     {
       "source": "orionis/storage/drivers/s3.py",
@@ -2171,7 +2171,7 @@
       "kind": "class",
       "line": 54,
       "signature": "class S3StorageDriver",
-      "reference": "/services/storage/disks-and-drivers#driver-s3"
+      "reference": "/storage/disks-and-drivers#driver-s3"
     },
     {
       "source": "orionis/storage/drivers/s3.py",
@@ -2179,7 +2179,7 @@
       "kind": "method",
       "line": 85,
       "signature": "__init__(self, config: object) -> None",
-      "reference": "/services/storage/disks-and-drivers#driver-s3"
+      "reference": "/storage/disks-and-drivers#driver-s3"
     },
     {
       "source": "orionis/storage/drivers/s3.py",
@@ -2187,7 +2187,7 @@
       "kind": "method",
       "line": 390,
       "signature": "async read(self, path: str) -> bytes",
-      "reference": "/services/storage/api-reference#driver-read"
+      "reference": "/storage/api-reference#driver-read"
     },
     {
       "source": "orionis/storage/drivers/s3.py",
@@ -2195,7 +2195,7 @@
       "kind": "method",
       "line": 434,
       "signature": "async readStream(self, path: str, chunk_size: int=_CHUNK_SIZE) -> AsyncIterator[bytes]",
-      "reference": "/services/storage/api-reference#driver-readstream"
+      "reference": "/storage/api-reference#driver-readstream"
     },
     {
       "source": "orionis/storage/drivers/s3.py",
@@ -2203,7 +2203,7 @@
       "kind": "method",
       "line": 490,
       "signature": "async exists(self, path: str) -> bool",
-      "reference": "/services/storage/api-reference#driver-exists"
+      "reference": "/storage/api-reference#driver-exists"
     },
     {
       "source": "orionis/storage/drivers/s3.py",
@@ -2211,7 +2211,7 @@
       "kind": "method",
       "line": 525,
       "signature": "async write(self, path: str, contents: bytes | str, visibility: str | None=None) -> None",
-      "reference": "/services/storage/api-reference#driver-write"
+      "reference": "/storage/api-reference#driver-write"
     },
     {
       "source": "orionis/storage/drivers/s3.py",
@@ -2219,7 +2219,7 @@
       "kind": "method",
       "line": 573,
       "signature": "async writeStream(self, path: str, stream: AsyncIterable[bytes], visibility: str | None=None) -> None",
-      "reference": "/services/storage/api-reference#driver-writestream"
+      "reference": "/storage/api-reference#driver-writestream"
     },
     {
       "source": "orionis/storage/drivers/s3.py",
@@ -2227,7 +2227,7 @@
       "kind": "method",
       "line": 625,
       "signature": "async delete(self, path: str) -> bool",
-      "reference": "/services/storage/api-reference#driver-delete"
+      "reference": "/storage/api-reference#driver-delete"
     },
     {
       "source": "orionis/storage/drivers/s3.py",
@@ -2235,7 +2235,7 @@
       "kind": "method",
       "line": 661,
       "signature": "async copy(self, source: str, target: str) -> None",
-      "reference": "/services/storage/api-reference#driver-copy"
+      "reference": "/storage/api-reference#driver-copy"
     },
     {
       "source": "orionis/storage/drivers/s3.py",
@@ -2243,7 +2243,7 @@
       "kind": "method",
       "line": 707,
       "signature": "async move(self, source: str, target: str) -> None",
-      "reference": "/services/storage/api-reference#driver-move"
+      "reference": "/storage/api-reference#driver-move"
     },
     {
       "source": "orionis/storage/drivers/s3.py",
@@ -2251,7 +2251,7 @@
       "kind": "method",
       "line": 740,
       "signature": "async size(self, path: str) -> int",
-      "reference": "/services/storage/api-reference#driver-size"
+      "reference": "/storage/api-reference#driver-size"
     },
     {
       "source": "orionis/storage/drivers/s3.py",
@@ -2259,7 +2259,7 @@
       "kind": "method",
       "line": 763,
       "signature": "async mimeType(self, path: str) -> str | None",
-      "reference": "/services/storage/api-reference#driver-mimetype"
+      "reference": "/storage/api-reference#driver-mimetype"
     },
     {
       "source": "orionis/storage/drivers/s3.py",
@@ -2267,7 +2267,7 @@
       "kind": "method",
       "line": 792,
       "signature": "async lastModified(self, path: str) -> datetime",
-      "reference": "/services/storage/api-reference#driver-lastmodified"
+      "reference": "/storage/api-reference#driver-lastmodified"
     },
     {
       "source": "orionis/storage/drivers/s3.py",
@@ -2275,7 +2275,7 @@
       "kind": "method",
       "line": 816,
       "signature": "async visibility(self, path: str) -> str",
-      "reference": "/services/storage/api-reference#driver-visibility"
+      "reference": "/storage/api-reference#driver-visibility"
     },
     {
       "source": "orionis/storage/drivers/s3.py",
@@ -2283,7 +2283,7 @@
       "kind": "method",
       "line": 838,
       "signature": "async setVisibility(self, path: str, visibility: str) -> None",
-      "reference": "/services/storage/api-reference#driver-setvisibility"
+      "reference": "/storage/api-reference#driver-setvisibility"
     },
     {
       "source": "orionis/storage/drivers/s3.py",
@@ -2291,7 +2291,7 @@
       "kind": "method",
       "line": 884,
       "signature": "async hash(self, path: str, algorithm: str='sha256') -> str",
-      "reference": "/services/storage/api-reference#driver-hash"
+      "reference": "/storage/api-reference#driver-hash"
     },
     {
       "source": "orionis/storage/drivers/s3.py",
@@ -2299,7 +2299,7 @@
       "kind": "method",
       "line": 943,
       "signature": "async info(self, path: str) -> FileInfo",
-      "reference": "/services/storage/api-reference#driver-info"
+      "reference": "/storage/api-reference#driver-info"
     },
     {
       "source": "orionis/storage/drivers/s3.py",
@@ -2307,7 +2307,7 @@
       "kind": "method",
       "line": 1005,
       "signature": "async createDirectory(self, path: str) -> None",
-      "reference": "/services/storage/api-reference#driver-createdirectory"
+      "reference": "/storage/api-reference#driver-createdirectory"
     },
     {
       "source": "orionis/storage/drivers/s3.py",
@@ -2315,7 +2315,7 @@
       "kind": "method",
       "line": 1028,
       "signature": "async deleteDirectory(self, path: str) -> bool",
-      "reference": "/services/storage/api-reference#driver-deletedirectory"
+      "reference": "/storage/api-reference#driver-deletedirectory"
     },
     {
       "source": "orionis/storage/drivers/s3.py",
@@ -2323,7 +2323,7 @@
       "kind": "method",
       "line": 1069,
       "signature": "async directoryExists(self, path: str) -> bool",
-      "reference": "/services/storage/api-reference#driver-directoryexists"
+      "reference": "/storage/api-reference#driver-directoryexists"
     },
     {
       "source": "orionis/storage/drivers/s3.py",
@@ -2331,7 +2331,7 @@
       "kind": "method",
       "line": 1106,
       "signature": "async files(self, path: str='', *, recursive: bool=False) -> list[str]",
-      "reference": "/services/storage/api-reference#driver-files"
+      "reference": "/storage/api-reference#driver-files"
     },
     {
       "source": "orionis/storage/drivers/s3.py",
@@ -2339,7 +2339,7 @@
       "kind": "method",
       "line": 1132,
       "signature": "async directories(self, path: str='', *, recursive: bool=False) -> list[str]",
-      "reference": "/services/storage/api-reference#driver-directories"
+      "reference": "/storage/api-reference#driver-directories"
     },
     {
       "source": "orionis/storage/drivers/s3.py",
@@ -2347,7 +2347,7 @@
       "kind": "method",
       "line": 1160,
       "signature": "async url(self, path: str) -> str",
-      "reference": "/services/storage/api-reference#driver-url"
+      "reference": "/storage/api-reference#driver-url"
     },
     {
       "source": "orionis/storage/drivers/s3.py",
@@ -2355,7 +2355,7 @@
       "kind": "method",
       "line": 1177,
       "signature": "async temporaryUrl(self, path: str, expires_in: int) -> str",
-      "reference": "/services/storage/api-reference#driver-temporaryurl"
+      "reference": "/storage/api-reference#driver-temporaryurl"
     },
     {
       "source": "orionis/storage/drivers/s3.py",
@@ -2363,7 +2363,7 @@
       "kind": "method",
       "line": 1217,
       "signature": "async download(self, path: str, destination: str | Path) -> Path",
-      "reference": "/services/storage/api-reference#driver-download"
+      "reference": "/storage/api-reference#driver-download"
     },
     {
       "source": "orionis/storage/drivers/s3.py",
@@ -2371,7 +2371,7 @@
       "kind": "method",
       "line": 1262,
       "signature": "open(self, path: str, mode: str='rb') -> AsyncStream",
-      "reference": "/services/storage/api-reference#driver-open"
+      "reference": "/storage/api-reference#driver-open"
     },
     {
       "source": "orionis/storage/entities/file_info.py",
@@ -2379,7 +2379,7 @@
       "kind": "class",
       "line": 10,
       "signature": "class FileInfo",
-      "reference": "/services/storage/files-and-directories#file-info"
+      "reference": "/storage/files-and-directories#file-info"
     },
     {
       "source": "orionis/storage/entities/file_info.py",
@@ -2387,7 +2387,7 @@
       "kind": "field",
       "line": 45,
       "signature": "path: str",
-      "reference": "/services/storage/files-and-directories#file-info"
+      "reference": "/storage/files-and-directories#file-info"
     },
     {
       "source": "orionis/storage/entities/file_info.py",
@@ -2395,7 +2395,7 @@
       "kind": "field",
       "line": 46,
       "signature": "size: int",
-      "reference": "/services/storage/files-and-directories#file-info"
+      "reference": "/storage/files-and-directories#file-info"
     },
     {
       "source": "orionis/storage/entities/file_info.py",
@@ -2403,7 +2403,7 @@
       "kind": "field",
       "line": 47,
       "signature": "lastModified: datetime",
-      "reference": "/services/storage/files-and-directories#file-info"
+      "reference": "/storage/files-and-directories#file-info"
     },
     {
       "source": "orionis/storage/entities/file_info.py",
@@ -2411,7 +2411,7 @@
       "kind": "field",
       "line": 48,
       "signature": "visibility: str",
-      "reference": "/services/storage/files-and-directories#file-info"
+      "reference": "/storage/files-and-directories#file-info"
     },
     {
       "source": "orionis/storage/entities/file_info.py",
@@ -2419,7 +2419,7 @@
       "kind": "field",
       "line": 49,
       "signature": "mimeType: str | None = None",
-      "reference": "/services/storage/files-and-directories#file-info"
+      "reference": "/storage/files-and-directories#file-info"
     },
     {
       "source": "orionis/storage/entities/file_info.py",
@@ -2427,7 +2427,7 @@
       "kind": "field",
       "line": 50,
       "signature": "createdAt: datetime | None = None",
-      "reference": "/services/storage/files-and-directories#file-info"
+      "reference": "/storage/files-and-directories#file-info"
     },
     {
       "source": "orionis/storage/entities/file_info.py",
@@ -2435,7 +2435,7 @@
       "kind": "field",
       "line": 51,
       "signature": "etag: str | None = None",
-      "reference": "/services/storage/files-and-directories#file-info"
+      "reference": "/storage/files-and-directories#file-info"
     },
     {
       "source": "orionis/storage/entities/file_info.py",
@@ -2443,7 +2443,7 @@
       "kind": "field",
       "line": 52,
       "signature": "checksum: str | None = None",
-      "reference": "/services/storage/files-and-directories#file-info"
+      "reference": "/storage/files-and-directories#file-info"
     },
     {
       "source": "orionis/storage/entities/file_info.py",
@@ -2451,7 +2451,7 @@
       "kind": "field",
       "line": 53,
       "signature": "url: str | None = None",
-      "reference": "/services/storage/files-and-directories#file-info"
+      "reference": "/storage/files-and-directories#file-info"
     },
     {
       "source": "orionis/storage/enums/visibility.py",
@@ -2459,7 +2459,7 @@
       "kind": "class",
       "line": 4,
       "signature": "class Visibility",
-      "reference": "/services/storage/files-and-directories#visibility"
+      "reference": "/storage/files-and-directories#visibility"
     },
     {
       "source": "orionis/storage/enums/visibility.py",
@@ -2467,7 +2467,7 @@
       "kind": "constant",
       "line": 20,
       "signature": "PUBLIC = 'public'",
-      "reference": "/services/storage/files-and-directories#visibility"
+      "reference": "/storage/files-and-directories#visibility"
     },
     {
       "source": "orionis/storage/enums/visibility.py",
@@ -2475,7 +2475,7 @@
       "kind": "constant",
       "line": 21,
       "signature": "PRIVATE = 'private'",
-      "reference": "/services/storage/files-and-directories#visibility"
+      "reference": "/storage/files-and-directories#visibility"
     },
     {
       "source": "orionis/storage/exceptions.py",
@@ -2483,7 +2483,7 @@
       "kind": "class",
       "line": 3,
       "signature": "class StorageException",
-      "reference": "/services/storage/api-reference#exceptions"
+      "reference": "/storage/api-reference#exceptions"
     },
     {
       "source": "orionis/storage/exceptions.py",
@@ -2491,7 +2491,7 @@
       "kind": "class",
       "line": 6,
       "signature": "class DiskNotFoundException",
-      "reference": "/services/storage/api-reference#exceptions"
+      "reference": "/storage/api-reference#exceptions"
     },
     {
       "source": "orionis/storage/exceptions.py",
@@ -2499,7 +2499,7 @@
       "kind": "class",
       "line": 9,
       "signature": "class DriverNotSupportedException",
-      "reference": "/services/storage/api-reference#exceptions"
+      "reference": "/storage/api-reference#exceptions"
     },
     {
       "source": "orionis/storage/exceptions.py",
@@ -2507,7 +2507,7 @@
       "kind": "class",
       "line": 12,
       "signature": "class MissingStorageDependencyException",
-      "reference": "/services/storage/api-reference#exceptions"
+      "reference": "/storage/api-reference#exceptions"
     },
     {
       "source": "orionis/storage/exceptions.py",
@@ -2515,7 +2515,7 @@
       "kind": "class",
       "line": 15,
       "signature": "class StoragePathException",
-      "reference": "/services/storage/api-reference#exceptions"
+      "reference": "/storage/api-reference#exceptions"
     },
     {
       "source": "orionis/storage/exceptions.py",
@@ -2523,7 +2523,7 @@
       "kind": "class",
       "line": 18,
       "signature": "class StorageFileNotFoundException",
-      "reference": "/services/storage/api-reference#exceptions"
+      "reference": "/storage/api-reference#exceptions"
     },
     {
       "source": "orionis/storage/exceptions.py",
@@ -2531,7 +2531,7 @@
       "kind": "class",
       "line": 21,
       "signature": "class UnsupportedStorageOperationException",
-      "reference": "/services/storage/api-reference#exceptions"
+      "reference": "/storage/api-reference#exceptions"
     },
     {
       "source": "orionis/storage/file.py",
@@ -2539,7 +2539,7 @@
       "kind": "class",
       "line": 15,
       "signature": "class File",
-      "reference": "/services/storage/files-and-directories#file-construction"
+      "reference": "/storage/files-and-directories#file-construction"
     },
     {
       "source": "orionis/storage/file.py",
@@ -2547,7 +2547,7 @@
       "kind": "method",
       "line": 26,
       "signature": "__init__(self, driver: IStorageDriver, path: str) -> None",
-      "reference": "/services/storage/files-and-directories#file-construction"
+      "reference": "/storage/files-and-directories#file-construction"
     },
     {
       "source": "orionis/storage/file.py",
@@ -2555,7 +2555,7 @@
       "kind": "method",
       "line": 49,
       "signature": "path(self) -> str",
-      "reference": "/services/storage/files-and-directories#file-path"
+      "reference": "/storage/files-and-directories#file-path"
     },
     {
       "source": "orionis/storage/file.py",
@@ -2563,7 +2563,7 @@
       "kind": "method",
       "line": 62,
       "signature": "async read(self) -> bytes",
-      "reference": "/services/storage/files-and-directories#file-read"
+      "reference": "/storage/files-and-directories#file-read"
     },
     {
       "source": "orionis/storage/file.py",
@@ -2571,7 +2571,7 @@
       "kind": "method",
       "line": 78,
       "signature": "readStream(self, chunk_size: int=65536) -> AsyncIterator[bytes]",
-      "reference": "/services/storage/files-and-directories#file-readstream"
+      "reference": "/storage/files-and-directories#file-readstream"
     },
     {
       "source": "orionis/storage/file.py",
@@ -2579,7 +2579,7 @@
       "kind": "method",
       "line": 99,
       "signature": "async write(self, contents: bytes | str, visibility: str | None=None) -> IFile",
-      "reference": "/services/storage/files-and-directories#file-write"
+      "reference": "/storage/files-and-directories#file-write"
     },
     {
       "source": "orionis/storage/file.py",
@@ -2587,7 +2587,7 @@
       "kind": "method",
       "line": 122,
       "signature": "async writeStream(self, stream: AsyncIterable[bytes], visibility: str | None=None) -> IFile",
-      "reference": "/services/storage/files-and-directories#file-writestream"
+      "reference": "/storage/files-and-directories#file-writestream"
     },
     {
       "source": "orionis/storage/file.py",
@@ -2595,7 +2595,7 @@
       "kind": "method",
       "line": 145,
       "signature": "open(self, mode: str='rb') -> IStorageStream",
-      "reference": "/services/storage/files-and-directories#file-open"
+      "reference": "/storage/files-and-directories#file-open"
     },
     {
       "source": "orionis/storage/file.py",
@@ -2603,7 +2603,7 @@
       "kind": "method",
       "line": 167,
       "signature": "async delete(self) -> bool",
-      "reference": "/services/storage/files-and-directories#file-delete"
+      "reference": "/storage/files-and-directories#file-delete"
     },
     {
       "source": "orionis/storage/file.py",
@@ -2611,7 +2611,7 @@
       "kind": "method",
       "line": 178,
       "signature": "async exists(self) -> bool",
-      "reference": "/services/storage/files-and-directories#file-exists"
+      "reference": "/storage/files-and-directories#file-exists"
     },
     {
       "source": "orionis/storage/file.py",
@@ -2619,7 +2619,7 @@
       "kind": "method",
       "line": 191,
       "signature": "async copyTo(self, target: str) -> IFile",
-      "reference": "/services/storage/files-and-directories#file-copyto"
+      "reference": "/storage/files-and-directories#file-copyto"
     },
     {
       "source": "orionis/storage/file.py",
@@ -2627,7 +2627,7 @@
       "kind": "method",
       "line": 214,
       "signature": "async moveTo(self, target: str) -> IFile",
-      "reference": "/services/storage/files-and-directories#file-moveto"
+      "reference": "/storage/files-and-directories#file-moveto"
     },
     {
       "source": "orionis/storage/file.py",
@@ -2635,7 +2635,7 @@
       "kind": "method",
       "line": 240,
       "signature": "async rename(self, name: str) -> IFile",
-      "reference": "/services/storage/files-and-directories#file-rename"
+      "reference": "/storage/files-and-directories#file-rename"
     },
     {
       "source": "orionis/storage/file.py",
@@ -2643,7 +2643,7 @@
       "kind": "method",
       "line": 272,
       "signature": "async size(self) -> int",
-      "reference": "/services/storage/files-and-directories#file-size"
+      "reference": "/storage/files-and-directories#file-size"
     },
     {
       "source": "orionis/storage/file.py",
@@ -2651,7 +2651,7 @@
       "kind": "method",
       "line": 288,
       "signature": "async mimeType(self) -> str | None",
-      "reference": "/services/storage/files-and-directories#file-mimetype"
+      "reference": "/storage/files-and-directories#file-mimetype"
     },
     {
       "source": "orionis/storage/file.py",
@@ -2659,7 +2659,7 @@
       "kind": "method",
       "line": 299,
       "signature": "async lastModified(self) -> datetime",
-      "reference": "/services/storage/files-and-directories#file-lastmodified"
+      "reference": "/storage/files-and-directories#file-lastmodified"
     },
     {
       "source": "orionis/storage/file.py",
@@ -2667,7 +2667,7 @@
       "kind": "method",
       "line": 315,
       "signature": "async url(self) -> str",
-      "reference": "/services/storage/files-and-directories#file-url"
+      "reference": "/storage/files-and-directories#file-url"
     },
     {
       "source": "orionis/storage/file.py",
@@ -2675,7 +2675,7 @@
       "kind": "method",
       "line": 331,
       "signature": "async temporaryUrl(self, expires_in: int=3600) -> str",
-      "reference": "/services/storage/files-and-directories#file-temporaryurl"
+      "reference": "/storage/files-and-directories#file-temporaryurl"
     },
     {
       "source": "orionis/storage/file.py",
@@ -2683,7 +2683,7 @@
       "kind": "method",
       "line": 352,
       "signature": "async visibility(self) -> str",
-      "reference": "/services/storage/files-and-directories#file-visibility"
+      "reference": "/storage/files-and-directories#file-visibility"
     },
     {
       "source": "orionis/storage/file.py",
@@ -2691,7 +2691,7 @@
       "kind": "method",
       "line": 368,
       "signature": "async setVisibility(self, visibility: str) -> IFile",
-      "reference": "/services/storage/files-and-directories#file-setvisibility"
+      "reference": "/storage/files-and-directories#file-setvisibility"
     },
     {
       "source": "orionis/storage/file.py",
@@ -2699,7 +2699,7 @@
       "kind": "method",
       "line": 390,
       "signature": "async download(self, destination: str | Path) -> Path",
-      "reference": "/services/storage/files-and-directories#file-download"
+      "reference": "/storage/files-and-directories#file-download"
     },
     {
       "source": "orionis/storage/file.py",
@@ -2707,7 +2707,7 @@
       "kind": "method",
       "line": 412,
       "signature": "async hash(self, algorithm: str='sha256') -> str",
-      "reference": "/services/storage/files-and-directories#file-hash"
+      "reference": "/storage/files-and-directories#file-hash"
     },
     {
       "source": "orionis/storage/file.py",
@@ -2715,7 +2715,7 @@
       "kind": "method",
       "line": 433,
       "signature": "async info(self) -> FileInfo",
-      "reference": "/services/storage/files-and-directories#file-info"
+      "reference": "/storage/files-and-directories#file-info"
     },
     {
       "source": "orionis/storage/manager.py",
@@ -2723,7 +2723,7 @@
       "kind": "class",
       "line": 22,
       "signature": "class StorageManager",
-      "reference": "/services/storage/manager-and-injection#manager-construction"
+      "reference": "/storage/manager-and-injection#manager-construction"
     },
     {
       "source": "orionis/storage/manager.py",
@@ -2731,7 +2731,7 @@
       "kind": "method",
       "line": 37,
       "signature": "__init__(self, app: IApplication) -> None",
-      "reference": "/services/storage/manager-and-injection#manager-construction"
+      "reference": "/storage/manager-and-injection#manager-construction"
     },
     {
       "source": "orionis/storage/manager.py",
@@ -2739,7 +2739,7 @@
       "kind": "method",
       "line": 68,
       "signature": "disk(self, name: str | None=None) -> IDisk",
-      "reference": "/services/storage/manager-and-injection#manager-disk"
+      "reference": "/storage/manager-and-injection#manager-disk"
     },
     {
       "source": "orionis/storage/manager.py",
@@ -2747,7 +2747,7 @@
       "kind": "method",
       "line": 101,
       "signature": "default(self) -> IDisk",
-      "reference": "/services/storage/manager-and-injection#manager-default"
+      "reference": "/storage/manager-and-injection#manager-default"
     },
     {
       "source": "orionis/storage/manager.py",
@@ -2755,7 +2755,7 @@
       "kind": "method",
       "line": 119,
       "signature": "extend(self, driver: str, factory: Callable[[object], IStorageDriver]) -> None",
-      "reference": "/services/storage/manager-and-injection#manager-extend"
+      "reference": "/storage/manager-and-injection#manager-extend"
     },
     {
       "source": "orionis/storage/manager.py",
@@ -2763,7 +2763,7 @@
       "kind": "method",
       "line": 147,
       "signature": "uploaded(self, source: IHttpUploadedFile) -> IUploadedFile",
-      "reference": "/services/storage/manager-and-injection#manager-uploaded"
+      "reference": "/storage/manager-and-injection#manager-uploaded"
     },
     {
       "source": "orionis/storage/paths.py",
@@ -2771,7 +2771,7 @@
       "kind": "function",
       "line": 4,
       "signature": "normalize_path(path: str) -> str",
-      "reference": "/services/storage/files-and-directories#path-normalization"
+      "reference": "/storage/files-and-directories#path-normalization"
     },
     {
       "source": "orionis/storage/paths.py",
@@ -2779,7 +2779,7 @@
       "kind": "function",
       "line": 60,
       "signature": "normalize_file_path(path: str) -> str",
-      "reference": "/services/storage/files-and-directories#path-normalization"
+      "reference": "/storage/files-and-directories#path-normalization"
     },
     {
       "source": "orionis/storage/provider.py",
@@ -2787,7 +2787,7 @@
       "kind": "class",
       "line": 7,
       "signature": "class StorageProvider",
-      "reference": "/services/storage/api-reference#provider"
+      "reference": "/storage/api-reference#provider"
     },
     {
       "source": "orionis/storage/provider.py",
@@ -2795,7 +2795,7 @@
       "kind": "method",
       "line": 20,
       "signature": "provides(cls) -> list[type]",
-      "reference": "/services/storage/api-reference#provider"
+      "reference": "/storage/api-reference#provider"
     },
     {
       "source": "orionis/storage/provider.py",
@@ -2803,7 +2803,7 @@
       "kind": "method",
       "line": 31,
       "signature": "register(self) -> None",
-      "reference": "/services/storage/api-reference#provider"
+      "reference": "/storage/api-reference#provider"
     },
     {
       "source": "orionis/storage/provider.py",
@@ -2811,7 +2811,7 @@
       "kind": "method",
       "line": 43,
       "signature": "async boot(self) -> None",
-      "reference": "/services/storage/api-reference#provider"
+      "reference": "/storage/api-reference#provider"
     },
     {
       "source": "orionis/storage/stream.py",
@@ -2819,7 +2819,7 @@
       "kind": "class",
       "line": 11,
       "signature": "class AsyncStream",
-      "reference": "/services/storage/streaming-and-uploads#stream-construction"
+      "reference": "/storage/streaming-and-uploads#stream-construction"
     },
     {
       "source": "orionis/storage/stream.py",
@@ -2827,7 +2827,7 @@
       "kind": "method",
       "line": 24,
       "signature": "__init__(self, opener: Callable[[], BinaryIO], on_close: Callable[[BinaryIO], None] | None=None) -> None",
-      "reference": "/services/storage/streaming-and-uploads#stream-construction"
+      "reference": "/storage/streaming-and-uploads#stream-construction"
     },
     {
       "source": "orionis/storage/stream.py",
@@ -2835,7 +2835,7 @@
       "kind": "method",
       "line": 63,
       "signature": "async read(self, size: int=-1) -> bytes",
-      "reference": "/services/storage/streaming-and-uploads#stream-read"
+      "reference": "/storage/streaming-and-uploads#stream-read"
     },
     {
       "source": "orionis/storage/stream.py",
@@ -2843,7 +2843,7 @@
       "kind": "method",
       "line": 80,
       "signature": "async write(self, data: bytes) -> int",
-      "reference": "/services/storage/streaming-and-uploads#stream-write"
+      "reference": "/storage/streaming-and-uploads#stream-write"
     },
     {
       "source": "orionis/storage/stream.py",
@@ -2851,7 +2851,7 @@
       "kind": "method",
       "line": 97,
       "signature": "async seek(self, offset: int, whence: int=0) -> int",
-      "reference": "/services/storage/streaming-and-uploads#stream-seek"
+      "reference": "/storage/streaming-and-uploads#stream-seek"
     },
     {
       "source": "orionis/storage/stream.py",
@@ -2859,7 +2859,7 @@
       "kind": "method",
       "line": 116,
       "signature": "async close(self) -> None",
-      "reference": "/services/storage/streaming-and-uploads#stream-close"
+      "reference": "/storage/streaming-and-uploads#stream-close"
     },
     {
       "source": "orionis/storage/stream.py",
@@ -2867,7 +2867,7 @@
       "kind": "method",
       "line": 138,
       "signature": "async __aenter__(self) -> IStorageStream",
-      "reference": "/services/storage/streaming-and-uploads#stream-context"
+      "reference": "/storage/streaming-and-uploads#stream-context"
     },
     {
       "source": "orionis/storage/stream.py",
@@ -2875,7 +2875,7 @@
       "kind": "method",
       "line": 150,
       "signature": "async __aexit__(self, exc_type: type[BaseException] | None, exc: BaseException | None, traceback: TracebackType | None) -> None",
-      "reference": "/services/storage/streaming-and-uploads#stream-context"
+      "reference": "/storage/streaming-and-uploads#stream-context"
     },
     {
       "source": "orionis/storage/uploaded_file.py",
@@ -2883,7 +2883,7 @@
       "kind": "class",
       "line": 16,
       "signature": "class UploadedFile",
-      "reference": "/services/storage/streaming-and-uploads#upload-construction"
+      "reference": "/storage/streaming-and-uploads#upload-construction"
     },
     {
       "source": "orionis/storage/uploaded_file.py",
@@ -2891,7 +2891,7 @@
       "kind": "method",
       "line": 29,
       "signature": "__init__(self, source: IHttpUploadedFile, manager: IStorageManager) -> None",
-      "reference": "/services/storage/streaming-and-uploads#upload-construction"
+      "reference": "/storage/streaming-and-uploads#upload-construction"
     },
     {
       "source": "orionis/storage/uploaded_file.py",
@@ -2899,7 +2899,7 @@
       "kind": "method",
       "line": 54,
       "signature": "originalName(self) -> str",
-      "reference": "/services/storage/streaming-and-uploads#upload-originalname"
+      "reference": "/storage/streaming-and-uploads#upload-originalname"
     },
     {
       "source": "orionis/storage/uploaded_file.py",
@@ -2907,7 +2907,7 @@
       "kind": "method",
       "line": 65,
       "signature": "extension(self) -> str",
-      "reference": "/services/storage/streaming-and-uploads#upload-extension"
+      "reference": "/storage/streaming-and-uploads#upload-extension"
     },
     {
       "source": "orionis/storage/uploaded_file.py",
@@ -2915,7 +2915,7 @@
       "kind": "method",
       "line": 77,
       "signature": "size(self) -> int",
-      "reference": "/services/storage/streaming-and-uploads#upload-size"
+      "reference": "/storage/streaming-and-uploads#upload-size"
     },
     {
       "source": "orionis/storage/uploaded_file.py",
@@ -2923,7 +2923,7 @@
       "kind": "method",
       "line": 88,
       "signature": "mimeType(self) -> str | None",
-      "reference": "/services/storage/streaming-and-uploads#upload-mimetype"
+      "reference": "/storage/streaming-and-uploads#upload-mimetype"
     },
     {
       "source": "orionis/storage/uploaded_file.py",
@@ -2931,7 +2931,7 @@
       "kind": "method",
       "line": 99,
       "signature": "hashName(self) -> str",
-      "reference": "/services/storage/streaming-and-uploads#upload-hashname"
+      "reference": "/storage/streaming-and-uploads#upload-hashname"
     },
     {
       "source": "orionis/storage/uploaded_file.py",
@@ -2939,7 +2939,7 @@
       "kind": "method",
       "line": 117,
       "signature": "async read(self) -> bytes",
-      "reference": "/services/storage/streaming-and-uploads#upload-read"
+      "reference": "/storage/streaming-and-uploads#upload-read"
     },
     {
       "source": "orionis/storage/uploaded_file.py",
@@ -2947,7 +2947,7 @@
       "kind": "method",
       "line": 149,
       "signature": "async store(self, directory: str='', disk: str | None=None, visibility: str | None=None) -> IFile",
-      "reference": "/services/storage/streaming-and-uploads#upload-store"
+      "reference": "/storage/streaming-and-uploads#upload-store"
     },
     {
       "source": "orionis/storage/uploaded_file.py",
@@ -2955,7 +2955,7 @@
       "kind": "method",
       "line": 174,
       "signature": "async storeAs(self, directory: str, name: str, disk: str | None=None, visibility: str | None=None) -> IFile",
-      "reference": "/services/storage/streaming-and-uploads#upload-storeas"
+      "reference": "/storage/streaming-and-uploads#upload-storeas"
     },
     {
       "source": "orionis/storage/uploaded_file.py",
@@ -2963,7 +2963,7 @@
       "kind": "method",
       "line": 214,
       "signature": "async move(self, directory: str, name: str | None=None, disk: str | None=None) -> IFile",
-      "reference": "/services/storage/streaming-and-uploads#upload-move"
+      "reference": "/storage/streaming-and-uploads#upload-move"
     },
     {
       "source": "orionis/storage/uploaded_file.py",
@@ -2971,7 +2971,7 @@
       "kind": "method",
       "line": 244,
       "signature": "async copy(self, directory: str, name: str | None=None, disk: str | None=None) -> IFile",
-      "reference": "/services/storage/streaming-and-uploads#upload-copy"
+      "reference": "/storage/streaming-and-uploads#upload-copy"
     },
     {
       "source": "orionis/support/facades/storage.py",
@@ -2979,7 +2979,7 @@
       "kind": "class",
       "line": 4,
       "signature": "class Storage",
-      "reference": "/services/storage/manager-and-injection#facade"
+      "reference": "/storage/manager-and-injection#facade"
     },
     {
       "source": "orionis/support/facades/storage.py",
@@ -2987,7 +2987,7 @@
       "kind": "method",
       "line": 7,
       "signature": "getFacadeAccessor(cls) -> type",
-      "reference": "/services/storage/api-reference#facade-accessor"
+      "reference": "/storage/api-reference#facade-accessor"
     }
   ],
   "compatibilityAliases": [
@@ -2995,43 +2995,43 @@
       "source": "orionis/storage/drivers/functions.py",
       "alias": "importDriverDependency",
       "target": "import_driver_dependency",
-      "reference": "/services/storage/api-reference#helper-import-driver-dependency"
+      "reference": "/storage/api-reference#helper-import-driver-dependency"
     },
     {
       "source": "orionis/storage/drivers/functions.py",
       "alias": "assertBinaryMode",
       "target": "assert_binary_mode",
-      "reference": "/services/storage/api-reference#helper-assert-binary-mode"
+      "reference": "/storage/api-reference#helper-assert-binary-mode"
     },
     {
       "source": "orionis/storage/drivers/functions.py",
       "alias": "resolveDownloadTarget",
       "target": "resolve_download_target",
-      "reference": "/services/storage/api-reference#helper-resolve-download-target"
+      "reference": "/storage/api-reference#helper-resolve-download-target"
     },
     {
       "source": "orionis/storage/drivers/functions.py",
       "alias": "filterFiles",
       "target": "filter_files",
-      "reference": "/services/storage/api-reference#helper-filter-files"
+      "reference": "/storage/api-reference#helper-filter-files"
     },
     {
       "source": "orionis/storage/drivers/functions.py",
       "alias": "deriveDirectories",
       "target": "derive_directories",
-      "reference": "/services/storage/api-reference#helper-derive-directories"
+      "reference": "/storage/api-reference#helper-derive-directories"
     },
     {
       "source": "orionis/storage/paths.py",
       "alias": "normalizePath",
       "target": "normalize_path",
-      "reference": "/services/storage/files-and-directories#path-normalization"
+      "reference": "/storage/files-and-directories#path-normalization"
     },
     {
       "source": "orionis/storage/paths.py",
       "alias": "normalizeFilePath",
       "target": "normalize_file_path",
-      "reference": "/services/storage/files-and-directories#path-normalization"
+      "reference": "/storage/files-and-directories#path-normalization"
     }
   ]
 }

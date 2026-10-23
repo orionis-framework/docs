@@ -57,7 +57,7 @@ def check_types(
     files = []
     for locale in locales:
         blocks = code_blocks(
-            docs / f"src/content/docs/{locale}/asynchronous/realtime/javascript-client.md",
+            docs / f"src/content/docs/{locale}/realtime/javascript-client.md",
             "typescript",
         )
         if not blocks:
@@ -157,13 +157,13 @@ def main() -> None:
                 target.write_text(content, encoding="utf-8")
 
         pages = docs / "src/content/docs"
-        chat = code_blocks(pages / "es/asynchronous/realtime/chat.md", "python")
-        assert chat == code_blocks(pages / "en/asynchronous/realtime/chat.md", "python")
+        chat = code_blocks(pages / "es/realtime/chat.md", "python")
+        assert chat == code_blocks(pages / "en/realtime/chat.md", "python")
         write("app/realtime/hubs/chat_hub.py", chat[0])
         # Exercise the same public methods and signatures linked by the client
         # manual, including keyword-only arguments and bidirectional callbacks.
-        hubs_page = pages / "es/asynchronous/realtime/hubs-and-methods.md"
-        protocol_page = pages / "es/asynchronous/realtime/protocol-and-streaming.md"
+        hubs_page = pages / "es/realtime/hubs-and-methods.md"
+        protocol_page = pages / "es/realtime/protocol-and-streaming.md"
         for module, name, page in (
             ("math_hub", "MathHub", hubs_page),
             ("search_hub", "SearchHub", hubs_page),
@@ -177,14 +177,14 @@ def main() -> None:
             )
             write("app/realtime/" + module + ".py", content)
         module_route = code_blocks(
-            pages / "es/asynchronous/realtime/javascript-client.md", "python",
+            pages / "es/realtime/javascript-client.md", "python",
         )[0]
         assert module_route == code_blocks(
-            pages / "en/asynchronous/realtime/javascript-client.md", "python",
+            pages / "en/realtime/javascript-client.md", "python",
         )[0]
         write("routes/web.py", module_route + "\n" + chat[2])
         write("resources/views/chat.html", code_blocks(
-            pages / "es/asynchronous/realtime/chat.md", "html",
+            pages / "es/realtime/chat.md", "html",
         )[0])
         write("storage/app/public/js/orionis-realtime.js", client_bytes)
         write("orionis-realtime.mjs", client_bytes)

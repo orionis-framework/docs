@@ -237,6 +237,6 @@ This does not change `unittest.TestLoader`'s discovery prefix: the command still
 
 Create an in-process MCP client for a server class or an already compiled server. It reuses the application started by the runner unless another container is supplied through `app=`. `config` accepts a `McpConfig` configuration; omitting it uses the client's defaults.
 
-Client calls open their own scopes; this isolation belongs to the MCP client. See the complete [MCP server testing examples](/en/testing/mcp-testing).
+Client calls open their own scopes; this isolation belongs to the MCP client. See the complete [MCP server testing examples](/en/mcp/testing).
 
 Continue with [execution and discovery](/en/testing/writing-and-running-tests) and [configuration and results](/en/testing/results-and-reference).

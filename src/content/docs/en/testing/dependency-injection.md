@@ -35,7 +35,7 @@ class TestPrices(TestCase):
         self.assertEqual(calculator.total(Decimal("10")), Decimal("12.00"))
 ```
 
-For abstract contracts, register an implementation in a [container provider](/en/architecture/service-container/providers-and-facades). You can also receive `IApplication` and use `app.config(...)`, `await app.make(...)` or `await app.invoke(...)`. Helpers called directly by your code receive the arguments you supply; belonging to the test case does not give them automatic injection.
+For abstract contracts, register an implementation in a [container provider](/en/application/container/providers). You can also receive `IApplication` and use `app.config(...)`, `await app.make(...)` or `await app.invoke(...)`. Helpers called directly by your code receive the arguments you supply; belonging to the test case does not give them automatic injection.
 
 ### Resolving scoped services
 
@@ -106,7 +106,7 @@ To obtain a service directly, use `await self.app.make(ContractOrClass)`. If you
 
 The engine runs the synchronous suite in an executor. It does not automatically propagate the CLI scope context to that thread; do not depend on it inside the case. Open the scope in the test method or fixture before resolving scoped services. The container does resolve constructors of **services** needed by the method; the test loader creates the `TestCase` instance.
 
-A pure-rule test does not need to replace the complete application. For integrations use exclusive data, stores intended for testing and explicit cleanup. Inheriting from `TestCase` does not automatically roll back a database; [Database and ORM testing](/en/database/orm/testing) explains the relevant mechanisms.
+A pure-rule test does not need to replace the complete application. For integrations use exclusive data, stores intended for testing and explicit cleanup. Inheriting from `TestCase` does not automatically roll back a database; [Database and ORM testing](/en/orm/testing) explains the relevant mechanisms.
 
 ## Choose the environment before running
 
@@ -119,6 +119,6 @@ APP_DEBUG=bool:false
 
 This selects the application environment; it does not automatically turn a production database into a test database. Configure connections, disks and services for your project. Variables are read in `config/`; receive `IApplication` in the test and use `app.config(...)`.
 
-If you retain compiled bootstrap cache between runs, review its [paths and invalidation](/en/getting-started/paths-and-caching) when changing configuration. Do not reuse another environment's cache without reviewing it. To replace collaborators during a test, use `unittest.mock` and patch contexts; see [test doubles](/en/testing/cases-and-decorators#test-doubles).
+If you retain compiled bootstrap cache between runs, review its [paths and invalidation](/en/application/paths-and-caching) when changing configuration. Do not reuse another environment's cache without reviewing it. To replace collaborators during a test, use `unittest.mock` and patch contexts; see [test doubles](/en/testing/cases-and-decorators#test-doubles).
 
-The runner does not create an HTTP request or load a payload for case parameters. To test a rule or schema, invoke it with fixture data; for MCP requests use [the MCP test client](/en/testing/mcp-testing), whose per-request scope belongs to that integration.
+The runner does not create an HTTP request or load a payload for case parameters. To test a rule or schema, invoke it with fixture data; for MCP requests use [the MCP test client](/en/mcp/testing), whose per-request scope belongs to that integration.

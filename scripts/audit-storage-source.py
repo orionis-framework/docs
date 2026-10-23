@@ -16,7 +16,7 @@ SOURCE_FILES = ("config/filesystems.py", "orionis/support/facades/storage.py")
 
 
 def destination(file: str, owner: str, name: str, kind: str) -> str:
-    base = "/services/storage/"
+    base = "/storage/"
     if file.startswith("orionis/foundation/config/filesystems") or file == "config/filesystems.py":
         return base + "configuration#" + ("filesystems" if owner == "BootstrapFilesystems" else owner.lower())
     if file.endswith("facades/storage.py"):

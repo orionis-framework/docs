@@ -691,4 +691,4 @@ from orionis.support.facades import DB
 query = DB.table("products").select("category_id").groupBy("category_id").havingRaw("COUNT(*) > :minimum", {"minimum": 1})
 ```
 
-[DB facade](/en/database/db-facade) · [ORM queries](/en/database/orm/querying) · [Testing scenario](/en/database/orm/testing)
+[DB facade](/en/database/db-facade) · [ORM queries](/en/orm/querying) · [Testing scenario](/en/orm/testing)

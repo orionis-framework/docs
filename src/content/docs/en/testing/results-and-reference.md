@@ -87,7 +87,7 @@ TESTING_METHOD_PATTERN=test*
 TESTING_CACHE_RESULTS=bool:true
 ```
 
-The prefixes produce actual types when configuration is constructed. Use `Env` in configuration files; at runtime, read these values through `IApplication.config()`. See [Environment](/en/architecture/environment) to configure loading and persistence.
+The prefixes produce actual types when configuration is constructed. Use `Env` in configuration files; at runtime, read these values through `IApplication.config()`. See [Environment](/en/environment) to configure loading and persistence.
 
 To fix options directly in `config/testing.py`, retain the class and replace the appropriate fields:
 
@@ -208,7 +208,7 @@ Each entry corresponds to an immutable `TestResult`:
 
 The first four fields are required when constructing `TestResult`; the others accept `None`. The processor uses `[]` when it extracts no code. `toDict()` returns the representation used by the engine. An ordinary skip does not retain its reason in a separate field; an expected failure preserves diagnostics despite exporting `SKIPPED`.
 
-Filenames have one-second resolution: two executions in that second use the same path, and the last can overwrite the first. There is no automatic retention or filename selector. These files are reports; they do not prevent tests from running again. With compiled configuration, follow [application caching](/en/getting-started/paths-and-caching) to update it.
+Filenames have one-second resolution: two executions in that second use the same path, and the last can overwrite the first. There is no automatic retention or filename selector. These files are reports; they do not prevent tests from running again. With compiled configuration, follow [application caching](/en/application/paths-and-caching) to update it.
 
 ## Engine and Test facade
 

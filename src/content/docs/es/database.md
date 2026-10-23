@@ -5,7 +5,7 @@ editUrl: true
 lastUpdated: false
 ---
 
-Database administra conexiones SQL con nombre y proporciona la infraestructura de consultas, transacciones, esquemas, migraciones y seeders. Puedes ejecutar SQL, utilizar el constructor de consultas o trabajar con modelos del [ORM](/es/database/orm). Las tres alternativas comparten el gestor y las transacciones.
+Database administra conexiones SQL con nombre y proporciona la infraestructura de consultas, transacciones, esquemas, migraciones y seeders. Puedes ejecutar SQL, utilizar el constructor de consultas o trabajar con modelos del [ORM](/es/orm). Las tres alternativas comparten el gestor y las transacciones.
 
 Las operaciones de E/S se esperan con `await`. Elegir una conexión, construir una consulta o definir una tabla son operaciones síncronas; una operación terminal como `get()` o `insert()` sí ejecuta SQL.
 
@@ -42,7 +42,7 @@ flowchart TD
 
 ## Primera consulta desde un controlador
 
-Configura una conexión y crea tus tablas mediante [migraciones](/es/database/migrations-and-seeders). Este ejemplo supone una tabla `notes` con columnas `id` y `body`. Registra el controlador mediante [rutas HTTP](/es/http/routing):
+Configura una conexión y crea tus tablas mediante [migraciones](/es/database/migrations). Este ejemplo supone una tabla `notes` con columnas `id` y `body`. Registra el controlador mediante [rutas HTTP](/es/http/routing):
 
 ```python
 from orionis.http import JSONResponse
@@ -83,8 +83,8 @@ Importa la fachada desde `orionis.support.facades`. La aplicación registra sus 
 - [SQL y resultados](/es/database/raw-queries): bindings, retornos y errores.
 - [Constructor de consultas](/es/database/query-builder): consultas sin modelos.
 - [Transacciones](/es/database/transactions): contextos, savepoints y concurrencia.
-- [Esquemas](/es/database/schema), [migraciones y seeders](/es/database/migrations-and-seeders).
+- [Esquemas](/es/database/schema), [migraciones y seeders](/es/database/migrations).
 - [Dialectos y producción](/es/database/dialects-and-production).
 - [API de conexiones y compilación](/es/database/runtime-api).
 
-Utiliza `DB` para trabajar sin instancias de modelo; su builder devuelve colecciones de diccionarios y no dispara eventos de modelos. Utiliza el [ORM](/es/database/orm) para estado de entidad, casts, scopes, eventos, relaciones y factories.
+Utiliza `DB` para trabajar sin instancias de modelo; su builder devuelve colecciones de diccionarios y no dispara eventos de modelos. Utiliza el [ORM](/es/orm) para estado de entidad, casts, scopes, eventos, relaciones y factories.

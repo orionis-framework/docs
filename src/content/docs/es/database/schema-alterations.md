@@ -62,7 +62,7 @@ Si existen claves externas, vistas SQL, triggers o índices, diseña la reconstr
 
 ## Índices, claves y otras operaciones
 
-En tablas nuevas utiliza [primaryKey, unique, index y foreignKey](/es/database/schema-modifiers), o [`TableDefinition`](/es/database/orm/schema-and-type-reference) para claves externas compuestas. En tablas existentes CREATE/DROP INDEX, ALTER CONSTRAINT, cambio de tipo y acciones referenciales requieren SQL propio del motor. Orionis no añade una API que compruebe automáticamente su compatibilidad.
+En tablas nuevas utiliza [primaryKey, unique, index y foreignKey](/es/database/schema-modifiers), o [`TableDefinition`](/es/orm/schema-and-type-reference) para claves externas compuestas. En tablas existentes CREATE/DROP INDEX, ALTER CONSTRAINT, cambio de tipo y acciones referenciales requieren SQL propio del motor. Orionis no añade una API que compruebe automáticamente su compatibilidad.
 
 El SQL de creación usa tipos del [catálogo](/es/database/column-types); tipos sin builder no funcionan tampoco en una reconstrucción. El enforcement de claves/unique e índices varía entre SQLite, motores tradicionales y Redshift. Una clave compuesta física tampoco amplía las capacidades de `Model.primary_key`.
 
@@ -70,4 +70,4 @@ El SQL de creación usa tipos del [catálogo](/es/database/column-types); tipos 
 
 Añade una migración nueva por cambio. Una tabla existente no es evidencia de que su estructura coincida con `TableDefinition`, y no hay reflexión pública desde `Schema` para comparar ambas. Cada archivo y su historial se ejecutan en una transacción; la atomicidad real de DDL y los bloqueos dependen del motor. Una excepción posterior a un DDL con commit implícito puede requerir reparación manual aunque el registro de migración no se haya confirmado.
 
-Consulta [migraciones](/es/database/migrations-and-seeders) para lotes, selección de conexión y errores, y [testing](/es/database/orm/factories-and-testing) para probar la evolución sin tocar bases de uso real.
+Consulta [migraciones](/es/database/migrations) para lotes, selección de conexión y errores, y [testing](/es/orm/factories) para probar la evolución sin tocar bases de uso real.

@@ -7,7 +7,7 @@ lastUpdated: false
 
 Orionis console exposes application operations as commands with typed arguments, help, interactive output and dependency injection. **Reactor** executes them. The **scheduler** decides when to execute scheduled commands through the public **`Schedule`** facade.
 
-`Scheduler` is the conventional name of the application class extending `BaseScheduler`; it is not the exported facade name. Its configuration belongs in `config/scheduler.py`. `config/queue.py` configures [Queues](/en/asynchronous/queues), whose job storage and workers have a different lifecycle.
+`Scheduler` is the conventional name of the application class extending `BaseScheduler`; it is not the exported facade name. Its configuration belongs in `config/scheduler.py`. `config/queue.py` configures [Queues](/en/queues), whose job storage and workers have a different lifecycle.
 
 ## Run the CLI
 
@@ -118,8 +118,8 @@ Task events belong to the scheduler: manual Reactor calls do not automatically t
 | Register a class/method through routes | [Console routes](/en/console/command-routing) |
 | Write messages and tables | [Text, tables and output](/en/console/console-output) |
 | Ask the operator for input | [Questions and interactive input](/en/console/interactive-input) |
-| Show progress and manage delays | [Progress](/en/console/progress-and-debugging) |
-| Run and inspect commands from code | [Reactor facade](/en/console/output-and-programmatic-execution) |
+| Show progress and manage delays | [Progress](/en/console/progress) |
+| Run and inspect commands from code | [Reactor facade](/en/console/reactor-and-injection) |
 | Configure discovery and invalidation | [Command caching](/en/console/command-cache) |
 | Create the application scheduler | [Schedule tasks](/en/console/task-scheduling) |
 | Schedule a command with arguments | [Schedule.command()](/en/console/scheduler-execution#schedule-command) |

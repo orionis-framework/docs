@@ -32,7 +32,7 @@ for (const entry of inventory.entries) {
     throw new Error(`Invalid or duplicate Logging declaration: ${identity}`);
   }
   symbols.add(identity);
-  if (typeof entry.reference !== 'string' || !entry.reference.startsWith('/services/logging')) {
+  if (typeof entry.reference !== 'string' || !entry.reference.startsWith('/logging')) {
     throw new Error(`Invalid Logging reference: ${identity}`);
   }
   const parts = entry.reference.split('#');

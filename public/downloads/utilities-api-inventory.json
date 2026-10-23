@@ -257,7 +257,7 @@
       "line": 8,
       "signature": "class ICollection(ABC)",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection"
+      "reference": "/utilities/helpers/collection"
     },
     {
       "source": "orionis/support/types/contracts/collection.py",
@@ -266,7 +266,7 @@
       "line": 11,
       "signature": "take(self, number: int) -> ICollection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-take",
+      "reference": "/utilities/helpers/collection#collection-method-take",
       "decorators": [
         "abstractmethod"
       ],
@@ -279,7 +279,7 @@
       "line": 30,
       "signature": "first(self, callback: Callable | None=None) -> object",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-first",
+      "reference": "/utilities/helpers/collection#collection-method-first",
       "decorators": [
         "abstractmethod"
       ],
@@ -292,7 +292,7 @@
       "line": 50,
       "signature": "last(self, callback: Callable | None=None) -> object",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-last",
+      "reference": "/utilities/helpers/collection#collection-method-last",
       "decorators": [
         "abstractmethod"
       ],
@@ -305,7 +305,7 @@
       "line": 69,
       "signature": "all(self) -> list[Any]",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-all",
+      "reference": "/utilities/helpers/collection#collection-method-all",
       "decorators": [
         "abstractmethod"
       ],
@@ -318,7 +318,7 @@
       "line": 80,
       "signature": "avg(self, key: str | None=None) -> float",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-avg",
+      "reference": "/utilities/helpers/collection#collection-method-avg",
       "decorators": [
         "abstractmethod"
       ],
@@ -331,7 +331,7 @@
       "line": 100,
       "signature": "max(self, key: str | None=None) -> object",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-max",
+      "reference": "/utilities/helpers/collection#collection-method-max",
       "decorators": [
         "abstractmethod"
       ],
@@ -344,7 +344,7 @@
       "line": 119,
       "signature": "min(self, key: str | None=None) -> object",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-min",
+      "reference": "/utilities/helpers/collection#collection-method-min",
       "decorators": [
         "abstractmethod"
       ],
@@ -357,7 +357,7 @@
       "line": 138,
       "signature": "chunk(self, size: int) -> ICollection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-chunk",
+      "reference": "/utilities/helpers/collection#collection-method-chunk",
       "decorators": [
         "abstractmethod"
       ],
@@ -370,7 +370,7 @@
       "line": 157,
       "signature": "collapse(self) -> ICollection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-collapse",
+      "reference": "/utilities/helpers/collection#collection-method-collapse",
       "decorators": [
         "abstractmethod"
       ],
@@ -383,7 +383,7 @@
       "line": 168,
       "signature": "contains(self, key: str | Callable, value: object=None) -> bool",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-contains",
+      "reference": "/utilities/helpers/collection#collection-method-contains",
       "decorators": [
         "abstractmethod"
       ],
@@ -396,7 +396,7 @@
       "line": 190,
       "signature": "count(self) -> int",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-count",
+      "reference": "/utilities/helpers/collection#collection-method-count",
       "decorators": [
         "abstractmethod"
       ],
@@ -409,7 +409,7 @@
       "line": 201,
       "signature": "diff(self, items: list[Any] | ICollection) -> ICollection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-diff",
+      "reference": "/utilities/helpers/collection#collection-method-diff",
       "decorators": [
         "abstractmethod"
       ],
@@ -422,7 +422,7 @@
       "line": 220,
       "signature": "each(self, callback: Callable) -> ICollection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-each",
+      "reference": "/utilities/helpers/collection#collection-method-each",
       "decorators": [
         "abstractmethod"
       ],
@@ -435,7 +435,7 @@
       "line": 239,
       "signature": "every(self, callback: Callable) -> bool",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-every",
+      "reference": "/utilities/helpers/collection#collection-method-every",
       "decorators": [
         "abstractmethod"
       ],
@@ -448,7 +448,7 @@
       "line": 258,
       "signature": "filter(self, callback: Callable) -> ICollection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-filter",
+      "reference": "/utilities/helpers/collection#collection-method-filter",
       "decorators": [
         "abstractmethod"
       ],
@@ -461,7 +461,7 @@
       "line": 277,
       "signature": "flatten(self) -> ICollection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-flatten",
+      "reference": "/utilities/helpers/collection#collection-method-flatten",
       "decorators": [
         "abstractmethod"
       ],
@@ -474,7 +474,7 @@
       "line": 288,
       "signature": "forget(self, *keys: int | str) -> ICollection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-forget",
+      "reference": "/utilities/helpers/collection#collection-method-forget",
       "decorators": [
         "abstractmethod"
       ],
@@ -487,7 +487,7 @@
       "line": 307,
       "signature": "forPage(self, page: int, number: int) -> ICollection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-forpage",
+      "reference": "/utilities/helpers/collection#collection-method-forpage",
       "decorators": [
         "abstractmethod"
       ],
@@ -500,7 +500,7 @@
       "line": 329,
       "signature": "get(self, key: int | str, default: object=None) -> object",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-get",
+      "reference": "/utilities/helpers/collection#collection-method-get",
       "decorators": [
         "abstractmethod"
       ],
@@ -513,7 +513,7 @@
       "line": 351,
       "signature": "implode(self, glue: str=',', key: str | None=None) -> str",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-implode",
+      "reference": "/utilities/helpers/collection#collection-method-implode",
       "decorators": [
         "abstractmethod"
       ],
@@ -526,7 +526,7 @@
       "line": 373,
       "signature": "isEmpty(self) -> bool",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-isempty",
+      "reference": "/utilities/helpers/collection#collection-method-isempty",
       "decorators": [
         "abstractmethod"
       ],
@@ -539,7 +539,7 @@
       "line": 384,
       "signature": "map(self, callback: Callable) -> ICollection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-map",
+      "reference": "/utilities/helpers/collection#collection-method-map",
       "decorators": [
         "abstractmethod"
       ],
@@ -552,7 +552,7 @@
       "line": 403,
       "signature": "mapInto(self, cls: type, method: str | None=None, **kwargs: object) -> ICollection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-mapinto",
+      "reference": "/utilities/helpers/collection#collection-method-mapinto",
       "decorators": [
         "abstractmethod"
       ],
@@ -565,7 +565,7 @@
       "line": 428,
       "signature": "merge(self, items: list[Any] | ICollection) -> ICollection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-merge",
+      "reference": "/utilities/helpers/collection#collection-method-merge",
       "decorators": [
         "abstractmethod"
       ],
@@ -578,7 +578,7 @@
       "line": 452,
       "signature": "pluck(self, value: str, key: str | None=None) -> ICollection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-pluck",
+      "reference": "/utilities/helpers/collection#collection-method-pluck",
       "decorators": [
         "abstractmethod"
       ],
@@ -591,7 +591,7 @@
       "line": 474,
       "signature": "pop(self) -> object",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-pop",
+      "reference": "/utilities/helpers/collection#collection-method-pop",
       "decorators": [
         "abstractmethod"
       ],
@@ -604,7 +604,7 @@
       "line": 485,
       "signature": "prepend(self, value: object) -> ICollection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-prepend",
+      "reference": "/utilities/helpers/collection#collection-method-prepend",
       "decorators": [
         "abstractmethod"
       ],
@@ -617,7 +617,7 @@
       "line": 504,
       "signature": "pull(self, key: int | str) -> object",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-pull",
+      "reference": "/utilities/helpers/collection#collection-method-pull",
       "decorators": [
         "abstractmethod"
       ],
@@ -630,7 +630,7 @@
       "line": 523,
       "signature": "push(self, value: object) -> ICollection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-push",
+      "reference": "/utilities/helpers/collection#collection-method-push",
       "decorators": [
         "abstractmethod"
       ],
@@ -643,7 +643,7 @@
       "line": 542,
       "signature": "put(self, key: int | str, value: object) -> ICollection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-put",
+      "reference": "/utilities/helpers/collection#collection-method-put",
       "decorators": [
         "abstractmethod"
       ],
@@ -656,7 +656,7 @@
       "line": 564,
       "signature": "random(self, count: int | None=None) -> object | ICollection | None",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-random",
+      "reference": "/utilities/helpers/collection#collection-method-random",
       "decorators": [
         "abstractmethod"
       ],
@@ -669,7 +669,7 @@
       "line": 589,
       "signature": "reduce(self, callback: Callable, initial: object=0) -> object",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-reduce",
+      "reference": "/utilities/helpers/collection#collection-method-reduce",
       "decorators": [
         "abstractmethod"
       ],
@@ -682,7 +682,7 @@
       "line": 611,
       "signature": "reject(self, callback: Callable) -> ICollection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-reject",
+      "reference": "/utilities/helpers/collection#collection-method-reject",
       "decorators": [
         "abstractmethod"
       ],
@@ -695,7 +695,7 @@
       "line": 630,
       "signature": "reverse(self) -> ICollection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-reverse",
+      "reference": "/utilities/helpers/collection#collection-method-reverse",
       "decorators": [
         "abstractmethod"
       ],
@@ -708,7 +708,7 @@
       "line": 641,
       "signature": "serialize(self) -> list[Any]",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-serialize",
+      "reference": "/utilities/helpers/collection#collection-method-serialize",
       "decorators": [
         "abstractmethod"
       ],
@@ -721,7 +721,7 @@
       "line": 652,
       "signature": "shift(self) -> object",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-shift",
+      "reference": "/utilities/helpers/collection#collection-method-shift",
       "decorators": [
         "abstractmethod"
       ],
@@ -734,7 +734,7 @@
       "line": 663,
       "signature": "sort(self, key: str | None=None) -> ICollection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-sort",
+      "reference": "/utilities/helpers/collection#collection-method-sort",
       "decorators": [
         "abstractmethod"
       ],
@@ -747,7 +747,7 @@
       "line": 682,
       "signature": "sum(self, key: str | None=None) -> float",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-sum",
+      "reference": "/utilities/helpers/collection#collection-method-sum",
       "decorators": [
         "abstractmethod"
       ],
@@ -760,7 +760,7 @@
       "line": 701,
       "signature": "toJson(self, **kwargs: object) -> str",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-tojson",
+      "reference": "/utilities/helpers/collection#collection-method-tojson",
       "decorators": [
         "abstractmethod"
       ],
@@ -773,7 +773,7 @@
       "line": 720,
       "signature": "groupBy(self, key: str) -> ICollection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-groupby",
+      "reference": "/utilities/helpers/collection#collection-method-groupby",
       "decorators": [
         "abstractmethod"
       ],
@@ -786,7 +786,7 @@
       "line": 741,
       "signature": "transform(self, callback: Callable) -> ICollection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-transform",
+      "reference": "/utilities/helpers/collection#collection-method-transform",
       "decorators": [
         "abstractmethod"
       ],
@@ -799,7 +799,7 @@
       "line": 760,
       "signature": "unique(self, key: str | None=None) -> ICollection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-unique",
+      "reference": "/utilities/helpers/collection#collection-method-unique",
       "decorators": [
         "abstractmethod"
       ],
@@ -812,7 +812,7 @@
       "line": 779,
       "signature": "where(self, key: str, *args: object) -> ICollection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-where",
+      "reference": "/utilities/helpers/collection#collection-method-where",
       "decorators": [
         "abstractmethod"
       ],
@@ -825,7 +825,7 @@
       "line": 801,
       "signature": "whereIn(self, key: str, values: list[Any] | ICollection) -> ICollection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-wherein",
+      "reference": "/utilities/helpers/collection#collection-method-wherein",
       "decorators": [
         "abstractmethod"
       ],
@@ -838,7 +838,7 @@
       "line": 823,
       "signature": "whereNotIn(self, key: str, values: list[Any] | ICollection) -> ICollection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-wherenotin",
+      "reference": "/utilities/helpers/collection#collection-method-wherenotin",
       "decorators": [
         "abstractmethod"
       ],
@@ -851,7 +851,7 @@
       "line": 845,
       "signature": "zip(self, items: list[Any] | ICollection) -> ICollection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-zip",
+      "reference": "/utilities/helpers/collection#collection-method-zip",
       "decorators": [
         "abstractmethod"
       ],
@@ -864,7 +864,7 @@
       "line": 869,
       "signature": "setAppends(self, appends: list[str]) -> ICollection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-setappends",
+      "reference": "/utilities/helpers/collection#collection-method-setappends",
       "decorators": [
         "abstractmethod"
       ],
@@ -877,7 +877,7 @@
       "line": 3,
       "signature": "class IStdClass(ABC)",
       "pageId": "helper-std-class",
-      "reference": "/advanced/data-utilities/std-class"
+      "reference": "/utilities/helpers/std-class"
     },
     {
       "source": "orionis/support/types/contracts/std.py",
@@ -886,7 +886,7 @@
       "line": 8,
       "signature": "toDict(self) -> dict",
       "pageId": "helper-std-class",
-      "reference": "/advanced/data-utilities/std-class#stdclass-method-todict",
+      "reference": "/utilities/helpers/std-class#stdclass-method-todict",
       "decorators": [
         "abstractmethod"
       ],
@@ -899,7 +899,7 @@
       "line": 19,
       "signature": "update(self, **kwargs: object) -> None",
       "pageId": "helper-std-class",
-      "reference": "/advanced/data-utilities/std-class#stdclass-method-update",
+      "reference": "/utilities/helpers/std-class#stdclass-method-update",
       "decorators": [
         "abstractmethod"
       ],
@@ -912,7 +912,7 @@
       "line": 40,
       "signature": "remove(self, *attributes: str) -> None",
       "pageId": "helper-std-class",
-      "reference": "/advanced/data-utilities/std-class#stdclass-method-remove",
+      "reference": "/utilities/helpers/std-class#stdclass-method-remove",
       "decorators": [
         "abstractmethod"
       ],
@@ -925,7 +925,7 @@
       "line": 5,
       "signature": "class IWorkers(ABC)",
       "pageId": "helper-workers",
-      "reference": "/advanced/data-utilities/workers"
+      "reference": "/utilities/helpers/workers"
     },
     {
       "source": "orionis/support/system/contracts/workers.py",
@@ -934,7 +934,7 @@
       "line": 8,
       "signature": "setRamPerWorker(cls, ram_per_worker: float) -> None",
       "pageId": "helper-workers",
-      "reference": "/advanced/data-utilities/workers#workers-method-setramperworker",
+      "reference": "/utilities/helpers/workers#workers-method-setramperworker",
       "decorators": [
         "classmethod",
         "abstractmethod"
@@ -948,7 +948,7 @@
       "line": 35,
       "signature": "calculate(cls) -> int",
       "pageId": "helper-workers",
-      "reference": "/advanced/data-utilities/workers#workers-method-calculate",
+      "reference": "/utilities/helpers/workers#workers-method-calculate",
       "decorators": [
         "classmethod",
         "abstractmethod"
@@ -962,7 +962,7 @@
       "line": 4,
       "signature": "class IPerformanceCounter(ABC)",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter"
+      "reference": "/utilities/helpers/performance-counter"
     },
     {
       "source": "orionis/support/performance/contracts/counter.py",
@@ -971,7 +971,7 @@
       "line": 8,
       "signature": "start(self) -> IPerformanceCounter",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-start",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-start",
       "decorators": [
         "abstractmethod"
       ],
@@ -984,7 +984,7 @@
       "line": 21,
       "signature": "async astart(self) -> IPerformanceCounter",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-astart",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-astart",
       "decorators": [
         "abstractmethod"
       ],
@@ -997,7 +997,7 @@
       "line": 34,
       "signature": "stop(self) -> IPerformanceCounter",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-stop",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-stop",
       "decorators": [
         "abstractmethod"
       ],
@@ -1010,7 +1010,7 @@
       "line": 55,
       "signature": "async astop(self) -> IPerformanceCounter",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-astop",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-astop",
       "decorators": [
         "abstractmethod"
       ],
@@ -1023,7 +1023,7 @@
       "line": 74,
       "signature": "elapsedTime(self) -> float",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-elapsedtime",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-elapsedtime",
       "decorators": [
         "abstractmethod"
       ],
@@ -1036,7 +1036,7 @@
       "line": 90,
       "signature": "async aelapsedTime(self) -> float",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-aelapsedtime",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-aelapsedtime",
       "decorators": [
         "abstractmethod"
       ],
@@ -1049,7 +1049,7 @@
       "line": 106,
       "signature": "getMicroseconds(self) -> float",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-getmicroseconds",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-getmicroseconds",
       "decorators": [
         "abstractmethod"
       ],
@@ -1062,7 +1062,7 @@
       "line": 119,
       "signature": "async agetMicroseconds(self) -> float",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-agetmicroseconds",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-agetmicroseconds",
       "decorators": [
         "abstractmethod"
       ],
@@ -1075,7 +1075,7 @@
       "line": 130,
       "signature": "getMilliseconds(self) -> float",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-getmilliseconds",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-getmilliseconds",
       "decorators": [
         "abstractmethod"
       ],
@@ -1088,7 +1088,7 @@
       "line": 143,
       "signature": "async agetMilliseconds(self) -> float",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-agetmilliseconds",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-agetmilliseconds",
       "decorators": [
         "abstractmethod"
       ],
@@ -1101,7 +1101,7 @@
       "line": 154,
       "signature": "getSeconds(self) -> float",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-getseconds",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-getseconds",
       "decorators": [
         "abstractmethod"
       ],
@@ -1114,7 +1114,7 @@
       "line": 165,
       "signature": "async agetSeconds(self) -> float",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-agetseconds",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-agetseconds",
       "decorators": [
         "abstractmethod"
       ],
@@ -1127,7 +1127,7 @@
       "line": 176,
       "signature": "getMinutes(self) -> float",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-getminutes",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-getminutes",
       "decorators": [
         "abstractmethod"
       ],
@@ -1140,7 +1140,7 @@
       "line": 187,
       "signature": "async agetMinutes(self) -> float",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-agetminutes",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-agetminutes",
       "decorators": [
         "abstractmethod"
       ],
@@ -1153,7 +1153,7 @@
       "line": 198,
       "signature": "restart(self) -> IPerformanceCounter",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-restart",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-restart",
       "decorators": [
         "abstractmethod"
       ],
@@ -1166,7 +1166,7 @@
       "line": 212,
       "signature": "async arestart(self) -> IPerformanceCounter",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-arestart",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-arestart",
       "decorators": [
         "abstractmethod"
       ],
@@ -1199,85 +1199,85 @@
         }
       ],
       "references": [
-        "/advanced/data-utilities/collection",
-        "/advanced/data-utilities/stringable",
-        "/advanced/data-utilities/dot-dict",
-        "/advanced/data-utilities/std-class",
-        "/advanced/data-utilities/sentinel",
-        "/advanced/data-utilities/workers",
-        "/advanced/data-utilities/freeze-thaw",
-        "/advanced/data-utilities/performance-counter"
+        "/utilities/helpers/collection",
+        "/utilities/helpers/stringable",
+        "/utilities/helpers/dot-dict",
+        "/utilities/helpers/std-class",
+        "/utilities/helpers/sentinel",
+        "/utilities/helpers/workers",
+        "/utilities/helpers/freeze-thaw",
+        "/utilities/helpers/performance-counter"
       ],
       "purpose": "Concrete auto-resolution, constructor injection, initialized instance binding and contract registration. Data values must be supplied explicitly; MISSING is an exported object, not an injectable public class."
     },
     {
       "source": "orionis/support/facades/datetime.py",
       "references": [
-        "/advanced/data-utilities/stringable#stringable-method-todate"
+        "/utilities/helpers/stringable#stringable-method-todate"
       ],
       "purpose": "Reviewed support for Stringable date/encryption calls and runnable service/controller examples; auxiliary API is not counted as helper declarations."
     },
     {
       "source": "orionis/support/facades/encrypter.py",
       "references": [
-        "/advanced/data-utilities/stringable#stringable-method-encrypt",
-        "/advanced/data-utilities/stringable#stringable-method-decrypt"
+        "/utilities/helpers/stringable#stringable-method-encrypt",
+        "/utilities/helpers/stringable#stringable-method-decrypt"
       ],
       "purpose": "Reviewed support for Stringable date/encryption calls and runnable service/controller examples; auxiliary API is not counted as helper declarations."
     },
     {
       "source": "orionis/encrypter/contracts/encrypter.py",
       "references": [
-        "/advanced/data-utilities/stringable#stringable-method-encrypt",
-        "/advanced/data-utilities/stringable#stringable-method-decrypt"
+        "/utilities/helpers/stringable#stringable-method-encrypt",
+        "/utilities/helpers/stringable#stringable-method-decrypt"
       ],
       "purpose": "Reviewed support for Stringable date/encryption calls and runnable service/controller examples; auxiliary API is not counted as helper declarations."
     },
     {
       "source": "orionis/encrypter/encrypter.py",
       "references": [
-        "/advanced/data-utilities/stringable#stringable-method-encrypt",
-        "/advanced/data-utilities/stringable#stringable-method-decrypt"
+        "/utilities/helpers/stringable#stringable-method-encrypt",
+        "/utilities/helpers/stringable#stringable-method-decrypt"
       ],
       "purpose": "Reviewed support for Stringable date/encryption calls and runnable service/controller examples; auxiliary API is not counted as helper declarations."
     },
     {
       "source": "orionis/container/facades/facade.py",
       "references": [
-        "/advanced/data-utilities/stringable#stringable-method-encrypt",
-        "/advanced/data-utilities/stringable#stringable-method-decrypt"
+        "/utilities/helpers/stringable#stringable-method-encrypt",
+        "/utilities/helpers/stringable#stringable-method-decrypt"
       ],
       "purpose": "Reviewed support for Stringable date/encryption calls and runnable service/controller examples; auxiliary API is not counted as helper declarations."
     },
     {
       "source": "orionis/container/facades/meta.py",
       "references": [
-        "/advanced/data-utilities/stringable#stringable-method-encrypt",
-        "/advanced/data-utilities/stringable#stringable-method-decrypt"
+        "/utilities/helpers/stringable#stringable-method-encrypt",
+        "/utilities/helpers/stringable#stringable-method-decrypt"
       ],
       "purpose": "Reviewed support for Stringable date/encryption calls and runnable service/controller examples; auxiliary API is not counted as helper declarations."
     },
     {
       "source": "orionis/support/facades/__init__.py",
       "references": [
-        "/advanced/data-utilities/stringable#stringable-method-encrypt",
-        "/advanced/data-utilities/stringable#stringable-method-todate"
+        "/utilities/helpers/stringable#stringable-method-encrypt",
+        "/utilities/helpers/stringable#stringable-method-todate"
       ],
       "purpose": "Reviewed support for Stringable date/encryption calls and runnable service/controller examples; auxiliary API is not counted as helper declarations."
     },
     {
       "source": "orionis/http/__init__.py",
       "references": [
-        "/advanced/data-utilities/stringable#stringable-method-encrypt",
-        "/advanced/data-utilities/stringable#stringable-method-decrypt"
+        "/utilities/helpers/stringable#stringable-method-encrypt",
+        "/utilities/helpers/stringable#stringable-method-decrypt"
       ],
       "purpose": "Reviewed support for Stringable date/encryption calls and runnable service/controller examples; auxiliary API is not counted as helper declarations."
     },
     {
       "source": "orionis/http/responses.py",
       "references": [
-        "/advanced/data-utilities/stringable#stringable-method-encrypt",
-        "/advanced/data-utilities/stringable#stringable-method-decrypt"
+        "/utilities/helpers/stringable#stringable-method-encrypt",
+        "/utilities/helpers/stringable#stringable-method-decrypt"
       ],
       "purpose": "Reviewed support for Stringable date/encryption calls and runnable service/controller examples; auxiliary API is not counted as helper declarations."
     }
@@ -1628,7 +1628,7 @@
     {
       "owner": "DotDict",
       "origin": "builtins.dict/object",
-      "reference": "/advanced/data-utilities/dot-dict#dotdict-protocol-dictionary",
+      "reference": "/utilities/helpers/dot-dict#dotdict-protocol-dictionary",
       "publicMethods": [
         "clear",
         "fromkeys",
@@ -1650,12 +1650,12 @@
         "union",
         "representation"
       ],
-      "copyAndSerializationReference": "/advanced/data-utilities/dot-dict#dotdict-protocol-copy-serialization"
+      "copyAndSerializationReference": "/utilities/helpers/dot-dict#dotdict-protocol-copy-serialization"
     },
     {
       "owner": "Stringable",
       "origin": "builtins.str",
-      "reference": "/advanced/data-utilities/stringable#stringable-constructor",
+      "reference": "/utilities/helpers/stringable#stringable-constructor",
       "protocols": [
         "construction",
         "length",
@@ -1673,19 +1673,19 @@
     {
       "owner": "StdClass",
       "origin": "builtins.object",
-      "reference": "/advanced/data-utilities/std-class#stdclass-protocol-attributes",
-      "copyAndSerializationReference": "/advanced/data-utilities/std-class#stdclass-protocol-copy-serialization"
+      "reference": "/utilities/helpers/std-class#stdclass-protocol-attributes",
+      "copyAndSerializationReference": "/utilities/helpers/std-class#stdclass-protocol-copy-serialization"
     },
     {
       "owner": "MISSING",
       "origin": "builtins.object",
-      "reference": "/advanced/data-utilities/sentinel#sentinel-protocol-identity",
-      "copyAndSerializationReference": "/advanced/data-utilities/sentinel#sentinel-protocol-copy-serialization"
+      "reference": "/utilities/helpers/sentinel#sentinel-protocol-identity",
+      "copyAndSerializationReference": "/utilities/helpers/sentinel#sentinel-protocol-copy-serialization"
     },
     {
       "owner": "FreezeThaw",
       "origin": "builtins.object; returned built-in containers",
-      "reference": "/advanced/data-utilities/freeze-thaw#freezethaw-protocol-serialization",
+      "reference": "/utilities/helpers/freeze-thaw#freezethaw-protocol-serialization",
       "note": "The helper declares no custom copy or serialization dunder."
     }
   ],
@@ -1697,7 +1697,7 @@
       "line": 31,
       "signature": "class Collection(ICollection)",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection"
+      "reference": "/utilities/helpers/collection"
     },
     {
       "source": "orionis/support/types/collection.py",
@@ -1706,7 +1706,7 @@
       "line": 35,
       "signature": "__hash__(self) -> int",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-hash",
+      "reference": "/utilities/helpers/collection#collection-method-hash",
       "decorators": [],
       "async": false
     },
@@ -1717,7 +1717,7 @@
       "line": 47,
       "signature": "__init__(self, items: list[Any] | None=None) -> None",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-init",
+      "reference": "/utilities/helpers/collection#collection-method-init",
       "decorators": [],
       "async": false
     },
@@ -1728,7 +1728,7 @@
       "line": 67,
       "signature": "take(self, number: int) -> Collection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-take",
+      "reference": "/utilities/helpers/collection#collection-method-take",
       "decorators": [],
       "async": false
     },
@@ -1739,7 +1739,7 @@
       "line": 89,
       "signature": "first(self, callback: Callable | None=None) -> object",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-first",
+      "reference": "/utilities/helpers/collection#collection-method-first",
       "decorators": [],
       "async": false
     },
@@ -1750,7 +1750,7 @@
       "line": 116,
       "signature": "last(self, callback: Callable | None=None) -> object",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-last",
+      "reference": "/utilities/helpers/collection#collection-method-last",
       "decorators": [],
       "async": false
     },
@@ -1761,7 +1761,7 @@
       "line": 143,
       "signature": "all(self) -> list[Any]",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-all",
+      "reference": "/utilities/helpers/collection#collection-method-all",
       "decorators": [],
       "async": false
     },
@@ -1772,7 +1772,7 @@
       "line": 154,
       "signature": "avg(self, key: str | None=None) -> float",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-avg",
+      "reference": "/utilities/helpers/collection#collection-method-avg",
       "decorators": [],
       "async": false
     },
@@ -1783,7 +1783,7 @@
       "line": 187,
       "signature": "max(self, key: str | None=None) -> object",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-max",
+      "reference": "/utilities/helpers/collection#collection-method-max",
       "decorators": [],
       "async": false
     },
@@ -1794,7 +1794,7 @@
       "line": 213,
       "signature": "min(self, key: str | None=None) -> object",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-min",
+      "reference": "/utilities/helpers/collection#collection-method-min",
       "decorators": [],
       "async": false
     },
@@ -1805,7 +1805,7 @@
       "line": 238,
       "signature": "chunk(self, size: int) -> Collection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-chunk",
+      "reference": "/utilities/helpers/collection#collection-method-chunk",
       "decorators": [],
       "async": false
     },
@@ -1816,7 +1816,7 @@
       "line": 264,
       "signature": "collapse(self) -> Collection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-collapse",
+      "reference": "/utilities/helpers/collection#collection-method-collapse",
       "decorators": [],
       "async": false
     },
@@ -1827,7 +1827,7 @@
       "line": 279,
       "signature": "contains(self, key: str | Callable, value: object=None) -> bool",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-contains",
+      "reference": "/utilities/helpers/collection#collection-method-contains",
       "decorators": [],
       "async": false
     },
@@ -1838,7 +1838,7 @@
       "line": 310,
       "signature": "count(self) -> int",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-count",
+      "reference": "/utilities/helpers/collection#collection-method-count",
       "decorators": [],
       "async": false
     },
@@ -1849,7 +1849,7 @@
       "line": 322,
       "signature": "diff(self, items: list[Any] | Collection) -> Collection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-diff",
+      "reference": "/utilities/helpers/collection#collection-method-diff",
       "decorators": [],
       "async": false
     },
@@ -1860,7 +1860,7 @@
       "line": 348,
       "signature": "each(self, callback: Callable) -> Collection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-each",
+      "reference": "/utilities/helpers/collection#collection-method-each",
       "decorators": [],
       "async": false
     },
@@ -1871,7 +1871,7 @@
       "line": 375,
       "signature": "every(self, callback: Callable) -> bool",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-every",
+      "reference": "/utilities/helpers/collection#collection-method-every",
       "decorators": [],
       "async": false
     },
@@ -1882,7 +1882,7 @@
       "line": 396,
       "signature": "filter(self, callback: Callable) -> Collection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-filter",
+      "reference": "/utilities/helpers/collection#collection-method-filter",
       "decorators": [],
       "async": false
     },
@@ -1893,7 +1893,7 @@
       "line": 417,
       "signature": "flatten(self) -> Collection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-flatten",
+      "reference": "/utilities/helpers/collection#collection-method-flatten",
       "decorators": [],
       "async": false
     },
@@ -1904,7 +1904,7 @@
       "line": 451,
       "signature": "forget(self, *keys: int | str) -> Collection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-forget",
+      "reference": "/utilities/helpers/collection#collection-method-forget",
       "decorators": [],
       "async": false
     },
@@ -1915,7 +1915,7 @@
       "line": 474,
       "signature": "forPage(self, page: int, number: int) -> Collection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-forpage",
+      "reference": "/utilities/helpers/collection#collection-method-forpage",
       "decorators": [],
       "async": false
     },
@@ -1926,7 +1926,7 @@
       "line": 506,
       "signature": "get(self, key: int | str, default: object=None) -> object",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-get",
+      "reference": "/utilities/helpers/collection#collection-method-get",
       "decorators": [],
       "async": false
     },
@@ -1937,7 +1937,7 @@
       "line": 532,
       "signature": "implode(self, glue: str=',', key: str | None=None) -> str",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-implode",
+      "reference": "/utilities/helpers/collection#collection-method-implode",
       "decorators": [],
       "async": false
     },
@@ -1948,7 +1948,7 @@
       "line": 567,
       "signature": "isEmpty(self) -> bool",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-isempty",
+      "reference": "/utilities/helpers/collection#collection-method-isempty",
       "decorators": [],
       "async": false
     },
@@ -1959,7 +1959,7 @@
       "line": 579,
       "signature": "map(self, callback: Callable) -> Collection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-map",
+      "reference": "/utilities/helpers/collection#collection-method-map",
       "decorators": [],
       "async": false
     },
@@ -1970,7 +1970,7 @@
       "line": 600,
       "signature": "mapInto(self, cls: type, method: str | None=None, **kwargs: object) -> Collection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-mapinto",
+      "reference": "/utilities/helpers/collection#collection-method-mapinto",
       "decorators": [],
       "async": false
     },
@@ -1981,7 +1981,7 @@
       "line": 644,
       "signature": "merge(self, items: list[Any] | Collection) -> Collection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-merge",
+      "reference": "/utilities/helpers/collection#collection-method-merge",
       "decorators": [],
       "async": false
     },
@@ -1992,7 +1992,7 @@
       "line": 675,
       "signature": "pluck(self, value: str, key: str | None=None) -> Collection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-pluck",
+      "reference": "/utilities/helpers/collection#collection-method-pluck",
       "decorators": [],
       "async": false
     },
@@ -2003,7 +2003,7 @@
       "line": 715,
       "signature": "pop(self) -> object",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-pop",
+      "reference": "/utilities/helpers/collection#collection-method-pop",
       "decorators": [],
       "async": false
     },
@@ -2014,7 +2014,7 @@
       "line": 731,
       "signature": "prepend(self, value: object) -> Collection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-prepend",
+      "reference": "/utilities/helpers/collection#collection-method-prepend",
       "decorators": [],
       "async": false
     },
@@ -2025,7 +2025,7 @@
       "line": 752,
       "signature": "pull(self, key: int | str) -> object",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-pull",
+      "reference": "/utilities/helpers/collection#collection-method-pull",
       "decorators": [],
       "async": false
     },
@@ -2036,7 +2036,7 @@
       "line": 774,
       "signature": "push(self, value: object) -> Collection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-push",
+      "reference": "/utilities/helpers/collection#collection-method-push",
       "decorators": [],
       "async": false
     },
@@ -2047,7 +2047,7 @@
       "line": 795,
       "signature": "put(self, key: int | str, value: object) -> Collection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-put",
+      "reference": "/utilities/helpers/collection#collection-method-put",
       "decorators": [],
       "async": false
     },
@@ -2058,7 +2058,7 @@
       "line": 819,
       "signature": "random(self, count: int | None=None) -> object | Collection | None",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-random",
+      "reference": "/utilities/helpers/collection#collection-method-random",
       "decorators": [],
       "async": false
     },
@@ -2069,7 +2069,7 @@
       "line": 865,
       "signature": "reduce(self, callback: Callable, initial: object=0) -> object",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-reduce",
+      "reference": "/utilities/helpers/collection#collection-method-reduce",
       "decorators": [],
       "async": false
     },
@@ -2080,7 +2080,7 @@
       "line": 888,
       "signature": "reject(self, callback: Callable) -> Collection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-reject",
+      "reference": "/utilities/helpers/collection#collection-method-reject",
       "decorators": [],
       "async": false
     },
@@ -2091,7 +2091,7 @@
       "line": 911,
       "signature": "reverse(self) -> Collection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-reverse",
+      "reference": "/utilities/helpers/collection#collection-method-reverse",
       "decorators": [],
       "async": false
     },
@@ -2102,7 +2102,7 @@
       "line": 924,
       "signature": "serialize(self) -> list[Any]",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-serialize",
+      "reference": "/utilities/helpers/collection#collection-method-serialize",
       "decorators": [],
       "async": false
     },
@@ -2113,7 +2113,7 @@
       "line": 977,
       "signature": "shift(self) -> object",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-shift",
+      "reference": "/utilities/helpers/collection#collection-method-shift",
       "decorators": [],
       "async": false
     },
@@ -2124,7 +2124,7 @@
       "line": 989,
       "signature": "sort(self, key: str | None=None) -> Collection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-sort",
+      "reference": "/utilities/helpers/collection#collection-method-sort",
       "decorators": [],
       "async": false
     },
@@ -2135,7 +2135,7 @@
       "line": 1015,
       "signature": "sum(self, key: str | None=None) -> float",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-sum",
+      "reference": "/utilities/helpers/collection#collection-method-sum",
       "decorators": [],
       "async": false
     },
@@ -2146,7 +2146,7 @@
       "line": 1039,
       "signature": "toJson(self, **kwargs: object) -> str",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-tojson",
+      "reference": "/utilities/helpers/collection#collection-method-tojson",
       "decorators": [],
       "async": false
     },
@@ -2157,7 +2157,7 @@
       "line": 1059,
       "signature": "groupBy(self, key: str) -> Collection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-groupby",
+      "reference": "/utilities/helpers/collection#collection-method-groupby",
       "decorators": [],
       "async": false
     },
@@ -2168,7 +2168,7 @@
       "line": 1088,
       "signature": "transform(self, callback: Callable) -> Collection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-transform",
+      "reference": "/utilities/helpers/collection#collection-method-transform",
       "decorators": [],
       "async": false
     },
@@ -2179,7 +2179,7 @@
       "line": 1110,
       "signature": "unique(self, key: str | None=None) -> Collection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-unique",
+      "reference": "/utilities/helpers/collection#collection-method-unique",
       "decorators": [],
       "async": false
     },
@@ -2190,7 +2190,7 @@
       "line": 1216,
       "signature": "where(self, key: str, *args: object) -> Collection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-where",
+      "reference": "/utilities/helpers/collection#collection-method-where",
       "decorators": [],
       "async": false
     },
@@ -2201,7 +2201,7 @@
       "line": 1264,
       "signature": "whereIn(self, key: str, values: list[Any] | Collection) -> Collection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-wherein",
+      "reference": "/utilities/helpers/collection#collection-method-wherein",
       "decorators": [],
       "async": false
     },
@@ -2212,7 +2212,7 @@
       "line": 1311,
       "signature": "whereNotIn(self, key: str, values: list[Any] | Collection) -> Collection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-wherenotin",
+      "reference": "/utilities/helpers/collection#collection-method-wherenotin",
       "decorators": [],
       "async": false
     },
@@ -2223,7 +2223,7 @@
       "line": 1358,
       "signature": "zip(self, items: list[Any] | Collection) -> Collection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-zip",
+      "reference": "/utilities/helpers/collection#collection-method-zip",
       "decorators": [],
       "async": false
     },
@@ -2234,7 +2234,7 @@
       "line": 1393,
       "signature": "setAppends(self, appends: list[str]) -> Collection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-setappends",
+      "reference": "/utilities/helpers/collection#collection-method-setappends",
       "decorators": [],
       "async": false
     },
@@ -2245,7 +2245,7 @@
       "line": 1414,
       "signature": "addRelation(self, relation_data: dict[str, Any]) -> Collection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-addrelation",
+      "reference": "/utilities/helpers/collection#collection-method-addrelation",
       "decorators": [],
       "async": false
     },
@@ -2256,7 +2256,7 @@
       "line": 1609,
       "signature": "__iter__(self) -> Iterator[Any]",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-iter",
+      "reference": "/utilities/helpers/collection#collection-method-iter",
       "decorators": [],
       "async": false
     },
@@ -2267,7 +2267,7 @@
       "line": 1621,
       "signature": "__eq__(self, other: object) -> bool",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-eq",
+      "reference": "/utilities/helpers/collection#collection-method-eq",
       "decorators": [],
       "async": false
     },
@@ -2278,7 +2278,7 @@
       "line": 1643,
       "signature": "__getitem__(self, item: int | slice) -> object | Collection",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-getitem",
+      "reference": "/utilities/helpers/collection#collection-method-getitem",
       "decorators": [],
       "async": false
     },
@@ -2289,7 +2289,7 @@
       "line": 1665,
       "signature": "__setitem__(self, key: int | str, value: object) -> None",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-setitem",
+      "reference": "/utilities/helpers/collection#collection-method-setitem",
       "decorators": [],
       "async": false
     },
@@ -2300,7 +2300,7 @@
       "line": 1688,
       "signature": "__delitem__(self, key: int | str) -> None",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-delitem",
+      "reference": "/utilities/helpers/collection#collection-method-delitem",
       "decorators": [],
       "async": false
     },
@@ -2311,7 +2311,7 @@
       "line": 1708,
       "signature": "__ne__(self, other: object) -> bool",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-ne",
+      "reference": "/utilities/helpers/collection#collection-method-ne",
       "decorators": [],
       "async": false
     },
@@ -2322,7 +2322,7 @@
       "line": 1730,
       "signature": "__len__(self) -> int",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-len",
+      "reference": "/utilities/helpers/collection#collection-method-len",
       "decorators": [],
       "async": false
     },
@@ -2333,7 +2333,7 @@
       "line": 1742,
       "signature": "__le__(self, other: object) -> bool",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-le",
+      "reference": "/utilities/helpers/collection#collection-method-le",
       "decorators": [],
       "async": false
     },
@@ -2344,7 +2344,7 @@
       "line": 1765,
       "signature": "__lt__(self, other: object) -> bool",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-lt",
+      "reference": "/utilities/helpers/collection#collection-method-lt",
       "decorators": [],
       "async": false
     },
@@ -2355,7 +2355,7 @@
       "line": 1788,
       "signature": "__ge__(self, other: object) -> bool",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-ge",
+      "reference": "/utilities/helpers/collection#collection-method-ge",
       "decorators": [],
       "async": false
     },
@@ -2366,7 +2366,7 @@
       "line": 1811,
       "signature": "__gt__(self, other: object) -> bool",
       "pageId": "helper-collection",
-      "reference": "/advanced/data-utilities/collection#collection-method-gt",
+      "reference": "/utilities/helpers/collection#collection-method-gt",
       "decorators": [],
       "async": false
     },
@@ -2377,7 +2377,7 @@
       "line": 28,
       "signature": "class Stringable(str)",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable"
+      "reference": "/utilities/helpers/stringable"
     },
     {
       "source": "orionis/support/types/stringable.py",
@@ -2386,7 +2386,7 @@
       "line": 34,
       "signature": "after(self, search: str) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-after",
+      "reference": "/utilities/helpers/stringable#stringable-method-after",
       "decorators": [],
       "async": false
     },
@@ -2397,7 +2397,7 @@
       "line": 54,
       "signature": "afterLast(self, search: str) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-afterlast",
+      "reference": "/utilities/helpers/stringable#stringable-method-afterlast",
       "decorators": [],
       "async": false
     },
@@ -2408,7 +2408,7 @@
       "line": 74,
       "signature": "append(self, *values: str) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-append",
+      "reference": "/utilities/helpers/stringable#stringable-method-append",
       "decorators": [],
       "async": false
     },
@@ -2419,7 +2419,7 @@
       "line": 96,
       "signature": "newLine(self, count: int=1) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-newline",
+      "reference": "/utilities/helpers/stringable#stringable-method-newline",
       "decorators": [],
       "async": false
     },
@@ -2430,7 +2430,7 @@
       "line": 114,
       "signature": "before(self, search: str) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-before",
+      "reference": "/utilities/helpers/stringable#stringable-method-before",
       "decorators": [],
       "async": false
     },
@@ -2441,7 +2441,7 @@
       "line": 134,
       "signature": "beforeLast(self, search: str) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-beforelast",
+      "reference": "/utilities/helpers/stringable#stringable-method-beforelast",
       "decorators": [],
       "async": false
     },
@@ -2452,7 +2452,7 @@
       "line": 158,
       "signature": "contains(self, needles: str | Iterable[str], *, ignore_case: bool=False) -> bool",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-contains",
+      "reference": "/utilities/helpers/stringable#stringable-method-contains",
       "decorators": [],
       "async": false
     },
@@ -2463,7 +2463,7 @@
       "line": 200,
       "signature": "endsWith(self, needles: str | Iterable[str]) -> bool",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-endswith",
+      "reference": "/utilities/helpers/stringable#stringable-method-endswith",
       "decorators": [],
       "async": false
     },
@@ -2474,7 +2474,7 @@
       "line": 223,
       "signature": "exactly(self, value: str) -> bool",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-exactly",
+      "reference": "/utilities/helpers/stringable#stringable-method-exactly",
       "decorators": [],
       "async": false
     },
@@ -2485,7 +2485,7 @@
       "line": 245,
       "signature": "isEmpty(self) -> bool",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-isempty",
+      "reference": "/utilities/helpers/stringable#stringable-method-isempty",
       "decorators": [],
       "async": false
     },
@@ -2496,7 +2496,7 @@
       "line": 257,
       "signature": "isNotEmpty(self) -> bool",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-isnotempty",
+      "reference": "/utilities/helpers/stringable#stringable-method-isnotempty",
       "decorators": [],
       "async": false
     },
@@ -2507,7 +2507,7 @@
       "line": 268,
       "signature": "lower(self) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-lower",
+      "reference": "/utilities/helpers/stringable#stringable-method-lower",
       "decorators": [],
       "async": false
     },
@@ -2518,7 +2518,7 @@
       "line": 280,
       "signature": "upper(self) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-upper",
+      "reference": "/utilities/helpers/stringable#stringable-method-upper",
       "decorators": [],
       "async": false
     },
@@ -2529,7 +2529,7 @@
       "line": 292,
       "signature": "reverse(self) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-reverse",
+      "reference": "/utilities/helpers/stringable#stringable-method-reverse",
       "decorators": [],
       "async": false
     },
@@ -2540,7 +2540,7 @@
       "line": 304,
       "signature": "repeat(self, times: int) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-repeat",
+      "reference": "/utilities/helpers/stringable#stringable-method-repeat",
       "decorators": [],
       "async": false
     },
@@ -2551,7 +2551,7 @@
       "line": 326,
       "signature": "replace(self, search: str | Iterable[str], replace: str | Iterable[str], *, case_sensitive: bool=True) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-replace",
+      "reference": "/utilities/helpers/stringable#stringable-method-replace",
       "decorators": [],
       "async": false
     },
@@ -2562,7 +2562,7 @@
       "line": 377,
       "signature": "stripTags(self, allowed_tags: str | None=None) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-striptags",
+      "reference": "/utilities/helpers/stringable#stringable-method-striptags",
       "decorators": [],
       "async": false
     },
@@ -2573,7 +2573,7 @@
       "line": 397,
       "signature": "toBase64(self) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-tobase64",
+      "reference": "/utilities/helpers/stringable#stringable-method-tobase64",
       "decorators": [],
       "async": false
     },
@@ -2584,7 +2584,7 @@
       "line": 409,
       "signature": "fromBase64(self, *, strict: bool=False) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-frombase64",
+      "reference": "/utilities/helpers/stringable#stringable-method-frombase64",
       "decorators": [],
       "async": false
     },
@@ -2595,7 +2595,7 @@
       "line": 440,
       "signature": "md5(self) -> str",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-md5",
+      "reference": "/utilities/helpers/stringable#stringable-method-md5",
       "decorators": [],
       "async": false
     },
@@ -2606,7 +2606,7 @@
       "line": 452,
       "signature": "sha1(self) -> str",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-sha1",
+      "reference": "/utilities/helpers/stringable#stringable-method-sha1",
       "decorators": [],
       "async": false
     },
@@ -2617,7 +2617,7 @@
       "line": 464,
       "signature": "sha256(self) -> str",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-sha256",
+      "reference": "/utilities/helpers/stringable#stringable-method-sha256",
       "decorators": [],
       "async": false
     },
@@ -2628,7 +2628,7 @@
       "line": 476,
       "signature": "length(self) -> int",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-length",
+      "reference": "/utilities/helpers/stringable#stringable-method-length",
       "decorators": [],
       "async": false
     },
@@ -2639,7 +2639,7 @@
       "line": 488,
       "signature": "value(self) -> str",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-value",
+      "reference": "/utilities/helpers/stringable#stringable-method-value",
       "decorators": [],
       "async": false
     },
@@ -2650,7 +2650,7 @@
       "line": 500,
       "signature": "toInteger(self, base: int=10) -> int",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-tointeger",
+      "reference": "/utilities/helpers/stringable#stringable-method-tointeger",
       "decorators": [],
       "async": false
     },
@@ -2661,7 +2661,7 @@
       "line": 526,
       "signature": "toFloat(self) -> float",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-tofloat",
+      "reference": "/utilities/helpers/stringable#stringable-method-tofloat",
       "decorators": [],
       "async": false
     },
@@ -2672,7 +2672,7 @@
       "line": 547,
       "signature": "toBoolean(self) -> bool",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-toboolean",
+      "reference": "/utilities/helpers/stringable#stringable-method-toboolean",
       "decorators": [],
       "async": false
     },
@@ -2683,7 +2683,7 @@
       "line": 562,
       "signature": "__getitem__(self, key: int | slice) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-getitem",
+      "reference": "/utilities/helpers/stringable#stringable-method-getitem",
       "decorators": [],
       "async": false
     },
@@ -2694,7 +2694,7 @@
       "line": 579,
       "signature": "__str__(self) -> str",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-str",
+      "reference": "/utilities/helpers/stringable#stringable-method-str",
       "decorators": [],
       "async": false
     },
@@ -2705,7 +2705,7 @@
       "line": 591,
       "signature": "isAlnum(self) -> bool",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-isalnum",
+      "reference": "/utilities/helpers/stringable#stringable-method-isalnum",
       "decorators": [],
       "async": false
     },
@@ -2716,7 +2716,7 @@
       "line": 602,
       "signature": "isAlpha(self) -> bool",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-isalpha",
+      "reference": "/utilities/helpers/stringable#stringable-method-isalpha",
       "decorators": [],
       "async": false
     },
@@ -2727,7 +2727,7 @@
       "line": 613,
       "signature": "isDecimal(self) -> bool",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-isdecimal",
+      "reference": "/utilities/helpers/stringable#stringable-method-isdecimal",
       "decorators": [],
       "async": false
     },
@@ -2738,7 +2738,7 @@
       "line": 624,
       "signature": "isDigit(self) -> bool",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-isdigit",
+      "reference": "/utilities/helpers/stringable#stringable-method-isdigit",
       "decorators": [],
       "async": false
     },
@@ -2749,7 +2749,7 @@
       "line": 635,
       "signature": "isIdentifier(self) -> bool",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-isidentifier",
+      "reference": "/utilities/helpers/stringable#stringable-method-isidentifier",
       "decorators": [],
       "async": false
     },
@@ -2760,7 +2760,7 @@
       "line": 646,
       "signature": "isLower(self) -> bool",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-islower",
+      "reference": "/utilities/helpers/stringable#stringable-method-islower",
       "decorators": [],
       "async": false
     },
@@ -2771,7 +2771,7 @@
       "line": 657,
       "signature": "isNumeric(self) -> bool",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-isnumeric",
+      "reference": "/utilities/helpers/stringable#stringable-method-isnumeric",
       "decorators": [],
       "async": false
     },
@@ -2782,7 +2782,7 @@
       "line": 668,
       "signature": "isPrintable(self) -> bool",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-isprintable",
+      "reference": "/utilities/helpers/stringable#stringable-method-isprintable",
       "decorators": [],
       "async": false
     },
@@ -2793,7 +2793,7 @@
       "line": 679,
       "signature": "isSpace(self) -> bool",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-isspace",
+      "reference": "/utilities/helpers/stringable#stringable-method-isspace",
       "decorators": [],
       "async": false
     },
@@ -2804,7 +2804,7 @@
       "line": 690,
       "signature": "isTitle(self) -> bool",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-istitle",
+      "reference": "/utilities/helpers/stringable#stringable-method-istitle",
       "decorators": [],
       "async": false
     },
@@ -2815,7 +2815,7 @@
       "line": 701,
       "signature": "isUpper(self) -> bool",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-isupper",
+      "reference": "/utilities/helpers/stringable#stringable-method-isupper",
       "decorators": [],
       "async": false
     },
@@ -2826,7 +2826,7 @@
       "line": 712,
       "signature": "lStrip(self, chars: str | None=None) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-lstrip",
+      "reference": "/utilities/helpers/stringable#stringable-method-lstrip",
       "decorators": [],
       "async": false
     },
@@ -2837,7 +2837,7 @@
       "line": 732,
       "signature": "rStrip(self, chars: str | None=None) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-rstrip",
+      "reference": "/utilities/helpers/stringable#stringable-method-rstrip",
       "decorators": [],
       "async": false
     },
@@ -2848,7 +2848,7 @@
       "line": 753,
       "signature": "swapCase(self) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-swapcase",
+      "reference": "/utilities/helpers/stringable#stringable-method-swapcase",
       "decorators": [],
       "async": false
     },
@@ -2859,7 +2859,7 @@
       "line": 772,
       "signature": "zFill(self, width: int) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-zfill",
+      "reference": "/utilities/helpers/stringable#stringable-method-zfill",
       "decorators": [],
       "async": false
     },
@@ -2870,7 +2870,7 @@
       "line": 792,
       "signature": "ascii(self) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-ascii",
+      "reference": "/utilities/helpers/stringable#stringable-method-ascii",
       "decorators": [],
       "async": false
     },
@@ -2881,7 +2881,7 @@
       "line": 808,
       "signature": "camel(self) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-camel",
+      "reference": "/utilities/helpers/stringable#stringable-method-camel",
       "decorators": [],
       "async": false
     },
@@ -2892,7 +2892,7 @@
       "line": 829,
       "signature": "kebab(self) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-kebab",
+      "reference": "/utilities/helpers/stringable#stringable-method-kebab",
       "decorators": [],
       "async": false
     },
@@ -2903,7 +2903,7 @@
       "line": 845,
       "signature": "snake(self, delimiter: str='_') -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-snake",
+      "reference": "/utilities/helpers/stringable#stringable-method-snake",
       "decorators": [],
       "async": false
     },
@@ -2914,7 +2914,7 @@
       "line": 869,
       "signature": "studly(self) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-studly",
+      "reference": "/utilities/helpers/stringable#stringable-method-studly",
       "decorators": [],
       "async": false
     },
@@ -2925,7 +2925,7 @@
       "line": 886,
       "signature": "pascal(self) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-pascal",
+      "reference": "/utilities/helpers/stringable#stringable-method-pascal",
       "decorators": [],
       "async": false
     },
@@ -2936,7 +2936,7 @@
       "line": 898,
       "signature": "slug(self, separator: str='-', dictionary: dict[str, str] | None=None) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-slug",
+      "reference": "/utilities/helpers/stringable#stringable-method-slug",
       "decorators": [],
       "async": false
     },
@@ -2947,7 +2947,7 @@
       "line": 951,
       "signature": "title(self) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-title",
+      "reference": "/utilities/helpers/stringable#stringable-method-title",
       "decorators": [],
       "async": false
     },
@@ -2958,7 +2958,7 @@
       "line": 963,
       "signature": "headline(self) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-headline",
+      "reference": "/utilities/helpers/stringable#stringable-method-headline",
       "decorators": [],
       "async": false
     },
@@ -2969,7 +2969,7 @@
       "line": 981,
       "signature": "apa(self) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-apa",
+      "reference": "/utilities/helpers/stringable#stringable-method-apa",
       "decorators": [],
       "async": false
     },
@@ -2980,7 +2980,7 @@
       "line": 1014,
       "signature": "ucfirst(self) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-ucfirst",
+      "reference": "/utilities/helpers/stringable#stringable-method-ucfirst",
       "decorators": [],
       "async": false
     },
@@ -2991,7 +2991,7 @@
       "line": 1028,
       "signature": "lcfirst(self) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-lcfirst",
+      "reference": "/utilities/helpers/stringable#stringable-method-lcfirst",
       "decorators": [],
       "async": false
     },
@@ -3002,7 +3002,7 @@
       "line": 1042,
       "signature": "isAscii(self) -> bool",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-isascii",
+      "reference": "/utilities/helpers/stringable#stringable-method-isascii",
       "decorators": [],
       "async": false
     },
@@ -3013,7 +3013,7 @@
       "line": 1058,
       "signature": "isJson(self) -> bool",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-isjson",
+      "reference": "/utilities/helpers/stringable#stringable-method-isjson",
       "decorators": [],
       "async": false
     },
@@ -3024,7 +3024,7 @@
       "line": 1074,
       "signature": "isUrl(self, protocols: list[str] | None=None) -> bool",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-isurl",
+      "reference": "/utilities/helpers/stringable#stringable-method-isurl",
       "decorators": [],
       "async": false
     },
@@ -3035,7 +3035,7 @@
       "line": 1105,
       "signature": "isUuid(self, version: int | str | None=None) -> bool",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-isuuid",
+      "reference": "/utilities/helpers/stringable#stringable-method-isuuid",
       "decorators": [],
       "async": false
     },
@@ -3046,7 +3046,7 @@
       "line": 1141,
       "signature": "isUlid(self) -> bool",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-isulid",
+      "reference": "/utilities/helpers/stringable#stringable-method-isulid",
       "decorators": [],
       "async": false
     },
@@ -3057,7 +3057,7 @@
       "line": 1153,
       "signature": "chopStart(self, needle: str | list[str]) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-chopstart",
+      "reference": "/utilities/helpers/stringable#stringable-method-chopstart",
       "decorators": [],
       "async": false
     },
@@ -3068,7 +3068,7 @@
       "line": 1185,
       "signature": "chopEnd(self, needle: str | list[str]) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-chopend",
+      "reference": "/utilities/helpers/stringable#stringable-method-chopend",
       "decorators": [],
       "async": false
     },
@@ -3079,7 +3079,7 @@
       "line": 1212,
       "signature": "deduplicate(self, character: str=' ') -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-deduplicate",
+      "reference": "/utilities/helpers/stringable#stringable-method-deduplicate",
       "decorators": [],
       "async": false
     },
@@ -3090,7 +3090,7 @@
       "line": 1233,
       "signature": "mask(self, character: str, index: int, length: int | None=None) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-mask",
+      "reference": "/utilities/helpers/stringable#stringable-method-mask",
       "decorators": [],
       "async": false
     },
@@ -3101,7 +3101,7 @@
       "line": 1289,
       "signature": "limit(self, limit: int=100, end: str='...', *, preserve_words: bool=False) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-limit",
+      "reference": "/utilities/helpers/stringable#stringable-method-limit",
       "decorators": [],
       "async": false
     },
@@ -3112,7 +3112,7 @@
       "line": 1343,
       "signature": "padBoth(self, length: int, pad: str=' ') -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-padboth",
+      "reference": "/utilities/helpers/stringable#stringable-method-padboth",
       "decorators": [],
       "async": false
     },
@@ -3123,7 +3123,7 @@
       "line": 1384,
       "signature": "padLeft(self, length: int, pad: str=' ') -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-padleft",
+      "reference": "/utilities/helpers/stringable#stringable-method-padleft",
       "decorators": [],
       "async": false
     },
@@ -3134,7 +3134,7 @@
       "line": 1420,
       "signature": "padRight(self, length: int, pad: str=' ') -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-padright",
+      "reference": "/utilities/helpers/stringable#stringable-method-padright",
       "decorators": [],
       "async": false
     },
@@ -3145,7 +3145,7 @@
       "line": 1456,
       "signature": "trim(self, characters: str | None=None) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-trim",
+      "reference": "/utilities/helpers/stringable#stringable-method-trim",
       "decorators": [],
       "async": false
     },
@@ -3156,7 +3156,7 @@
       "line": 1477,
       "signature": "ltrim(self, characters: str | None=None) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-ltrim",
+      "reference": "/utilities/helpers/stringable#stringable-method-ltrim",
       "decorators": [],
       "async": false
     },
@@ -3167,7 +3167,7 @@
       "line": 1498,
       "signature": "rtrim(self, characters: str | None=None) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-rtrim",
+      "reference": "/utilities/helpers/stringable#stringable-method-rtrim",
       "decorators": [],
       "async": false
     },
@@ -3178,7 +3178,7 @@
       "line": 1519,
       "signature": "charAt(self, index: int) -> str | bool",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-charat",
+      "reference": "/utilities/helpers/stringable#stringable-method-charat",
       "decorators": [],
       "async": false
     },
@@ -3189,7 +3189,7 @@
       "line": 1542,
       "signature": "position(self, needle: str, offset: int=0, encoding: str | None=None) -> int | bool",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-position",
+      "reference": "/utilities/helpers/stringable#stringable-method-position",
       "decorators": [],
       "async": false
     },
@@ -3200,7 +3200,7 @@
       "line": 1580,
       "signature": "match(self, pattern: str) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-match",
+      "reference": "/utilities/helpers/stringable#stringable-method-match",
       "decorators": [],
       "async": false
     },
@@ -3211,7 +3211,7 @@
       "line": 1604,
       "signature": "matchAll(self, pattern: str) -> list[str]",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-matchall",
+      "reference": "/utilities/helpers/stringable#stringable-method-matchall",
       "decorators": [],
       "async": false
     },
@@ -3222,7 +3222,7 @@
       "line": 1626,
       "signature": "isMatch(self, pattern: str | list[str]) -> bool",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-ismatch",
+      "reference": "/utilities/helpers/stringable#stringable-method-ismatch",
       "decorators": [],
       "async": false
     },
@@ -3233,7 +3233,7 @@
       "line": 1661,
       "signature": "test(self, pattern: str) -> bool",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-test",
+      "reference": "/utilities/helpers/stringable#stringable-method-test",
       "decorators": [],
       "async": false
     },
@@ -3244,7 +3244,7 @@
       "line": 1678,
       "signature": "numbers(self) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-numbers",
+      "reference": "/utilities/helpers/stringable#stringable-method-numbers",
       "decorators": [],
       "async": false
     },
@@ -3255,7 +3255,7 @@
       "line": 1695,
       "signature": "excerpt(self, phrase: str='', options: dict | None=None) -> str | None",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-excerpt",
+      "reference": "/utilities/helpers/stringable#stringable-method-excerpt",
       "decorators": [],
       "async": false
     },
@@ -3266,7 +3266,7 @@
       "line": 1758,
       "signature": "basename(self, suffix: str='') -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-basename",
+      "reference": "/utilities/helpers/stringable#stringable-method-basename",
       "decorators": [],
       "async": false
     },
@@ -3277,7 +3277,7 @@
       "line": 1776,
       "signature": "dirname(self, levels: int=1) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-dirname",
+      "reference": "/utilities/helpers/stringable#stringable-method-dirname",
       "decorators": [],
       "async": false
     },
@@ -3288,7 +3288,7 @@
       "line": 1796,
       "signature": "between(self, from_str: str, to_str: str) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-between",
+      "reference": "/utilities/helpers/stringable#stringable-method-between",
       "decorators": [],
       "async": false
     },
@@ -3299,7 +3299,7 @@
       "line": 1834,
       "signature": "betweenFirst(self, from_str: str, to_str: str) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-betweenfirst",
+      "reference": "/utilities/helpers/stringable#stringable-method-betweenfirst",
       "decorators": [],
       "async": false
     },
@@ -3310,7 +3310,7 @@
       "line": 1875,
       "signature": "finish(self, cap: str) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-finish",
+      "reference": "/utilities/helpers/stringable#stringable-method-finish",
       "decorators": [],
       "async": false
     },
@@ -3321,7 +3321,7 @@
       "line": 1904,
       "signature": "start(self, prefix: str) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-start",
+      "reference": "/utilities/helpers/stringable#stringable-method-start",
       "decorators": [],
       "async": false
     },
@@ -3332,7 +3332,7 @@
       "line": 1933,
       "signature": "explode(self, delimiter: str, limit: int=-1) -> list[str]",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-explode",
+      "reference": "/utilities/helpers/stringable#stringable-method-explode",
       "decorators": [],
       "async": false
     },
@@ -3343,7 +3343,7 @@
       "line": 1964,
       "signature": "split(self, pattern: str | int, limit: int=-1, flags: int=0) -> list[str]",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-split",
+      "reference": "/utilities/helpers/stringable#stringable-method-split",
       "decorators": [],
       "async": false
     },
@@ -3354,7 +3354,7 @@
       "line": 2012,
       "signature": "ucsplit(self) -> list[str]",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-ucsplit",
+      "reference": "/utilities/helpers/stringable#stringable-method-ucsplit",
       "decorators": [],
       "async": false
     },
@@ -3365,7 +3365,7 @@
       "line": 2031,
       "signature": "squish(self) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-squish",
+      "reference": "/utilities/helpers/stringable#stringable-method-squish",
       "decorators": [],
       "async": false
     },
@@ -3376,7 +3376,7 @@
       "line": 2046,
       "signature": "words(self, words: int=100, end: str='...') -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-words",
+      "reference": "/utilities/helpers/stringable#stringable-method-words",
       "decorators": [],
       "async": false
     },
@@ -3387,7 +3387,7 @@
       "line": 2080,
       "signature": "wordCount(self, characters: str | None=None) -> int",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-wordcount",
+      "reference": "/utilities/helpers/stringable#stringable-method-wordcount",
       "decorators": [],
       "async": false
     },
@@ -3398,7 +3398,7 @@
       "line": 2116,
       "signature": "wordWrap(self, characters: int=75, break_str: str='\\n', *, cut_long_words: bool=False) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-wordwrap",
+      "reference": "/utilities/helpers/stringable#stringable-method-wordwrap",
       "decorators": [],
       "async": false
     },
@@ -3409,7 +3409,7 @@
       "line": 2161,
       "signature": "wrap(self, before: str, after: str | None=None) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-wrap",
+      "reference": "/utilities/helpers/stringable#stringable-method-wrap",
       "decorators": [],
       "async": false
     },
@@ -3420,7 +3420,7 @@
       "line": 2194,
       "signature": "unwrap(self, before: str, after: str | None=None) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-unwrap",
+      "reference": "/utilities/helpers/stringable#stringable-method-unwrap",
       "decorators": [],
       "async": false
     },
@@ -3431,7 +3431,7 @@
       "line": 2234,
       "signature": "replaceArray(self, search: str, replace: list[str]) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-replacearray",
+      "reference": "/utilities/helpers/stringable#stringable-method-replacearray",
       "decorators": [],
       "async": false
     },
@@ -3442,7 +3442,7 @@
       "line": 2277,
       "signature": "replaceFirst(self, search: str, replace: str) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-replacefirst",
+      "reference": "/utilities/helpers/stringable#stringable-method-replacefirst",
       "decorators": [],
       "async": false
     },
@@ -3453,7 +3453,7 @@
       "line": 2301,
       "signature": "replaceLast(self, search: str, replace: str) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-replacelast",
+      "reference": "/utilities/helpers/stringable#stringable-method-replacelast",
       "decorators": [],
       "async": false
     },
@@ -3464,7 +3464,7 @@
       "line": 2335,
       "signature": "replaceStart(self, search: str, replace: str) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-replacestart",
+      "reference": "/utilities/helpers/stringable#stringable-method-replacestart",
       "decorators": [],
       "async": false
     },
@@ -3475,7 +3475,7 @@
       "line": 2366,
       "signature": "replaceEnd(self, search: str, replace: str) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-replaceend",
+      "reference": "/utilities/helpers/stringable#stringable-method-replaceend",
       "decorators": [],
       "async": false
     },
@@ -3486,7 +3486,7 @@
       "line": 2398,
       "signature": "replaceMatches(self, pattern: str | list[str], replace: str | Callable, limit: int=-1) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-replacematches",
+      "reference": "/utilities/helpers/stringable#stringable-method-replacematches",
       "decorators": [],
       "async": false
     },
@@ -3497,7 +3497,7 @@
       "line": 2457,
       "signature": "remove(self, search: str | list[str], *, case_sensitive: bool=True) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-remove",
+      "reference": "/utilities/helpers/stringable#stringable-method-remove",
       "decorators": [],
       "async": false
     },
@@ -3508,7 +3508,7 @@
       "line": 2504,
       "signature": "plural(self, count: int | list | Any=2, *, prepend_count: bool=False) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-plural",
+      "reference": "/utilities/helpers/stringable#stringable-method-plural",
       "decorators": [],
       "async": false
     },
@@ -3519,7 +3519,7 @@
       "line": 2571,
       "signature": "pluralStudly(self, count: int | list | Any=2) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-pluralstudly",
+      "reference": "/utilities/helpers/stringable#stringable-method-pluralstudly",
       "decorators": [],
       "async": false
     },
@@ -3530,7 +3530,7 @@
       "line": 2598,
       "signature": "pluralPascal(self, count: int | list | Any=2) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-pluralpascal",
+      "reference": "/utilities/helpers/stringable#stringable-method-pluralpascal",
       "decorators": [],
       "async": false
     },
@@ -3541,7 +3541,7 @@
       "line": 2637,
       "signature": "singular(self) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-singular",
+      "reference": "/utilities/helpers/stringable#stringable-method-singular",
       "decorators": [],
       "async": false
     },
@@ -3552,7 +3552,7 @@
       "line": 2667,
       "signature": "parseCallback(self, default: str | None=None) -> list[str | None]",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-parsecallback",
+      "reference": "/utilities/helpers/stringable#stringable-method-parsecallback",
       "decorators": [],
       "async": false
     },
@@ -3563,7 +3563,7 @@
       "line": 2695,
       "signature": "when(self, condition: bool | Callable, callback: Callable, default: Callable | None=None) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-when",
+      "reference": "/utilities/helpers/stringable#stringable-method-when",
       "decorators": [],
       "async": false
     },
@@ -3574,7 +3574,7 @@
       "line": 2749,
       "signature": "whenContains(self, needles: str | list[str], callback: Callable, default: Callable | None=None) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-whencontains",
+      "reference": "/utilities/helpers/stringable#stringable-method-whencontains",
       "decorators": [],
       "async": false
     },
@@ -3585,7 +3585,7 @@
       "line": 2775,
       "signature": "whenContainsAll(self, needles: list[str], callback: Callable, default: Callable | None=None) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-whencontainsall",
+      "reference": "/utilities/helpers/stringable#stringable-method-whencontainsall",
       "decorators": [],
       "async": false
     },
@@ -3596,7 +3596,7 @@
       "line": 2802,
       "signature": "whenEmpty(self, callback: Callable, default: Callable | None=None) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-whenempty",
+      "reference": "/utilities/helpers/stringable#stringable-method-whenempty",
       "decorators": [],
       "async": false
     },
@@ -3607,7 +3607,7 @@
       "line": 2825,
       "signature": "whenNotEmpty(self, callback: Callable, default: Callable | None=None) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-whennotempty",
+      "reference": "/utilities/helpers/stringable#stringable-method-whennotempty",
       "decorators": [],
       "async": false
     },
@@ -3618,7 +3618,7 @@
       "line": 2848,
       "signature": "whenEndsWith(self, needles: str | list[str], callback: Callable, default: Callable | None=None) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-whenendswith",
+      "reference": "/utilities/helpers/stringable#stringable-method-whenendswith",
       "decorators": [],
       "async": false
     },
@@ -3629,7 +3629,7 @@
       "line": 2874,
       "signature": "whenDoesntEndWith(self, needles: str | list[str], callback: Callable, default: Callable | None=None) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-whendoesntendwith",
+      "reference": "/utilities/helpers/stringable#stringable-method-whendoesntendwith",
       "decorators": [],
       "async": false
     },
@@ -3640,7 +3640,7 @@
       "line": 2901,
       "signature": "whenExactly(self, value: str, callback: Callable, default: Callable | None=None) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-whenexactly",
+      "reference": "/utilities/helpers/stringable#stringable-method-whenexactly",
       "decorators": [],
       "async": false
     },
@@ -3651,7 +3651,7 @@
       "line": 2927,
       "signature": "whenNotExactly(self, value: str, callback: Callable, default: Callable | None=None) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-whennotexactly",
+      "reference": "/utilities/helpers/stringable#stringable-method-whennotexactly",
       "decorators": [],
       "async": false
     },
@@ -3662,7 +3662,7 @@
       "line": 2953,
       "signature": "whenStartsWith(self, needles: str | list[str], callback: Callable, default: Callable | None=None) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-whenstartswith",
+      "reference": "/utilities/helpers/stringable#stringable-method-whenstartswith",
       "decorators": [],
       "async": false
     },
@@ -3673,7 +3673,7 @@
       "line": 2990,
       "signature": "whenDoesntStartWith(self, needles: str | list[str], callback: Callable, default: Callable | None=None) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-whendoesntstartwith",
+      "reference": "/utilities/helpers/stringable#stringable-method-whendoesntstartwith",
       "decorators": [],
       "async": false
     },
@@ -3684,7 +3684,7 @@
       "line": 3027,
       "signature": "whenTest(self, pattern: str, callback: Callable, default: Callable | None=None) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-whentest",
+      "reference": "/utilities/helpers/stringable#stringable-method-whentest",
       "decorators": [],
       "async": false
     },
@@ -3695,7 +3695,7 @@
       "line": 3053,
       "signature": "convertCase(self, mode: int | None=None) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-convertcase",
+      "reference": "/utilities/helpers/stringable#stringable-method-convertcase",
       "decorators": [],
       "async": false
     },
@@ -3706,7 +3706,7 @@
       "line": 3096,
       "signature": "transliterate(self, unknown: str='?', *, strict: bool=False) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-transliterate",
+      "reference": "/utilities/helpers/stringable#stringable-method-transliterate",
       "decorators": [],
       "async": false
     },
@@ -3717,7 +3717,7 @@
       "line": 3145,
       "signature": "hash(self, algorithm: str) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-hash",
+      "reference": "/utilities/helpers/stringable#stringable-method-hash",
       "decorators": [],
       "async": false
     },
@@ -3728,7 +3728,7 @@
       "line": 3174,
       "signature": "pipe(self, callback: Callable) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-pipe",
+      "reference": "/utilities/helpers/stringable#stringable-method-pipe",
       "decorators": [],
       "async": false
     },
@@ -3739,7 +3739,7 @@
       "line": 3206,
       "signature": "take(self, limit: int) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-take",
+      "reference": "/utilities/helpers/stringable#stringable-method-take",
       "decorators": [],
       "async": false
     },
@@ -3750,7 +3750,7 @@
       "line": 3232,
       "signature": "swap(self, map_dict: dict[str, str]) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-swap",
+      "reference": "/utilities/helpers/stringable#stringable-method-swap",
       "decorators": [],
       "async": false
     },
@@ -3761,7 +3761,7 @@
       "line": 3270,
       "signature": "substrCount(self, needle: str, offset: int=0, length: int | None=None) -> int",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-substrcount",
+      "reference": "/utilities/helpers/stringable#stringable-method-substrcount",
       "decorators": [],
       "async": false
     },
@@ -3772,7 +3772,7 @@
       "line": 3324,
       "signature": "substrReplace(self, replace: str | list[str], offset: int | list[int]=0, length: int | list[int] | None=None) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-substrreplace",
+      "reference": "/utilities/helpers/stringable#stringable-method-substrreplace",
       "decorators": [],
       "async": false
     },
@@ -3783,7 +3783,7 @@
       "line": 3484,
       "signature": "scan(self, format_str: str) -> list[str]",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-scan",
+      "reference": "/utilities/helpers/stringable#stringable-method-scan",
       "decorators": [],
       "async": false
     },
@@ -3794,7 +3794,7 @@
       "line": 3520,
       "signature": "prepend(self, *values: str) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-prepend",
+      "reference": "/utilities/helpers/stringable#stringable-method-prepend",
       "decorators": [],
       "async": false
     },
@@ -3805,7 +3805,7 @@
       "line": 3548,
       "signature": "substr(self, start: int, length: int | None=None) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-substr",
+      "reference": "/utilities/helpers/stringable#stringable-method-substr",
       "decorators": [],
       "async": false
     },
@@ -3816,7 +3816,7 @@
       "line": 3586,
       "signature": "doesntContain(self, needles: str | list[str], *, ignore_case: bool=False) -> bool",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-doesntcontain",
+      "reference": "/utilities/helpers/stringable#stringable-method-doesntcontain",
       "decorators": [],
       "async": false
     },
@@ -3827,7 +3827,7 @@
       "line": 3637,
       "signature": "doesntStartWith(self, needles: str | list[str]) -> bool",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-doesntstartwith",
+      "reference": "/utilities/helpers/stringable#stringable-method-doesntstartwith",
       "decorators": [],
       "async": false
     },
@@ -3838,7 +3838,7 @@
       "line": 3674,
       "signature": "doesntEndWith(self, needles: str | list[str]) -> bool",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-doesntendwith",
+      "reference": "/utilities/helpers/stringable#stringable-method-doesntendwith",
       "decorators": [],
       "async": false
     },
@@ -3849,7 +3849,7 @@
       "line": 3711,
       "signature": "startsWith(self, needles: str | list[str]) -> bool",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-startswith",
+      "reference": "/utilities/helpers/stringable#stringable-method-startswith",
       "decorators": [],
       "async": false
     },
@@ -3860,7 +3860,7 @@
       "line": 3744,
       "signature": "jsonSerialize(self) -> str",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-jsonserialize",
+      "reference": "/utilities/helpers/stringable#stringable-method-jsonserialize",
       "decorators": [],
       "async": false
     },
@@ -3871,7 +3871,7 @@
       "line": 3758,
       "signature": "offsetExists(self, offset: int) -> bool",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-offsetexists",
+      "reference": "/utilities/helpers/stringable#stringable-method-offsetexists",
       "decorators": [],
       "async": false
     },
@@ -3882,7 +3882,7 @@
       "line": 3781,
       "signature": "offsetGet(self, offset: int) -> str",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-offsetget",
+      "reference": "/utilities/helpers/stringable#stringable-method-offsetget",
       "decorators": [],
       "async": false
     },
@@ -3893,7 +3893,7 @@
       "line": 3810,
       "signature": "isPattern(self, pattern: str | list[str], *, ignore_case: bool=False) -> bool",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-ispattern",
+      "reference": "/utilities/helpers/stringable#stringable-method-ispattern",
       "decorators": [],
       "async": false
     },
@@ -3904,7 +3904,7 @@
       "line": 3879,
       "signature": "containsAll(self, needles: list[str], *, ignore_case: bool=False) -> bool",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-containsall",
+      "reference": "/utilities/helpers/stringable#stringable-method-containsall",
       "decorators": [],
       "async": false
     },
@@ -3915,7 +3915,7 @@
       "line": 3933,
       "signature": "whenIs(self, pattern: str | list[str], callback: Callable, default: Callable | None=None) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-whenis",
+      "reference": "/utilities/helpers/stringable#stringable-method-whenis",
       "decorators": [],
       "async": false
     },
@@ -3926,7 +3926,7 @@
       "line": 3959,
       "signature": "whenIsAscii(self, callback: Callable, default: Callable | None=None) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-whenisascii",
+      "reference": "/utilities/helpers/stringable#stringable-method-whenisascii",
       "decorators": [],
       "async": false
     },
@@ -3937,7 +3937,7 @@
       "line": 3982,
       "signature": "whenIsUuid(self, callback: Callable, default: Callable | None=None) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-whenisuuid",
+      "reference": "/utilities/helpers/stringable#stringable-method-whenisuuid",
       "decorators": [],
       "async": false
     },
@@ -3948,7 +3948,7 @@
       "line": 4005,
       "signature": "whenIsUlid(self, callback: Callable, default: Callable | None=None) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-whenisulid",
+      "reference": "/utilities/helpers/stringable#stringable-method-whenisulid",
       "decorators": [],
       "async": false
     },
@@ -3959,7 +3959,7 @@
       "line": 4028,
       "signature": "toDate(self, format_str: str | None='%Y-%m-%d') -> datetime | None",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-todate",
+      "reference": "/utilities/helpers/stringable#stringable-method-todate",
       "decorators": [],
       "async": false
     },
@@ -3970,7 +3970,7 @@
       "line": 4056,
       "signature": "encrypt(self) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-encrypt",
+      "reference": "/utilities/helpers/stringable#stringable-method-encrypt",
       "decorators": [],
       "async": false
     },
@@ -3981,7 +3981,7 @@
       "line": 4072,
       "signature": "decrypt(self) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-decrypt",
+      "reference": "/utilities/helpers/stringable#stringable-method-decrypt",
       "decorators": [],
       "async": false
     },
@@ -3992,7 +3992,7 @@
       "line": 4088,
       "signature": "toHtmlString(self) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-tohtmlstring",
+      "reference": "/utilities/helpers/stringable#stringable-method-tohtmlstring",
       "decorators": [],
       "async": false
     },
@@ -4003,7 +4003,7 @@
       "line": 4102,
       "signature": "tap(self, callback: Callable[[Stringable], Any]) -> Stringable",
       "pageId": "helper-stringable",
-      "reference": "/advanced/data-utilities/stringable#stringable-method-tap",
+      "reference": "/utilities/helpers/stringable#stringable-method-tap",
       "decorators": [],
       "async": false
     },
@@ -4014,7 +4014,7 @@
       "line": 6,
       "signature": "class DotDict(dict)",
       "pageId": "helper-dot-dict",
-      "reference": "/advanced/data-utilities/dot-dict"
+      "reference": "/utilities/helpers/dot-dict"
     },
     {
       "source": "orionis/support/types/dot_dict.py",
@@ -4023,7 +4023,7 @@
       "line": 10,
       "signature": "__getattr__(self, key: str) -> object | None",
       "pageId": "helper-dot-dict",
-      "reference": "/advanced/data-utilities/dot-dict#dotdict-method-getattr",
+      "reference": "/utilities/helpers/dot-dict#dotdict-method-getattr",
       "decorators": [],
       "async": false
     },
@@ -4034,7 +4034,7 @@
       "line": 38,
       "signature": "__setattr__(self, key: str, value: object) -> None",
       "pageId": "helper-dot-dict",
-      "reference": "/advanced/data-utilities/dot-dict#dotdict-method-setattr",
+      "reference": "/utilities/helpers/dot-dict#dotdict-method-setattr",
       "decorators": [],
       "async": false
     },
@@ -4045,7 +4045,7 @@
       "line": 63,
       "signature": "__delattr__(self, key: str) -> None",
       "pageId": "helper-dot-dict",
-      "reference": "/advanced/data-utilities/dot-dict#dotdict-method-delattr",
+      "reference": "/utilities/helpers/dot-dict#dotdict-method-delattr",
       "decorators": [],
       "async": false
     },
@@ -4056,7 +4056,7 @@
       "line": 94,
       "signature": "get(self, key: str, default: object | None=None) -> object | None",
       "pageId": "helper-dot-dict",
-      "reference": "/advanced/data-utilities/dot-dict#dotdict-method-get",
+      "reference": "/utilities/helpers/dot-dict#dotdict-method-get",
       "decorators": [],
       "async": false
     },
@@ -4067,7 +4067,7 @@
       "line": 117,
       "signature": "export(self) -> dict[str, Any]",
       "pageId": "helper-dot-dict",
-      "reference": "/advanced/data-utilities/dot-dict#dotdict-method-export",
+      "reference": "/utilities/helpers/dot-dict#dotdict-method-export",
       "decorators": [],
       "async": false
     },
@@ -4078,7 +4078,7 @@
       "line": 137,
       "signature": "copy(self) -> DotDict",
       "pageId": "helper-dot-dict",
-      "reference": "/advanced/data-utilities/dot-dict#dotdict-method-copy",
+      "reference": "/utilities/helpers/dot-dict#dotdict-method-copy",
       "decorators": [],
       "async": false
     },
@@ -4089,7 +4089,7 @@
       "line": 5,
       "signature": "class StdClass(IStdClass)",
       "pageId": "helper-std-class",
-      "reference": "/advanced/data-utilities/std-class"
+      "reference": "/utilities/helpers/std-class"
     },
     {
       "source": "orionis/support/types/std.py",
@@ -4098,7 +4098,7 @@
       "line": 10,
       "signature": "__init_subclass__(cls, **kwargs: object) -> None",
       "pageId": "helper-std-class",
-      "reference": "/advanced/data-utilities/std-class#stdclass-method-init-subclass",
+      "reference": "/utilities/helpers/std-class#stdclass-method-init-subclass",
       "decorators": [
         "classmethod"
       ],
@@ -4111,7 +4111,7 @@
       "line": 29,
       "signature": "__hash__(self) -> int",
       "pageId": "helper-std-class",
-      "reference": "/advanced/data-utilities/std-class#stdclass-method-hash",
+      "reference": "/utilities/helpers/std-class#stdclass-method-hash",
       "decorators": [],
       "async": false
     },
@@ -4122,7 +4122,7 @@
       "line": 44,
       "signature": "__init__(self, **kwargs: object) -> None",
       "pageId": "helper-std-class",
-      "reference": "/advanced/data-utilities/std-class#stdclass-method-init",
+      "reference": "/utilities/helpers/std-class#stdclass-method-init",
       "decorators": [],
       "async": false
     },
@@ -4133,7 +4133,7 @@
       "line": 62,
       "signature": "__repr__(self) -> str",
       "pageId": "helper-std-class",
-      "reference": "/advanced/data-utilities/std-class#stdclass-method-repr",
+      "reference": "/utilities/helpers/std-class#stdclass-method-repr",
       "decorators": [],
       "async": false
     },
@@ -4144,7 +4144,7 @@
       "line": 74,
       "signature": "__str__(self) -> str",
       "pageId": "helper-std-class",
-      "reference": "/advanced/data-utilities/std-class#stdclass-method-str",
+      "reference": "/utilities/helpers/std-class#stdclass-method-str",
       "decorators": [],
       "async": false
     },
@@ -4155,7 +4155,7 @@
       "line": 86,
       "signature": "__eq__(self, other: object) -> bool",
       "pageId": "helper-std-class",
-      "reference": "/advanced/data-utilities/std-class#stdclass-method-eq",
+      "reference": "/utilities/helpers/std-class#stdclass-method-eq",
       "decorators": [],
       "async": false
     },
@@ -4166,7 +4166,7 @@
       "line": 105,
       "signature": "toDict(self) -> dict",
       "pageId": "helper-std-class",
-      "reference": "/advanced/data-utilities/std-class#stdclass-method-todict",
+      "reference": "/utilities/helpers/std-class#stdclass-method-todict",
       "decorators": [],
       "async": false
     },
@@ -4177,7 +4177,7 @@
       "line": 117,
       "signature": "update(self, **kwargs: object) -> None",
       "pageId": "helper-std-class",
-      "reference": "/advanced/data-utilities/std-class#stdclass-method-update",
+      "reference": "/utilities/helpers/std-class#stdclass-method-update",
       "decorators": [],
       "async": false
     },
@@ -4188,7 +4188,7 @@
       "line": 152,
       "signature": "remove(self, *attributes: str) -> None",
       "pageId": "helper-std-class",
-      "reference": "/advanced/data-utilities/std-class#stdclass-method-remove",
+      "reference": "/utilities/helpers/std-class#stdclass-method-remove",
       "decorators": [],
       "async": false
     },
@@ -4199,7 +4199,7 @@
       "line": 181,
       "signature": "fromDict(cls, dictionary: dict) -> StdClass",
       "pageId": "helper-std-class",
-      "reference": "/advanced/data-utilities/std-class#stdclass-method-fromdict",
+      "reference": "/utilities/helpers/std-class#stdclass-method-fromdict",
       "decorators": [
         "classmethod"
       ],
@@ -4212,7 +4212,7 @@
       "line": 7,
       "signature": "RESERVED: frozenset",
       "pageId": "helper-std-class",
-      "reference": "/advanced/data-utilities/std-class#stdclass-property-reserved"
+      "reference": "/utilities/helpers/std-class#stdclass-property-reserved"
     },
     {
       "source": "orionis/support/types/sentinel.py",
@@ -4221,7 +4221,7 @@
       "line": 1,
       "signature": "class _MISSING_TYPE",
       "pageId": "helper-sentinel",
-      "reference": "/advanced/data-utilities/sentinel"
+      "reference": "/utilities/helpers/sentinel"
     },
     {
       "source": "orionis/support/types/sentinel.py",
@@ -4230,7 +4230,7 @@
       "line": 5,
       "signature": "__repr__(self) -> str",
       "pageId": "helper-sentinel",
-      "reference": "/advanced/data-utilities/sentinel#sentinel-method-repr",
+      "reference": "/utilities/helpers/sentinel#sentinel-method-repr",
       "decorators": [],
       "async": false
     },
@@ -4241,7 +4241,7 @@
       "line": 16,
       "signature": "__bool__(self) -> bool",
       "pageId": "helper-sentinel",
-      "reference": "/advanced/data-utilities/sentinel#sentinel-method-bool",
+      "reference": "/utilities/helpers/sentinel#sentinel-method-bool",
       "decorators": [],
       "async": false
     },
@@ -4252,7 +4252,7 @@
       "line": 28,
       "signature": "MISSING = _MISSING_TYPE()",
       "pageId": "helper-sentinel",
-      "reference": "/advanced/data-utilities/sentinel#sentinel-protocol-identity"
+      "reference": "/utilities/helpers/sentinel#sentinel-protocol-identity"
     },
     {
       "source": "orionis/support/system/workers.py",
@@ -4261,7 +4261,7 @@
       "line": 27,
       "signature": "class Workers(IWorkers)",
       "pageId": "helper-workers",
-      "reference": "/advanced/data-utilities/workers"
+      "reference": "/utilities/helpers/workers"
     },
     {
       "source": "orionis/support/system/workers.py",
@@ -4270,7 +4270,7 @@
       "line": 35,
       "signature": "setRamPerWorker(cls, ram_per_worker: float) -> None",
       "pageId": "helper-workers",
-      "reference": "/advanced/data-utilities/workers#workers-method-setramperworker",
+      "reference": "/utilities/helpers/workers#workers-method-setramperworker",
       "decorators": [
         "classmethod"
       ],
@@ -4283,7 +4283,7 @@
       "line": 69,
       "signature": "calculate(cls) -> int",
       "pageId": "helper-workers",
-      "reference": "/advanced/data-utilities/workers#workers-method-calculate",
+      "reference": "/utilities/helpers/workers#workers-method-calculate",
       "decorators": [
         "classmethod"
       ],
@@ -4296,7 +4296,7 @@
       "line": 10,
       "signature": "class FreezeThaw",
       "pageId": "helper-freeze-thaw",
-      "reference": "/advanced/data-utilities/freeze-thaw"
+      "reference": "/utilities/helpers/freeze-thaw"
     },
     {
       "source": "orionis/support/structures/freezer.py",
@@ -4305,7 +4305,7 @@
       "line": 33,
       "signature": "thaw(obj: object) -> object",
       "pageId": "helper-freeze-thaw",
-      "reference": "/advanced/data-utilities/freeze-thaw#freezethaw-method-thaw",
+      "reference": "/utilities/helpers/freeze-thaw#freezethaw-method-thaw",
       "decorators": [
         "staticmethod"
       ],
@@ -4318,7 +4318,7 @@
       "line": 100,
       "signature": "freeze(obj: object) -> object",
       "pageId": "helper-freeze-thaw",
-      "reference": "/advanced/data-utilities/freeze-thaw#freezethaw-method-freeze",
+      "reference": "/utilities/helpers/freeze-thaw#freezethaw-method-freeze",
       "decorators": [
         "staticmethod"
       ],
@@ -4331,7 +4331,7 @@
       "line": 14,
       "signature": "class PerformanceCounter(IPerformanceCounter)",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter"
+      "reference": "/utilities/helpers/performance-counter"
     },
     {
       "source": "orionis/support/performance/counter.py",
@@ -4340,7 +4340,7 @@
       "line": 21,
       "signature": "__init__(self) -> None",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-init",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-init",
       "decorators": [],
       "async": false
     },
@@ -4351,7 +4351,7 @@
       "line": 37,
       "signature": "start(self) -> PerformanceCounter",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-start",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-start",
       "decorators": [],
       "async": false
     },
@@ -4362,7 +4362,7 @@
       "line": 54,
       "signature": "async astart(self) -> PerformanceCounter",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-astart",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-astart",
       "decorators": [],
       "async": true
     },
@@ -4373,7 +4373,7 @@
       "line": 71,
       "signature": "stop(self) -> PerformanceCounter",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-stop",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-stop",
       "decorators": [],
       "async": false
     },
@@ -4384,7 +4384,7 @@
       "line": 100,
       "signature": "async astop(self) -> PerformanceCounter",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-astop",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-astop",
       "decorators": [],
       "async": true
     },
@@ -4395,7 +4395,7 @@
       "line": 127,
       "signature": "elapsedTime(self) -> float",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-elapsedtime",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-elapsedtime",
       "decorators": [],
       "async": false
     },
@@ -4406,7 +4406,7 @@
       "line": 147,
       "signature": "async aelapsedTime(self) -> float",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-aelapsedtime",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-aelapsedtime",
       "decorators": [],
       "async": true
     },
@@ -4417,7 +4417,7 @@
       "line": 167,
       "signature": "getMicroseconds(self) -> float",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-getmicroseconds",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-getmicroseconds",
       "decorators": [],
       "async": false
     },
@@ -4428,7 +4428,7 @@
       "line": 184,
       "signature": "async agetMicroseconds(self) -> float",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-agetmicroseconds",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-agetmicroseconds",
       "decorators": [],
       "async": true
     },
@@ -4439,7 +4439,7 @@
       "line": 199,
       "signature": "getMilliseconds(self) -> float",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-getmilliseconds",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-getmilliseconds",
       "decorators": [],
       "async": false
     },
@@ -4450,7 +4450,7 @@
       "line": 216,
       "signature": "async agetMilliseconds(self) -> float",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-agetmilliseconds",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-agetmilliseconds",
       "decorators": [],
       "async": true
     },
@@ -4461,7 +4461,7 @@
       "line": 231,
       "signature": "getSeconds(self) -> float",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-getseconds",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-getseconds",
       "decorators": [],
       "async": false
     },
@@ -4472,7 +4472,7 @@
       "line": 246,
       "signature": "async agetSeconds(self) -> float",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-agetseconds",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-agetseconds",
       "decorators": [],
       "async": true
     },
@@ -4483,7 +4483,7 @@
       "line": 261,
       "signature": "getMinutes(self) -> float",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-getminutes",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-getminutes",
       "decorators": [],
       "async": false
     },
@@ -4494,7 +4494,7 @@
       "line": 276,
       "signature": "async agetMinutes(self) -> float",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-agetminutes",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-agetminutes",
       "decorators": [],
       "async": true
     },
@@ -4505,7 +4505,7 @@
       "line": 291,
       "signature": "restart(self) -> PerformanceCounter",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-restart",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-restart",
       "decorators": [],
       "async": false
     },
@@ -4516,7 +4516,7 @@
       "line": 309,
       "signature": "async arestart(self) -> PerformanceCounter",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-arestart",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-arestart",
       "decorators": [],
       "async": true
     },
@@ -4527,7 +4527,7 @@
       "line": 327,
       "signature": "__enter__(self) -> Self",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-enter",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-enter",
       "decorators": [],
       "async": false
     },
@@ -4538,7 +4538,7 @@
       "line": 339,
       "signature": "__exit__(self, exc_type: type[BaseException] | None, exc_val: BaseException | None, exc_tb: TracebackType | None) -> None",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-exit",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-exit",
       "decorators": [],
       "async": false
     },
@@ -4549,7 +4549,7 @@
       "line": 365,
       "signature": "async __aenter__(self) -> Self",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-aenter",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-aenter",
       "decorators": [],
       "async": true
     },
@@ -4560,7 +4560,7 @@
       "line": 377,
       "signature": "async __aexit__(self, exc_type: type[BaseException] | None, exc_val: BaseException | None, exc_tb: TracebackType | None) -> None",
       "pageId": "helper-performance-counter",
-      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-aexit",
+      "reference": "/utilities/helpers/performance-counter#performancecounter-method-aexit",
       "decorators": [],
       "async": true
     },
@@ -4571,7 +4571,7 @@
       "line": 2,
       "signature": "AUTHOR = 'Raul Mauricio Uñate Castro'",
       "pageId": "metadata-overview",
-      "reference": "/advanced/framework-metadata#metadata-constant-author",
+      "reference": "/utilities/metadata#metadata-constant-author",
       "value": "Raul Mauricio Uñate Castro",
       "valueType": "str"
     },
@@ -4582,7 +4582,7 @@
       "line": 5,
       "signature": "AUTHOR_EMAIL = 'raulmauriciounate@gmail.com'",
       "pageId": "metadata-overview",
-      "reference": "/advanced/framework-metadata#metadata-constant-author-email",
+      "reference": "/utilities/metadata#metadata-constant-author-email",
       "value": "raulmauriciounate@gmail.com",
       "valueType": "str"
     },
@@ -4593,7 +4593,7 @@
       "line": 8,
       "signature": "API = 'https://pypi.org/pypi/orionis/json'",
       "pageId": "metadata-overview",
-      "reference": "/advanced/framework-metadata#metadata-constant-api",
+      "reference": "/utilities/metadata#metadata-constant-api",
       "value": "https://pypi.org/pypi/orionis/json",
       "valueType": "str"
     },
@@ -4604,7 +4604,7 @@
       "line": 11,
       "signature": "DESCRIPTION = 'Orionis Framework — Async-first full-stack framework for modern Python applications.'",
       "pageId": "metadata-overview",
-      "reference": "/advanced/framework-metadata#metadata-constant-description",
+      "reference": "/utilities/metadata#metadata-constant-description",
       "value": "Orionis Framework — Async-first full-stack framework for modern Python applications.",
       "valueType": "str"
     },
@@ -4615,7 +4615,7 @@
       "line": 17,
       "signature": "DOCS = 'https://orionis-framework.com/'",
       "pageId": "metadata-overview",
-      "reference": "/advanced/framework-metadata#metadata-constant-docs",
+      "reference": "/utilities/metadata#metadata-constant-docs",
       "value": "https://orionis-framework.com/",
       "valueType": "str"
     },
@@ -4626,7 +4626,7 @@
       "line": 20,
       "signature": "FRAMEWORK = 'https://github.com/orionis-framework/framework'",
       "pageId": "metadata-overview",
-      "reference": "/advanced/framework-metadata#metadata-constant-framework",
+      "reference": "/utilities/metadata#metadata-constant-framework",
       "value": "https://github.com/orionis-framework/framework",
       "valueType": "str"
     },
@@ -4637,7 +4637,7 @@
       "line": 23,
       "signature": "NAME = 'orionis'",
       "pageId": "metadata-overview",
-      "reference": "/advanced/framework-metadata#metadata-constant-name",
+      "reference": "/utilities/metadata#metadata-constant-name",
       "value": "orionis",
       "valueType": "str"
     },
@@ -4648,7 +4648,7 @@
       "line": 26,
       "signature": "PYTHON_REQUIRES = (3, 14)",
       "pageId": "metadata-overview",
-      "reference": "/advanced/framework-metadata#metadata-constant-python-requires",
+      "reference": "/utilities/metadata#metadata-constant-python-requires",
       "value": [
         3,
         14
@@ -4662,7 +4662,7 @@
       "line": 29,
       "signature": "SKELETON = 'https://github.com/orionis-framework/skeleton'",
       "pageId": "metadata-overview",
-      "reference": "/advanced/framework-metadata#metadata-constant-skeleton",
+      "reference": "/utilities/metadata#metadata-constant-skeleton",
       "value": "https://github.com/orionis-framework/skeleton",
       "valueType": "str"
     },
@@ -4673,7 +4673,7 @@
       "line": 32,
       "signature": "VERSION = '1.0.7'",
       "pageId": "metadata-overview",
-      "reference": "/advanced/framework-metadata#metadata-constant-version",
+      "reference": "/utilities/metadata#metadata-constant-version",
       "value": "1.0.7",
       "valueType": "str"
     }

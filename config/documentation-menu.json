@@ -49,8 +49,8 @@
         "es": "Primer arranque"
       },
       "slug": {
-        "es": "/es/getting-started/getting-started",
-        "en": "/en/getting-started/getting-started"
+        "es": "/es/getting-started/quick-start",
+        "en": "/en/getting-started/quick-start"
       }
     },
     {
@@ -70,258 +70,6 @@
       }
     },
     {
-      "id": "foundation-application-lifecycle",
-      "kind": "doc",
-      "title": {
-        "es": "Ciclo de vida y recursos de aplicación",
-        "en": "Application lifecycle and resource ownership"
-      },
-      "label": {
-        "en": "Application lifecycle",
-        "es": "Ciclo de vida"
-      },
-      "slug": {
-        "es": "/es/getting-started/application-lifecycle",
-        "en": "/en/getting-started/application-lifecycle"
-      }
-    },
-    {
-      "id": "foundation-configuration",
-      "kind": "doc",
-      "title": {
-        "es": "Configuración tipada y valores en ejecución",
-        "en": "Typed configuration and runtime values"
-      },
-      "label": {
-        "en": "Application configuration",
-        "es": "Configuración de la aplicación"
-      },
-      "slug": {
-        "es": "/es/getting-started/configuration",
-        "en": "/en/getting-started/configuration"
-      }
-    },
-    {
-      "id": "foundation-paths-and-caching",
-      "kind": "doc",
-      "title": {
-        "es": "Directorios y caché de arranque",
-        "en": "Directories and bootstrap caching"
-      },
-      "label": {
-        "en": "Directories and bootstrap cache",
-        "es": "Directorios y caché de arranque"
-      },
-      "slug": {
-        "es": "/es/getting-started/paths-and-caching",
-        "en": "/en/getting-started/paths-and-caching"
-      }
-    },
-    {
-      "id": "foundation-deployment-and-reference",
-      "kind": "doc",
-      "title": {
-        "es": "Preparar un despliegue",
-        "en": "Prepare a deployment"
-      },
-      "label": {
-        "es": "Preparación",
-        "en": "Preparation"
-      },
-      "slug": {
-        "es": "/es/getting-started/deployment-and-reference",
-        "en": "/en/getting-started/deployment-and-reference"
-      }
-    },
-    {
-      "id": "environment-overview",
-      "kind": "doc",
-      "title": {
-        "es": "Entorno",
-        "en": "Environment"
-      },
-      "label": {
-        "es": "Introducción",
-        "en": "Introduction"
-      },
-      "slug": {
-        "es": "/es/architecture/environment",
-        "en": "/en/architecture/environment"
-      }
-    },
-    {
-      "id": "environment-compiled-configuration",
-      "kind": "doc",
-      "title": {
-        "es": "Bootstrap y configuración compilada",
-        "en": "Bootstrap and compiled configuration"
-      },
-      "label": {
-        "es": "Bootstrap y archivos JSON",
-        "en": "Bootstrap and JSON files"
-      },
-      "slug": {
-        "es": "/es/architecture/environment/compiled-configuration",
-        "en": "/en/architecture/environment/compiled-configuration"
-      }
-    },
-    {
-      "id": "environment-operations-and-reference",
-      "kind": "doc",
-      "title": {
-        "es": "Referencia de Env y operaciones de configuración",
-        "en": "Env reference and configuration operations"
-      },
-      "label": {
-        "es": "Referencia de Env",
-        "en": "Env reference"
-      },
-      "slug": {
-        "es": "/es/architecture/environment/operations-and-reference",
-        "en": "/en/architecture/environment/operations-and-reference"
-      }
-    },
-    {
-      "id": "environment-typed-configuration",
-      "kind": "doc",
-      "title": {
-        "es": "Variables y configuración tipada",
-        "en": "Variables and typed configuration"
-      },
-      "label": {
-        "es": "Variables y tipos",
-        "en": "Variables and types"
-      },
-      "slug": {
-        "es": "/es/architecture/environment/typed-configuration",
-        "en": "/en/architecture/environment/typed-configuration"
-      }
-    },
-    {
-      "id": "container-overview",
-      "kind": "doc",
-      "title": {
-        "es": "Contenedor de servicios",
-        "en": "Service container"
-      },
-      "slug": {
-        "es": "/es/architecture/service-container",
-        "en": "/en/architecture/service-container"
-      }
-    },
-    {
-      "id": "container-bindings-and-invocation",
-      "kind": "doc",
-      "title": {
-        "es": "Registrar e invocar servicios",
-        "en": "Registering and invoking services"
-      },
-      "label": {
-        "en": "Bindings and invocation",
-        "es": "Registro e invocación"
-      },
-      "slug": {
-        "es": "/es/architecture/service-container/bindings-and-invocation",
-        "en": "/en/architecture/service-container/bindings-and-invocation"
-      }
-    },
-    {
-      "id": "container-providers-and-facades",
-      "kind": "doc",
-      "title": {
-        "es": "Proveedores de servicios",
-        "en": "Service providers"
-      },
-      "label": {
-        "es": "Proveedores de servicios",
-        "en": "Service providers"
-      },
-      "slug": {
-        "es": "/es/architecture/service-container/providers-and-facades",
-        "en": "/en/architecture/service-container/providers-and-facades"
-      }
-    },
-    {
-      "id": "container-scopes-and-concurrency",
-      "kind": "doc",
-      "title": {
-        "es": "Scopes, aislamiento y concurrencia",
-        "en": "Scopes, isolation, and concurrency"
-      },
-      "label": {
-        "en": "Scopes and concurrency",
-        "es": "Scopes y concurrencia"
-      },
-      "slug": {
-        "es": "/es/architecture/service-container/scopes-and-concurrency",
-        "en": "/en/architecture/service-container/scopes-and-concurrency"
-      }
-    },
-    {
-      "id": "failure-overview",
-      "kind": "doc",
-      "title": {
-        "es": "Gestión de excepciones",
-        "en": "Exception handling"
-      },
-      "slug": {
-        "es": "/es/architecture/exception-handling",
-        "en": "/en/architecture/exception-handling"
-      },
-      "label": {
-        "es": "Introducción y registro",
-        "en": "Introduction and registration"
-      }
-    },
-    {
-      "id": "failure-handling-exceptions",
-      "kind": "doc",
-      "title": {
-        "es": "Reportar y gestionar excepciones",
-        "en": "Reporting and handling exceptions"
-      },
-      "label": {
-        "es": "Personalizar el handler",
-        "en": "Customize the handler"
-      },
-      "slug": {
-        "es": "/es/architecture/exception-handling/handling-exceptions",
-        "en": "/en/architecture/exception-handling/handling-exceptions"
-      }
-    },
-    {
-      "id": "failure-contexts-and-transports",
-      "kind": "doc",
-      "title": {
-        "es": "Excepciones por contexto y transporte",
-        "en": "Exceptions by context and transport"
-      },
-      "label": {
-        "es": "Contextos y transportes",
-        "en": "Contexts and transports"
-      },
-      "slug": {
-        "es": "/es/architecture/exception-handling/contexts-and-transports",
-        "en": "/en/architecture/exception-handling/contexts-and-transports"
-      }
-    },
-    {
-      "id": "failure-policies-and-reference",
-      "kind": "doc",
-      "title": {
-        "es": "Políticas de errores y referencia",
-        "en": "Error policies and reference"
-      },
-      "label": {
-        "es": "Políticas y referencia",
-        "en": "Policies and reference"
-      },
-      "slug": {
-        "es": "/es/architecture/exception-handling/policies-and-reference",
-        "en": "/en/architecture/exception-handling/policies-and-reference"
-      }
-    },
-    {
       "id": "http-overview",
       "kind": "doc",
       "title": {
@@ -335,22 +83,6 @@
       "slug": {
         "es": "/es/http",
         "en": "/en/http"
-      }
-    },
-    {
-      "id": "http-request-lifecycle",
-      "kind": "doc",
-      "title": {
-        "es": "Controladores HTTP",
-        "en": "HTTP controllers"
-      },
-      "label": {
-        "en": "Controllers",
-        "es": "Controladores"
-      },
-      "slug": {
-        "es": "/es/http/request-lifecycle",
-        "en": "/en/http/request-lifecycle"
       }
     },
     {
@@ -370,6 +102,38 @@
       }
     },
     {
+      "id": "http-middleware-and-security",
+      "kind": "doc",
+      "title": {
+        "es": "Middleware HTTP",
+        "en": "HTTP middleware"
+      },
+      "label": {
+        "en": "Middleware",
+        "es": "Middleware"
+      },
+      "slug": {
+        "es": "/es/http/middleware",
+        "en": "/en/http/middleware"
+      }
+    },
+    {
+      "id": "http-request-lifecycle",
+      "kind": "doc",
+      "title": {
+        "es": "Controladores HTTP",
+        "en": "HTTP controllers"
+      },
+      "label": {
+        "en": "Controllers",
+        "es": "Controladores"
+      },
+      "slug": {
+        "es": "/es/http/controllers",
+        "en": "/en/http/controllers"
+      }
+    },
+    {
       "id": "http-requests-and-validation",
       "kind": "doc",
       "title": {
@@ -381,8 +145,8 @@
         "es": "Validación"
       },
       "slug": {
-        "es": "/es/http/requests-and-validation",
-        "en": "/en/http/requests-and-validation"
+        "es": "/es/http/validation",
+        "en": "/en/http/validation"
       }
     },
     {
@@ -397,8 +161,8 @@
         "es": "Request (payloads)"
       },
       "slug": {
-        "es": "/es/http/forms-and-uploads",
-        "en": "/en/http/forms-and-uploads"
+        "es": "/es/http/requests",
+        "en": "/en/http/requests"
       }
     },
     {
@@ -434,19 +198,115 @@
       }
     },
     {
-      "id": "http-streaming-and-sse",
+      "id": "realtime-overview",
       "kind": "doc",
       "title": {
-        "es": "Streaming y eventos del servidor",
-        "en": "Streaming and server-sent events"
+        "es": "Realtime, WebSocket y SSE",
+        "en": "Realtime, WebSocket and SSE"
       },
       "label": {
-        "en": "Streaming and SSE",
-        "es": "Streaming y SSE"
+        "en": "Introduction",
+        "es": "Introducción"
       },
       "slug": {
-        "es": "/es/http/streaming-and-sse",
-        "en": "/en/http/streaming-and-sse"
+        "es": "/es/realtime",
+        "en": "/en/realtime"
+      }
+    },
+    {
+      "id": "realtime-routing-and-lifecycle",
+      "kind": "doc",
+      "title": {
+        "es": "Rutas y ciclo de vida de conexiones",
+        "en": "Routing and connection lifecycle"
+      },
+      "label": {
+        "es": "Rutas y ciclo de vida",
+        "en": "Routes and lifecycle"
+      },
+      "slug": {
+        "es": "/es/realtime/routing-and-lifecycle",
+        "en": "/en/realtime/routing-and-lifecycle"
+      }
+    },
+    {
+      "id": "realtime-hubs-and-methods",
+      "kind": "doc",
+      "title": {
+        "es": "Hubs, rutas y métodos remotos",
+        "en": "Hubs, routes, and remote methods"
+      },
+      "label": {
+        "en": "Hubs and remote methods",
+        "es": "Hubs y métodos remotos"
+      },
+      "slug": {
+        "es": "/es/realtime/hubs-and-methods",
+        "en": "/en/realtime/hubs-and-methods"
+      }
+    },
+    {
+      "id": "realtime-javascript-client",
+      "kind": "doc",
+      "title": {
+        "es": "Cliente JavaScript con npm",
+        "en": "JavaScript client with npm"
+      },
+      "label": {
+        "es": "Cliente JavaScript",
+        "en": "JavaScript client"
+      },
+      "slug": {
+        "es": "/es/realtime/javascript-client",
+        "en": "/en/realtime/javascript-client"
+      }
+    },
+    {
+      "id": "realtime-chat",
+      "kind": "doc",
+      "title": {
+        "es": "Chat con salas en Realtime",
+        "en": "Realtime chat with rooms"
+      },
+      "label": {
+        "es": "Chat con salas",
+        "en": "Chat with rooms"
+      },
+      "slug": {
+        "es": "/es/realtime/chat",
+        "en": "/en/realtime/chat"
+      }
+    },
+    {
+      "id": "realtime-protocol-and-streaming",
+      "kind": "doc",
+      "title": {
+        "es": "Cliente JavaScript, protocolo y streams",
+        "en": "JavaScript client, protocol, and streams"
+      },
+      "label": {
+        "en": "Protocol and streams",
+        "es": "Protocolo y streams"
+      },
+      "slug": {
+        "es": "/es/realtime/protocol-and-streaming",
+        "en": "/en/realtime/protocol-and-streaming"
+      }
+    },
+    {
+      "id": "realtime-groups-and-deployment",
+      "kind": "doc",
+      "title": {
+        "es": "Grupos, difusión y despliegue",
+        "en": "Groups, broadcasts, and deployment"
+      },
+      "label": {
+        "es": "Grupos y despliegue",
+        "en": "Groups and deployment"
+      },
+      "slug": {
+        "es": "/es/realtime/groups-and-deployment",
+        "en": "/en/realtime/groups-and-deployment"
       }
     },
     {
@@ -461,104 +321,360 @@
         "es": "WebSocket"
       },
       "slug": {
-        "es": "/es/http/websockets",
-        "en": "/en/http/websockets"
+        "es": "/es/realtime/websocket",
+        "en": "/en/realtime/websocket"
       }
     },
     {
-      "id": "http-middleware-and-security",
+      "id": "http-streaming-and-sse",
       "kind": "doc",
       "title": {
-        "es": "Middleware HTTP",
-        "en": "HTTP middleware"
+        "es": "Streaming y eventos del servidor",
+        "en": "Streaming and server-sent events"
       },
       "label": {
-        "en": "Middleware",
-        "es": "Middlewares"
+        "en": "Streaming and SSE",
+        "es": "Streaming y SSE"
       },
       "slug": {
-        "es": "/es/http/middleware-and-security",
-        "en": "/en/http/middleware-and-security"
+        "es": "/es/realtime/streaming-and-sse",
+        "en": "/en/realtime/streaming-and-sse"
       }
     },
     {
-      "id": "http-default-responses",
+      "id": "mcp-overview",
       "kind": "doc",
       "title": {
-        "es": "Salud, errores y rutas predeterminadas",
-        "en": "Health, errors and default routes"
-      },
-      "label": {
-        "en": "Health, errors and default routes",
-        "es": "Salud, errores y rutas"
-      },
-      "slug": {
-        "es": "/es/http/default-responses",
-        "en": "/en/http/default-responses"
-      }
-    },
-    {
-      "id": "session-overview",
-      "kind": "doc",
-      "title": {
-        "es": "Sesiones HTTP",
-        "en": "HTTP sessions"
+        "es": "Introducción a MCP",
+        "en": "Introduction to MCP"
       },
       "label": {
         "es": "Introducción",
         "en": "Introduction"
       },
       "slug": {
-        "es": "/es/http/sessions",
-        "en": "/en/http/sessions"
+        "es": "/es/mcp",
+        "en": "/en/mcp"
       }
     },
     {
-      "id": "session-state-and-flash",
+      "id": "mcp-servers-and-tools",
       "kind": "doc",
       "title": {
-        "es": "Estado de usuario y formularios con flash",
-        "en": "User state and form flash data"
+        "es": "Servidores y rutas",
+        "en": "Servers and routes"
       },
       "label": {
-        "en": "Data and form flash",
-        "es": "Datos y formularios flash"
+        "es": "Servidores y rutas",
+        "en": "Servers and routes"
       },
       "slug": {
-        "es": "/es/http/sessions/state-and-flash",
-        "en": "/en/http/sessions/state-and-flash"
+        "es": "/es/mcp/servers-and-routes",
+        "en": "/en/mcp/servers-and-routes"
       }
     },
     {
-      "id": "session-stores-and-concurrency",
+      "id": "mcp-tools",
       "kind": "doc",
       "title": {
-        "es": "Elegir almacenamiento y entender concurrencia",
-        "en": "Choosing storage and understanding concurrency"
+        "es": "Herramientas MCP",
+        "en": "MCP tools"
       },
       "label": {
-        "en": "Storage",
-        "es": "Almacenamiento"
+        "es": "Herramientas (Tools)",
+        "en": "Tools"
       },
       "slug": {
-        "es": "/es/http/sessions/stores-and-concurrency",
-        "en": "/en/http/sessions/stores-and-concurrency"
+        "es": "/es/mcp/tools",
+        "en": "/en/mcp/tools"
       }
     },
     {
-      "id": "session-configuration-and-security",
+      "id": "mcp-resources-and-prompts",
       "kind": "doc",
       "title": {
-        "es": "Cookies, renovación y ciclo seguro",
-        "en": "Cookies, renewal and secure lifecycle"
+        "es": "Recursos y plantillas URI",
+        "en": "Resources and URI templates"
       },
       "label": {
-        "en": "Configuration and lifecycle",
-        "es": "Configuración y ciclo de vida"
+        "es": "Recursos (Resources)",
+        "en": "Resources"
       },
       "slug": {
-        "es": "/es/http/sessions/configuration-and-security",
-        "en": "/en/http/sessions/configuration-and-security"
+        "es": "/es/mcp/resources",
+        "en": "/en/mcp/resources"
+      }
+    },
+    {
+      "id": "mcp-prompts",
+      "kind": "doc",
+      "title": {
+        "es": "Prompts MCP",
+        "en": "MCP prompts"
+      },
+      "label": {
+        "es": "Prompts",
+        "en": "Prompts"
+      },
+      "slug": {
+        "es": "/es/mcp/prompts",
+        "en": "/en/mcp/prompts"
+      }
+    },
+    {
+      "id": "mcp-responses-and-content",
+      "kind": "doc",
+      "title": {
+        "es": "Respuestas y contenido MCP",
+        "en": "MCP responses and content"
+      },
+      "label": {
+        "es": "Respuestas y contenido",
+        "en": "Responses and content"
+      },
+      "slug": {
+        "es": "/es/mcp/responses-and-content",
+        "en": "/en/mcp/responses-and-content"
+      }
+    },
+    {
+      "id": "mcp-http-and-clients",
+      "kind": "doc",
+      "title": {
+        "es": "Consultas HTTP y clientes MCP",
+        "en": "HTTP requests and MCP clients"
+      },
+      "label": {
+        "es": "HTTP y clientes",
+        "en": "HTTP and clients"
+      },
+      "slug": {
+        "es": "/es/mcp/http-and-clients",
+        "en": "/en/mcp/http-and-clients"
+      }
+    },
+    {
+      "id": "mcp-transports-and-configuration",
+      "kind": "doc",
+      "title": {
+        "es": "STDIO y configuración MCP",
+        "en": "STDIO and MCP configuration"
+      },
+      "label": {
+        "es": "STDIO y configuración",
+        "en": "STDIO and configuration"
+      },
+      "slug": {
+        "es": "/es/mcp/stdio-and-configuration",
+        "en": "/en/mcp/stdio-and-configuration"
+      }
+    },
+    {
+      "id": "mcp-advanced-workflows",
+      "kind": "doc",
+      "title": {
+        "es": "Flujos avanzados de MCP",
+        "en": "Advanced MCP workflows"
+      },
+      "label": {
+        "es": "Flujos avanzados",
+        "en": "Advanced workflows"
+      },
+      "slug": {
+        "es": "/es/mcp/advanced-workflows",
+        "en": "/en/mcp/advanced-workflows"
+      }
+    },
+    {
+      "id": "test-mcp-testing",
+      "kind": "doc",
+      "title": {
+        "es": "Probar herramientas MCP dentro del proceso",
+        "en": "Testing MCP tools in process"
+      },
+      "label": {
+        "en": "In-process MCP tests",
+        "es": "Pruebas MCP en proceso"
+      },
+      "slug": {
+        "es": "/es/mcp/testing",
+        "en": "/en/mcp/testing"
+      }
+    },
+    {
+      "id": "view-overview",
+      "kind": "doc",
+      "title": {
+        "es": "Introducción a las vistas",
+        "en": "Introduction to views"
+      },
+      "slug": {
+        "es": "/es/views",
+        "en": "/en/views"
+      },
+      "label": {
+        "es": "Introducción",
+        "en": "Introduction"
+      }
+    },
+    {
+      "id": "view-rendering-templates",
+      "kind": "doc",
+      "title": {
+        "es": "Controladores y HTML",
+        "en": "Controllers and HTML"
+      },
+      "label": {
+        "es": "Controladores y HTML",
+        "en": "Controllers and HTML"
+      },
+      "slug": {
+        "es": "/es/views/rendering-templates",
+        "en": "/en/views/rendering-templates"
+      }
+    },
+    {
+      "id": "view-template-language",
+      "kind": "doc",
+      "title": {
+        "es": "Plantillas y herencia",
+        "en": "Templates and inheritance"
+      },
+      "label": {
+        "es": "Plantillas y herencia",
+        "en": "Templates and inheritance"
+      },
+      "slug": {
+        "es": "/es/views/template-language",
+        "en": "/en/views/template-language"
+      }
+    },
+    {
+      "id": "view-filters",
+      "kind": "doc",
+      "title": {
+        "es": "Filtros de las plantillas",
+        "en": "Template filters"
+      },
+      "label": {
+        "es": "Filtros",
+        "en": "Filters"
+      },
+      "slug": {
+        "es": "/es/views/filters",
+        "en": "/en/views/filters"
+      }
+    },
+    {
+      "id": "view-globals",
+      "kind": "doc",
+      "title": {
+        "es": "Globals y contexto de las vistas",
+        "en": "View globals and context"
+      },
+      "label": {
+        "es": "Globals y contexto",
+        "en": "Globals and context"
+      },
+      "slug": {
+        "es": "/es/views/globals",
+        "en": "/en/views/globals"
+      }
+    },
+    {
+      "id": "view-configuration-and-extensions",
+      "kind": "doc",
+      "title": {
+        "es": "Configuración y caché de vistas",
+        "en": "View configuration and cache"
+      },
+      "label": {
+        "es": "Configuración y caché",
+        "en": "Configuration and cache"
+      },
+      "slug": {
+        "es": "/es/views/configuration-and-cache",
+        "en": "/en/views/configuration-and-cache"
+      }
+    },
+    {
+      "id": "view-providers-and-extensions",
+      "kind": "doc",
+      "title": {
+        "es": "Providers y extensiones de vistas",
+        "en": "View providers and extensions"
+      },
+      "label": {
+        "es": "Providers y extensiones",
+        "en": "Providers and extensions"
+      },
+      "slug": {
+        "es": "/es/views/providers-and-extensions",
+        "en": "/en/views/providers-and-extensions"
+      }
+    },
+    {
+      "id": "localization-overview",
+      "kind": "doc",
+      "title": {
+        "es": "Introducción a la localización",
+        "en": "Introduction to localization"
+      },
+      "slug": {
+        "es": "/es/localization",
+        "en": "/en/localization"
+      },
+      "label": {
+        "es": "Introducción",
+        "en": "Introduction"
+      }
+    },
+    {
+      "id": "localization-messages-and-locales",
+      "kind": "doc",
+      "title": {
+        "es": "Archivos, idiomas y configuración",
+        "en": "Files, locales, and configuration"
+      },
+      "label": {
+        "es": "Archivos e idiomas",
+        "en": "Files and locales"
+      },
+      "slug": {
+        "es": "/es/localization/messages-and-locales",
+        "en": "/en/localization/messages-and-locales"
+      }
+    },
+    {
+      "id": "localization-translating-content",
+      "kind": "doc",
+      "title": {
+        "es": "Traducir mensajes y plurales",
+        "en": "Translate messages and plurals"
+      },
+      "label": {
+        "en": "Messages and plurals",
+        "es": "Mensajes y plurales"
+      },
+      "slug": {
+        "es": "/es/localization/translating-content",
+        "en": "/en/localization/translating-content"
+      }
+    },
+    {
+      "id": "localization-application-and-views",
+      "kind": "doc",
+      "title": {
+        "es": "Fachada, inyección y vistas",
+        "en": "Facade, injection, and views"
+      },
+      "label": {
+        "es": "Fachada, inyección y vistas",
+        "en": "Facade, injection, and views"
+      },
+      "slug": {
+        "es": "/es/localization/application-and-views",
+        "en": "/en/localization/application-and-views"
       }
     },
     {
@@ -573,8 +689,8 @@
         "en": "Introduction"
       },
       "slug": {
-        "es": "/es/security/authentication",
-        "en": "/en/security/authentication"
+        "es": "/es/authentication",
+        "en": "/en/authentication"
       }
     },
     {
@@ -589,8 +705,8 @@
         "en": "Configuration and guards"
       },
       "slug": {
-        "es": "/es/security/authentication/configuration-and-guards",
-        "en": "/en/security/authentication/configuration-and-guards"
+        "es": "/es/authentication/configuration-and-guards",
+        "en": "/en/authentication/configuration-and-guards"
       }
     },
     {
@@ -605,24 +721,8 @@
         "es": "Autenticación con sesiones"
       },
       "slug": {
-        "es": "/es/security/authentication/identity-and-session",
-        "en": "/en/security/authentication/identity-and-session"
-      }
-    },
-    {
-      "id": "auth-authorization",
-      "kind": "doc",
-      "title": {
-        "es": "Roles y permisos",
-        "en": "Roles and permissions"
-      },
-      "label": {
-        "en": "Roles and permissions",
-        "es": "Roles y permisos"
-      },
-      "slug": {
-        "es": "/es/security/authentication/authorization",
-        "en": "/en/security/authentication/authorization"
+        "es": "/es/authentication/session-authentication",
+        "en": "/en/authentication/session-authentication"
       }
     },
     {
@@ -637,8 +737,8 @@
         "es": "Autenticación con tokens"
       },
       "slug": {
-        "es": "/es/security/authentication/personal-access-tokens",
-        "en": "/en/security/authentication/personal-access-tokens"
+        "es": "/es/authentication/personal-access-tokens",
+        "en": "/en/authentication/personal-access-tokens"
       }
     },
     {
@@ -653,8 +753,24 @@
         "en": "Access middleware"
       },
       "slug": {
-        "es": "/es/security/authentication/middleware",
-        "en": "/en/security/authentication/middleware"
+        "es": "/es/authentication/middleware",
+        "en": "/en/authentication/middleware"
+      }
+    },
+    {
+      "id": "auth-authorization",
+      "kind": "doc",
+      "title": {
+        "es": "Roles y permisos",
+        "en": "Roles and permissions"
+      },
+      "label": {
+        "en": "Roles and permissions",
+        "es": "Roles y permisos"
+      },
+      "slug": {
+        "es": "/es/authentication/authorization",
+        "en": "/en/authentication/authorization"
       }
     },
     {
@@ -669,8 +785,8 @@
         "en": "Resource policies"
       },
       "slug": {
-        "es": "/es/security/authentication/policies",
-        "en": "/en/security/authentication/policies"
+        "es": "/es/authentication/policies",
+        "en": "/en/authentication/policies"
       }
     },
     {
@@ -685,8 +801,72 @@
         "es": "Recuperación y verificación"
       },
       "slug": {
-        "es": "/es/security/authentication/account-recovery",
-        "en": "/en/security/authentication/account-recovery"
+        "es": "/es/authentication/account-recovery",
+        "en": "/en/authentication/account-recovery"
+      }
+    },
+    {
+      "id": "session-overview",
+      "kind": "doc",
+      "title": {
+        "es": "Sesiones HTTP",
+        "en": "HTTP sessions"
+      },
+      "label": {
+        "es": "Introducción",
+        "en": "Introduction"
+      },
+      "slug": {
+        "es": "/es/sessions",
+        "en": "/en/sessions"
+      }
+    },
+    {
+      "id": "session-state-and-flash",
+      "kind": "doc",
+      "title": {
+        "es": "Estado de usuario y formularios con flash",
+        "en": "User state and form flash data"
+      },
+      "label": {
+        "en": "Data and form flash",
+        "es": "Datos y formularios flash"
+      },
+      "slug": {
+        "es": "/es/sessions/state-and-flash",
+        "en": "/en/sessions/state-and-flash"
+      }
+    },
+    {
+      "id": "session-stores-and-concurrency",
+      "kind": "doc",
+      "title": {
+        "es": "Elegir almacenamiento y entender concurrencia",
+        "en": "Choosing storage and understanding concurrency"
+      },
+      "label": {
+        "en": "Storage",
+        "es": "Almacenamiento"
+      },
+      "slug": {
+        "es": "/es/sessions/stores-and-concurrency",
+        "en": "/en/sessions/stores-and-concurrency"
+      }
+    },
+    {
+      "id": "session-configuration-and-security",
+      "kind": "doc",
+      "title": {
+        "es": "Cookies, renovación y ciclo seguro",
+        "en": "Cookies, renewal and secure lifecycle"
+      },
+      "label": {
+        "en": "Configuration and lifecycle",
+        "es": "Configuración y ciclo de vida"
+      },
+      "slug": {
+        "es": "/es/sessions/configuration-and-security",
+        "en": "/en/sessions/configuration-and-security"
       }
     },
     {
@@ -697,8 +877,8 @@
         "en": "Password hashing"
       },
       "slug": {
-        "es": "/es/security/hashing",
-        "en": "/en/security/hashing"
+        "es": "/es/cryptography/hashing",
+        "en": "/en/cryptography/hashing"
       }
     },
     {
@@ -713,8 +893,8 @@
         "es": "Generar y verificar hashes"
       },
       "slug": {
-        "es": "/es/security/hashing/password-storage",
-        "en": "/en/security/hashing/password-storage"
+        "es": "/es/cryptography/hashing/password-storage",
+        "en": "/en/cryptography/hashing/password-storage"
       }
     },
     {
@@ -729,8 +909,8 @@
         "es": "Cifrado de datos"
       },
       "slug": {
-        "es": "/es/security/encryption",
-        "en": "/en/security/encryption"
+        "es": "/es/cryptography/encryption",
+        "en": "/en/cryptography/encryption"
       }
     },
     {
@@ -745,8 +925,8 @@
         "es": "Cifrar y descifrar valores"
       },
       "slug": {
-        "es": "/es/security/encryption/encrypting-values",
-        "en": "/en/security/encryption/encrypting-values"
+        "es": "/es/cryptography/encryption/encrypting-values",
+        "en": "/en/cryptography/encryption/encrypting-values"
       }
     },
     {
@@ -798,19 +978,19 @@
       }
     },
     {
-      "id": "schemas-validation-and-errors",
+      "id": "schemas-constraints-and-reference",
       "kind": "doc",
       "title": {
-        "es": "Validación, errores e integración",
-        "en": "Validation, errors, and integration"
+        "es": "Constraints, metadatos y referencia",
+        "en": "Constraints, metadata, and reference"
       },
       "label": {
-        "en": "Validation and errors",
-        "es": "Validación y errores"
+        "en": "Native rules",
+        "es": "Reglas nativas"
       },
       "slug": {
-        "es": "/es/validation/validation-and-errors",
-        "en": "/en/validation/validation-and-errors"
+        "es": "/es/validation/constraints-and-reference",
+        "en": "/en/validation/constraints-and-reference"
       }
     },
     {
@@ -830,19 +1010,19 @@
       }
     },
     {
-      "id": "schemas-constraints-and-reference",
+      "id": "schemas-validation-and-errors",
       "kind": "doc",
       "title": {
-        "es": "Constraints, metadatos y referencia",
-        "en": "Constraints, metadata, and reference"
+        "es": "Validación, errores e integración",
+        "en": "Validation, errors, and integration"
       },
       "label": {
-        "en": "Native rules",
-        "es": "Reglas nativas"
+        "en": "Validation and errors",
+        "es": "Validación y errores"
       },
       "slug": {
-        "es": "/es/validation/constraints-and-reference",
-        "en": "/en/validation/constraints-and-reference"
+        "es": "/es/validation/validation-and-errors",
+        "en": "/en/validation/validation-and-errors"
       }
     },
     {
@@ -923,22 +1103,6 @@
       "slug": {
         "es": "/es/database/connections",
         "en": "/en/database/connections"
-      }
-    },
-    {
-      "id": "database-commands",
-      "kind": "doc",
-      "title": {
-        "es": "Comandos de Database",
-        "en": "Database commands"
-      },
-      "label": {
-        "es": "Comandos de Database",
-        "en": "Database commands"
-      },
-      "slug": {
-        "es": "/es/database/commands",
-        "en": "/en/database/commands"
       }
     },
     {
@@ -1129,8 +1293,8 @@
         "en": "Migrations"
       },
       "slug": {
-        "es": "/es/database/migrations-and-seeders",
-        "en": "/en/database/migrations-and-seeders"
+        "es": "/es/database/migrations",
+        "en": "/en/database/migrations"
       }
     },
     {
@@ -1147,6 +1311,22 @@
       "label": {
         "es": "Seeders",
         "en": "Seeders"
+      }
+    },
+    {
+      "id": "database-commands",
+      "kind": "doc",
+      "title": {
+        "es": "Comandos de Database",
+        "en": "Database commands"
+      },
+      "label": {
+        "es": "Comandos de Database",
+        "en": "Database commands"
+      },
+      "slug": {
+        "es": "/es/database/commands",
+        "en": "/en/database/commands"
       }
     },
     {
@@ -1225,8 +1405,8 @@
         "en": "ORM introduction"
       },
       "slug": {
-        "es": "/es/database/orm",
-        "en": "/en/database/orm"
+        "es": "/es/orm",
+        "en": "/en/orm"
       }
     },
     {
@@ -1241,8 +1421,8 @@
         "en": "Defining models"
       },
       "slug": {
-        "es": "/es/database/orm/models-and-attributes",
-        "en": "/en/database/orm/models-and-attributes"
+        "es": "/es/orm/models-and-attributes",
+        "en": "/en/orm/models-and-attributes"
       }
     },
     {
@@ -1253,268 +1433,12 @@
         "en": "Model persistence and state"
       },
       "slug": {
-        "es": "/es/database/orm/model-api",
-        "en": "/en/database/orm/model-api"
+        "es": "/es/orm/model-api",
+        "en": "/en/orm/model-api"
       },
       "label": {
         "es": "Persistencia y estado",
         "en": "Persistence and state"
-      }
-    },
-    {
-      "id": "orm-querying",
-      "kind": "doc",
-      "title": {
-        "es": "Consultas con modelos",
-        "en": "Querying models"
-      },
-      "label": {
-        "es": "Consultar modelos",
-        "en": "Querying models"
-      },
-      "slug": {
-        "es": "/es/database/orm/querying",
-        "en": "/en/database/orm/querying"
-      }
-    },
-    {
-      "id": "orm-relationships",
-      "kind": "doc",
-      "title": {
-        "es": "Definir relaciones",
-        "en": "Defining relationships"
-      },
-      "label": {
-        "es": "Definir relaciones",
-        "en": "Defining relationships"
-      },
-      "slug": {
-        "es": "/es/database/orm/relationships",
-        "en": "/en/database/orm/relationships"
-      }
-    },
-    {
-      "id": "orm-relationship-operations",
-      "kind": "doc",
-      "title": {
-        "es": "Consultar y modificar relaciones",
-        "en": "Querying and modifying relationships"
-      },
-      "slug": {
-        "es": "/es/database/orm/relationship-operations",
-        "en": "/en/database/orm/relationship-operations"
-      },
-      "label": {
-        "es": "Operaciones de relaciones",
-        "en": "Relationship operations"
-      }
-    },
-    {
-      "id": "orm-eager-loading",
-      "kind": "doc",
-      "title": {
-        "es": "Carga anticipada y N+1",
-        "en": "Eager loading and N+1"
-      },
-      "slug": {
-        "es": "/es/database/orm/eager-loading",
-        "en": "/en/database/orm/eager-loading"
-      },
-      "label": {
-        "es": "Carga anticipada y N+1",
-        "en": "Eager loading and N+1"
-      }
-    },
-    {
-      "id": "orm-soft-deletes",
-      "kind": "doc",
-      "title": {
-        "es": "Eliminación lógica",
-        "en": "Soft deletes"
-      },
-      "slug": {
-        "es": "/es/database/orm/soft-deletes",
-        "en": "/en/database/orm/soft-deletes"
-      },
-      "label": {
-        "es": "Eliminación lógica",
-        "en": "Soft deletion"
-      }
-    },
-    {
-      "id": "orm-scopes",
-      "kind": "doc",
-      "title": {
-        "es": "Scopes locales y globales",
-        "en": "Local and global scopes"
-      },
-      "slug": {
-        "es": "/es/database/orm/scopes",
-        "en": "/en/database/orm/scopes"
-      },
-      "label": {
-        "es": "Scopes",
-        "en": "Scopes"
-      }
-    },
-    {
-      "id": "orm-events",
-      "kind": "doc",
-      "title": {
-        "es": "Eventos y observers",
-        "en": "Events and observers"
-      },
-      "slug": {
-        "es": "/es/database/orm/events",
-        "en": "/en/database/orm/events"
-      },
-      "label": {
-        "es": "Eventos y observers",
-        "en": "Events and observers"
-      }
-    },
-    {
-      "id": "orm-collections-and-pagination",
-      "kind": "doc",
-      "title": {
-        "es": "Colecciones y paginación",
-        "en": "Collections and pagination"
-      },
-      "slug": {
-        "es": "/es/database/orm/collections-and-pagination",
-        "en": "/en/database/orm/collections-and-pagination"
-      },
-      "label": {
-        "es": "Colecciones y paginación",
-        "en": "Collections and pagination"
-      }
-    },
-    {
-      "id": "orm-factories-and-testing",
-      "kind": "doc",
-      "title": {
-        "es": "Factories de modelos",
-        "en": "Model factories"
-      },
-      "slug": {
-        "es": "/es/database/orm/factories-and-testing",
-        "en": "/en/database/orm/factories-and-testing"
-      },
-      "label": {
-        "es": "Factories",
-        "en": "Factories"
-      }
-    },
-    {
-      "id": "orm-faker",
-      "kind": "doc",
-      "title": {
-        "es": "Faker y datos simulados",
-        "en": "Faker and sample data"
-      },
-      "slug": {
-        "es": "/es/database/orm/faker",
-        "en": "/en/database/orm/faker"
-      },
-      "label": {
-        "es": "Guía de uso",
-        "en": "Usage guide"
-      }
-    },
-    {
-      "id": "orm-faker-reference-a-d",
-      "kind": "doc",
-      "title": {
-        "es": "Faker: proveedores A–D",
-        "en": "Faker: providers A–D"
-      },
-      "slug": {
-        "es": "/es/database/orm/faker-reference-a-d",
-        "en": "/en/database/orm/faker-reference-a-d"
-      },
-      "label": {
-        "es": "Proveedores A–D",
-        "en": "Providers A–D"
-      }
-    },
-    {
-      "id": "orm-faker-reference-e-h",
-      "kind": "doc",
-      "title": {
-        "es": "Faker: proveedores E–H",
-        "en": "Faker: providers E–H"
-      },
-      "slug": {
-        "es": "/es/database/orm/faker-reference-e-h",
-        "en": "/en/database/orm/faker-reference-e-h"
-      },
-      "label": {
-        "es": "Proveedores E–H",
-        "en": "Providers E–H"
-      }
-    },
-    {
-      "id": "orm-faker-reference-i-l",
-      "kind": "doc",
-      "title": {
-        "es": "Faker: proveedores I–L",
-        "en": "Faker: providers I–L"
-      },
-      "slug": {
-        "es": "/es/database/orm/faker-reference-i-l",
-        "en": "/en/database/orm/faker-reference-i-l"
-      },
-      "label": {
-        "es": "Proveedores I–L",
-        "en": "Providers I–L"
-      }
-    },
-    {
-      "id": "orm-faker-reference-m-p",
-      "kind": "doc",
-      "title": {
-        "es": "Faker: proveedores M–P",
-        "en": "Faker: providers M–P"
-      },
-      "slug": {
-        "es": "/es/database/orm/faker-reference-m-p",
-        "en": "/en/database/orm/faker-reference-m-p"
-      },
-      "label": {
-        "es": "Proveedores M–P",
-        "en": "Providers M–P"
-      }
-    },
-    {
-      "id": "orm-faker-reference-q-t",
-      "kind": "doc",
-      "title": {
-        "es": "Faker: proveedores Q–T",
-        "en": "Faker: providers Q–T"
-      },
-      "slug": {
-        "es": "/es/database/orm/faker-reference-q-t",
-        "en": "/en/database/orm/faker-reference-q-t"
-      },
-      "label": {
-        "es": "Proveedores Q–T",
-        "en": "Providers Q–T"
-      }
-    },
-    {
-      "id": "orm-faker-reference-u-z",
-      "kind": "doc",
-      "title": {
-        "es": "Faker: proveedores U–Z",
-        "en": "Faker: providers U–Z"
-      },
-      "slug": {
-        "es": "/es/database/orm/faker-reference-u-z",
-        "en": "/en/database/orm/faker-reference-u-z"
-      },
-      "label": {
-        "es": "Proveedores U–Z",
-        "en": "Providers U–Z"
       }
     },
     {
@@ -1529,24 +1453,152 @@
         "en": "Table definitions and types"
       },
       "slug": {
-        "es": "/es/database/orm/schema-and-type-reference",
-        "en": "/en/database/orm/schema-and-type-reference"
+        "es": "/es/orm/schema-and-type-reference",
+        "en": "/en/orm/schema-and-type-reference"
       }
     },
     {
-      "id": "orm-events-and-scopes",
+      "id": "orm-querying",
       "kind": "doc",
       "title": {
-        "es": "Eventos, scopes y ciclo del modelo",
-        "en": "Events, scopes and model lifecycle"
+        "es": "Consultas con modelos",
+        "en": "Querying models"
       },
       "label": {
-        "es": "Guía de mecanismos del modelo",
-        "en": "Model mechanism guide"
+        "es": "Consultar modelos",
+        "en": "Querying models"
       },
       "slug": {
-        "es": "/es/database/orm/events-and-scopes",
-        "en": "/en/database/orm/events-and-scopes"
+        "es": "/es/orm/querying",
+        "en": "/en/orm/querying"
+      }
+    },
+    {
+      "id": "orm-collections-and-pagination",
+      "kind": "doc",
+      "title": {
+        "es": "Colecciones y paginación",
+        "en": "Collections and pagination"
+      },
+      "slug": {
+        "es": "/es/orm/collections-and-pagination",
+        "en": "/en/orm/collections-and-pagination"
+      },
+      "label": {
+        "es": "Colecciones y paginación",
+        "en": "Collections and pagination"
+      }
+    },
+    {
+      "id": "orm-scopes",
+      "kind": "doc",
+      "title": {
+        "es": "Scopes locales y globales",
+        "en": "Local and global scopes"
+      },
+      "slug": {
+        "es": "/es/orm/scopes",
+        "en": "/en/orm/scopes"
+      },
+      "label": {
+        "es": "Scopes",
+        "en": "Scopes"
+      }
+    },
+    {
+      "id": "orm-relationships",
+      "kind": "doc",
+      "title": {
+        "es": "Definir relaciones",
+        "en": "Defining relationships"
+      },
+      "label": {
+        "es": "Definir relaciones",
+        "en": "Defining relationships"
+      },
+      "slug": {
+        "es": "/es/orm/relationships",
+        "en": "/en/orm/relationships"
+      }
+    },
+    {
+      "id": "orm-relationship-operations",
+      "kind": "doc",
+      "title": {
+        "es": "Consultar y modificar relaciones",
+        "en": "Querying and modifying relationships"
+      },
+      "slug": {
+        "es": "/es/orm/relationship-operations",
+        "en": "/en/orm/relationship-operations"
+      },
+      "label": {
+        "es": "Operaciones de relaciones",
+        "en": "Relationship operations"
+      }
+    },
+    {
+      "id": "orm-eager-loading",
+      "kind": "doc",
+      "title": {
+        "es": "Carga anticipada y N+1",
+        "en": "Eager loading and N+1"
+      },
+      "slug": {
+        "es": "/es/orm/eager-loading",
+        "en": "/en/orm/eager-loading"
+      },
+      "label": {
+        "es": "Carga anticipada y N+1",
+        "en": "Eager loading and N+1"
+      }
+    },
+    {
+      "id": "orm-soft-deletes",
+      "kind": "doc",
+      "title": {
+        "es": "Eliminación lógica",
+        "en": "Soft deletes"
+      },
+      "slug": {
+        "es": "/es/orm/soft-deletes",
+        "en": "/en/orm/soft-deletes"
+      },
+      "label": {
+        "es": "Eliminación lógica",
+        "en": "Soft deletion"
+      }
+    },
+    {
+      "id": "orm-events",
+      "kind": "doc",
+      "title": {
+        "es": "Eventos y observers",
+        "en": "Events and observers"
+      },
+      "slug": {
+        "es": "/es/orm/events",
+        "en": "/en/orm/events"
+      },
+      "label": {
+        "es": "Eventos y observers",
+        "en": "Events and observers"
+      }
+    },
+    {
+      "id": "orm-factories-and-testing",
+      "kind": "doc",
+      "title": {
+        "es": "Factories de modelos",
+        "en": "Model factories"
+      },
+      "slug": {
+        "es": "/es/orm/factories",
+        "en": "/en/orm/factories"
+      },
+      "label": {
+        "es": "Factories",
+        "en": "Factories"
       }
     },
     {
@@ -1557,8 +1609,8 @@
         "en": "Testing Database and ORM"
       },
       "slug": {
-        "es": "/es/database/orm/testing",
-        "en": "/en/database/orm/testing"
+        "es": "/es/orm/testing",
+        "en": "/en/orm/testing"
       },
       "label": {
         "es": "Pruebas de Database y ORM",
@@ -1566,131 +1618,115 @@
       }
     },
     {
-      "id": "cache-overview",
+      "id": "orm-faker",
       "kind": "doc",
       "title": {
-        "es": "Caché",
-        "en": "Cache"
+        "es": "Faker y datos simulados",
+        "en": "Faker and sample data"
       },
       "slug": {
-        "es": "/es/services/cache",
-        "en": "/en/services/cache"
+        "es": "/es/faker",
+        "en": "/en/faker"
       },
       "label": {
-        "en": "Introduction",
-        "es": "Introducción"
+        "es": "Guía de uso",
+        "en": "Usage guide"
       }
     },
     {
-      "id": "cache-caching-values",
+      "id": "orm-faker-reference-a-d",
       "kind": "doc",
       "title": {
-        "es": "Guardar y regenerar datos",
-        "en": "Storing and regenerating values"
-      },
-      "label": {
-        "en": "Storing and regenerating values",
-        "es": "Guardar y regenerar valores"
+        "es": "Faker: proveedores A–D",
+        "en": "Faker: providers A–D"
       },
       "slug": {
-        "es": "/es/services/cache/caching-values",
-        "en": "/en/services/cache/caching-values"
+        "es": "/es/faker/reference/a-d",
+        "en": "/en/faker/reference/a-d"
+      },
+      "label": {
+        "es": "Proveedores A–D",
+        "en": "Providers A–D"
       }
     },
     {
-      "id": "cache-stores-and-locks",
+      "id": "orm-faker-reference-e-h",
       "kind": "doc",
       "title": {
-        "es": "Drivers y almacenes de caché",
-        "en": "Cache drivers and stores"
-      },
-      "label": {
-        "en": "Drivers and stores",
-        "es": "Drivers y almacenes"
+        "es": "Faker: proveedores E–H",
+        "en": "Faker: providers E–H"
       },
       "slug": {
-        "es": "/es/services/cache/stores-and-locks",
-        "en": "/en/services/cache/stores-and-locks"
+        "es": "/es/faker/reference/e-h",
+        "en": "/en/faker/reference/e-h"
+      },
+      "label": {
+        "es": "Proveedores E–H",
+        "en": "Providers E–H"
       }
     },
     {
-      "id": "cache-source-artifacts",
+      "id": "orm-faker-reference-i-l",
       "kind": "doc",
       "title": {
-        "es": "Cachear artefactos derivados de fuentes",
-        "en": "Caching source-derived artifacts"
-      },
-      "label": {
-        "en": "Source-derived artifacts",
-        "es": "Artefactos de código fuente"
+        "es": "Faker: proveedores I–L",
+        "en": "Faker: providers I–L"
       },
       "slug": {
-        "es": "/es/services/cache/source-artifacts",
-        "en": "/en/services/cache/source-artifacts"
+        "es": "/es/faker/reference/i-l",
+        "en": "/en/faker/reference/i-l"
+      },
+      "label": {
+        "es": "Proveedores I–L",
+        "en": "Providers I–L"
       }
     },
     {
-      "id": "cache-configuration",
+      "id": "orm-faker-reference-m-p",
       "kind": "doc",
       "title": {
-        "es": "Configuración de caché",
-        "en": "Cache configuration"
-      },
-      "label": {
-        "es": "Configuración",
-        "en": "Configuration"
+        "es": "Faker: proveedores M–P",
+        "en": "Faker: providers M–P"
       },
       "slug": {
-        "es": "/es/services/cache/configuration",
-        "en": "/en/services/cache/configuration"
+        "es": "/es/faker/reference/m-p",
+        "en": "/en/faker/reference/m-p"
+      },
+      "label": {
+        "es": "Proveedores M–P",
+        "en": "Providers M–P"
       }
     },
     {
-      "id": "cache-locks",
+      "id": "orm-faker-reference-q-t",
       "kind": "doc",
       "title": {
-        "es": "Bloqueos y concurrencia",
-        "en": "Locks and concurrency"
-      },
-      "label": {
-        "es": "Bloqueos y concurrencia",
-        "en": "Locks and concurrency"
+        "es": "Faker: proveedores Q–T",
+        "en": "Faker: providers Q–T"
       },
       "slug": {
-        "es": "/es/services/cache/locks",
-        "en": "/en/services/cache/locks"
+        "es": "/es/faker/reference/q-t",
+        "en": "/en/faker/reference/q-t"
+      },
+      "label": {
+        "es": "Proveedores Q–T",
+        "en": "Providers Q–T"
       }
     },
     {
-      "id": "cache-manager-and-injection",
+      "id": "orm-faker-reference-u-z",
       "kind": "doc",
       "title": {
-        "es": "Fachada e inyección de Cache",
-        "en": "Cache facade and injection"
-      },
-      "label": {
-        "es": "Fachada e inyección",
-        "en": "Facade and injection"
+        "es": "Faker: proveedores U–Z",
+        "en": "Faker: providers U–Z"
       },
       "slug": {
-        "es": "/es/services/cache/manager-and-injection",
-        "en": "/en/services/cache/manager-and-injection"
-      }
-    },
-    {
-      "id": "cache-api-reference",
-      "kind": "doc",
-      "title": {
-        "es": "Referencia técnica de caché",
-        "en": "Cache technical reference"
+        "es": "/es/faker/reference/u-z",
+        "en": "/en/faker/reference/u-z"
       },
       "label": {
-        "es": "Referencia técnica",
-        "en": "Technical reference"
-      },
-      "slug": {
-        "es": "/es/services/cache/api-reference",
-        "en": "/en/services/cache/api-reference"
+        "es": "Proveedores U–Z",
+        "en": "Providers U–Z"
       }
     },
     {
@@ -1705,40 +1741,8 @@
         "es": "Introducción"
       },
       "slug": {
-        "es": "/es/services/storage",
-        "en": "/en/services/storage"
-      }
-    },
-    {
-      "id": "storage-files-and-directories",
-      "kind": "doc",
-      "title": {
-        "es": "Guardar archivos y recorrer directorios",
-        "en": "Saving files and listing directories"
-      },
-      "label": {
-        "en": "Files and directories",
-        "es": "Archivos y directorios"
-      },
-      "slug": {
-        "es": "/es/services/storage/files-and-directories",
-        "en": "/en/services/storage/files-and-directories"
-      }
-    },
-    {
-      "id": "storage-streaming-and-uploads",
-      "kind": "doc",
-      "title": {
-        "es": "Transmitir contenido y guardar uploads",
-        "en": "Streaming content and saving uploads"
-      },
-      "label": {
-        "en": "Streaming and uploads",
-        "es": "Streaming y uploads"
-      },
-      "slug": {
-        "es": "/es/services/storage/streaming-and-uploads",
-        "en": "/en/services/storage/streaming-and-uploads"
+        "es": "/es/storage",
+        "en": "/en/storage"
       }
     },
     {
@@ -1753,8 +1757,8 @@
         "es": "Discos y drivers"
       },
       "slug": {
-        "es": "/es/services/storage/disks-and-drivers",
-        "en": "/en/services/storage/disks-and-drivers"
+        "es": "/es/storage/disks-and-drivers",
+        "en": "/en/storage/disks-and-drivers"
       }
     },
     {
@@ -1769,8 +1773,40 @@
         "en": "Configuration"
       },
       "slug": {
-        "es": "/es/services/storage/configuration",
-        "en": "/en/services/storage/configuration"
+        "es": "/es/storage/configuration",
+        "en": "/en/storage/configuration"
+      }
+    },
+    {
+      "id": "storage-files-and-directories",
+      "kind": "doc",
+      "title": {
+        "es": "Guardar archivos y recorrer directorios",
+        "en": "Saving files and listing directories"
+      },
+      "label": {
+        "en": "Files and directories",
+        "es": "Archivos y directorios"
+      },
+      "slug": {
+        "es": "/es/storage/files-and-directories",
+        "en": "/en/storage/files-and-directories"
+      }
+    },
+    {
+      "id": "storage-streaming-and-uploads",
+      "kind": "doc",
+      "title": {
+        "es": "Transmitir contenido y guardar uploads",
+        "en": "Streaming content and saving uploads"
+      },
+      "label": {
+        "en": "Streaming and uploads",
+        "es": "Streaming y uploads"
+      },
+      "slug": {
+        "es": "/es/storage/streaming-and-uploads",
+        "en": "/en/storage/streaming-and-uploads"
       }
     },
     {
@@ -1785,8 +1821,8 @@
         "en": "Temporary files and contexts"
       },
       "slug": {
-        "es": "/es/services/storage/temporary-files-and-contexts",
-        "en": "/en/services/storage/temporary-files-and-contexts"
+        "es": "/es/storage/temporary-files-and-contexts",
+        "en": "/en/storage/temporary-files-and-contexts"
       }
     },
     {
@@ -1801,8 +1837,8 @@
         "en": "Facade and injection"
       },
       "slug": {
-        "es": "/es/services/storage/manager-and-injection",
-        "en": "/en/services/storage/manager-and-injection"
+        "es": "/es/storage/manager-and-injection",
+        "en": "/en/storage/manager-and-injection"
       }
     },
     {
@@ -1817,72 +1853,136 @@
         "en": "Technical reference"
       },
       "slug": {
-        "es": "/es/services/storage/api-reference",
-        "en": "/en/services/storage/api-reference"
+        "es": "/es/storage/api-reference",
+        "en": "/en/storage/api-reference"
       }
     },
     {
-      "id": "logging-overview",
+      "id": "cache-overview",
       "kind": "doc",
       "title": {
-        "es": "Logs de aplicación",
-        "en": "Application logs"
-      },
-      "label": {
-        "es": "Introducción",
-        "en": "Introduction"
+        "es": "Caché",
+        "en": "Cache"
       },
       "slug": {
-        "es": "/es/services/logging",
-        "en": "/en/services/logging"
+        "es": "/es/cache",
+        "en": "/en/cache"
+      },
+      "label": {
+        "en": "Introduction",
+        "es": "Introducción"
       }
     },
     {
-      "id": "logging-configuration",
+      "id": "cache-stores-and-locks",
       "kind": "doc",
       "title": {
-        "es": "Canales y configuración de logs",
-        "en": "Log channels and configuration"
+        "es": "Drivers y almacenes de caché",
+        "en": "Cache drivers and stores"
       },
       "label": {
-        "es": "Canales y configuración",
-        "en": "Channels and configuration"
+        "en": "Drivers and stores",
+        "es": "Drivers y almacenes"
       },
       "slug": {
-        "es": "/es/services/logging/configuration",
-        "en": "/en/services/logging/configuration"
+        "es": "/es/cache/stores-and-drivers",
+        "en": "/en/cache/stores-and-drivers"
       }
     },
     {
-      "id": "logging-writing-logs",
+      "id": "cache-configuration",
       "kind": "doc",
       "title": {
-        "es": "Registrar eventos de aplicación",
-        "en": "Recording application events"
+        "es": "Configuración de caché",
+        "en": "Cache configuration"
       },
       "label": {
-        "en": "Writing logs",
-        "es": "Escribir logs"
+        "es": "Configuración",
+        "en": "Configuration"
       },
       "slug": {
-        "es": "/es/services/logging/writing-logs",
-        "en": "/en/services/logging/writing-logs"
+        "es": "/es/cache/configuration",
+        "en": "/en/cache/configuration"
       }
     },
     {
-      "id": "logging-rotation-and-lifecycle",
+      "id": "cache-caching-values",
       "kind": "doc",
       "title": {
-        "es": "Configurar rotación y ciclo de vida",
-        "en": "Configuring rotation and lifecycle"
+        "es": "Guardar y regenerar datos",
+        "en": "Storing and regenerating values"
       },
       "label": {
-        "en": "Rotation and lifecycle",
-        "es": "Rotación y ciclo de vida"
+        "en": "Storing and regenerating values",
+        "es": "Guardar y regenerar valores"
       },
       "slug": {
-        "es": "/es/services/logging/rotation-and-lifecycle",
-        "en": "/en/services/logging/rotation-and-lifecycle"
+        "es": "/es/cache/caching-values",
+        "en": "/en/cache/caching-values"
+      }
+    },
+    {
+      "id": "cache-locks",
+      "kind": "doc",
+      "title": {
+        "es": "Bloqueos y concurrencia",
+        "en": "Locks and concurrency"
+      },
+      "label": {
+        "es": "Bloqueos y concurrencia",
+        "en": "Locks and concurrency"
+      },
+      "slug": {
+        "es": "/es/cache/locks",
+        "en": "/en/cache/locks"
+      }
+    },
+    {
+      "id": "cache-source-artifacts",
+      "kind": "doc",
+      "title": {
+        "es": "Cachear artefactos derivados de fuentes",
+        "en": "Caching source-derived artifacts"
+      },
+      "label": {
+        "en": "Source-derived artifacts",
+        "es": "Artefactos de código fuente"
+      },
+      "slug": {
+        "es": "/es/cache/source-artifacts",
+        "en": "/en/cache/source-artifacts"
+      }
+    },
+    {
+      "id": "cache-manager-and-injection",
+      "kind": "doc",
+      "title": {
+        "es": "Fachada e inyección de Cache",
+        "en": "Cache facade and injection"
+      },
+      "label": {
+        "es": "Fachada e inyección",
+        "en": "Facade and injection"
+      },
+      "slug": {
+        "es": "/es/cache/manager-and-injection",
+        "en": "/en/cache/manager-and-injection"
+      }
+    },
+    {
+      "id": "cache-api-reference",
+      "kind": "doc",
+      "title": {
+        "es": "Referencia técnica de caché",
+        "en": "Cache technical reference"
+      },
+      "label": {
+        "es": "Referencia técnica",
+        "en": "Technical reference"
+      },
+      "slug": {
+        "es": "/es/cache/api-reference",
+        "en": "/en/cache/api-reference"
       }
     },
     {
@@ -1893,60 +1993,12 @@
         "en": "Mail"
       },
       "slug": {
-        "es": "/es/services/mail",
-        "en": "/en/services/mail"
+        "es": "/es/mail",
+        "en": "/en/mail"
       },
       "label": {
         "en": "Introduction",
         "es": "Introducción"
-      }
-    },
-    {
-      "id": "mail-composing-mail",
-      "kind": "doc",
-      "title": {
-        "es": "Crear clases de correo",
-        "en": "Creating mailable classes"
-      },
-      "label": {
-        "es": "Clases Mailable",
-        "en": "Mailable classes"
-      },
-      "slug": {
-        "es": "/es/services/mail/composing-mail",
-        "en": "/en/services/mail/composing-mail"
-      }
-    },
-    {
-      "id": "mail-sending-and-results",
-      "kind": "doc",
-      "title": {
-        "es": "Enviar mensajes y manejar resultados",
-        "en": "Sending messages and handling results"
-      },
-      "label": {
-        "en": "Sending and results",
-        "es": "Envío y resultados"
-      },
-      "slug": {
-        "es": "/es/services/mail/sending-and-results",
-        "en": "/en/services/mail/sending-and-results"
-      }
-    },
-    {
-      "id": "mail-transports-and-extensions",
-      "kind": "doc",
-      "title": {
-        "es": "Configurar SMTP, file y transportes propios",
-        "en": "Configuring SMTP, file, and custom transports"
-      },
-      "label": {
-        "en": "Mail transports",
-        "es": "Transportes de correo"
-      },
-      "slug": {
-        "es": "/es/services/mail/transports-and-extensions",
-        "en": "/en/services/mail/transports-and-extensions"
       }
     },
     {
@@ -1961,8 +2013,40 @@
         "en": "Configuration"
       },
       "slug": {
-        "es": "/es/services/mail/configuration",
-        "en": "/en/services/mail/configuration"
+        "es": "/es/mail/configuration",
+        "en": "/en/mail/configuration"
+      }
+    },
+    {
+      "id": "mail-transports-and-extensions",
+      "kind": "doc",
+      "title": {
+        "es": "Configurar SMTP, file y transportes propios",
+        "en": "Configuring SMTP, file, and custom transports"
+      },
+      "label": {
+        "en": "Mail transports",
+        "es": "Transportes de correo"
+      },
+      "slug": {
+        "es": "/es/mail/transports-and-extensions",
+        "en": "/en/mail/transports-and-extensions"
+      }
+    },
+    {
+      "id": "mail-composing-mail",
+      "kind": "doc",
+      "title": {
+        "es": "Crear clases de correo",
+        "en": "Creating mailable classes"
+      },
+      "label": {
+        "es": "Clases Mailable",
+        "en": "Mailable classes"
+      },
+      "slug": {
+        "es": "/es/mail/composing-mail",
+        "en": "/en/mail/composing-mail"
       }
     },
     {
@@ -1977,8 +2061,8 @@
         "en": "Content and views"
       },
       "slug": {
-        "es": "/es/services/mail/content-and-views",
-        "en": "/en/services/mail/content-and-views"
+        "es": "/es/mail/content-and-views",
+        "en": "/en/mail/content-and-views"
       }
     },
     {
@@ -1993,8 +2077,24 @@
         "en": "Storage attachments"
       },
       "slug": {
-        "es": "/es/services/mail/attachments",
-        "en": "/en/services/mail/attachments"
+        "es": "/es/mail/attachments",
+        "en": "/en/mail/attachments"
+      }
+    },
+    {
+      "id": "mail-sending-and-results",
+      "kind": "doc",
+      "title": {
+        "es": "Enviar mensajes y manejar resultados",
+        "en": "Sending messages and handling results"
+      },
+      "label": {
+        "en": "Sending and results",
+        "es": "Envío y resultados"
+      },
+      "slug": {
+        "es": "/es/mail/sending-and-results",
+        "en": "/en/mail/sending-and-results"
       }
     },
     {
@@ -2009,8 +2109,8 @@
         "en": "Facade and injection"
       },
       "slug": {
-        "es": "/es/services/mail/manager-and-injection",
-        "en": "/en/services/mail/manager-and-injection"
+        "es": "/es/mail/manager-and-injection",
+        "en": "/en/mail/manager-and-injection"
       }
     },
     {
@@ -2025,244 +2125,8 @@
         "en": "Technical reference"
       },
       "slug": {
-        "es": "/es/services/mail/api-reference",
-        "en": "/en/services/mail/api-reference"
-      }
-    },
-    {
-      "id": "view-overview",
-      "kind": "doc",
-      "title": {
-        "es": "Introducción a las vistas",
-        "en": "Introduction to views"
-      },
-      "slug": {
-        "es": "/es/services/views",
-        "en": "/en/services/views"
-      },
-      "label": {
-        "es": "Introducción",
-        "en": "Introduction"
-      }
-    },
-    {
-      "id": "view-rendering-templates",
-      "kind": "doc",
-      "title": {
-        "es": "Controladores y HTML",
-        "en": "Controllers and HTML"
-      },
-      "label": {
-        "es": "Controladores y HTML",
-        "en": "Controllers and HTML"
-      },
-      "slug": {
-        "es": "/es/services/views/rendering-templates",
-        "en": "/en/services/views/rendering-templates"
-      }
-    },
-    {
-      "id": "view-template-language",
-      "kind": "doc",
-      "title": {
-        "es": "Plantillas y herencia",
-        "en": "Templates and inheritance"
-      },
-      "label": {
-        "es": "Plantillas y herencia",
-        "en": "Templates and inheritance"
-      },
-      "slug": {
-        "es": "/es/services/views/template-language",
-        "en": "/en/services/views/template-language"
-      }
-    },
-    {
-      "id": "view-filters",
-      "kind": "doc",
-      "title": {
-        "es": "Filtros de las plantillas",
-        "en": "Template filters"
-      },
-      "label": {
-        "es": "Filtros",
-        "en": "Filters"
-      },
-      "slug": {
-        "es": "/es/services/views/filters",
-        "en": "/en/services/views/filters"
-      }
-    },
-    {
-      "id": "view-globals",
-      "kind": "doc",
-      "title": {
-        "es": "Globals y contexto de las vistas",
-        "en": "View globals and context"
-      },
-      "label": {
-        "es": "Globals y contexto",
-        "en": "Globals and context"
-      },
-      "slug": {
-        "es": "/es/services/views/globals",
-        "en": "/en/services/views/globals"
-      }
-    },
-    {
-      "id": "view-configuration-and-extensions",
-      "kind": "doc",
-      "title": {
-        "es": "Configuración y caché de vistas",
-        "en": "View configuration and cache"
-      },
-      "label": {
-        "es": "Configuración y caché",
-        "en": "Configuration and cache"
-      },
-      "slug": {
-        "es": "/es/services/views/configuration-and-extensions",
-        "en": "/en/services/views/configuration-and-extensions"
-      }
-    },
-    {
-      "id": "view-providers-and-extensions",
-      "kind": "doc",
-      "title": {
-        "es": "Providers y extensiones de vistas",
-        "en": "View providers and extensions"
-      },
-      "label": {
-        "es": "Providers y extensiones",
-        "en": "Providers and extensions"
-      },
-      "slug": {
-        "es": "/es/services/views/providers-and-extensions",
-        "en": "/en/services/views/providers-and-extensions"
-      }
-    },
-    {
-      "id": "localization-overview",
-      "kind": "doc",
-      "title": {
-        "es": "Introducción a la localización",
-        "en": "Introduction to localization"
-      },
-      "slug": {
-        "es": "/es/services/localization",
-        "en": "/en/services/localization"
-      },
-      "label": {
-        "es": "Introducción",
-        "en": "Introduction"
-      }
-    },
-    {
-      "id": "localization-messages-and-locales",
-      "kind": "doc",
-      "title": {
-        "es": "Archivos, idiomas y configuración",
-        "en": "Files, locales, and configuration"
-      },
-      "label": {
-        "es": "Archivos e idiomas",
-        "en": "Files and locales"
-      },
-      "slug": {
-        "es": "/es/services/localization/messages-and-locales",
-        "en": "/en/services/localization/messages-and-locales"
-      }
-    },
-    {
-      "id": "localization-translating-content",
-      "kind": "doc",
-      "title": {
-        "es": "Traducir mensajes y plurales",
-        "en": "Translate messages and plurals"
-      },
-      "label": {
-        "en": "Messages and plurals",
-        "es": "Mensajes y plurales"
-      },
-      "slug": {
-        "es": "/es/services/localization/translating-content",
-        "en": "/en/services/localization/translating-content"
-      }
-    },
-    {
-      "id": "localization-application-and-views",
-      "kind": "doc",
-      "title": {
-        "es": "Fachada, inyección y vistas",
-        "en": "Facade, injection, and views"
-      },
-      "label": {
-        "es": "Fachada, inyección y vistas",
-        "en": "Facade, injection, and views"
-      },
-      "slug": {
-        "es": "/es/services/localization/application-and-views",
-        "en": "/en/services/localization/application-and-views"
-      }
-    },
-    {
-      "id": "aio-overview",
-      "kind": "doc",
-      "title": {
-        "es": "Ejecución asíncrona",
-        "en": "Async execution"
-      },
-      "slug": {
-        "es": "/es/asynchronous/event-loops",
-        "en": "/en/asynchronous/event-loops"
-      }
-    },
-    {
-      "id": "aio-async-execution",
-      "kind": "doc",
-      "title": {
-        "es": "Conectar código síncrono y asíncrono",
-        "en": "Connecting synchronous and asynchronous code"
-      },
-      "label": {
-        "en": "Sync and async code",
-        "es": "Código síncrono y asíncrono"
-      },
-      "slug": {
-        "es": "/es/asynchronous/event-loops/async-execution",
-        "en": "/en/asynchronous/event-loops/async-execution"
-      }
-    },
-    {
-      "id": "background-overview",
-      "kind": "doc",
-      "title": {
-        "es": "Tareas después de la respuesta",
-        "en": "Tasks after the response"
-      },
-      "label": {
-        "en": "Tasks after the response",
-        "es": "Tareas tras la respuesta"
-      },
-      "slug": {
-        "es": "/es/asynchronous/background-tasks",
-        "en": "/en/asynchronous/background-tasks"
-      }
-    },
-    {
-      "id": "background-response-tasks",
-      "kind": "doc",
-      "title": {
-        "es": "Ejecutar acciones después de responder",
-        "en": "Running actions after responding"
-      },
-      "label": {
-        "en": "Running post-response tasks",
-        "es": "Ejecución tras responder"
-      },
-      "slug": {
-        "es": "/es/asynchronous/background-tasks/response-tasks",
-        "en": "/en/asynchronous/background-tasks/response-tasks"
+        "es": "/es/mail/api-reference",
+        "en": "/en/mail/api-reference"
       }
     },
     {
@@ -2273,28 +2137,12 @@
         "en": "Queues and jobs"
       },
       "slug": {
-        "es": "/es/asynchronous/queues",
-        "en": "/en/asynchronous/queues"
+        "es": "/es/queues",
+        "en": "/en/queues"
       },
       "label": {
         "es": "Introducción",
         "en": "Introduction"
-      }
-    },
-    {
-      "id": "queues-jobs-and-dispatch",
-      "kind": "doc",
-      "title": {
-        "es": "Escribir y enviar jobs",
-        "en": "Write and dispatch jobs"
-      },
-      "label": {
-        "en": "Creating and dispatching jobs",
-        "es": "Crear y enviar jobs"
-      },
-      "slug": {
-        "es": "/es/asynchronous/queues/jobs-and-dispatch",
-        "en": "/en/asynchronous/queues/jobs-and-dispatch"
       }
     },
     {
@@ -2309,8 +2157,56 @@
         "es": "Drivers de colas"
       },
       "slug": {
-        "es": "/es/asynchronous/queues/drivers-and-configuration",
-        "en": "/en/asynchronous/queues/drivers-and-configuration"
+        "es": "/es/queues/drivers-and-configuration",
+        "en": "/en/queues/drivers-and-configuration"
+      }
+    },
+    {
+      "id": "queues-configuration",
+      "kind": "doc",
+      "title": {
+        "es": "Configuración de colas",
+        "en": "Queue configuration"
+      },
+      "slug": {
+        "es": "/es/queues/configuration",
+        "en": "/en/queues/configuration"
+      },
+      "label": {
+        "es": "Configuración",
+        "en": "Configuration"
+      }
+    },
+    {
+      "id": "queues-jobs-and-dispatch",
+      "kind": "doc",
+      "title": {
+        "es": "Escribir y enviar jobs",
+        "en": "Write and dispatch jobs"
+      },
+      "label": {
+        "en": "Creating and dispatching jobs",
+        "es": "Crear y enviar jobs"
+      },
+      "slug": {
+        "es": "/es/queues/jobs-and-dispatch",
+        "en": "/en/queues/jobs-and-dispatch"
+      }
+    },
+    {
+      "id": "queues-execution-modes",
+      "kind": "doc",
+      "title": {
+        "es": "Formas de ejecución de jobs",
+        "en": "Job execution modes"
+      },
+      "slug": {
+        "es": "/es/queues/execution-modes",
+        "en": "/en/queues/execution-modes"
+      },
+      "label": {
+        "es": "Formas de ejecución",
+        "en": "Execution modes"
       }
     },
     {
@@ -2325,40 +2221,8 @@
         "en": "Workers and processing"
       },
       "slug": {
-        "es": "/es/asynchronous/queues/workers-and-failures",
-        "en": "/en/asynchronous/queues/workers-and-failures"
-      }
-    },
-    {
-      "id": "queues-configuration",
-      "kind": "doc",
-      "title": {
-        "es": "Configuración de colas",
-        "en": "Queue configuration"
-      },
-      "slug": {
-        "es": "/es/asynchronous/queues/configuration",
-        "en": "/en/asynchronous/queues/configuration"
-      },
-      "label": {
-        "es": "Configuración",
-        "en": "Configuration"
-      }
-    },
-    {
-      "id": "queues-execution-modes",
-      "kind": "doc",
-      "title": {
-        "es": "Formas de ejecución de jobs",
-        "en": "Job execution modes"
-      },
-      "slug": {
-        "es": "/es/asynchronous/queues/execution-modes",
-        "en": "/en/asynchronous/queues/execution-modes"
-      },
-      "label": {
-        "es": "Formas de ejecución",
-        "en": "Execution modes"
+        "es": "/es/queues/workers",
+        "en": "/en/queues/workers"
       }
     },
     {
@@ -2369,8 +2233,8 @@
         "en": "Retries, exceptions and failed jobs"
       },
       "slug": {
-        "es": "/es/asynchronous/queues/failures-and-retries",
-        "en": "/en/asynchronous/queues/failures-and-retries"
+        "es": "/es/queues/failures-and-retries",
+        "en": "/en/queues/failures-and-retries"
       },
       "label": {
         "es": "Reintentos y fallos",
@@ -2385,8 +2249,8 @@
         "en": "Queue facade and injection"
       },
       "slug": {
-        "es": "/es/asynchronous/queues/manager-and-injection",
-        "en": "/en/asynchronous/queues/manager-and-injection"
+        "es": "/es/queues/manager-and-injection",
+        "en": "/en/queues/manager-and-injection"
       },
       "label": {
         "es": "Fachada e inyección",
@@ -2401,8 +2265,8 @@
         "en": "Queue technical reference"
       },
       "slug": {
-        "es": "/es/asynchronous/queues/api-reference",
-        "en": "/en/asynchronous/queues/api-reference"
+        "es": "/es/queues/api-reference",
+        "en": "/en/queues/api-reference"
       },
       "label": {
         "es": "Referencia técnica",
@@ -2410,115 +2274,35 @@
       }
     },
     {
-      "id": "realtime-overview",
+      "id": "background-overview",
       "kind": "doc",
       "title": {
-        "es": "Realtime, WebSocket y SSE",
-        "en": "Realtime, WebSocket and SSE"
+        "es": "Tareas después de la respuesta",
+        "en": "Tasks after the response"
       },
       "label": {
-        "en": "Introduction",
-        "es": "Introducción"
+        "en": "Tasks after the response",
+        "es": "Tareas tras la respuesta"
       },
       "slug": {
-        "es": "/es/asynchronous/realtime",
-        "en": "/en/asynchronous/realtime"
+        "es": "/es/queues/background-tasks",
+        "en": "/en/queues/background-tasks"
       }
     },
     {
-      "id": "realtime-routing-and-lifecycle",
+      "id": "background-response-tasks",
       "kind": "doc",
       "title": {
-        "es": "Rutas y ciclo de vida de conexiones",
-        "en": "Routing and connection lifecycle"
+        "es": "Ejecutar acciones después de responder",
+        "en": "Running actions after responding"
       },
       "label": {
-        "es": "Rutas y ciclo de vida",
-        "en": "Routes and lifecycle"
+        "en": "Running post-response tasks",
+        "es": "Ejecución tras responder"
       },
       "slug": {
-        "es": "/es/asynchronous/realtime/routing-and-lifecycle",
-        "en": "/en/asynchronous/realtime/routing-and-lifecycle"
-      }
-    },
-    {
-      "id": "realtime-hubs-and-methods",
-      "kind": "doc",
-      "title": {
-        "es": "Hubs, rutas y métodos remotos",
-        "en": "Hubs, routes, and remote methods"
-      },
-      "label": {
-        "en": "Hubs and remote methods",
-        "es": "Hubs y métodos remotos"
-      },
-      "slug": {
-        "es": "/es/asynchronous/realtime/hubs-and-methods",
-        "en": "/en/asynchronous/realtime/hubs-and-methods"
-      }
-    },
-    {
-      "id": "realtime-chat",
-      "kind": "doc",
-      "title": {
-        "es": "Chat con salas en Realtime",
-        "en": "Realtime chat with rooms"
-      },
-      "label": {
-        "es": "Chat con salas",
-        "en": "Chat with rooms"
-      },
-      "slug": {
-        "es": "/es/asynchronous/realtime/chat",
-        "en": "/en/asynchronous/realtime/chat"
-      }
-    },
-    {
-      "id": "realtime-javascript-client",
-      "kind": "doc",
-      "title": {
-        "es": "Cliente JavaScript con npm",
-        "en": "JavaScript client with npm"
-      },
-      "label": {
-        "es": "Cliente JavaScript",
-        "en": "JavaScript client"
-      },
-      "slug": {
-        "es": "/es/asynchronous/realtime/javascript-client",
-        "en": "/en/asynchronous/realtime/javascript-client"
-      }
-    },
-    {
-      "id": "realtime-protocol-and-streaming",
-      "kind": "doc",
-      "title": {
-        "es": "Cliente JavaScript, protocolo y streams",
-        "en": "JavaScript client, protocol, and streams"
-      },
-      "label": {
-        "en": "Protocol and streams",
-        "es": "Protocolo y streams"
-      },
-      "slug": {
-        "es": "/es/asynchronous/realtime/protocol-and-streaming",
-        "en": "/en/asynchronous/realtime/protocol-and-streaming"
-      }
-    },
-    {
-      "id": "realtime-groups-and-deployment",
-      "kind": "doc",
-      "title": {
-        "es": "Grupos, difusión y despliegue",
-        "en": "Groups, broadcasts, and deployment"
-      },
-      "label": {
-        "es": "Grupos y despliegue",
-        "en": "Groups and deployment"
-      },
-      "slug": {
-        "es": "/es/asynchronous/realtime/groups-and-deployment",
-        "en": "/en/asynchronous/realtime/groups-and-deployment"
+        "es": "/es/queues/background-tasks/response-tasks",
+        "en": "/en/queues/background-tasks/response-tasks"
       }
     },
     {
@@ -2538,66 +2322,6 @@
       }
     },
     {
-      "id": "console-commands-and-arguments",
-      "kind": "doc",
-      "title": {
-        "es": "Argumentos y opciones",
-        "en": "Arguments and options"
-      },
-      "label": {
-        "es": "Argumentos y opciones",
-        "en": "Arguments and options"
-      },
-      "slug": {
-        "es": "/es/console/commands-and-arguments",
-        "en": "/en/console/commands-and-arguments"
-      }
-    },
-    {
-      "id": "console-output-and-programmatic-execution",
-      "kind": "doc",
-      "title": {
-        "es": "Fachada Reactor y ejecución programática",
-        "en": "Reactor facade and programmatic execution"
-      },
-      "slug": {
-        "es": "/es/console/output-and-programmatic-execution",
-        "en": "/en/console/output-and-programmatic-execution"
-      },
-      "label": {
-        "es": "Fachada e inyección",
-        "en": "Facade and injection"
-      }
-    },
-    {
-      "id": "console-task-scheduling",
-      "kind": "doc",
-      "title": {
-        "es": "Programar tareas",
-        "en": "Schedule tasks"
-      },
-      "label": {
-        "en": "Task scheduling",
-        "es": "Programación de tareas"
-      },
-      "slug": {
-        "es": "/es/console/task-scheduling",
-        "en": "/en/console/task-scheduling"
-      }
-    },
-    {
-      "id": "console-built-in-commands",
-      "kind": "doc",
-      "title": {
-        "es": "Comandos incluidos",
-        "en": "Built-in commands"
-      },
-      "slug": {
-        "es": "/es/console/built-in-commands",
-        "en": "/en/console/built-in-commands"
-      }
-    },
-    {
       "id": "console-creating-commands",
       "kind": "doc",
       "title": {
@@ -2614,6 +2338,22 @@
       }
     },
     {
+      "id": "console-commands-and-arguments",
+      "kind": "doc",
+      "title": {
+        "es": "Argumentos y opciones",
+        "en": "Arguments and options"
+      },
+      "label": {
+        "es": "Argumentos y opciones",
+        "en": "Arguments and options"
+      },
+      "slug": {
+        "es": "/es/console/commands-and-arguments",
+        "en": "/en/console/commands-and-arguments"
+      }
+    },
+    {
       "id": "console-command-routing",
       "kind": "doc",
       "title": {
@@ -2627,38 +2367,6 @@
       "slug": {
         "es": "/es/console/command-routing",
         "en": "/en/console/command-routing"
-      }
-    },
-    {
-      "id": "console-command-cache",
-      "kind": "doc",
-      "title": {
-        "es": "Descubrimiento y caché de comandos",
-        "en": "Command discovery and cache"
-      },
-      "label": {
-        "es": "Descubrimiento y caché",
-        "en": "Discovery and cache"
-      },
-      "slug": {
-        "es": "/es/console/command-cache",
-        "en": "/en/console/command-cache"
-      }
-    },
-    {
-      "id": "console-api-reference",
-      "kind": "doc",
-      "title": {
-        "es": "Referencia técnica de consola",
-        "en": "Console technical reference"
-      },
-      "label": {
-        "es": "Referencia técnica",
-        "en": "Technical reference"
-      },
-      "slug": {
-        "es": "/es/console/api-reference",
-        "en": "/en/console/api-reference"
       }
     },
     {
@@ -2705,8 +2413,72 @@
         "en": "Progress"
       },
       "slug": {
-        "es": "/es/console/progress-and-debugging",
-        "en": "/en/console/progress-and-debugging"
+        "es": "/es/console/progress",
+        "en": "/en/console/progress"
+      }
+    },
+    {
+      "id": "console-output-and-programmatic-execution",
+      "kind": "doc",
+      "title": {
+        "es": "Fachada Reactor y ejecución programática",
+        "en": "Reactor facade and programmatic execution"
+      },
+      "slug": {
+        "es": "/es/console/reactor-and-injection",
+        "en": "/en/console/reactor-and-injection"
+      },
+      "label": {
+        "es": "Fachada e inyección",
+        "en": "Facade and injection"
+      }
+    },
+    {
+      "id": "console-command-cache",
+      "kind": "doc",
+      "title": {
+        "es": "Descubrimiento y caché de comandos",
+        "en": "Command discovery and cache"
+      },
+      "label": {
+        "es": "Descubrimiento y caché",
+        "en": "Discovery and cache"
+      },
+      "slug": {
+        "es": "/es/console/command-cache",
+        "en": "/en/console/command-cache"
+      }
+    },
+    {
+      "id": "console-api-reference",
+      "kind": "doc",
+      "title": {
+        "es": "Referencia técnica de consola",
+        "en": "Console technical reference"
+      },
+      "label": {
+        "es": "Referencia técnica",
+        "en": "Technical reference"
+      },
+      "slug": {
+        "es": "/es/console/api-reference",
+        "en": "/en/console/api-reference"
+      }
+    },
+    {
+      "id": "console-task-scheduling",
+      "kind": "doc",
+      "title": {
+        "es": "Programar tareas",
+        "en": "Schedule tasks"
+      },
+      "label": {
+        "en": "Task scheduling",
+        "es": "Programación de tareas"
+      },
+      "slug": {
+        "es": "/es/console/task-scheduling",
+        "en": "/en/console/task-scheduling"
       }
     },
     {
@@ -2771,6 +2543,18 @@
       "slug": {
         "es": "/es/console/scheduler-execution",
         "en": "/en/console/scheduler-execution"
+      }
+    },
+    {
+      "id": "console-built-in-commands",
+      "kind": "doc",
+      "title": {
+        "es": "Comandos incluidos",
+        "en": "Built-in commands"
+      },
+      "slug": {
+        "es": "/es/console/built-in-commands",
+        "en": "/en/console/built-in-commands"
       }
     },
     {
@@ -2854,147 +2638,495 @@
       }
     },
     {
-      "id": "mcp-overview",
+      "id": "environment-overview",
       "kind": "doc",
       "title": {
-        "es": "Introducción a MCP",
-        "en": "Introduction to MCP"
+        "es": "Entorno",
+        "en": "Environment"
       },
       "label": {
         "es": "Introducción",
         "en": "Introduction"
       },
       "slug": {
-        "es": "/es/protocols/mcp",
-        "en": "/en/protocols/mcp"
+        "es": "/es/environment",
+        "en": "/en/environment"
       }
     },
     {
-      "id": "mcp-servers-and-tools",
+      "id": "environment-typed-configuration",
       "kind": "doc",
       "title": {
-        "es": "Servidores y rutas",
-        "en": "Servers and routes"
+        "es": "Variables y configuración tipada",
+        "en": "Variables and typed configuration"
       },
       "label": {
-        "es": "Servidores y rutas",
-        "en": "Servers and routes"
+        "es": "Variables y tipos",
+        "en": "Variables and types"
       },
       "slug": {
-        "es": "/es/protocols/mcp/servers-and-tools",
-        "en": "/en/protocols/mcp/servers-and-tools"
+        "es": "/es/environment/typed-configuration",
+        "en": "/en/environment/typed-configuration"
       }
     },
     {
-      "id": "mcp-tools",
+      "id": "environment-compiled-configuration",
       "kind": "doc",
       "title": {
-        "es": "Herramientas MCP",
-        "en": "MCP tools"
+        "es": "Bootstrap y configuración compilada",
+        "en": "Bootstrap and compiled configuration"
       },
       "label": {
-        "es": "Herramientas (Tools)",
-        "en": "Tools"
+        "es": "Bootstrap y archivos JSON",
+        "en": "Bootstrap and JSON files"
       },
       "slug": {
-        "es": "/es/protocols/mcp/tools",
-        "en": "/en/protocols/mcp/tools"
+        "es": "/es/environment/compiled-configuration",
+        "en": "/en/environment/compiled-configuration"
       }
     },
     {
-      "id": "mcp-resources-and-prompts",
+      "id": "environment-operations-and-reference",
       "kind": "doc",
       "title": {
-        "es": "Recursos y plantillas URI",
-        "en": "Resources and URI templates"
+        "es": "Referencia de Env y operaciones de configuración",
+        "en": "Env reference and configuration operations"
       },
       "label": {
-        "es": "Recursos (Resources)",
-        "en": "Resources"
+        "es": "Referencia de Env",
+        "en": "Env reference"
       },
       "slug": {
-        "es": "/es/protocols/mcp/resources-and-prompts",
-        "en": "/en/protocols/mcp/resources-and-prompts"
+        "es": "/es/environment/operations-and-reference",
+        "en": "/en/environment/operations-and-reference"
       }
     },
     {
-      "id": "mcp-prompts",
+      "id": "foundation-application-overview",
       "kind": "doc",
       "title": {
-        "es": "Prompts MCP",
-        "en": "MCP prompts"
+        "es": "Aplicación y contenedor",
+        "en": "Application and container"
       },
       "label": {
-        "es": "Prompts",
-        "en": "Prompts"
+        "es": "Introducción",
+        "en": "Introduction"
       },
       "slug": {
-        "es": "/es/protocols/mcp/prompts",
-        "en": "/en/protocols/mcp/prompts"
+        "es": "/es/application",
+        "en": "/en/application"
       }
     },
     {
-      "id": "mcp-responses-and-content",
+      "id": "foundation-application-lifecycle",
       "kind": "doc",
       "title": {
-        "es": "Respuestas y contenido MCP",
-        "en": "MCP responses and content"
+        "es": "Ciclo de vida y recursos de aplicación",
+        "en": "Application lifecycle and resource ownership"
       },
       "label": {
-        "es": "Respuestas y contenido",
-        "en": "Responses and content"
+        "en": "Application lifecycle",
+        "es": "Ciclo de vida"
       },
       "slug": {
-        "es": "/es/protocols/mcp/responses-and-content",
-        "en": "/en/protocols/mcp/responses-and-content"
+        "es": "/es/application/lifecycle",
+        "en": "/en/application/lifecycle"
       }
     },
     {
-      "id": "mcp-http-and-clients",
+      "id": "foundation-server-entrypoints",
       "kind": "doc",
       "title": {
-        "es": "Consultas HTTP y clientes MCP",
-        "en": "HTTP requests and MCP clients"
+        "es": "Puntos de entrada ASGI y RSGI",
+        "en": "ASGI and RSGI entry points"
       },
       "label": {
-        "es": "HTTP y clientes",
-        "en": "HTTP and clients"
+        "es": "ASGI y RSGI",
+        "en": "ASGI and RSGI"
       },
       "slug": {
-        "es": "/es/protocols/mcp/http-and-clients",
-        "en": "/en/protocols/mcp/http-and-clients"
+        "es": "/es/application/server-entrypoints",
+        "en": "/en/application/server-entrypoints"
       }
     },
     {
-      "id": "mcp-transports-and-configuration",
+      "id": "foundation-application-api",
       "kind": "doc",
       "title": {
-        "es": "STDIO y configuración MCP",
-        "en": "STDIO and MCP configuration"
+        "es": "IApplication: servicios y referencia",
+        "en": "IApplication: services and reference"
       },
       "label": {
-        "es": "STDIO y configuración",
-        "en": "STDIO and configuration"
+        "es": "IApplication y API",
+        "en": "IApplication and API"
       },
       "slug": {
-        "es": "/es/protocols/mcp/transports-and-configuration",
-        "en": "/en/protocols/mcp/transports-and-configuration"
+        "es": "/es/application/api",
+        "en": "/en/application/api"
       }
     },
     {
-      "id": "mcp-advanced-workflows",
+      "id": "foundation-bootstrap-options",
       "kind": "doc",
       "title": {
-        "es": "Flujos avanzados de MCP",
-        "en": "Advanced MCP workflows"
+        "es": "Configurar bootstrap/app.py",
+        "en": "Configure bootstrap/app.py"
       },
       "label": {
-        "es": "Flujos avanzados",
-        "en": "Advanced workflows"
+        "es": "Opciones de bootstrap",
+        "en": "Bootstrap options"
       },
       "slug": {
-        "es": "/es/protocols/mcp/advanced-workflows",
-        "en": "/en/protocols/mcp/advanced-workflows"
+        "es": "/es/application/bootstrap",
+        "en": "/en/application/bootstrap"
+      }
+    },
+    {
+      "id": "foundation-configuration",
+      "kind": "doc",
+      "title": {
+        "es": "Configuración tipada y valores en ejecución",
+        "en": "Typed configuration and runtime values"
+      },
+      "label": {
+        "en": "Application configuration",
+        "es": "Configuración de la aplicación"
+      },
+      "slug": {
+        "es": "/es/application/configuration",
+        "en": "/en/application/configuration"
+      }
+    },
+    {
+      "id": "foundation-paths-and-caching",
+      "kind": "doc",
+      "title": {
+        "es": "Directorios y caché de arranque",
+        "en": "Directories and bootstrap caching"
+      },
+      "label": {
+        "en": "Directories and bootstrap cache",
+        "es": "Directorios y caché de arranque"
+      },
+      "slug": {
+        "es": "/es/application/paths-and-caching",
+        "en": "/en/application/paths-and-caching"
+      }
+    },
+    {
+      "id": "container-overview",
+      "kind": "doc",
+      "title": {
+        "es": "Contenedor de servicios",
+        "en": "Service container"
+      },
+      "slug": {
+        "es": "/es/application/container",
+        "en": "/en/application/container"
+      }
+    },
+    {
+      "id": "container-bindings-and-invocation",
+      "kind": "doc",
+      "title": {
+        "es": "Registrar e invocar servicios",
+        "en": "Registering and invoking services"
+      },
+      "label": {
+        "en": "Bindings and invocation",
+        "es": "Registro e invocación"
+      },
+      "slug": {
+        "es": "/es/application/container/bindings-and-invocation",
+        "en": "/en/application/container/bindings-and-invocation"
+      }
+    },
+    {
+      "id": "container-scopes-and-concurrency",
+      "kind": "doc",
+      "title": {
+        "es": "Scopes, aislamiento y concurrencia",
+        "en": "Scopes, isolation, and concurrency"
+      },
+      "label": {
+        "en": "Scopes and concurrency",
+        "es": "Scopes y concurrencia"
+      },
+      "slug": {
+        "es": "/es/application/container/scopes-and-concurrency",
+        "en": "/en/application/container/scopes-and-concurrency"
+      }
+    },
+    {
+      "id": "container-providers-and-facades",
+      "kind": "doc",
+      "title": {
+        "es": "Proveedores de servicios",
+        "en": "Service providers"
+      },
+      "label": {
+        "es": "Proveedores de servicios",
+        "en": "Service providers"
+      },
+      "slug": {
+        "es": "/es/application/container/providers",
+        "en": "/en/application/container/providers"
+      }
+    },
+    {
+      "id": "container-facades",
+      "kind": "doc",
+      "title": {
+        "es": "Fachadas síncronas y asíncronas",
+        "en": "Synchronous and asynchronous facades"
+      },
+      "label": {
+        "es": "Fachadas sync y async",
+        "en": "Sync and async facades"
+      },
+      "slug": {
+        "es": "/es/application/container/facades",
+        "en": "/en/application/container/facades"
+      }
+    },
+    {
+      "id": "aio-async-execution",
+      "kind": "doc",
+      "title": {
+        "es": "Conectar código síncrono y asíncrono",
+        "en": "Connecting synchronous and asynchronous code"
+      },
+      "label": {
+        "en": "Sync and async code",
+        "es": "Código síncrono y asíncrono"
+      },
+      "slug": {
+        "es": "/es/application/async",
+        "en": "/en/application/async"
+      }
+    },
+    {
+      "id": "logging-overview",
+      "kind": "doc",
+      "title": {
+        "es": "Logs de aplicación",
+        "en": "Application logs"
+      },
+      "label": {
+        "es": "Introducción",
+        "en": "Introduction"
+      },
+      "slug": {
+        "es": "/es/logging",
+        "en": "/en/logging"
+      }
+    },
+    {
+      "id": "logging-configuration",
+      "kind": "doc",
+      "title": {
+        "es": "Canales y configuración de logs",
+        "en": "Log channels and configuration"
+      },
+      "label": {
+        "es": "Canales y configuración",
+        "en": "Channels and configuration"
+      },
+      "slug": {
+        "es": "/es/logging/configuration",
+        "en": "/en/logging/configuration"
+      }
+    },
+    {
+      "id": "logging-writing-logs",
+      "kind": "doc",
+      "title": {
+        "es": "Registrar eventos de aplicación",
+        "en": "Recording application events"
+      },
+      "label": {
+        "en": "Writing logs",
+        "es": "Escribir logs"
+      },
+      "slug": {
+        "es": "/es/logging/writing-logs",
+        "en": "/en/logging/writing-logs"
+      }
+    },
+    {
+      "id": "logging-rotation-and-lifecycle",
+      "kind": "doc",
+      "title": {
+        "es": "Configurar rotación y ciclo de vida",
+        "en": "Configuring rotation and lifecycle"
+      },
+      "label": {
+        "en": "Rotation and lifecycle",
+        "es": "Rotación y ciclo de vida"
+      },
+      "slug": {
+        "es": "/es/logging/rotation-and-lifecycle",
+        "en": "/en/logging/rotation-and-lifecycle"
+      }
+    },
+    {
+      "id": "failure-overview",
+      "kind": "doc",
+      "title": {
+        "es": "Gestión de excepciones",
+        "en": "Exception handling"
+      },
+      "slug": {
+        "es": "/es/exceptions",
+        "en": "/en/exceptions"
+      },
+      "label": {
+        "es": "Introducción y registro",
+        "en": "Introduction and registration"
+      }
+    },
+    {
+      "id": "failure-handling-exceptions",
+      "kind": "doc",
+      "title": {
+        "es": "Reportar y gestionar excepciones",
+        "en": "Reporting and handling exceptions"
+      },
+      "label": {
+        "es": "Personalizar el handler",
+        "en": "Customize the handler"
+      },
+      "slug": {
+        "es": "/es/exceptions/handling-exceptions",
+        "en": "/en/exceptions/handling-exceptions"
+      }
+    },
+    {
+      "id": "failure-contexts-and-transports",
+      "kind": "doc",
+      "title": {
+        "es": "Excepciones por contexto y transporte",
+        "en": "Exceptions by context and transport"
+      },
+      "label": {
+        "es": "Contextos y transportes",
+        "en": "Contexts and transports"
+      },
+      "slug": {
+        "es": "/es/exceptions/contexts-and-transports",
+        "en": "/en/exceptions/contexts-and-transports"
+      }
+    },
+    {
+      "id": "failure-policies-and-reference",
+      "kind": "doc",
+      "title": {
+        "es": "Políticas de errores y referencia",
+        "en": "Error policies and reference"
+      },
+      "label": {
+        "es": "Políticas y referencia",
+        "en": "Policies and reference"
+      },
+      "slug": {
+        "es": "/es/exceptions/policies-and-reference",
+        "en": "/en/exceptions/policies-and-reference"
+      }
+    },
+    {
+      "id": "foundation-deployment-and-reference",
+      "kind": "doc",
+      "title": {
+        "es": "Preparar un despliegue",
+        "en": "Prepare a deployment"
+      },
+      "label": {
+        "es": "Preparación",
+        "en": "Preparation"
+      },
+      "slug": {
+        "es": "/es/deployment",
+        "en": "/en/deployment"
+      }
+    },
+    {
+      "id": "deployment-reverse-proxies",
+      "kind": "doc",
+      "title": {
+        "es": "Proxies, HTTPS y conexiones persistentes",
+        "en": "Proxies, HTTPS and persistent connections"
+      },
+      "label": {
+        "es": "Proxies y HTTPS",
+        "en": "Proxies and HTTPS"
+      },
+      "slug": {
+        "es": "/es/deployment/reverse-proxies",
+        "en": "/en/deployment/reverse-proxies"
+      }
+    },
+    {
+      "id": "http-default-responses",
+      "kind": "doc",
+      "title": {
+        "es": "Salud, errores y rutas predeterminadas",
+        "en": "Health, errors and default routes"
+      },
+      "label": {
+        "en": "Health, errors and default routes",
+        "es": "Salud, errores y rutas"
+      },
+      "slug": {
+        "es": "/es/deployment/health-and-default-responses",
+        "en": "/en/deployment/health-and-default-responses"
+      }
+    },
+    {
+      "id": "deployment-windows-server",
+      "kind": "doc",
+      "title": {
+        "es": "Desplegar en Windows Server",
+        "en": "Deploy on Windows Server"
+      },
+      "label": {
+        "es": "Windows Server",
+        "en": "Windows Server"
+      },
+      "slug": {
+        "es": "/es/deployment/windows-server",
+        "en": "/en/deployment/windows-server"
+      }
+    },
+    {
+      "id": "deployment-linux",
+      "kind": "doc",
+      "title": {
+        "es": "Desplegar en Linux",
+        "en": "Deploy on Linux"
+      },
+      "label": {
+        "es": "Linux",
+        "en": "Linux"
+      },
+      "slug": {
+        "es": "/es/deployment/linux",
+        "en": "/en/deployment/linux"
+      }
+    },
+    {
+      "id": "deployment-docker",
+      "kind": "doc",
+      "title": {
+        "es": "Desplegar con Docker",
+        "en": "Deploy with Docker"
+      },
+      "label": {
+        "es": "Docker",
+        "en": "Docker"
+      },
+      "slug": {
+        "es": "/es/deployment/docker",
+        "en": "/en/deployment/docker"
       }
     },
     {
@@ -3014,38 +3146,6 @@
       }
     },
     {
-      "id": "test-mcp-testing",
-      "kind": "doc",
-      "title": {
-        "es": "Probar herramientas MCP dentro del proceso",
-        "en": "Testing MCP tools in process"
-      },
-      "label": {
-        "en": "In-process MCP tests",
-        "es": "Pruebas MCP en proceso"
-      },
-      "slug": {
-        "es": "/es/testing/mcp-testing",
-        "en": "/en/testing/mcp-testing"
-      }
-    },
-    {
-      "id": "test-results-and-reference",
-      "kind": "doc",
-      "title": {
-        "es": "Resultados, configuración y referencia",
-        "en": "Results, configuration, and reference"
-      },
-      "label": {
-        "en": "Results and configuration",
-        "es": "Resultados y configuración"
-      },
-      "slug": {
-        "es": "/es/testing/results-and-reference",
-        "en": "/en/testing/results-and-reference"
-      }
-    },
-    {
       "id": "test-writing-and-running-tests",
       "kind": "doc",
       "title": {
@@ -3059,302 +3159,6 @@
       "label": {
         "es": "Crear y ejecutar casos",
         "en": "Create and run cases"
-      }
-    },
-    {
-      "id": "introspection-overview",
-      "kind": "doc",
-      "title": {
-        "es": "Introspección",
-        "en": "Introspection"
-      },
-      "label": {
-        "es": "Introducción",
-        "en": "Introduction"
-      },
-      "slug": {
-        "es": "/es/advanced/introspection",
-        "en": "/en/advanced/introspection"
-      }
-    },
-    {
-      "id": "introspection-dependencies-and-discovery",
-      "kind": "doc",
-      "title": {
-        "es": "Dependencias y firmas",
-        "en": "Dependencies and signatures"
-      },
-      "label": {
-        "es": "Dependencias y firmas",
-        "en": "Dependencies and signatures"
-      },
-      "slug": {
-        "es": "/es/advanced/introspection/dependencies-and-discovery",
-        "en": "/en/advanced/introspection/dependencies-and-discovery"
-      }
-    },
-    {
-      "id": "introspection-reflection",
-      "kind": "doc",
-      "title": {
-        "es": "Reflection: clasificación y selección",
-        "en": "Reflection: classification and selection"
-      },
-      "label": {
-        "es": "Reflection",
-        "en": "Reflection"
-      },
-      "slug": {
-        "es": "/es/advanced/introspection/reflection",
-        "en": "/en/advanced/introspection/reflection"
-      }
-    },
-    {
-      "id": "support-overview",
-      "kind": "doc",
-      "title": {
-        "es": "Tipos y utilidades de soporte",
-        "en": "Support types and utilities"
-      },
-      "label": {
-        "en": "Types and utilities",
-        "es": "Tipos y utilidades"
-      },
-      "slug": {
-        "es": "/es/advanced/data-utilities",
-        "en": "/en/advanced/data-utilities"
-      }
-    },
-    {
-      "id": "support-collections-and-strings",
-      "kind": "doc",
-      "title": {
-        "es": "Transformar colecciones y cadenas",
-        "en": "Transforming collections and strings"
-      },
-      "label": {
-        "en": "Collections and strings",
-        "es": "Colecciones y cadenas"
-      },
-      "slug": {
-        "es": "/es/advanced/data-utilities/collections-and-strings",
-        "en": "/en/advanced/data-utilities/collections-and-strings"
-      }
-    },
-    {
-      "id": "support-entities-and-structures",
-      "kind": "doc",
-      "title": {
-        "es": "Entidades y estructuras de datos",
-        "en": "Entities and data structures"
-      },
-      "label": {
-        "en": "Entities and data structures",
-        "es": "Entidades y estructuras"
-      },
-      "slug": {
-        "es": "/es/advanced/data-utilities/entities-and-structures",
-        "en": "/en/advanced/data-utilities/entities-and-structures"
-      }
-    },
-    {
-      "id": "support-facades-and-runtime-utilities",
-      "kind": "doc",
-      "title": {
-        "es": "Facades, fechas y utilidades del runtime",
-        "en": "Facades, dates, and runtime utilities"
-      },
-      "label": {
-        "en": "Facades, dates and utilities",
-        "es": "Facades, fechas y utilidades"
-      },
-      "slug": {
-        "es": "/es/advanced/data-utilities/facades-and-runtime-utilities",
-        "en": "/en/advanced/data-utilities/facades-and-runtime-utilities"
-      }
-    },
-    {
-      "id": "metadata-overview",
-      "kind": "doc",
-      "title": {
-        "es": "Metadata",
-        "en": "Metadata"
-      },
-      "label": {
-        "es": "Metadata",
-        "en": "Metadata"
-      },
-      "slug": {
-        "es": "/es/advanced/framework-metadata",
-        "en": "/en/advanced/framework-metadata"
-      }
-    },
-    {
-      "id": "contribution-guide",
-      "kind": "doc",
-      "title": {
-        "en": "Contribution Guide",
-        "es": "Guía de Contribución"
-      },
-      "slug": {
-        "en": "/en/contribute/guide",
-        "es": "/es/contribute/guide"
-      }
-    },
-    {
-      "id": "community-contributors",
-      "kind": "astro",
-      "title": {
-        "en": "Contributors",
-        "es": "Contribuidores"
-      },
-      "slug": {
-        "en": "/en/contribute/contributors",
-        "es": "/es/contribute/contributors"
-      }
-    },
-    {
-      "id": "foundation-application-overview",
-      "kind": "doc",
-      "title": {
-        "es": "Aplicación y contenedor",
-        "en": "Application and container"
-      },
-      "label": {
-        "es": "Introducción",
-        "en": "Introduction"
-      },
-      "slug": {
-        "es": "/es/getting-started/application-overview",
-        "en": "/en/getting-started/application-overview"
-      }
-    },
-    {
-      "id": "foundation-server-entrypoints",
-      "kind": "doc",
-      "title": {
-        "es": "Puntos de entrada ASGI y RSGI",
-        "en": "ASGI and RSGI entry points"
-      },
-      "label": {
-        "es": "ASGI y RSGI",
-        "en": "ASGI and RSGI"
-      },
-      "slug": {
-        "es": "/es/getting-started/server-entrypoints",
-        "en": "/en/getting-started/server-entrypoints"
-      }
-    },
-    {
-      "id": "foundation-application-api",
-      "kind": "doc",
-      "title": {
-        "es": "IApplication: servicios y referencia",
-        "en": "IApplication: services and reference"
-      },
-      "label": {
-        "es": "IApplication y API",
-        "en": "IApplication and API"
-      },
-      "slug": {
-        "es": "/es/getting-started/application-api",
-        "en": "/en/getting-started/application-api"
-      }
-    },
-    {
-      "id": "foundation-bootstrap-options",
-      "kind": "doc",
-      "title": {
-        "es": "Configurar bootstrap/app.py",
-        "en": "Configure bootstrap/app.py"
-      },
-      "label": {
-        "es": "Opciones de bootstrap",
-        "en": "Bootstrap options"
-      },
-      "slug": {
-        "es": "/es/getting-started/bootstrap-options",
-        "en": "/en/getting-started/bootstrap-options"
-      }
-    },
-    {
-      "id": "container-facades",
-      "kind": "doc",
-      "title": {
-        "es": "Fachadas síncronas y asíncronas",
-        "en": "Synchronous and asynchronous facades"
-      },
-      "label": {
-        "es": "Fachadas sync y async",
-        "en": "Sync and async facades"
-      },
-      "slug": {
-        "es": "/es/architecture/service-container/facades",
-        "en": "/en/architecture/service-container/facades"
-      }
-    },
-    {
-      "id": "deployment-reverse-proxies",
-      "kind": "doc",
-      "title": {
-        "es": "Proxies, HTTPS y conexiones persistentes",
-        "en": "Proxies, HTTPS and persistent connections"
-      },
-      "label": {
-        "es": "Proxies y HTTPS",
-        "en": "Proxies and HTTPS"
-      },
-      "slug": {
-        "es": "/es/getting-started/deployment/reverse-proxies",
-        "en": "/en/getting-started/deployment/reverse-proxies"
-      }
-    },
-    {
-      "id": "deployment-windows-server",
-      "kind": "doc",
-      "title": {
-        "es": "Desplegar en Windows Server",
-        "en": "Deploy on Windows Server"
-      },
-      "label": {
-        "es": "Windows Server",
-        "en": "Windows Server"
-      },
-      "slug": {
-        "es": "/es/getting-started/deployment/windows-server",
-        "en": "/en/getting-started/deployment/windows-server"
-      }
-    },
-    {
-      "id": "deployment-linux",
-      "kind": "doc",
-      "title": {
-        "es": "Desplegar en Linux",
-        "en": "Deploy on Linux"
-      },
-      "label": {
-        "es": "Linux",
-        "en": "Linux"
-      },
-      "slug": {
-        "es": "/es/getting-started/deployment/linux",
-        "en": "/en/getting-started/deployment/linux"
-      }
-    },
-    {
-      "id": "deployment-docker",
-      "kind": "doc",
-      "title": {
-        "es": "Desplegar con Docker",
-        "en": "Deploy with Docker"
-      },
-      "label": {
-        "es": "Docker",
-        "en": "Docker"
-      },
-      "slug": {
-        "es": "/es/getting-started/deployment/docker",
-        "en": "/en/getting-started/deployment/docker"
       }
     },
     {
@@ -3390,6 +3194,22 @@
       }
     },
     {
+      "id": "test-results-and-reference",
+      "kind": "doc",
+      "title": {
+        "es": "Resultados, configuración y referencia",
+        "en": "Results, configuration, and reference"
+      },
+      "label": {
+        "en": "Results and configuration",
+        "es": "Resultados y configuración"
+      },
+      "slug": {
+        "es": "/es/testing/results-and-reference",
+        "en": "/en/testing/results-and-reference"
+      }
+    },
+    {
       "id": "helper-collection",
       "kind": "doc",
       "title": {
@@ -3401,8 +3221,8 @@
         "en": "Collection"
       },
       "slug": {
-        "es": "/es/advanced/data-utilities/collection",
-        "en": "/en/advanced/data-utilities/collection"
+        "es": "/es/utilities/helpers/collection",
+        "en": "/en/utilities/helpers/collection"
       }
     },
     {
@@ -3417,8 +3237,8 @@
         "en": "DotDict"
       },
       "slug": {
-        "es": "/es/advanced/data-utilities/dot-dict",
-        "en": "/en/advanced/data-utilities/dot-dict"
+        "es": "/es/utilities/helpers/dot-dict",
+        "en": "/en/utilities/helpers/dot-dict"
       }
     },
     {
@@ -3433,8 +3253,8 @@
         "en": "Sentinel"
       },
       "slug": {
-        "es": "/es/advanced/data-utilities/sentinel",
-        "en": "/en/advanced/data-utilities/sentinel"
+        "es": "/es/utilities/helpers/sentinel",
+        "en": "/en/utilities/helpers/sentinel"
       }
     },
     {
@@ -3449,8 +3269,8 @@
         "en": "StdClass"
       },
       "slug": {
-        "es": "/es/advanced/data-utilities/std-class",
-        "en": "/en/advanced/data-utilities/std-class"
+        "es": "/es/utilities/helpers/std-class",
+        "en": "/en/utilities/helpers/std-class"
       }
     },
     {
@@ -3465,8 +3285,8 @@
         "en": "Stringable"
       },
       "slug": {
-        "es": "/es/advanced/data-utilities/stringable",
-        "en": "/en/advanced/data-utilities/stringable"
+        "es": "/es/utilities/helpers/stringable",
+        "en": "/en/utilities/helpers/stringable"
       }
     },
     {
@@ -3481,8 +3301,8 @@
         "en": "Workers"
       },
       "slug": {
-        "es": "/es/advanced/data-utilities/workers",
-        "en": "/en/advanced/data-utilities/workers"
+        "es": "/es/utilities/helpers/workers",
+        "en": "/en/utilities/helpers/workers"
       }
     },
     {
@@ -3497,8 +3317,8 @@
         "en": "FreezeThaw"
       },
       "slug": {
-        "es": "/es/advanced/data-utilities/freeze-thaw",
-        "en": "/en/advanced/data-utilities/freeze-thaw"
+        "es": "/es/utilities/helpers/freeze-thaw",
+        "en": "/en/utilities/helpers/freeze-thaw"
       }
     },
     {
@@ -3513,8 +3333,56 @@
         "en": "PerformanceCounter"
       },
       "slug": {
-        "es": "/es/advanced/data-utilities/performance-counter",
-        "en": "/en/advanced/data-utilities/performance-counter"
+        "es": "/es/utilities/helpers/performance-counter",
+        "en": "/en/utilities/helpers/performance-counter"
+      }
+    },
+    {
+      "id": "metadata-overview",
+      "kind": "doc",
+      "title": {
+        "es": "Metadata",
+        "en": "Metadata"
+      },
+      "label": {
+        "es": "Metadata",
+        "en": "Metadata"
+      },
+      "slug": {
+        "es": "/es/utilities/metadata",
+        "en": "/en/utilities/metadata"
+      }
+    },
+    {
+      "id": "introspection-overview",
+      "kind": "doc",
+      "title": {
+        "es": "Introspección",
+        "en": "Introspection"
+      },
+      "label": {
+        "es": "Introducción",
+        "en": "Introduction"
+      },
+      "slug": {
+        "es": "/es/utilities/introspection",
+        "en": "/en/utilities/introspection"
+      }
+    },
+    {
+      "id": "introspection-reflection",
+      "kind": "doc",
+      "title": {
+        "es": "Reflection: clasificación y selección",
+        "en": "Reflection: classification and selection"
+      },
+      "label": {
+        "es": "Reflection",
+        "en": "Reflection"
+      },
+      "slug": {
+        "es": "/es/utilities/introspection/reflection",
+        "en": "/en/utilities/introspection/reflection"
       }
     },
     {
@@ -3529,8 +3397,8 @@
         "en": "Functions and methods"
       },
       "slug": {
-        "es": "/es/advanced/introspection/callables",
-        "en": "/en/advanced/introspection/callables"
+        "es": "/es/utilities/introspection/callables",
+        "en": "/en/utilities/introspection/callables"
       }
     },
     {
@@ -3545,8 +3413,8 @@
         "en": "Abstract classes"
       },
       "slug": {
-        "es": "/es/advanced/introspection/abstract-classes",
-        "en": "/en/advanced/introspection/abstract-classes"
+        "es": "/es/utilities/introspection/abstract-classes",
+        "en": "/en/utilities/introspection/abstract-classes"
       }
     },
     {
@@ -3561,8 +3429,8 @@
         "en": "Concrete classes"
       },
       "slug": {
-        "es": "/es/advanced/introspection/concrete-classes",
-        "en": "/en/advanced/introspection/concrete-classes"
+        "es": "/es/utilities/introspection/concrete-classes",
+        "en": "/en/utilities/introspection/concrete-classes"
       }
     },
     {
@@ -3577,8 +3445,24 @@
         "en": "Instances"
       },
       "slug": {
-        "es": "/es/advanced/introspection/instances",
-        "en": "/en/advanced/introspection/instances"
+        "es": "/es/utilities/introspection/instances",
+        "en": "/en/utilities/introspection/instances"
+      }
+    },
+    {
+      "id": "introspection-dependencies-and-discovery",
+      "kind": "doc",
+      "title": {
+        "es": "Dependencias y firmas",
+        "en": "Dependencies and signatures"
+      },
+      "label": {
+        "es": "Dependencias y firmas",
+        "en": "Dependencies and signatures"
+      },
+      "slug": {
+        "es": "/es/utilities/introspection/dependencies-and-discovery",
+        "en": "/en/utilities/introspection/dependencies-and-discovery"
       }
     },
     {
@@ -3593,8 +3477,8 @@
         "en": "Modules"
       },
       "slug": {
-        "es": "/es/advanced/introspection/modules",
-        "en": "/en/advanced/introspection/modules"
+        "es": "/es/utilities/introspection/modules",
+        "en": "/en/utilities/introspection/modules"
       }
     },
     {
@@ -3609,8 +3493,96 @@
         "en": "Module discovery"
       },
       "slug": {
-        "es": "/es/advanced/introspection/module-discovery",
-        "en": "/en/advanced/introspection/module-discovery"
+        "es": "/es/utilities/introspection/module-discovery",
+        "en": "/en/utilities/introspection/module-discovery"
+      }
+    },
+    {
+      "id": "support-overview",
+      "kind": "doc",
+      "title": {
+        "es": "Tipos y utilidades de soporte",
+        "en": "Support types and utilities"
+      },
+      "label": {
+        "en": "Types and utilities",
+        "es": "Tipos y utilidades"
+      },
+      "slug": {
+        "es": "/es/utilities",
+        "en": "/en/utilities"
+      }
+    },
+    {
+      "id": "support-collections-and-strings",
+      "kind": "doc",
+      "title": {
+        "es": "Transformar colecciones y cadenas",
+        "en": "Transforming collections and strings"
+      },
+      "label": {
+        "en": "Collections and strings",
+        "es": "Colecciones y cadenas"
+      },
+      "slug": {
+        "es": "/es/utilities/workflows/collections-and-strings",
+        "en": "/en/utilities/workflows/collections-and-strings"
+      }
+    },
+    {
+      "id": "support-entities-and-structures",
+      "kind": "doc",
+      "title": {
+        "es": "Entidades y estructuras de datos",
+        "en": "Entities and data structures"
+      },
+      "label": {
+        "en": "Entities and data structures",
+        "es": "Entidades y estructuras"
+      },
+      "slug": {
+        "es": "/es/utilities/workflows/entities-and-structures",
+        "en": "/en/utilities/workflows/entities-and-structures"
+      }
+    },
+    {
+      "id": "support-facades-and-runtime-utilities",
+      "kind": "doc",
+      "title": {
+        "es": "Facades, fechas y utilidades del runtime",
+        "en": "Facades, dates, and runtime utilities"
+      },
+      "label": {
+        "en": "Facades, dates and utilities",
+        "es": "Facades, fechas y utilidades"
+      },
+      "slug": {
+        "es": "/es/utilities/extensions/runtime-utilities",
+        "en": "/en/utilities/extensions/runtime-utilities"
+      }
+    },
+    {
+      "id": "contribution-guide",
+      "kind": "doc",
+      "title": {
+        "en": "Contribution Guide",
+        "es": "Guía de Contribución"
+      },
+      "slug": {
+        "es": "/es/contribute/guide",
+        "en": "/en/contribute/guide"
+      }
+    },
+    {
+      "id": "community-contributors",
+      "kind": "astro",
+      "title": {
+        "en": "Contributors",
+        "es": "Contribuidores"
+      },
+      "slug": {
+        "es": "/es/contribute/contributors",
+        "en": "/en/contribute/contributors"
       }
     }
   ]

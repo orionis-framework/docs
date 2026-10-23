@@ -5,7 +5,7 @@ editUrl: true
 lastUpdated: false
 ---
 
-Las escrituras de un builder son operaciones sobre conjuntos de filas. Devuelven `InsertResult` o recuentos, y no equivalen a crear o guardar cada instancia de un [modelo](/es/database/orm/model-api).
+Las escrituras de un builder son operaciones sobre conjuntos de filas. Devuelven `InsertResult` o recuentos, y no equivalen a crear o guardar cada instancia de un [modelo](/es/orm/model-api).
 
 `update()` y `delete()` construyen planes que contienen la tabla y sus `where`. No trasladan joins, orden, límites ni offset a esos planes. Un `limit(1).delete()` **no limita el borrado a una fila**. El plan también omite el alias de tabla: un WHERE calificado con ese alias puede fallar al escribir; usa la columna de la tabla destino sin alias. Selecciona explícitamente una clave o conjunto de claves en `where` para delimitar la escritura.
 
@@ -140,4 +140,4 @@ async def run_example():
 
 **Errores:** `QueryException` si la compilación o ejecución falla; la capa de conexión sanea el mensaje y suprime la causa encadenada del driver.
 
-[Fachada DB](/es/database/db-facade) · [Consultas ORM](/es/database/orm/querying) · [Escenario de pruebas](/es/database/orm/testing)
+[Fachada DB](/es/database/db-facade) · [Consultas ORM](/es/orm/querying) · [Escenario de pruebas](/es/orm/testing)

@@ -16,13 +16,13 @@ Check the existing `app.withRouting(...)` call in `bootstrap/app.py`: it must re
 ## Recommended path
 
 1. [Routes](/en/http/routing): methods, parameters, groups and endpoint registration.
-2. [Middlewares](/en/http/middleware-and-security): creation, registration and request/response processing.
-3. [Controllers](/en/http/request-lifecycle): generation, actions, parameters and route integration.
-4. [Validation](/en/http/requests-and-validation): receive validated controller input and return schemas as JSON.
-5. [Request and HTTP payloads](/en/http/forms-and-uploads): request access, body formats and uploaded files.
+2. [Middlewares](/en/http/middleware): creation, registration and request/response processing.
+3. [Controllers](/en/http/controllers): generation, actions, parameters and route integration.
+4. [Validation](/en/http/validation): receive validated controller input and return schemas as JSON.
+5. [Request and HTTP payloads](/en/http/requests): request access, body formats and uploaded files.
 6. [Responses](/en/http/responses): JSON, schemas, views, redirects and downloads.
 7. [HTTP exceptions](/en/http/exceptions): error responses and the diagnostic page.
 
-For other HTTP flows and services, see [streaming and SSE](/en/http/streaming-and-sse), [WebSocket](/en/http/websockets) and [default pages and routes](/en/http/default-responses).
+For other HTTP flows and services, see [streaming and SSE](/en/realtime/streaming-and-sse), [WebSocket](/en/realtime/websocket) and [default pages and routes](/en/deployment/health-and-default-responses).
 
-Continue with [sessions](/en/http/sessions), [authentication](/en/security/authentication), [schemas](/en/validation), [views](/en/services/views) and [Realtime hubs](/en/asynchronous/realtime).
+Continue with [sessions](/en/sessions), [authentication](/en/authentication), [schemas](/en/validation), [views](/en/views) and [Realtime hubs](/en/realtime).

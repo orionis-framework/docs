@@ -7,7 +7,7 @@ lastUpdated: false
 
 An exception can interrupt body reading, middleware, dependency resolution, or a controller action. The HTTP layers and kernel turn failures they can handle into a response for the client. The result depends on the exception type, debug mode, and when the failure occurs.
 
-This page focuses on **HTTP requests and responses**. The [general exception guide](/en/architecture/exception-handling), in the independent **Exceptions** section, explains `app.withExceptionHandler(ExceptionHandler)`, the `failure` contracts, reporting, and the framework's other contexts.
+This page focuses on **HTTP requests and responses**. The [general exception guide](/en/exceptions), in the independent **Exceptions** section, explains `app.withExceptionHandler(ExceptionHandler)`, the `failure` contracts, reporting, and the framework's other contexts.
 
 ## From an exception to an HTTP response
 
@@ -40,7 +40,7 @@ The setting is declared through `APP_DEBUG` and read from `config/app.py`. To in
 APP_DEBUG=bool:true
 ```
 
-Restart the application to apply its startup configuration. If you use compilation, see the [registration and configuration considerations](/en/architecture/exception-handling#compiled-configuration-and-running-processes).
+Restart the application to apply its startup configuration. If you use compilation, see the [registration and configuration considerations](/en/exceptions#compiled-configuration-and-running-processes).
 
 The environment name `APP_ENV` does not replace this setting: an environment named production with debug enabled still exposes the diagnostic.
 
@@ -77,7 +77,7 @@ curl -i "http://localhost:8000/http-error-demo?quantity=invalid" -H "Accept: app
 
 `int("invalid")` raises `ValueError`. The native implementation does not automatically turn it into an input error with status `400`: with debug enabled, both requests receive the detailed `500` page. With `quantity=3`, the endpoint returns `{"quantity":3}`.
 
-This endpoint demonstrates a programming error or missing validation. For real input, declare a [request schema](/en/http/requests-and-validation) or handle the conversion explicitly; keep this endpoint only as a local demonstration.
+This endpoint demonstrates a programming error or missing validation. For real input, declare a [request schema](/en/http/validation) or handle the conversion explicitly; keep this endpoint only as a local demonstration.
 
 ## What the page contains and how to read it
 
@@ -167,9 +167,9 @@ The kernel can handle some cases earlier with its own response, so the exact mes
 | Missing route with a configured fallback | Executes the corresponding fallback. |
 | Application exception without specific handling | Application handler policy; by default, a generic `500` or diagnostic according to debug mode. |
 
-Malformed JSON can raise `ValueError`; XML or MessagePack use their decoding exceptions. There is no universal rule turning every parsing exception into `400`. See [Request reading errors](/en/http/forms-and-uploads#reading-and-validation-errors) and [validation handling](/en/validation/controllers-and-http).
+Malformed JSON can raise `ValueError`; XML or MessagePack use their decoding exceptions. There is no universal rule turning every parsing exception into `400`. See [Request reading errors](/en/http/requests#reading-and-validation-errors) and [validation handling](/en/validation/controllers-and-http).
 
-If a domain condition needs a response such as `409`, define that translation in the [application handler](/en/architecture/exception-handling/handling-exceptions). Catching an exception locally and returning a response is also valid when that component can handle the case.
+If a domain condition needs a response such as `409`, define that translation in the [application handler](/en/exceptions/handling-exceptions). Catching an exception locally and returning a response is also valid when that component can handle the case.
 
 ## Development diagnostics and public responses
 
@@ -179,7 +179,7 @@ For an application exposed to users, disable debug:
 APP_DEBUG=bool:false
 ```
 
-With the native handler, an unrecognized error returns `Internal Server Error` without the traceback. The [general guide](/en/architecture/exception-handling) explains how to preserve internal reporting and define public messages for application errors.
+With the native handler, an unrecognized error returns `Internal Server Error` without the traceback. The [general guide](/en/exceptions) explains how to preserve internal reporting and define public messages for application errors.
 
 Error templates escape HTML, and native responses include `Cache-Control: no-cache, no-store, must-revalidate`. Escaping prevents text from being interpreted as HTML; it does not remove secrets from messages or code.
 
@@ -193,4 +193,4 @@ Conversion to an error page happens during request processing. Body delivery, st
 
 If a producer fails after the headers have been sent, that response cannot be replaced with an exception page. The transport attempts to close resources and propagates the failure. Background errors also cannot change an HTTP status that has already been delivered.
 
-See [HTTP responses and delivery](/en/http/responses), [streaming and SSE](/en/http/streaming-and-sse), and the [general exception guide](/en/architecture/exception-handling) for their respective boundaries.
+See [HTTP responses and delivery](/en/http/responses), [streaming and SSE](/en/realtime/streaming-and-sse), and the [general exception guide](/en/exceptions) for their respective boundaries.

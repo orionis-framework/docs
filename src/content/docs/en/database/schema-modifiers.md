@@ -346,4 +346,4 @@ Timestamps(*, timezone: bool=True) -> None
 
 `Comment.text` retains the normalized comment; `PrimaryKey.columns` is the column tuple; `ForeignKey.foreign` retains `CompositeForeignKey`; `Index.constraint` retains `TableIndex`; `Unique.constraint` retains `UniqueConstraint`. `Timestamps`(timezone=True) has a different default from `Blueprint.timestamps`(timezone=False): the marker retains timezone but is not a column, and the public usage route is table.timestamps(). Do not pass it as a column factory.
 
-Structured constraints, `ColumnOptions` properties, and composite foreign keys are covered in [ORM definitions](/en/database/orm/schema-and-type-reference). See [alterations](/en/database/schema-alterations) to rename, remove, or change existing constraints.
+Structured constraints, `ColumnOptions` properties, and composite foreign keys are covered in [ORM definitions](/en/orm/schema-and-type-reference). See [alterations](/en/database/schema-alterations) to rename, remove, or change existing constraints.

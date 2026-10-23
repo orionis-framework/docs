@@ -198,7 +198,7 @@ python -B reactor make:database-migration create_products
 
 With default paths it creates `database/migrations/m<YYYYmmddHHMMSS>_create_products.py`, containing class `CreateProducts`. The timestamp uses the application timezone; do not type `<YYYYmmddHHMMSS>` literally in the command.
 
-It also accepts `catalog/create_products`. Implement `up()` and `down()` before running `migrate`; the generator does not infer operations from the name. It has no `--create`, `--table`, `--database` or `--force` flags. See [Migrations](/en/database/migrations-and-seeders) for the full workflow.
+It also accepts `catalog/create_products`. Implement `up()` and `down()` before running `migrate`; the generator does not infer operations from the name. It has no `--create`, `--table`, `--database` or `--force` flags. See [Migrations](/en/database/migrations) for the full workflow.
 
 <a id="make-database-schema"></a>
 
@@ -279,7 +279,7 @@ python -B reactor make:factory catalog/ProductFactory --model catalog/Product
 
 The first example creates `database/factories/product_factory.py`, class `ProductFactory`, and an import of `app.models.product.Product`. The second uses the corresponding `catalog` directories. Targets are resolved through configured `database_factories` and `app_models` paths.
 
-The generator does not check whether the model module exists: a syntactically valid name may create an import that fails later if the file is missing. The stub includes `model = Product` and synchronous `definition()` returning `{}`. Implement the attributes: the command does not generate the model or create its table, and accepts neither `--count` nor `--force`. Build or persist data later through `make()`/`create()` in code; see [Factories](/en/database/orm/factories-and-testing).
+The generator does not check whether the model module exists: a syntactically valid name may create an import that fails later if the file is missing. The stub includes `model = Product` and synchronous `definition()` returning `{}`. Implement the attributes: the command does not generate the model or create its table, and accepts neither `--count` nor `--force`. Build or persist data later through `make()`/`create()` in code; see [Factories](/en/orm/factories).
 
 <a id="migrate"></a>
 
@@ -309,7 +309,7 @@ python -B reactor migrate --database sqlite --seed
 
 Pending migrations in one invocation share a batch; each file uses its own transaction. The CLI displays RUNNING/DONE/FAIL lines with timings, or indicates there is nothing pending.
 
-`--seed` also runs seeders when migrations were already up to date. Seeder failure does not undo previously committed migrations. There are no `--step`, `--force` or `--pretend` flags. See [Migrations](/en/database/migrations-and-seeders) for history, discovery and transactions.
+`--seed` also runs seeders when migrations were already up to date. Seeder failure does not undo previously committed migrations. There are no `--step`, `--force` or `--pretend` flags. See [Migrations](/en/database/migrations) for history, discovery and transactions.
 
 <a id="migrate-status"></a>
 
@@ -466,4 +466,4 @@ Migrations use per-file transactions, but DDL rollback depends on the [engine](/
 
 The four `migrate:*` commands running `down()` do not request the interactive confirmation used by `db:wipe`. Their data effects depend on migrations. These commands have no `--force` flag: do not add it based on another CLI's conventions.
 
-Read more under [Migrations](/en/database/migrations-and-seeders), [Seeders](/en/database/seeders), [Factories](/en/database/orm/factories-and-testing), [transactions](/en/database/transactions) and [isolated database testing](/en/database/orm/testing).
+Read more under [Migrations](/en/database/migrations), [Seeders](/en/database/seeders), [Factories](/en/orm/factories), [transactions](/en/database/transactions) and [isolated database testing](/en/orm/testing).

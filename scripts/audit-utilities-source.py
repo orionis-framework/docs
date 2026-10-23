@@ -24,7 +24,7 @@ REVIEWED_MODULES = {
         "class": "Collection",
         "prefix": "collection",
         "pageId": "helper-collection",
-        "reference": "/advanced/data-utilities/collection",
+        "reference": "/utilities/helpers/collection",
         "methods": [
             "__hash__",
             "__init__",
@@ -104,7 +104,7 @@ REVIEWED_MODULES = {
         "class": "Stringable",
         "prefix": "stringable",
         "pageId": "helper-stringable",
-        "reference": "/advanced/data-utilities/stringable",
+        "reference": "/utilities/helpers/stringable",
         "methods": [
             "after",
             "afterLast",
@@ -261,7 +261,7 @@ REVIEWED_MODULES = {
         "class": "DotDict",
         "prefix": "dotdict",
         "pageId": "helper-dot-dict",
-        "reference": "/advanced/data-utilities/dot-dict",
+        "reference": "/utilities/helpers/dot-dict",
         "methods": [
             "__getattr__",
             "__setattr__",
@@ -276,7 +276,7 @@ REVIEWED_MODULES = {
         "class": "StdClass",
         "prefix": "stdclass",
         "pageId": "helper-std-class",
-        "reference": "/advanced/data-utilities/std-class",
+        "reference": "/utilities/helpers/std-class",
         "methods": [
             "__init_subclass__",
             "__hash__",
@@ -295,7 +295,7 @@ REVIEWED_MODULES = {
         "class": "_MISSING_TYPE",
         "prefix": "sentinel",
         "pageId": "helper-sentinel",
-        "reference": "/advanced/data-utilities/sentinel",
+        "reference": "/utilities/helpers/sentinel",
         "methods": [
             "__repr__",
             "__bool__"
@@ -306,7 +306,7 @@ REVIEWED_MODULES = {
         "class": "Workers",
         "prefix": "workers",
         "pageId": "helper-workers",
-        "reference": "/advanced/data-utilities/workers",
+        "reference": "/utilities/helpers/workers",
         "methods": [
             "setRamPerWorker",
             "calculate"
@@ -319,7 +319,7 @@ REVIEWED_MODULES = {
         "class": "FreezeThaw",
         "prefix": "freezethaw",
         "pageId": "helper-freeze-thaw",
-        "reference": "/advanced/data-utilities/freeze-thaw",
+        "reference": "/utilities/helpers/freeze-thaw",
         "methods": [
             "thaw",
             "freeze"
@@ -332,7 +332,7 @@ REVIEWED_MODULES = {
         "class": "PerformanceCounter",
         "prefix": "performancecounter",
         "pageId": "helper-performance-counter",
-        "reference": "/advanced/data-utilities/performance-counter",
+        "reference": "/utilities/helpers/performance-counter",
         "methods": [
             "__init__",
             "start",
@@ -564,7 +564,7 @@ def extract(framework: Path) -> dict:
         raise ValueError("Unreviewed metadata declarations; review the ten explicit constant mappings.")
     for node, name in metadata_nodes:
         item = entry(METADATA_SOURCE, node, name, "metadata-constant", ast.unparse(node),
-                     "metadata-overview", "/advanced/framework-metadata#metadata-constant-" + name.replace("_", "-").lower())
+                     "metadata-overview", "/utilities/metadata#metadata-constant-" + name.replace("_", "-").lower())
         literal = ast.literal_eval(node.value)
         item["value"] = list(literal) if isinstance(literal, tuple) else literal
         item["valueType"] = type(literal).__name__
@@ -631,7 +631,7 @@ def extract(framework: Path) -> dict:
         read(source)
         integrations.append({
             "source": source,
-            "references": ["/advanced/data-utilities/stringable#" + anchor for anchor in anchors],
+            "references": ["/utilities/helpers/stringable#" + anchor for anchor in anchors],
             "purpose": "Reviewed support for Stringable date/encryption calls and runnable service/controller examples; auxiliary API is not counted as helper declarations.",
         })
 
@@ -679,30 +679,30 @@ def extract(framework: Path) -> dict:
         "inheritedApi": [
             {
                 "owner": "DotDict", "origin": "builtins.dict/object",
-                "reference": "/advanced/data-utilities/dot-dict#dotdict-protocol-dictionary",
+                "reference": "/utilities/helpers/dot-dict#dotdict-protocol-dictionary",
                 "publicMethods": ["clear", "fromkeys", "items", "keys", "pop", "popitem", "setdefault", "update", "values"],
                 "protocols": ["construction", "indexing", "iteration", "length", "membership", "comparison", "union", "representation"],
-                "copyAndSerializationReference": "/advanced/data-utilities/dot-dict#dotdict-protocol-copy-serialization",
+                "copyAndSerializationReference": "/utilities/helpers/dot-dict#dotdict-protocol-copy-serialization",
             },
             {
                 "owner": "Stringable", "origin": "builtins.str",
-                "reference": "/advanced/data-utilities/stringable#stringable-constructor",
+                "reference": "/utilities/helpers/stringable#stringable-constructor",
                 "protocols": ["construction", "length", "iteration", "containment", "comparison", "hashing", "formatting", "truthiness", "concatenation", "multiplication"],
                 "note": "Only __getitem__ and __str__ are declared by Orionis; inherited str methods are not extra native declarations.",
             },
             {
                 "owner": "StdClass", "origin": "builtins.object",
-                "reference": "/advanced/data-utilities/std-class#stdclass-protocol-attributes",
-                "copyAndSerializationReference": "/advanced/data-utilities/std-class#stdclass-protocol-copy-serialization",
+                "reference": "/utilities/helpers/std-class#stdclass-protocol-attributes",
+                "copyAndSerializationReference": "/utilities/helpers/std-class#stdclass-protocol-copy-serialization",
             },
             {
                 "owner": "MISSING", "origin": "builtins.object",
-                "reference": "/advanced/data-utilities/sentinel#sentinel-protocol-identity",
-                "copyAndSerializationReference": "/advanced/data-utilities/sentinel#sentinel-protocol-copy-serialization",
+                "reference": "/utilities/helpers/sentinel#sentinel-protocol-identity",
+                "copyAndSerializationReference": "/utilities/helpers/sentinel#sentinel-protocol-copy-serialization",
             },
             {
                 "owner": "FreezeThaw", "origin": "builtins.object; returned built-in containers",
-                "reference": "/advanced/data-utilities/freeze-thaw#freezethaw-protocol-serialization",
+                "reference": "/utilities/helpers/freeze-thaw#freezethaw-protocol-serialization",
                 "note": "The helper declares no custom copy or serialization dunder.",
             },
         ],

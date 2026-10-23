@@ -59,7 +59,7 @@
       "kind": "class",
       "line": 8,
       "signature": "class BootstrapQueue",
-      "reference": "/asynchronous/queues/configuration#config-queue"
+      "reference": "/queues/configuration#config-queue"
     },
     {
       "source": "config/queue.py",
@@ -67,7 +67,7 @@
       "kind": "field",
       "line": 15,
       "signature": "default: str = field(default_factory=lambda: Env.get('QUEUE_CONNECTION', Drivers.SYNC))",
-      "reference": "/asynchronous/queues/configuration#config-queue"
+      "reference": "/queues/configuration#config-queue"
     },
     {
       "source": "config/queue.py",
@@ -75,7 +75,7 @@
       "kind": "field",
       "line": 25,
       "signature": "connections: Connections | dict[str, Sync | Database | Redis | dict] = field(default_factory=lambda: Connections(sync=Sync(queue=Env.get('QUEUE_SYNC_QUEUE', 'default'), retry_after=Env.get('QUEUE_SYNC_RETRY_AFTER', 90.0)), database=Database(connection=Env.get('QUEUE_DB_CONNECTION', None), table=Env.get('QUEUE_TABLE', 'jobs'), queue=Env.get('QUEUE_DB_QUEUE', 'default'), retry_after=Env.get('QUEUE_DB_RETRY_AFTER', 90.0)), redis=Redis(endpoint=Env.get('REDIS_HOST', '127.0.0.1'), port=Env.get('REDIS_PORT', 6379), db=Env.get('REDIS_DB', 0), password=Env.get('REDIS_PASSWORD', None), prefix=Env.get('QUEUE_REDIS_PREFIX', 'orionis:queues'), queue=Env.get('QUEUE_REDIS_QUEUE', 'default'), retry_after=Env.get('QUEUE_REDIS_RETRY_AFTER', 90.0))))",
-      "reference": "/asynchronous/queues/configuration#config-queue"
+      "reference": "/queues/configuration#config-queue"
     },
     {
       "source": "config/queue.py",
@@ -83,7 +83,7 @@
       "kind": "field",
       "line": 76,
       "signature": "failed: Failed | dict = field(default_factory=lambda: Failed(connection=Env.get('QUEUE_FAILED_DB_CONNECTION', None), table=Env.get('QUEUE_FAILED_TABLE', 'failed_jobs')))",
-      "reference": "/asynchronous/queues/configuration#config-queue"
+      "reference": "/queues/configuration#config-queue"
     },
     {
       "source": "config/queue.py",
@@ -91,7 +91,7 @@
       "kind": "field",
       "line": 91,
       "signature": "worker: Worker | dict = field(default_factory=lambda: Worker(concurrency=Env.get('QUEUE_WORKER_CONCURRENCY', 1), sleep=Env.get('QUEUE_WORKER_SLEEP', 1.0), timeout=Env.get('QUEUE_WORKER_TIMEOUT', 60.0), tries=Env.get('QUEUE_WORKER_TRIES', 3), backoff=Env.get('QUEUE_WORKER_BACKOFF', (0.0,))))",
-      "reference": "/asynchronous/queues/configuration#config-queue"
+      "reference": "/queues/configuration#config-queue"
     },
     {
       "source": "orionis/foundation/config/queue/entities/connections.py",
@@ -99,7 +99,7 @@
       "kind": "class",
       "line": 10,
       "signature": "class Connections",
-      "reference": "/asynchronous/queues/configuration#config-connections"
+      "reference": "/queues/configuration#config-connections"
     },
     {
       "source": "orionis/foundation/config/queue/entities/connections.py",
@@ -107,7 +107,7 @@
       "kind": "field",
       "line": 24,
       "signature": "sync: Sync | dict = field(default_factory=Sync, metadata={'description': 'Synchronous connection settings.', 'default_factory': Sync().toDict()})",
-      "reference": "/asynchronous/queues/configuration#config-connections"
+      "reference": "/queues/configuration#config-connections"
     },
     {
       "source": "orionis/foundation/config/queue/entities/connections.py",
@@ -115,7 +115,7 @@
       "kind": "field",
       "line": 32,
       "signature": "database: Database | dict = field(default_factory=Database, metadata={'description': 'Durable database connection settings.', 'default_factory': Database().toDict()})",
-      "reference": "/asynchronous/queues/configuration#config-connections"
+      "reference": "/queues/configuration#config-connections"
     },
     {
       "source": "orionis/foundation/config/queue/entities/connections.py",
@@ -123,7 +123,7 @@
       "kind": "field",
       "line": 40,
       "signature": "redis: Redis | dict = field(default_factory=Redis, metadata={'description': 'Durable Redis connection settings.', 'default_factory': Redis().toDict()})",
-      "reference": "/asynchronous/queues/configuration#config-connections"
+      "reference": "/queues/configuration#config-connections"
     },
     {
       "source": "orionis/foundation/config/queue/entities/database.py",
@@ -131,7 +131,7 @@
       "kind": "class",
       "line": 10,
       "signature": "class Database",
-      "reference": "/asynchronous/queues/configuration#config-database"
+      "reference": "/queues/configuration#config-database"
     },
     {
       "source": "orionis/foundation/config/queue/entities/database.py",
@@ -139,7 +139,7 @@
       "kind": "field",
       "line": 28,
       "signature": "driver: Drivers | str = Drivers.DATABASE",
-      "reference": "/asynchronous/queues/configuration#config-database"
+      "reference": "/queues/configuration#config-database"
     },
     {
       "source": "orionis/foundation/config/queue/entities/database.py",
@@ -147,7 +147,7 @@
       "kind": "field",
       "line": 30,
       "signature": "connection: str | None = field(default_factory=lambda: Env.get('QUEUE_DB_CONNECTION'), metadata={'description': 'Framework database connection.', 'default': None})",
-      "reference": "/asynchronous/queues/configuration#config-database"
+      "reference": "/queues/configuration#config-database"
     },
     {
       "source": "orionis/foundation/config/queue/entities/database.py",
@@ -155,7 +155,7 @@
       "kind": "field",
       "line": 38,
       "signature": "table: str = field(default_factory=lambda: Env.get('QUEUE_TABLE', 'jobs'), metadata={'description': 'Unqualified SQL table used to persist jobs.', 'default': 'jobs'})",
-      "reference": "/asynchronous/queues/configuration#config-database"
+      "reference": "/queues/configuration#config-database"
     },
     {
       "source": "orionis/foundation/config/queue/entities/database.py",
@@ -163,7 +163,7 @@
       "kind": "field",
       "line": 46,
       "signature": "queue: str = field(default_factory=lambda: Env.get('QUEUE_DB_QUEUE', 'default'), metadata={'description': 'Default database queue name.', 'default': 'default'})",
-      "reference": "/asynchronous/queues/configuration#config-database"
+      "reference": "/queues/configuration#config-database"
     },
     {
       "source": "orionis/foundation/config/queue/entities/database.py",
@@ -171,7 +171,7 @@
       "kind": "field",
       "line": 54,
       "signature": "retry_after: float = field(default_factory=lambda: Env.get('QUEUE_DB_RETRY_AFTER', 90.0), metadata={'description': 'Database reservation duration.', 'default': 90.0})",
-      "reference": "/asynchronous/queues/configuration#config-database"
+      "reference": "/queues/configuration#config-database"
     },
     {
       "source": "orionis/foundation/config/queue/entities/failed.py",
@@ -179,7 +179,7 @@
       "kind": "class",
       "line": 7,
       "signature": "class Failed",
-      "reference": "/asynchronous/queues/configuration#config-failed"
+      "reference": "/queues/configuration#config-failed"
     },
     {
       "source": "orionis/foundation/config/queue/entities/failed.py",
@@ -187,7 +187,7 @@
       "kind": "field",
       "line": 19,
       "signature": "connection: str | None = field(default_factory=lambda: Env.get('QUEUE_FAILED_DB_CONNECTION'))",
-      "reference": "/asynchronous/queues/configuration#config-failed"
+      "reference": "/queues/configuration#config-failed"
     },
     {
       "source": "orionis/foundation/config/queue/entities/failed.py",
@@ -195,7 +195,7 @@
       "kind": "field",
       "line": 22,
       "signature": "table: str = field(default_factory=lambda: Env.get('QUEUE_FAILED_TABLE', 'failed_jobs'))",
-      "reference": "/asynchronous/queues/configuration#config-failed"
+      "reference": "/queues/configuration#config-failed"
     },
     {
       "source": "orionis/foundation/config/queue/entities/queue.py",
@@ -203,7 +203,7 @@
       "kind": "class",
       "line": 15,
       "signature": "class Queue",
-      "reference": "/asynchronous/queues/configuration#config-queue"
+      "reference": "/queues/configuration#config-queue"
     },
     {
       "source": "orionis/foundation/config/queue/entities/queue.py",
@@ -211,7 +211,7 @@
       "kind": "field",
       "line": 31,
       "signature": "default: str = field(default_factory=lambda: Env.get('QUEUE_CONNECTION', 'sync'), metadata={'description': 'Default queue connection name.', 'default': 'sync'})",
-      "reference": "/asynchronous/queues/configuration#config-queue"
+      "reference": "/queues/configuration#config-queue"
     },
     {
       "source": "orionis/foundation/config/queue/entities/queue.py",
@@ -219,7 +219,7 @@
       "kind": "field",
       "line": 39,
       "signature": "connections: Connections | dict[str, Sync | Database | Redis | dict] = field(default_factory=Connections, metadata={'description': 'Named queue connection settings.', 'default': lambda: Connections().toDict()})",
-      "reference": "/asynchronous/queues/configuration#config-queue"
+      "reference": "/queues/configuration#config-queue"
     },
     {
       "source": "orionis/foundation/config/queue/entities/queue.py",
@@ -227,7 +227,7 @@
       "kind": "field",
       "line": 47,
       "signature": "failed: Failed | dict = field(default_factory=Failed, metadata={'description': 'Failed-job database storage.', 'default': lambda: Failed().toDict()})",
-      "reference": "/asynchronous/queues/configuration#config-queue"
+      "reference": "/queues/configuration#config-queue"
     },
     {
       "source": "orionis/foundation/config/queue/entities/queue.py",
@@ -235,7 +235,7 @@
       "kind": "field",
       "line": 55,
       "signature": "worker: Worker | dict = field(default_factory=Worker, metadata={'description': 'Queue worker defaults.', 'default': lambda: Worker().toDict()})",
-      "reference": "/asynchronous/queues/configuration#config-queue"
+      "reference": "/queues/configuration#config-queue"
     },
     {
       "source": "orionis/foundation/config/queue/entities/redis.py",
@@ -243,7 +243,7 @@
       "kind": "class",
       "line": 16,
       "signature": "class Redis",
-      "reference": "/asynchronous/queues/configuration#config-redis"
+      "reference": "/queues/configuration#config-redis"
     },
     {
       "source": "orionis/foundation/config/queue/entities/redis.py",
@@ -251,7 +251,7 @@
       "kind": "field",
       "line": 40,
       "signature": "driver: Drivers | str = Drivers.REDIS",
-      "reference": "/asynchronous/queues/configuration#config-redis"
+      "reference": "/queues/configuration#config-redis"
     },
     {
       "source": "orionis/foundation/config/queue/entities/redis.py",
@@ -259,7 +259,7 @@
       "kind": "field",
       "line": 42,
       "signature": "endpoint: str = field(default_factory=lambda: Env.get('REDIS_HOST', '127.0.0.1'), metadata={'description': 'Redis host address.', 'default': '127.0.0.1'})",
-      "reference": "/asynchronous/queues/configuration#config-redis"
+      "reference": "/queues/configuration#config-redis"
     },
     {
       "source": "orionis/foundation/config/queue/entities/redis.py",
@@ -267,7 +267,7 @@
       "kind": "field",
       "line": 49,
       "signature": "port: int = field(default_factory=lambda: Env.get('REDIS_PORT', 6379), metadata={'description': 'Redis port.', 'default': 6379})",
-      "reference": "/asynchronous/queues/configuration#config-redis"
+      "reference": "/queues/configuration#config-redis"
     },
     {
       "source": "orionis/foundation/config/queue/entities/redis.py",
@@ -275,7 +275,7 @@
       "kind": "field",
       "line": 57,
       "signature": "db: int = field(default_factory=lambda: Env.get('REDIS_DB', 0), metadata={'description': 'Redis database index.', 'default': 0})",
-      "reference": "/asynchronous/queues/configuration#config-redis"
+      "reference": "/queues/configuration#config-redis"
     },
     {
       "source": "orionis/foundation/config/queue/entities/redis.py",
@@ -283,7 +283,7 @@
       "kind": "field",
       "line": 64,
       "signature": "password: str | None = field(default_factory=lambda: Env.get('REDIS_PASSWORD'), metadata={'description': 'Redis password.', 'default': None})",
-      "reference": "/asynchronous/queues/configuration#config-redis"
+      "reference": "/queues/configuration#config-redis"
     },
     {
       "source": "orionis/foundation/config/queue/entities/redis.py",
@@ -291,7 +291,7 @@
       "kind": "field",
       "line": 71,
       "signature": "prefix: str = field(default_factory=lambda: Env.get('QUEUE_REDIS_PREFIX', 'orionis:queues'), metadata={'description': 'Redis queue namespace.', 'default': 'orionis:queues'})",
-      "reference": "/asynchronous/queues/configuration#config-redis"
+      "reference": "/queues/configuration#config-redis"
     },
     {
       "source": "orionis/foundation/config/queue/entities/redis.py",
@@ -299,7 +299,7 @@
       "kind": "field",
       "line": 78,
       "signature": "queue: str = field(default_factory=lambda: Env.get('QUEUE_REDIS_QUEUE', 'default'), metadata={'description': 'Default Redis queue name.', 'default': 'default'})",
-      "reference": "/asynchronous/queues/configuration#config-redis"
+      "reference": "/queues/configuration#config-redis"
     },
     {
       "source": "orionis/foundation/config/queue/entities/redis.py",
@@ -307,7 +307,7 @@
       "kind": "field",
       "line": 85,
       "signature": "retry_after: float = field(default_factory=lambda: Env.get('QUEUE_REDIS_RETRY_AFTER', 90.0), metadata={'description': 'Redis reservation duration.', 'default': 90.0})",
-      "reference": "/asynchronous/queues/configuration#config-redis"
+      "reference": "/queues/configuration#config-redis"
     },
     {
       "source": "orionis/foundation/config/queue/entities/sync.py",
@@ -315,7 +315,7 @@
       "kind": "class",
       "line": 10,
       "signature": "class Sync",
-      "reference": "/asynchronous/queues/configuration#config-sync"
+      "reference": "/queues/configuration#config-sync"
     },
     {
       "source": "orionis/foundation/config/queue/entities/sync.py",
@@ -323,7 +323,7 @@
       "kind": "field",
       "line": 24,
       "signature": "driver: Drivers | str = Drivers.SYNC",
-      "reference": "/asynchronous/queues/configuration#config-sync"
+      "reference": "/queues/configuration#config-sync"
     },
     {
       "source": "orionis/foundation/config/queue/entities/sync.py",
@@ -331,7 +331,7 @@
       "kind": "field",
       "line": 26,
       "signature": "queue: str = field(default_factory=lambda: Env.get('QUEUE_SYNC_QUEUE', 'default'), metadata={'description': 'Default sync queue name.', 'default': 'default'})",
-      "reference": "/asynchronous/queues/configuration#config-sync"
+      "reference": "/queues/configuration#config-sync"
     },
     {
       "source": "orionis/foundation/config/queue/entities/sync.py",
@@ -339,7 +339,7 @@
       "kind": "field",
       "line": 34,
       "signature": "retry_after: float = field(default_factory=lambda: Env.get('QUEUE_SYNC_RETRY_AFTER', 90.0), metadata={'description': 'Sync reservation duration.', 'default': 90.0})",
-      "reference": "/asynchronous/queues/configuration#config-sync"
+      "reference": "/queues/configuration#config-sync"
     },
     {
       "source": "orionis/foundation/config/queue/entities/worker.py",
@@ -347,7 +347,7 @@
       "kind": "class",
       "line": 7,
       "signature": "class Worker",
-      "reference": "/asynchronous/queues/configuration#config-worker"
+      "reference": "/queues/configuration#config-worker"
     },
     {
       "source": "orionis/foundation/config/queue/entities/worker.py",
@@ -355,7 +355,7 @@
       "kind": "field",
       "line": 25,
       "signature": "concurrency: int = field(default_factory=lambda: Env.get('QUEUE_WORKER_CONCURRENCY', 1), metadata={'description': 'Maximum concurrent jobs.', 'default': 1})",
-      "reference": "/asynchronous/queues/configuration#config-worker"
+      "reference": "/queues/configuration#config-worker"
     },
     {
       "source": "orionis/foundation/config/queue/entities/worker.py",
@@ -363,7 +363,7 @@
       "kind": "field",
       "line": 33,
       "signature": "sleep: float = field(default_factory=lambda: Env.get('QUEUE_WORKER_SLEEP', 1.0), metadata={'description': 'Worker polling interval in seconds.', 'default': 1.0})",
-      "reference": "/asynchronous/queues/configuration#config-worker"
+      "reference": "/queues/configuration#config-worker"
     },
     {
       "source": "orionis/foundation/config/queue/entities/worker.py",
@@ -371,7 +371,7 @@
       "kind": "field",
       "line": 41,
       "signature": "timeout: float = field(default_factory=lambda: Env.get('QUEUE_WORKER_TIMEOUT', 60.0), metadata={'description': 'Job execution timeout in seconds.', 'default': 60.0})",
-      "reference": "/asynchronous/queues/configuration#config-worker"
+      "reference": "/queues/configuration#config-worker"
     },
     {
       "source": "orionis/foundation/config/queue/entities/worker.py",
@@ -379,7 +379,7 @@
       "kind": "field",
       "line": 49,
       "signature": "tries: int = field(default_factory=lambda: Env.get('QUEUE_WORKER_TRIES', 3), metadata={'description': 'Maximum job attempts.', 'default': 3})",
-      "reference": "/asynchronous/queues/configuration#config-worker"
+      "reference": "/queues/configuration#config-worker"
     },
     {
       "source": "orionis/foundation/config/queue/entities/worker.py",
@@ -387,7 +387,7 @@
       "kind": "field",
       "line": 57,
       "signature": "backoff: tuple[float, ...] | list[float] = field(default_factory=lambda: Env.get('QUEUE_WORKER_BACKOFF', (0.0,)), metadata={'description': 'Retry delays in seconds.', 'default': (0.0,)})",
-      "reference": "/asynchronous/queues/configuration#config-worker"
+      "reference": "/queues/configuration#config-worker"
     },
     {
       "source": "orionis/foundation/config/queue/enums/drivers.py",
@@ -395,7 +395,7 @@
       "kind": "class",
       "line": 3,
       "signature": "class Drivers",
-      "reference": "/asynchronous/queues/configuration#config-drivers"
+      "reference": "/queues/configuration#config-drivers"
     },
     {
       "source": "orionis/foundation/config/queue/enums/drivers.py",
@@ -403,7 +403,7 @@
       "kind": "constant",
       "line": 6,
       "signature": "SYNC = 'sync'",
-      "reference": "/asynchronous/queues/configuration#config-drivers"
+      "reference": "/queues/configuration#config-drivers"
     },
     {
       "source": "orionis/foundation/config/queue/enums/drivers.py",
@@ -411,7 +411,7 @@
       "kind": "constant",
       "line": 7,
       "signature": "DATABASE = 'database'",
-      "reference": "/asynchronous/queues/configuration#config-drivers"
+      "reference": "/queues/configuration#config-drivers"
     },
     {
       "source": "orionis/foundation/config/queue/enums/drivers.py",
@@ -419,7 +419,7 @@
       "kind": "constant",
       "line": 8,
       "signature": "REDIS = 'redis'",
-      "reference": "/asynchronous/queues/configuration#config-drivers"
+      "reference": "/queues/configuration#config-drivers"
     },
     {
       "source": "orionis/queues/context.py",
@@ -427,7 +427,7 @@
       "kind": "type-alias",
       "line": 7,
       "signature": "type FailureCallback = Callable[[ReservedJob, Exception], Awaitable[bool]]",
-      "reference": "/asynchronous/queues/api-reference#queue-types"
+      "reference": "/queues/api-reference#queue-types"
     },
     {
       "source": "orionis/queues/context.py",
@@ -435,7 +435,7 @@
       "kind": "class",
       "line": 12,
       "signature": "class JobContext",
-      "reference": "/asynchronous/queues/failures-and-retries#job-context"
+      "reference": "/queues/failures-and-retries#job-context"
     },
     {
       "source": "orionis/queues/context.py",
@@ -443,7 +443,7 @@
       "kind": "method",
       "line": 24,
       "signature": "__init__(self, driver: IQueueDriver, reserved: ReservedJob, connection: str, fail: FailureCallback) -> None",
-      "reference": "/asynchronous/queues/failures-and-retries#job-context"
+      "reference": "/queues/failures-and-retries#job-context"
     },
     {
       "source": "orionis/queues/context.py",
@@ -451,7 +451,7 @@
       "kind": "method",
       "line": 58,
       "signature": "id(self) -> str",
-      "reference": "/asynchronous/queues/failures-and-retries#job-context-id"
+      "reference": "/queues/failures-and-retries#job-context-id"
     },
     {
       "source": "orionis/queues/context.py",
@@ -459,7 +459,7 @@
       "kind": "method",
       "line": 70,
       "signature": "attempts(self) -> int",
-      "reference": "/asynchronous/queues/failures-and-retries#job-context-attempts"
+      "reference": "/queues/failures-and-retries#job-context-attempts"
     },
     {
       "source": "orionis/queues/context.py",
@@ -467,7 +467,7 @@
       "kind": "method",
       "line": 82,
       "signature": "queue(self) -> str",
-      "reference": "/asynchronous/queues/failures-and-retries#job-context-queue"
+      "reference": "/queues/failures-and-retries#job-context-queue"
     },
     {
       "source": "orionis/queues/context.py",
@@ -475,7 +475,7 @@
       "kind": "method",
       "line": 94,
       "signature": "connection(self) -> str",
-      "reference": "/asynchronous/queues/failures-and-retries#job-context-connection"
+      "reference": "/queues/failures-and-retries#job-context-connection"
     },
     {
       "source": "orionis/queues/context.py",
@@ -483,7 +483,7 @@
       "kind": "method",
       "line": 106,
       "signature": "finished(self) -> bool",
-      "reference": "/asynchronous/queues/failures-and-retries#job-context-finished"
+      "reference": "/queues/failures-and-retries#job-context-finished"
     },
     {
       "source": "orionis/queues/context.py",
@@ -491,7 +491,7 @@
       "kind": "method",
       "line": 118,
       "signature": "failure(self) -> Exception | None",
-      "reference": "/asynchronous/queues/failures-and-retries#job-context-failure"
+      "reference": "/queues/failures-and-retries#job-context-failure"
     },
     {
       "source": "orionis/queues/context.py",
@@ -499,7 +499,7 @@
       "kind": "method",
       "line": 147,
       "signature": "async release(self, delay: float=0.0) -> None",
-      "reference": "/asynchronous/queues/failures-and-retries#job-context-release"
+      "reference": "/queues/failures-and-retries#job-context-release"
     },
     {
       "source": "orionis/queues/context.py",
@@ -507,7 +507,7 @@
       "kind": "method",
       "line": 175,
       "signature": "async delete(self) -> None",
-      "reference": "/asynchronous/queues/failures-and-retries#job-context-delete"
+      "reference": "/queues/failures-and-retries#job-context-delete"
     },
     {
       "source": "orionis/queues/context.py",
@@ -515,7 +515,7 @@
       "kind": "method",
       "line": 195,
       "signature": "async fail(self, exception: Exception) -> None",
-      "reference": "/asynchronous/queues/failures-and-retries#job-context-fail"
+      "reference": "/queues/failures-and-retries#job-context-fail"
     },
     {
       "source": "orionis/queues/contracts/driver.py",
@@ -523,7 +523,7 @@
       "kind": "class",
       "line": 8,
       "signature": "class IQueueDriver",
-      "reference": "/asynchronous/queues/api-reference#driver-construction"
+      "reference": "/queues/api-reference#driver-construction"
     },
     {
       "source": "orionis/queues/contracts/driver.py",
@@ -531,7 +531,7 @@
       "kind": "method",
       "line": 14,
       "signature": "async push(self, envelope: JobEnvelope, delay: float=0) -> str",
-      "reference": "/asynchronous/queues/api-reference#driver-push"
+      "reference": "/queues/api-reference#driver-push"
     },
     {
       "source": "orionis/queues/contracts/driver.py",
@@ -539,7 +539,7 @@
       "kind": "method",
       "line": 32,
       "signature": "async reserve(self, queues: tuple[str, ...], retry_after: float) -> ReservedJob | None",
-      "reference": "/asynchronous/queues/api-reference#driver-reserve"
+      "reference": "/queues/api-reference#driver-reserve"
     },
     {
       "source": "orionis/queues/contracts/driver.py",
@@ -547,7 +547,7 @@
       "kind": "method",
       "line": 54,
       "signature": "async release(self, reserved: ReservedJob, delay: float=0) -> bool",
-      "reference": "/asynchronous/queues/api-reference#driver-release"
+      "reference": "/queues/api-reference#driver-release"
     },
     {
       "source": "orionis/queues/contracts/driver.py",
@@ -555,7 +555,7 @@
       "kind": "method",
       "line": 72,
       "signature": "async delete(self, reserved: ReservedJob) -> bool",
-      "reference": "/asynchronous/queues/api-reference#driver-delete"
+      "reference": "/queues/api-reference#driver-delete"
     },
     {
       "source": "orionis/queues/contracts/driver.py",
@@ -563,7 +563,7 @@
       "kind": "method",
       "line": 88,
       "signature": "async size(self, queue: str) -> int",
-      "reference": "/asynchronous/queues/api-reference#driver-size"
+      "reference": "/queues/api-reference#driver-size"
     },
     {
       "source": "orionis/queues/contracts/driver.py",
@@ -571,7 +571,7 @@
       "kind": "method",
       "line": 104,
       "signature": "async clear(self, queue: str) -> int",
-      "reference": "/asynchronous/queues/api-reference#driver-clear"
+      "reference": "/queues/api-reference#driver-clear"
     },
     {
       "source": "orionis/queues/contracts/driver.py",
@@ -579,7 +579,7 @@
       "kind": "method",
       "line": 120,
       "signature": "async close(self) -> None",
-      "reference": "/asynchronous/queues/api-reference#driver-close"
+      "reference": "/queues/api-reference#driver-close"
     },
     {
       "source": "orionis/queues/contracts/failed_repository.py",
@@ -587,7 +587,7 @@
       "kind": "class",
       "line": 8,
       "signature": "class IFailedJobRepository",
-      "reference": "/asynchronous/queues/failures-and-retries#failed-repository"
+      "reference": "/queues/failures-and-retries#failed-repository"
     },
     {
       "source": "orionis/queues/contracts/failed_repository.py",
@@ -595,7 +595,7 @@
       "kind": "method",
       "line": 14,
       "signature": "async record(self, reserved: ReservedJob, connection: str, exception: BaseException) -> FailedJob",
-      "reference": "/asynchronous/queues/failures-and-retries#failed-repository-record"
+      "reference": "/queues/failures-and-retries#failed-repository-record"
     },
     {
       "source": "orionis/queues/contracts/failed_repository.py",
@@ -603,7 +603,7 @@
       "kind": "method",
       "line": 39,
       "signature": "async all(self) -> tuple[FailedJob, ...]",
-      "reference": "/asynchronous/queues/failures-and-retries#failed-repository-all"
+      "reference": "/queues/failures-and-retries#failed-repository-all"
     },
     {
       "source": "orionis/queues/contracts/failed_repository.py",
@@ -611,7 +611,7 @@
       "kind": "method",
       "line": 50,
       "signature": "async find(self, failed_id: str) -> FailedJob | None",
-      "reference": "/asynchronous/queues/failures-and-retries#failed-repository-find"
+      "reference": "/queues/failures-and-retries#failed-repository-find"
     },
     {
       "source": "orionis/queues/contracts/failed_repository.py",
@@ -619,7 +619,7 @@
       "kind": "method",
       "line": 66,
       "signature": "async forget(self, failed_id: str) -> bool",
-      "reference": "/asynchronous/queues/failures-and-retries#failed-repository-forget"
+      "reference": "/queues/failures-and-retries#failed-repository-forget"
     },
     {
       "source": "orionis/queues/contracts/failed_repository.py",
@@ -627,7 +627,7 @@
       "kind": "method",
       "line": 82,
       "signature": "async close(self) -> None",
-      "reference": "/asynchronous/queues/failures-and-retries#failed-repository-close"
+      "reference": "/queues/failures-and-retries#failed-repository-close"
     },
     {
       "source": "orionis/queues/contracts/job.py",
@@ -635,7 +635,7 @@
       "kind": "class",
       "line": 3,
       "signature": "class IJob",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#job-construction"
+      "reference": "/queues/jobs-and-dispatch#job-construction"
     },
     {
       "source": "orionis/queues/contracts/job.py",
@@ -643,7 +643,7 @@
       "kind": "method",
       "line": 9,
       "signature": "async handle(self) -> None",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#job-handle"
+      "reference": "/queues/jobs-and-dispatch#job-handle"
     },
     {
       "source": "orionis/queues/contracts/manager.py",
@@ -651,7 +651,7 @@
       "kind": "class",
       "line": 11,
       "signature": "class IQueueManager",
-      "reference": "/asynchronous/queues/manager-and-injection#manager-construction"
+      "reference": "/queues/manager-and-injection#manager-construction"
     },
     {
       "source": "orionis/queues/contracts/manager.py",
@@ -659,7 +659,7 @@
       "kind": "method",
       "line": 17,
       "signature": "dispatch(self, job: BaseJob) -> PendingDispatch",
-      "reference": "/asynchronous/queues/manager-and-injection#manager-dispatch"
+      "reference": "/queues/manager-and-injection#manager-dispatch"
     },
     {
       "source": "orionis/queues/contracts/manager.py",
@@ -667,7 +667,7 @@
       "kind": "method",
       "line": 33,
       "signature": "async connection(self, name: str | None=None) -> IQueueDriver",
-      "reference": "/asynchronous/queues/manager-and-injection#manager-connection"
+      "reference": "/queues/manager-and-injection#manager-connection"
     },
     {
       "source": "orionis/queues/contracts/manager.py",
@@ -675,7 +675,7 @@
       "kind": "method",
       "line": 49,
       "signature": "async worker(self, connection: str | None=None, queues: tuple[str, ...] | None=None, concurrency: int | None=None) -> IWorker",
-      "reference": "/asynchronous/queues/manager-and-injection#manager-worker"
+      "reference": "/queues/manager-and-injection#manager-worker"
     },
     {
       "source": "orionis/queues/contracts/manager.py",
@@ -683,7 +683,7 @@
       "kind": "method",
       "line": 74,
       "signature": "async failed(self) -> IFailedJobRepository",
-      "reference": "/asynchronous/queues/manager-and-injection#manager-failed"
+      "reference": "/queues/manager-and-injection#manager-failed"
     },
     {
       "source": "orionis/queues/contracts/manager.py",
@@ -691,7 +691,7 @@
       "kind": "method",
       "line": 85,
       "signature": "async retryFailed(self, failed_id: str) -> str",
-      "reference": "/asynchronous/queues/manager-and-injection#manager-retryfailed"
+      "reference": "/queues/manager-and-injection#manager-retryfailed"
     },
     {
       "source": "orionis/queues/contracts/manager.py",
@@ -699,7 +699,7 @@
       "kind": "method",
       "line": 101,
       "signature": "async close(self) -> None",
-      "reference": "/asynchronous/queues/manager-and-injection#manager-close"
+      "reference": "/queues/manager-and-injection#manager-close"
     },
     {
       "source": "orionis/queues/contracts/serializer.py",
@@ -707,7 +707,7 @@
       "kind": "class",
       "line": 8,
       "signature": "class IJobSerializer",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#serializer-construction"
+      "reference": "/queues/jobs-and-dispatch#serializer-construction"
     },
     {
       "source": "orionis/queues/contracts/serializer.py",
@@ -715,7 +715,7 @@
       "kind": "method",
       "line": 14,
       "signature": "register(self, job_type: type[BaseJob]) -> None",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#serializer-register"
+      "reference": "/queues/jobs-and-dispatch#serializer-register"
     },
     {
       "source": "orionis/queues/contracts/serializer.py",
@@ -723,7 +723,7 @@
       "kind": "method",
       "line": 30,
       "signature": "encode(self, job: BaseJob) -> tuple[str, bytes]",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#serializer-encode"
+      "reference": "/queues/jobs-and-dispatch#serializer-encode"
     },
     {
       "source": "orionis/queues/contracts/serializer.py",
@@ -731,7 +731,7 @@
       "kind": "method",
       "line": 46,
       "signature": "decode(self, identity: str, payload: bytes) -> BaseJob",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#serializer-decode"
+      "reference": "/queues/jobs-and-dispatch#serializer-decode"
     },
     {
       "source": "orionis/queues/contracts/serializer.py",
@@ -739,7 +739,7 @@
       "kind": "method",
       "line": 64,
       "signature": "encodeEnvelope(self, envelope: JobEnvelope) -> bytes",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#serializer-encodeenvelope"
+      "reference": "/queues/jobs-and-dispatch#serializer-encodeenvelope"
     },
     {
       "source": "orionis/queues/contracts/serializer.py",
@@ -747,7 +747,7 @@
       "kind": "method",
       "line": 80,
       "signature": "decodeEnvelope(self, payload: bytes) -> JobEnvelope",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#serializer-decodeenvelope"
+      "reference": "/queues/jobs-and-dispatch#serializer-decodeenvelope"
     },
     {
       "source": "orionis/queues/contracts/worker.py",
@@ -755,7 +755,7 @@
       "kind": "class",
       "line": 7,
       "signature": "class IWorker",
-      "reference": "/asynchronous/queues/workers-and-failures#worker-construction"
+      "reference": "/queues/workers#worker-construction"
     },
     {
       "source": "orionis/queues/contracts/worker.py",
@@ -763,7 +763,7 @@
       "kind": "method",
       "line": 13,
       "signature": "async run(self, *, stop_when_empty: bool=False, max_jobs: int | None=None) -> int",
-      "reference": "/asynchronous/queues/workers-and-failures#worker-run"
+      "reference": "/queues/workers#worker-run"
     },
     {
       "source": "orionis/queues/contracts/worker.py",
@@ -771,7 +771,7 @@
       "kind": "method",
       "line": 36,
       "signature": "stop(self) -> None",
-      "reference": "/asynchronous/queues/workers-and-failures#worker-stop"
+      "reference": "/queues/workers#worker-stop"
     },
     {
       "source": "orionis/queues/contracts/worker.py",
@@ -779,7 +779,7 @@
       "kind": "method",
       "line": 47,
       "signature": "async execute(self, reserved: ReservedJob, *, raise_errors: bool=False) -> None",
-      "reference": "/asynchronous/queues/workers-and-failures#worker-execute"
+      "reference": "/queues/workers#worker-execute"
     },
     {
       "source": "orionis/queues/drivers/database.py",
@@ -787,7 +787,7 @@
       "kind": "function",
       "line": 30,
       "signature": "eligible_clauses(queue: str, now: float) -> list[WhereClause]",
-      "reference": "/asynchronous/queues/api-reference#eligible-clauses"
+      "reference": "/queues/api-reference#eligible-clauses"
     },
     {
       "source": "orionis/queues/drivers/database.py",
@@ -795,7 +795,7 @@
       "kind": "class",
       "line": 60,
       "signature": "class DatabaseQueueDriver",
-      "reference": "/asynchronous/queues/api-reference#driver-construction"
+      "reference": "/queues/api-reference#driver-construction"
     },
     {
       "source": "orionis/queues/drivers/database.py",
@@ -803,7 +803,7 @@
       "kind": "method",
       "line": 65,
       "signature": "__init__(self, connection: IConnection, table: str='jobs') -> None",
-      "reference": "/asynchronous/queues/api-reference#driver-construction"
+      "reference": "/queues/api-reference#driver-construction"
     },
     {
       "source": "orionis/queues/drivers/database.py",
@@ -811,7 +811,7 @@
       "kind": "method",
       "line": 118,
       "signature": "async push(self, envelope: JobEnvelope, delay: float=0) -> str",
-      "reference": "/asynchronous/queues/api-reference#driver-push"
+      "reference": "/queues/api-reference#driver-push"
     },
     {
       "source": "orionis/queues/drivers/database.py",
@@ -819,7 +819,7 @@
       "kind": "method",
       "line": 152,
       "signature": "async reserve(self, queues: tuple[str, ...], retry_after: float) -> ReservedJob | None",
-      "reference": "/asynchronous/queues/api-reference#driver-reserve"
+      "reference": "/queues/api-reference#driver-reserve"
     },
     {
       "source": "orionis/queues/drivers/database.py",
@@ -827,7 +827,7 @@
       "kind": "method",
       "line": 246,
       "signature": "async release(self, reserved: ReservedJob, delay: float=0) -> bool",
-      "reference": "/asynchronous/queues/api-reference#driver-release"
+      "reference": "/queues/api-reference#driver-release"
     },
     {
       "source": "orionis/queues/drivers/database.py",
@@ -835,7 +835,7 @@
       "kind": "method",
       "line": 273,
       "signature": "async delete(self, reserved: ReservedJob) -> bool",
-      "reference": "/asynchronous/queues/api-reference#driver-delete"
+      "reference": "/queues/api-reference#driver-delete"
     },
     {
       "source": "orionis/queues/drivers/database.py",
@@ -843,7 +843,7 @@
       "kind": "method",
       "line": 291,
       "signature": "async size(self, queue: str) -> int",
-      "reference": "/asynchronous/queues/api-reference#driver-size"
+      "reference": "/queues/api-reference#driver-size"
     },
     {
       "source": "orionis/queues/drivers/database.py",
@@ -851,7 +851,7 @@
       "kind": "method",
       "line": 313,
       "signature": "async clear(self, queue: str) -> int",
-      "reference": "/asynchronous/queues/api-reference#driver-clear"
+      "reference": "/queues/api-reference#driver-clear"
     },
     {
       "source": "orionis/queues/drivers/database.py",
@@ -859,7 +859,7 @@
       "kind": "method",
       "line": 333,
       "signature": "async close(self) -> None",
-      "reference": "/asynchronous/queues/api-reference#driver-close"
+      "reference": "/queues/api-reference#driver-close"
     },
     {
       "source": "orionis/queues/drivers/redis.py",
@@ -867,7 +867,7 @@
       "kind": "class",
       "line": 92,
       "signature": "class RedisQueueDriver",
-      "reference": "/asynchronous/queues/api-reference#driver-construction"
+      "reference": "/queues/api-reference#driver-construction"
     },
     {
       "source": "orionis/queues/drivers/redis.py",
@@ -875,7 +875,7 @@
       "kind": "method",
       "line": 97,
       "signature": "__init__(self, config: RedisConfig | None=None, *, client: Redis | None=None) -> None",
-      "reference": "/asynchronous/queues/api-reference#driver-construction"
+      "reference": "/queues/api-reference#driver-construction"
     },
     {
       "source": "orionis/queues/drivers/redis.py",
@@ -883,7 +883,7 @@
       "kind": "method",
       "line": 201,
       "signature": "async push(self, envelope: JobEnvelope, delay: float=0) -> str",
-      "reference": "/asynchronous/queues/api-reference#driver-push"
+      "reference": "/queues/api-reference#driver-push"
     },
     {
       "source": "orionis/queues/drivers/redis.py",
@@ -891,7 +891,7 @@
       "kind": "method",
       "line": 232,
       "signature": "async reserve(self, queues: tuple[str, ...], retry_after: float) -> ReservedJob | None",
-      "reference": "/asynchronous/queues/api-reference#driver-reserve"
+      "reference": "/queues/api-reference#driver-reserve"
     },
     {
       "source": "orionis/queues/drivers/redis.py",
@@ -899,7 +899,7 @@
       "kind": "method",
       "line": 284,
       "signature": "async release(self, reserved: ReservedJob, delay: float=0) -> bool",
-      "reference": "/asynchronous/queues/api-reference#driver-release"
+      "reference": "/queues/api-reference#driver-release"
     },
     {
       "source": "orionis/queues/drivers/redis.py",
@@ -907,7 +907,7 @@
       "kind": "method",
       "line": 307,
       "signature": "async delete(self, reserved: ReservedJob) -> bool",
-      "reference": "/asynchronous/queues/api-reference#driver-delete"
+      "reference": "/queues/api-reference#driver-delete"
     },
     {
       "source": "orionis/queues/drivers/redis.py",
@@ -915,7 +915,7 @@
       "kind": "method",
       "line": 326,
       "signature": "async size(self, queue: str) -> int",
-      "reference": "/asynchronous/queues/api-reference#driver-size"
+      "reference": "/queues/api-reference#driver-size"
     },
     {
       "source": "orionis/queues/drivers/redis.py",
@@ -923,7 +923,7 @@
       "kind": "method",
       "line": 346,
       "signature": "async clear(self, queue: str) -> int",
-      "reference": "/asynchronous/queues/api-reference#driver-clear"
+      "reference": "/queues/api-reference#driver-clear"
     },
     {
       "source": "orionis/queues/drivers/redis.py",
@@ -931,7 +931,7 @@
       "kind": "method",
       "line": 366,
       "signature": "async close(self) -> None",
-      "reference": "/asynchronous/queues/api-reference#driver-close"
+      "reference": "/queues/api-reference#driver-close"
     },
     {
       "source": "orionis/queues/drivers/sync.py",
@@ -939,7 +939,7 @@
       "kind": "class",
       "line": 15,
       "signature": "class SyncQueueDriver",
-      "reference": "/asynchronous/queues/api-reference#driver-construction"
+      "reference": "/queues/api-reference#driver-construction"
     },
     {
       "source": "orionis/queues/drivers/sync.py",
@@ -947,7 +947,7 @@
       "kind": "method",
       "line": 20,
       "signature": "__init__(self, app: IApplication, serializer: IJobSerializer, connection: str, failed_resolver: FailedResolver, retry_after: float=90.0) -> None",
-      "reference": "/asynchronous/queues/api-reference#driver-construction"
+      "reference": "/queues/api-reference#driver-construction"
     },
     {
       "source": "orionis/queues/drivers/sync.py",
@@ -955,7 +955,7 @@
       "kind": "method",
       "line": 62,
       "signature": "async push(self, envelope: JobEnvelope, delay: float=0.0) -> str",
-      "reference": "/asynchronous/queues/api-reference#driver-push"
+      "reference": "/queues/api-reference#driver-push"
     },
     {
       "source": "orionis/queues/drivers/sync.py",
@@ -963,7 +963,7 @@
       "kind": "method",
       "line": 94,
       "signature": "async reserve(self, queues: tuple[str, ...], retry_after: float) -> ReservedJob | None",
-      "reference": "/asynchronous/queues/api-reference#driver-reserve"
+      "reference": "/queues/api-reference#driver-reserve"
     },
     {
       "source": "orionis/queues/drivers/sync.py",
@@ -971,7 +971,7 @@
       "kind": "method",
       "line": 117,
       "signature": "async release(self, reserved: ReservedJob, delay: float=0.0) -> bool",
-      "reference": "/asynchronous/queues/api-reference#driver-release"
+      "reference": "/queues/api-reference#driver-release"
     },
     {
       "source": "orionis/queues/drivers/sync.py",
@@ -979,7 +979,7 @@
       "kind": "method",
       "line": 142,
       "signature": "async delete(self, reserved: ReservedJob) -> bool",
-      "reference": "/asynchronous/queues/api-reference#driver-delete"
+      "reference": "/queues/api-reference#driver-delete"
     },
     {
       "source": "orionis/queues/drivers/sync.py",
@@ -987,7 +987,7 @@
       "kind": "method",
       "line": 159,
       "signature": "async size(self, queue: str) -> int",
-      "reference": "/asynchronous/queues/api-reference#driver-size"
+      "reference": "/queues/api-reference#driver-size"
     },
     {
       "source": "orionis/queues/drivers/sync.py",
@@ -995,7 +995,7 @@
       "kind": "method",
       "line": 176,
       "signature": "async clear(self, queue: str) -> int",
-      "reference": "/asynchronous/queues/api-reference#driver-clear"
+      "reference": "/queues/api-reference#driver-clear"
     },
     {
       "source": "orionis/queues/drivers/sync.py",
@@ -1003,7 +1003,7 @@
       "kind": "method",
       "line": 193,
       "signature": "async close(self) -> None",
-      "reference": "/asynchronous/queues/api-reference#driver-close"
+      "reference": "/queues/api-reference#driver-close"
     },
     {
       "source": "orionis/queues/entities/envelope.py",
@@ -1011,7 +1011,7 @@
       "kind": "class",
       "line": 7,
       "signature": "class JobEnvelope",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#job-envelope"
+      "reference": "/queues/jobs-and-dispatch#job-envelope"
     },
     {
       "source": "orionis/queues/entities/envelope.py",
@@ -1019,7 +1019,7 @@
       "kind": "field",
       "line": 12,
       "signature": "id: str",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#job-envelope"
+      "reference": "/queues/jobs-and-dispatch#job-envelope"
     },
     {
       "source": "orionis/queues/entities/envelope.py",
@@ -1027,7 +1027,7 @@
       "kind": "field",
       "line": 13,
       "signature": "job: str",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#job-envelope"
+      "reference": "/queues/jobs-and-dispatch#job-envelope"
     },
     {
       "source": "orionis/queues/entities/envelope.py",
@@ -1035,7 +1035,7 @@
       "kind": "field",
       "line": 14,
       "signature": "payload: bytes",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#job-envelope"
+      "reference": "/queues/jobs-and-dispatch#job-envelope"
     },
     {
       "source": "orionis/queues/entities/envelope.py",
@@ -1043,7 +1043,7 @@
       "kind": "field",
       "line": 15,
       "signature": "connection: str",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#job-envelope"
+      "reference": "/queues/jobs-and-dispatch#job-envelope"
     },
     {
       "source": "orionis/queues/entities/envelope.py",
@@ -1051,7 +1051,7 @@
       "kind": "field",
       "line": 16,
       "signature": "queue: str",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#job-envelope"
+      "reference": "/queues/jobs-and-dispatch#job-envelope"
     },
     {
       "source": "orionis/queues/entities/envelope.py",
@@ -1059,7 +1059,7 @@
       "kind": "field",
       "line": 17,
       "signature": "max_tries: int",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#job-envelope"
+      "reference": "/queues/jobs-and-dispatch#job-envelope"
     },
     {
       "source": "orionis/queues/entities/envelope.py",
@@ -1067,7 +1067,7 @@
       "kind": "field",
       "line": 18,
       "signature": "timeout: float | None",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#job-envelope"
+      "reference": "/queues/jobs-and-dispatch#job-envelope"
     },
     {
       "source": "orionis/queues/entities/envelope.py",
@@ -1075,7 +1075,7 @@
       "kind": "field",
       "line": 19,
       "signature": "backoff: tuple[float, ...]",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#job-envelope"
+      "reference": "/queues/jobs-and-dispatch#job-envelope"
     },
     {
       "source": "orionis/queues/entities/envelope.py",
@@ -1083,7 +1083,7 @@
       "kind": "field",
       "line": 20,
       "signature": "retry_until: float | None = None",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#job-envelope"
+      "reference": "/queues/jobs-and-dispatch#job-envelope"
     },
     {
       "source": "orionis/queues/entities/envelope.py",
@@ -1091,7 +1091,7 @@
       "kind": "field",
       "line": 21,
       "signature": "version: int = 1",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#job-envelope"
+      "reference": "/queues/jobs-and-dispatch#job-envelope"
     },
     {
       "source": "orionis/queues/entities/failed_job.py",
@@ -1099,7 +1099,7 @@
       "kind": "class",
       "line": 3,
       "signature": "class FailedJob",
-      "reference": "/asynchronous/queues/failures-and-retries#failed-job"
+      "reference": "/queues/failures-and-retries#failed-job"
     },
     {
       "source": "orionis/queues/entities/failed_job.py",
@@ -1107,7 +1107,7 @@
       "kind": "field",
       "line": 6,
       "signature": "id: str",
-      "reference": "/asynchronous/queues/failures-and-retries#failed-job"
+      "reference": "/queues/failures-and-retries#failed-job"
     },
     {
       "source": "orionis/queues/entities/failed_job.py",
@@ -1115,7 +1115,7 @@
       "kind": "field",
       "line": 7,
       "signature": "job_id: str",
-      "reference": "/asynchronous/queues/failures-and-retries#failed-job"
+      "reference": "/queues/failures-and-retries#failed-job"
     },
     {
       "source": "orionis/queues/entities/failed_job.py",
@@ -1123,7 +1123,7 @@
       "kind": "field",
       "line": 8,
       "signature": "connection: str",
-      "reference": "/asynchronous/queues/failures-and-retries#failed-job"
+      "reference": "/queues/failures-and-retries#failed-job"
     },
     {
       "source": "orionis/queues/entities/failed_job.py",
@@ -1131,7 +1131,7 @@
       "kind": "field",
       "line": 9,
       "signature": "queue: str",
-      "reference": "/asynchronous/queues/failures-and-retries#failed-job"
+      "reference": "/queues/failures-and-retries#failed-job"
     },
     {
       "source": "orionis/queues/entities/failed_job.py",
@@ -1139,7 +1139,7 @@
       "kind": "field",
       "line": 10,
       "signature": "payload: bytes",
-      "reference": "/asynchronous/queues/failures-and-retries#failed-job"
+      "reference": "/queues/failures-and-retries#failed-job"
     },
     {
       "source": "orionis/queues/entities/failed_job.py",
@@ -1147,7 +1147,7 @@
       "kind": "field",
       "line": 11,
       "signature": "exception_type: str",
-      "reference": "/asynchronous/queues/failures-and-retries#failed-job"
+      "reference": "/queues/failures-and-retries#failed-job"
     },
     {
       "source": "orionis/queues/entities/failed_job.py",
@@ -1155,7 +1155,7 @@
       "kind": "field",
       "line": 12,
       "signature": "exception_message: str",
-      "reference": "/asynchronous/queues/failures-and-retries#failed-job"
+      "reference": "/queues/failures-and-retries#failed-job"
     },
     {
       "source": "orionis/queues/entities/failed_job.py",
@@ -1163,7 +1163,7 @@
       "kind": "field",
       "line": 13,
       "signature": "traceback: str",
-      "reference": "/asynchronous/queues/failures-and-retries#failed-job"
+      "reference": "/queues/failures-and-retries#failed-job"
     },
     {
       "source": "orionis/queues/entities/failed_job.py",
@@ -1171,7 +1171,7 @@
       "kind": "field",
       "line": 14,
       "signature": "failed_at: float",
-      "reference": "/asynchronous/queues/failures-and-retries#failed-job"
+      "reference": "/queues/failures-and-retries#failed-job"
     },
     {
       "source": "orionis/queues/entities/failed_job.py",
@@ -1179,7 +1179,7 @@
       "kind": "field",
       "line": 15,
       "signature": "attempts: int",
-      "reference": "/asynchronous/queues/failures-and-retries#failed-job"
+      "reference": "/queues/failures-and-retries#failed-job"
     },
     {
       "source": "orionis/queues/entities/reserved_job.py",
@@ -1187,7 +1187,7 @@
       "kind": "class",
       "line": 3,
       "signature": "class ReservedJob",
-      "reference": "/asynchronous/queues/workers-and-failures#reserved-job"
+      "reference": "/queues/workers#reserved-job"
     },
     {
       "source": "orionis/queues/entities/reserved_job.py",
@@ -1195,7 +1195,7 @@
       "kind": "field",
       "line": 6,
       "signature": "id: str",
-      "reference": "/asynchronous/queues/workers-and-failures#reserved-job"
+      "reference": "/queues/workers#reserved-job"
     },
     {
       "source": "orionis/queues/entities/reserved_job.py",
@@ -1203,7 +1203,7 @@
       "kind": "field",
       "line": 7,
       "signature": "payload: bytes",
-      "reference": "/asynchronous/queues/workers-and-failures#reserved-job"
+      "reference": "/queues/workers#reserved-job"
     },
     {
       "source": "orionis/queues/entities/reserved_job.py",
@@ -1211,7 +1211,7 @@
       "kind": "field",
       "line": 8,
       "signature": "queue: str",
-      "reference": "/asynchronous/queues/workers-and-failures#reserved-job"
+      "reference": "/queues/workers#reserved-job"
     },
     {
       "source": "orionis/queues/entities/reserved_job.py",
@@ -1219,7 +1219,7 @@
       "kind": "field",
       "line": 9,
       "signature": "attempts: int",
-      "reference": "/asynchronous/queues/workers-and-failures#reserved-job"
+      "reference": "/queues/workers#reserved-job"
     },
     {
       "source": "orionis/queues/entities/reserved_job.py",
@@ -1227,7 +1227,7 @@
       "kind": "field",
       "line": 10,
       "signature": "token: str",
-      "reference": "/asynchronous/queues/workers-and-failures#reserved-job"
+      "reference": "/queues/workers#reserved-job"
     },
     {
       "source": "orionis/queues/entities/reserved_job.py",
@@ -1235,7 +1235,7 @@
       "kind": "field",
       "line": 11,
       "signature": "reserved_until: float",
-      "reference": "/asynchronous/queues/workers-and-failures#reserved-job"
+      "reference": "/queues/workers#reserved-job"
     },
     {
       "source": "orionis/queues/exceptions.py",
@@ -1243,7 +1243,7 @@
       "kind": "class",
       "line": 1,
       "signature": "class QueueError",
-      "reference": "/asynchronous/queues/api-reference#exceptions"
+      "reference": "/queues/api-reference#exceptions"
     },
     {
       "source": "orionis/queues/exceptions.py",
@@ -1251,7 +1251,7 @@
       "kind": "class",
       "line": 6,
       "signature": "class QueueConfigurationError",
-      "reference": "/asynchronous/queues/api-reference#exceptions"
+      "reference": "/queues/api-reference#exceptions"
     },
     {
       "source": "orionis/queues/exceptions.py",
@@ -1259,7 +1259,7 @@
       "kind": "class",
       "line": 11,
       "signature": "class QueuePayloadError",
-      "reference": "/asynchronous/queues/api-reference#exceptions"
+      "reference": "/queues/api-reference#exceptions"
     },
     {
       "source": "orionis/queues/exceptions.py",
@@ -1267,7 +1267,7 @@
       "kind": "class",
       "line": 16,
       "signature": "class UnknownJobError",
-      "reference": "/asynchronous/queues/api-reference#exceptions"
+      "reference": "/queues/api-reference#exceptions"
     },
     {
       "source": "orionis/queues/exceptions.py",
@@ -1275,7 +1275,7 @@
       "kind": "class",
       "line": 21,
       "signature": "class QueueStorageError",
-      "reference": "/asynchronous/queues/api-reference#exceptions"
+      "reference": "/queues/api-reference#exceptions"
     },
     {
       "source": "orionis/queues/exceptions.py",
@@ -1283,7 +1283,7 @@
       "kind": "class",
       "line": 26,
       "signature": "class QueueLeaseError",
-      "reference": "/asynchronous/queues/api-reference#exceptions"
+      "reference": "/queues/api-reference#exceptions"
     },
     {
       "source": "orionis/queues/exceptions.py",
@@ -1291,7 +1291,7 @@
       "kind": "class",
       "line": 31,
       "signature": "class QueueDispatchError",
-      "reference": "/asynchronous/queues/api-reference#exceptions"
+      "reference": "/queues/api-reference#exceptions"
     },
     {
       "source": "orionis/queues/exceptions.py",
@@ -1299,7 +1299,7 @@
       "kind": "class",
       "line": 36,
       "signature": "class QueueRetryError",
-      "reference": "/asynchronous/queues/api-reference#exceptions"
+      "reference": "/queues/api-reference#exceptions"
     },
     {
       "source": "orionis/queues/failed/repository.py",
@@ -1307,7 +1307,7 @@
       "kind": "class",
       "line": 22,
       "signature": "class DatabaseFailedJobRepository",
-      "reference": "/asynchronous/queues/failures-and-retries#failed-repository"
+      "reference": "/queues/failures-and-retries#failed-repository"
     },
     {
       "source": "orionis/queues/failed/repository.py",
@@ -1315,7 +1315,7 @@
       "kind": "method",
       "line": 27,
       "signature": "__init__(self, connection: IConnection, table: str='failed_jobs') -> None",
-      "reference": "/asynchronous/queues/failures-and-retries#failed-repository"
+      "reference": "/queues/failures-and-retries#failed-repository"
     },
     {
       "source": "orionis/queues/failed/repository.py",
@@ -1323,7 +1323,7 @@
       "kind": "method",
       "line": 74,
       "signature": "async record(self, reserved: ReservedJob, connection: str, exception: Exception) -> FailedJob",
-      "reference": "/asynchronous/queues/failures-and-retries#failed-repository-record"
+      "reference": "/queues/failures-and-retries#failed-repository-record"
     },
     {
       "source": "orionis/queues/failed/repository.py",
@@ -1331,7 +1331,7 @@
       "kind": "method",
       "line": 125,
       "signature": "async all(self) -> tuple[FailedJob, ...]",
-      "reference": "/asynchronous/queues/failures-and-retries#failed-repository-all"
+      "reference": "/queues/failures-and-retries#failed-repository-all"
     },
     {
       "source": "orionis/queues/failed/repository.py",
@@ -1339,7 +1339,7 @@
       "kind": "method",
       "line": 141,
       "signature": "async find(self, failure_id: str) -> FailedJob | None",
-      "reference": "/asynchronous/queues/failures-and-retries#failed-repository-find"
+      "reference": "/queues/failures-and-retries#failed-repository-find"
     },
     {
       "source": "orionis/queues/failed/repository.py",
@@ -1347,7 +1347,7 @@
       "kind": "method",
       "line": 163,
       "signature": "async forget(self, failure_id: str) -> bool",
-      "reference": "/asynchronous/queues/failures-and-retries#failed-repository-forget"
+      "reference": "/queues/failures-and-retries#failed-repository-forget"
     },
     {
       "source": "orionis/queues/failed/repository.py",
@@ -1355,7 +1355,7 @@
       "kind": "method",
       "line": 183,
       "signature": "async close(self) -> None",
-      "reference": "/asynchronous/queues/failures-and-retries#failed-repository-close"
+      "reference": "/queues/failures-and-retries#failed-repository-close"
     },
     {
       "source": "orionis/queues/functions.py",
@@ -1363,7 +1363,7 @@
       "kind": "function",
       "line": 8,
       "signature": "validate_name(value: str, label: str) -> str",
-      "reference": "/asynchronous/queues/api-reference#helper-validate-name"
+      "reference": "/queues/api-reference#helper-validate-name"
     },
     {
       "source": "orionis/queues/functions.py",
@@ -1371,7 +1371,7 @@
       "kind": "function",
       "line": 30,
       "signature": "validate_seconds(value: float, label: str, *, positive: bool=False) -> float",
-      "reference": "/asynchronous/queues/api-reference#helper-validate-seconds"
+      "reference": "/queues/api-reference#helper-validate-seconds"
     },
     {
       "source": "orionis/queues/functions.py",
@@ -1379,7 +1379,7 @@
       "kind": "function",
       "line": 66,
       "signature": "current_time() -> float",
-      "reference": "/asynchronous/queues/api-reference#helper-current-time"
+      "reference": "/queues/api-reference#helper-current-time"
     },
     {
       "source": "orionis/queues/job.py",
@@ -1387,7 +1387,7 @@
       "kind": "class",
       "line": 4,
       "signature": "class BaseJob",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#job-construction"
+      "reference": "/queues/jobs-and-dispatch#job-construction"
     },
     {
       "source": "orionis/queues/job.py",
@@ -1395,7 +1395,7 @@
       "kind": "field",
       "line": 20,
       "signature": "tries: ClassVar[int | None] = None",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#job-construction"
+      "reference": "/queues/jobs-and-dispatch#job-construction"
     },
     {
       "source": "orionis/queues/job.py",
@@ -1403,7 +1403,7 @@
       "kind": "field",
       "line": 21,
       "signature": "timeout: ClassVar[float | None] = None",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#job-construction"
+      "reference": "/queues/jobs-and-dispatch#job-construction"
     },
     {
       "source": "orionis/queues/job.py",
@@ -1411,7 +1411,7 @@
       "kind": "field",
       "line": 22,
       "signature": "backoff: ClassVar[tuple[float, ...] | None] = None",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#job-construction"
+      "reference": "/queues/jobs-and-dispatch#job-construction"
     },
     {
       "source": "orionis/queues/job.py",
@@ -1419,7 +1419,7 @@
       "kind": "method",
       "line": 24,
       "signature": "retryUntil(self) -> float | None",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#job-retryuntil"
+      "reference": "/queues/jobs-and-dispatch#job-retryuntil"
     },
     {
       "source": "orionis/queues/manager.py",
@@ -1427,7 +1427,7 @@
       "kind": "class",
       "line": 68,
       "signature": "class QueueManager",
-      "reference": "/asynchronous/queues/manager-and-injection#manager-construction"
+      "reference": "/queues/manager-and-injection#manager-construction"
     },
     {
       "source": "orionis/queues/manager.py",
@@ -1435,7 +1435,7 @@
       "kind": "method",
       "line": 83,
       "signature": "__init__(self, app: IApplication, serializer: IJobSerializer) -> None",
-      "reference": "/asynchronous/queues/manager-and-injection#manager-construction"
+      "reference": "/queues/manager-and-injection#manager-construction"
     },
     {
       "source": "orionis/queues/manager.py",
@@ -1443,7 +1443,7 @@
       "kind": "method",
       "line": 115,
       "signature": "async boot(self) -> None",
-      "reference": "/asynchronous/queues/manager-and-injection#manager-boot"
+      "reference": "/queues/manager-and-injection#manager-boot"
     },
     {
       "source": "orionis/queues/manager.py",
@@ -1451,7 +1451,7 @@
       "kind": "method",
       "line": 137,
       "signature": "dispatch(self, job: BaseJob) -> PendingDispatch",
-      "reference": "/asynchronous/queues/manager-and-injection#manager-dispatch"
+      "reference": "/queues/manager-and-injection#manager-dispatch"
     },
     {
       "source": "orionis/queues/manager.py",
@@ -1459,7 +1459,7 @@
       "kind": "method",
       "line": 226,
       "signature": "async connection(self, name: str | None=None) -> IQueueDriver",
-      "reference": "/asynchronous/queues/manager-and-injection#manager-connection"
+      "reference": "/queues/manager-and-injection#manager-connection"
     },
     {
       "source": "orionis/queues/manager.py",
@@ -1467,7 +1467,7 @@
       "kind": "method",
       "line": 284,
       "signature": "async worker(self, connection: str | None=None, queues: tuple[str, ...] | None=None, concurrency: int | None=None) -> Worker",
-      "reference": "/asynchronous/queues/manager-and-injection#manager-worker"
+      "reference": "/queues/manager-and-injection#manager-worker"
     },
     {
       "source": "orionis/queues/manager.py",
@@ -1475,7 +1475,7 @@
       "kind": "method",
       "line": 328,
       "signature": "async failed(self) -> IFailedJobRepository",
-      "reference": "/asynchronous/queues/manager-and-injection#manager-failed"
+      "reference": "/queues/manager-and-injection#manager-failed"
     },
     {
       "source": "orionis/queues/manager.py",
@@ -1483,7 +1483,7 @@
       "kind": "method",
       "line": 350,
       "signature": "async retryFailed(self, failed_id: str) -> str",
-      "reference": "/asynchronous/queues/manager-and-injection#manager-retryfailed"
+      "reference": "/queues/manager-and-injection#manager-retryfailed"
     },
     {
       "source": "orionis/queues/manager.py",
@@ -1491,7 +1491,7 @@
       "kind": "method",
       "line": 379,
       "signature": "async close(self) -> None",
-      "reference": "/asynchronous/queues/manager-and-injection#manager-close"
+      "reference": "/queues/manager-and-injection#manager-close"
     },
     {
       "source": "orionis/queues/pending.py",
@@ -1499,7 +1499,7 @@
       "kind": "class",
       "line": 11,
       "signature": "class PendingDispatch",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#pending-construction"
+      "reference": "/queues/jobs-and-dispatch#pending-construction"
     },
     {
       "source": "orionis/queues/pending.py",
@@ -1507,7 +1507,7 @@
       "kind": "method",
       "line": 18,
       "signature": "__init__(self, submit: DispatchCallback, job: BaseJob) -> None",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#pending-construction"
+      "reference": "/queues/jobs-and-dispatch#pending-construction"
     },
     {
       "source": "orionis/queues/pending.py",
@@ -1515,7 +1515,7 @@
       "kind": "method",
       "line": 41,
       "signature": "onConnection(self, name: str) -> PendingDispatch",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#pending-onconnection"
+      "reference": "/queues/jobs-and-dispatch#pending-onconnection"
     },
     {
       "source": "orionis/queues/pending.py",
@@ -1523,7 +1523,7 @@
       "kind": "method",
       "line": 59,
       "signature": "onQueue(self, name: str) -> PendingDispatch",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#pending-onqueue"
+      "reference": "/queues/jobs-and-dispatch#pending-onqueue"
     },
     {
       "source": "orionis/queues/pending.py",
@@ -1531,7 +1531,7 @@
       "kind": "method",
       "line": 77,
       "signature": "delay(self, seconds: float) -> PendingDispatch",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#pending-delay"
+      "reference": "/queues/jobs-and-dispatch#pending-delay"
     },
     {
       "source": "orionis/queues/pending.py",
@@ -1539,7 +1539,7 @@
       "kind": "method",
       "line": 140,
       "signature": "__await__(self) -> Generator[object, None, str]",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#pending-__await__"
+      "reference": "/queues/jobs-and-dispatch#pending-__await__"
     },
     {
       "source": "orionis/queues/provider.py",
@@ -1547,7 +1547,7 @@
       "kind": "class",
       "line": 9,
       "signature": "class QueueProvider",
-      "reference": "/asynchronous/queues/api-reference#provider"
+      "reference": "/queues/api-reference#provider"
     },
     {
       "source": "orionis/queues/provider.py",
@@ -1555,7 +1555,7 @@
       "kind": "method",
       "line": 18,
       "signature": "register(self) -> None",
-      "reference": "/asynchronous/queues/api-reference#provider"
+      "reference": "/queues/api-reference#provider"
     },
     {
       "source": "orionis/queues/provider.py",
@@ -1563,7 +1563,7 @@
       "kind": "method",
       "line": 30,
       "signature": "async boot(self) -> None",
-      "reference": "/asynchronous/queues/api-reference#provider"
+      "reference": "/queues/api-reference#provider"
     },
     {
       "source": "orionis/queues/schema.py",
@@ -1571,7 +1571,7 @@
       "kind": "function",
       "line": 9,
       "signature": "validate_table_name(table: str) -> str",
-      "reference": "/asynchronous/queues/drivers-and-configuration#schema-functions"
+      "reference": "/queues/drivers-and-configuration#schema-functions"
     },
     {
       "source": "orionis/queues/schema.py",
@@ -1579,7 +1579,7 @@
       "kind": "function",
       "line": 33,
       "signature": "build_jobs_table(table: str) -> TableDefinition",
-      "reference": "/asynchronous/queues/drivers-and-configuration#schema-functions"
+      "reference": "/queues/drivers-and-configuration#schema-functions"
     },
     {
       "source": "orionis/queues/schema.py",
@@ -1587,7 +1587,7 @@
       "kind": "function",
       "line": 65,
       "signature": "build_failed_jobs_table(table: str) -> TableDefinition",
-      "reference": "/asynchronous/queues/drivers-and-configuration#schema-functions"
+      "reference": "/queues/drivers-and-configuration#schema-functions"
     },
     {
       "source": "orionis/queues/serializer.py",
@@ -1595,7 +1595,7 @@
       "kind": "class",
       "line": 243,
       "signature": "class JobSerializer",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#serializer-construction"
+      "reference": "/queues/jobs-and-dispatch#serializer-construction"
     },
     {
       "source": "orionis/queues/serializer.py",
@@ -1603,7 +1603,7 @@
       "kind": "method",
       "line": 248,
       "signature": "__init__(self) -> None",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#serializer-construction"
+      "reference": "/queues/jobs-and-dispatch#serializer-construction"
     },
     {
       "source": "orionis/queues/serializer.py",
@@ -1611,7 +1611,7 @@
       "kind": "method",
       "line": 263,
       "signature": "register(self, job_type: type[BaseJob]) -> None",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#serializer-register"
+      "reference": "/queues/jobs-and-dispatch#serializer-register"
     },
     {
       "source": "orionis/queues/serializer.py",
@@ -1619,7 +1619,7 @@
       "kind": "method",
       "line": 301,
       "signature": "encode(self, job: BaseJob) -> tuple[str, bytes]",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#serializer-encode"
+      "reference": "/queues/jobs-and-dispatch#serializer-encode"
     },
     {
       "source": "orionis/queues/serializer.py",
@@ -1627,7 +1627,7 @@
       "kind": "method",
       "line": 340,
       "signature": "decode(self, identity: str, payload: bytes) -> BaseJob",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#serializer-decode"
+      "reference": "/queues/jobs-and-dispatch#serializer-decode"
     },
     {
       "source": "orionis/queues/serializer.py",
@@ -1635,7 +1635,7 @@
       "kind": "method",
       "line": 417,
       "signature": "encodeEnvelope(self, envelope: JobEnvelope) -> bytes",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#serializer-encodeenvelope"
+      "reference": "/queues/jobs-and-dispatch#serializer-encodeenvelope"
     },
     {
       "source": "orionis/queues/serializer.py",
@@ -1643,7 +1643,7 @@
       "kind": "method",
       "line": 435,
       "signature": "decodeEnvelope(self, payload: bytes) -> JobEnvelope",
-      "reference": "/asynchronous/queues/jobs-and-dispatch#serializer-decodeenvelope"
+      "reference": "/queues/jobs-and-dispatch#serializer-decodeenvelope"
     },
     {
       "source": "orionis/queues/types.py",
@@ -1651,7 +1651,7 @@
       "kind": "type-alias",
       "line": 4,
       "signature": "type DispatchCallback = Callable[[BaseJob, str | None, str | None, float], Awaitable[str]]",
-      "reference": "/asynchronous/queues/api-reference#queue-types"
+      "reference": "/queues/api-reference#queue-types"
     },
     {
       "source": "orionis/queues/worker.py",
@@ -1659,7 +1659,7 @@
       "kind": "type-alias",
       "line": 22,
       "signature": "type FailedResolver = Callable[[], Awaitable[IFailedJobRepository]]",
-      "reference": "/asynchronous/queues/api-reference#queue-types"
+      "reference": "/queues/api-reference#queue-types"
     },
     {
       "source": "orionis/queues/worker.py",
@@ -1667,7 +1667,7 @@
       "kind": "class",
       "line": 25,
       "signature": "class WorkerOptions",
-      "reference": "/asynchronous/queues/workers-and-failures#worker-options"
+      "reference": "/queues/workers#worker-options"
     },
     {
       "source": "orionis/queues/worker.py",
@@ -1675,7 +1675,7 @@
       "kind": "field",
       "line": 28,
       "signature": "connection: str",
-      "reference": "/asynchronous/queues/workers-and-failures#worker-options"
+      "reference": "/queues/workers#worker-options"
     },
     {
       "source": "orionis/queues/worker.py",
@@ -1683,7 +1683,7 @@
       "kind": "field",
       "line": 29,
       "signature": "queues: tuple[str, ...] = ('default',)",
-      "reference": "/asynchronous/queues/workers-and-failures#worker-options"
+      "reference": "/queues/workers#worker-options"
     },
     {
       "source": "orionis/queues/worker.py",
@@ -1691,7 +1691,7 @@
       "kind": "field",
       "line": 30,
       "signature": "concurrency: int = 1",
-      "reference": "/asynchronous/queues/workers-and-failures#worker-options"
+      "reference": "/queues/workers#worker-options"
     },
     {
       "source": "orionis/queues/worker.py",
@@ -1699,7 +1699,7 @@
       "kind": "field",
       "line": 31,
       "signature": "retry_after: float = 90.0",
-      "reference": "/asynchronous/queues/workers-and-failures#worker-options"
+      "reference": "/queues/workers#worker-options"
     },
     {
       "source": "orionis/queues/worker.py",
@@ -1707,7 +1707,7 @@
       "kind": "field",
       "line": 32,
       "signature": "sleep: float = 1.0",
-      "reference": "/asynchronous/queues/workers-and-failures#worker-options"
+      "reference": "/queues/workers#worker-options"
     },
     {
       "source": "orionis/queues/worker.py",
@@ -1715,7 +1715,7 @@
       "kind": "class",
       "line": 61,
       "signature": "class Worker",
-      "reference": "/asynchronous/queues/workers-and-failures#worker-construction"
+      "reference": "/queues/workers#worker-construction"
     },
     {
       "source": "orionis/queues/worker.py",
@@ -1723,7 +1723,7 @@
       "kind": "method",
       "line": 81,
       "signature": "__init__(self, app: IApplication, driver: IQueueDriver, serializer: IJobSerializer, options: WorkerOptions, failed: IFailedJobRepository | FailedResolver | None=None) -> None",
-      "reference": "/asynchronous/queues/workers-and-failures#worker-construction"
+      "reference": "/queues/workers#worker-construction"
     },
     {
       "source": "orionis/queues/worker.py",
@@ -1731,7 +1731,7 @@
       "kind": "method",
       "line": 123,
       "signature": "stop(self) -> None",
-      "reference": "/asynchronous/queues/workers-and-failures#worker-stop"
+      "reference": "/queues/workers#worker-stop"
     },
     {
       "source": "orionis/queues/worker.py",
@@ -1739,7 +1739,7 @@
       "kind": "method",
       "line": 134,
       "signature": "async run(self, *, stop_when_empty: bool=False, max_jobs: int | None=None) -> int",
-      "reference": "/asynchronous/queues/workers-and-failures#worker-run"
+      "reference": "/queues/workers#worker-run"
     },
     {
       "source": "orionis/queues/worker.py",
@@ -1747,7 +1747,7 @@
       "kind": "method",
       "line": 277,
       "signature": "async execute(self, reserved: ReservedJob, *, raise_errors: bool=False) -> None",
-      "reference": "/asynchronous/queues/workers-and-failures#worker-execute"
+      "reference": "/queues/workers#worker-execute"
     },
     {
       "source": "orionis/support/facades/queue.py",
@@ -1755,7 +1755,7 @@
       "kind": "class",
       "line": 4,
       "signature": "class Queue",
-      "reference": "/asynchronous/queues/api-reference#facade-accessor"
+      "reference": "/queues/api-reference#facade-accessor"
     },
     {
       "source": "orionis/support/facades/queue.py",
@@ -1763,7 +1763,7 @@
       "kind": "method",
       "line": 9,
       "signature": "getFacadeAccessor(cls) -> type[IQueueManager]",
-      "reference": "/asynchronous/queues/api-reference#facade-accessor"
+      "reference": "/queues/api-reference#facade-accessor"
     }
   ]
 }

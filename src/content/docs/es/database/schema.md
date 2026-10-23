@@ -5,7 +5,7 @@ editUrl: true
 lastUpdated: false
 ---
 
-Un esquema físico describe tablas, columnas, claves e índices. **Definir un modelo no crea su tabla.** `Schema` convierte un `Blueprint` o `TableDefinition` en operaciones de la conexión; el ORM comparte esos metadatos para generar consultas. Los cambios duraderos se organizan en [migraciones](/es/database/migrations-and-seeders).
+Un esquema físico describe tablas, columnas, claves e índices. **Definir un modelo no crea su tabla.** `Schema` convierte un `Blueprint` o `TableDefinition` en operaciones de la conexión; el ORM comparte esos metadatos para generar consultas. Los cambios duraderos se organizan en [migraciones](/es/database/migrations).
 
 ## Crear una tabla
 
@@ -187,7 +187,7 @@ class ProjectsV1Schema:
     )
 ```
 
-Guarda el ejemplo en database/schemas/projects_v1_schema.py. `TableDefinition` contiene el nombre lógico, columnas y restricciones. La metaclase del modelo admite table_definition = ProjectsV1Schema.table_definition. Congela V1: para evolucionar el esquema crea V2 y otra migración, en lugar de cambiar el significado de una migración aplicada. Los subdirectorios se crean automáticamente; un archivo existente produce `FileExistsError` y no hay --force. Los nombres, rutas relativas, sufijos y rechazos siguen el [generador de migraciones](/es/database/migrations-and-seeders#generar-una-migración).
+Guarda el ejemplo en database/schemas/projects_v1_schema.py. `TableDefinition` contiene el nombre lógico, columnas y restricciones. La metaclase del modelo admite table_definition = ProjectsV1Schema.table_definition. Congela V1: para evolucionar el esquema crea V2 y otra migración, en lugar de cambiar el significado de una migración aplicada. Los subdirectorios se crean automáticamente; un archivo existente produce `FileExistsError` y no hay --force. Los nombres, rutas relativas, sufijos y rechazos siguen el [generador de migraciones](/es/database/migrations#generar-una-migración).
 
 <a id="blueprint-api"></a>
 
@@ -209,7 +209,7 @@ definitions = table.definitions()
 
 La creación mantiene una tabla ya existente mediante checkfirst=True y devuelve True; no compara columnas ni actualiza su estructura. Para necesitar una comprobación estricta, `IConnection.createTable`(definition, if_not_exists=False) es el nivel que expone ese flag. El prefijo de conexión se aplica a tablas y referencias estructuradas; no lo dupliques en name. Una cadena de SQL manual no recibe ese tratamiento.
 
-El código no expone `Schema.table`, alter, rename, hasTable ni dropIfExists. Las [alteraciones](/es/database/schema-alterations) requieren SQL explícito del motor. Consulta [todos los tipos](/es/database/column-types), [modificadores y claves](/es/database/schema-modifiers) y [`TableDefinition`](/es/database/orm/schema-and-type-reference) para completar la declaración.
+El código no expone `Schema.table`, alter, rename, hasTable ni dropIfExists. Las [alteraciones](/es/database/schema-alterations) requieren SQL explícito del motor. Consulta [todos los tipos](/es/database/column-types), [modificadores y claves](/es/database/schema-modifiers) y [`TableDefinition`](/es/orm/schema-and-type-reference) para completar la declaración.
 
 Si declaras una columna varias veces con el mismo nombre, `Schema` conserva la última definición; no crea dos columnas ni informa duplicado. Declara cada nombre una vez para evitar reemplazar accidentalmente opciones.
 

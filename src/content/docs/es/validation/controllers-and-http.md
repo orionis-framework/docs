@@ -128,7 +128,7 @@ La conversión conserva el comportamiento estricto del validador. En el ejemplo,
 | `request: Request` | Para consultar cabeceras, query string, cookies, metadatos o controlar la lectura del cuerpo. Recibirlo no valida automáticamente esos datos. |
 | Ambos parámetros | Cuando necesitas el cuerpo validado y otros datos de la petición. Importa `Request` desde `orionis.http`. |
 
-Los parámetros de ruta siguen llegando por su nombre a la acción; son independientes del schema del cuerpo. Consulta [controladores](/es/http/request-lifecycle) y [Request y payloads](/es/http/forms-and-uploads) para sus mecanismos de acceso.
+Los parámetros de ruta siguen llegando por su nombre a la acción; son independientes del schema del cuerpo. Consulta [controladores](/es/http/controllers) y [Request y payloads](/es/http/requests) para sus mecanismos de acceso.
 
 ## Errores de validación HTTP
 
@@ -163,7 +163,7 @@ Para el cuerpo inválido `{"name": "x", "email": "bad", "age": 17}`, el endpoint
 
 `message` resume el primer fallo y los restantes; `errors` agrupa los mensajes por campo. Puede haber varios fallos de una misma operación. La [API de errores](/es/validation/validation-and-errors) explica cómo inspeccionarlos y personalizarlos.
 
-En una redirección WEB, se usa primero la URL anterior de sesión, después un `Referer` permitido del mismo origen y, como alternativa, la URL actual. El input conservado excluye campos sensibles de primer nivel como `password` y `password_confirmation`. Consulta [sesiones y datos flash](/es/http/sessions/state-and-flash).
+En una redirección WEB, se usa primero la URL anterior de sesión, después un `Referer` permitido del mismo origen y, como alternativa, la URL actual. El input conservado excluye campos sensibles de primer nivel como `password` y `password_confirmation`. Consulta [sesiones y datos flash](/es/sessions/state-and-flash).
 
 Estas respuestas corresponden a fallos del schema con el manejo predeterminado. Los errores de lectura del cuerpo, de formato o de middleware pueden producir otras respuestas antes de validar.
 
@@ -243,4 +243,4 @@ class UserImportService:
 
 El llamador de este servicio debe esperar `await service.validate_record(record)` desde su propio contexto asíncrono. Las reglas y las excepciones son las mismas; la selección y la decodificación de los datos dependen de ese punto de entrada.
 
-La [introducción HTTP a la validación](/es/http/requests-and-validation) resume este flujo. Para ampliar las condiciones del payload, continúa con el [catálogo de reglas y sus ejemplos](/es/validation/constraints-and-reference) y las [reglas personalizadas](/es/validation/application-rules).
+La [introducción HTTP a la validación](/es/http/validation) resume este flujo. Para ampliar las condiciones del payload, continúa con el [catálogo de reglas y sus ejemplos](/es/validation/constraints-and-reference) y las [reglas personalizadas](/es/validation/application-rules).

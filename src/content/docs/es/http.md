@@ -16,13 +16,13 @@ Comprueba la llamada existente `app.withRouting(...)` en `bootstrap/app.py`: deb
 ## Recorrido recomendado
 
 1. [Rutas](/es/http/routing): métodos, parámetros, grupos y registro de endpoints.
-2. [Middlewares](/es/http/middleware-and-security): creación, registro y procesamiento de peticiones y respuestas.
-3. [Controladores](/es/http/request-lifecycle): generación, acciones, parámetros e integración con rutas.
-4. [Validación](/es/http/requests-and-validation): recibe datos validados en controladores y devuelve schemas como JSON.
-5. [Request y payloads HTTP](/es/http/forms-and-uploads): lectura de la petición, formatos del cuerpo y archivos subidos.
+2. [Middlewares](/es/http/middleware): creación, registro y procesamiento de peticiones y respuestas.
+3. [Controladores](/es/http/controllers): generación, acciones, parámetros e integración con rutas.
+4. [Validación](/es/http/validation): recibe datos validados en controladores y devuelve schemas como JSON.
+5. [Request y payloads HTTP](/es/http/requests): lectura de la petición, formatos del cuerpo y archivos subidos.
 6. [Respuestas](/es/http/responses): JSON, schemas, vistas, redirecciones y descargas.
 7. [Excepciones HTTP](/es/http/exceptions): respuestas de error y página de diagnóstico.
 
-Para otros flujos y servicios HTTP, consulta [streaming y SSE](/es/http/streaming-and-sse), [WebSocket](/es/http/websockets) y [páginas y rutas predeterminadas](/es/http/default-responses).
+Para otros flujos y servicios HTTP, consulta [streaming y SSE](/es/realtime/streaming-and-sse), [WebSocket](/es/realtime/websocket) y [páginas y rutas predeterminadas](/es/deployment/health-and-default-responses).
 
-Continúa con [sesiones](/es/http/sessions), [autenticación](/es/security/authentication), [schemas](/es/validation), [vistas](/es/services/views) y [hubs Realtime](/es/asynchronous/realtime).
+Continúa con [sesiones](/es/sessions), [autenticación](/es/authentication), [schemas](/es/validation), [vistas](/es/views) y [hubs Realtime](/es/realtime).

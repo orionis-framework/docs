@@ -64,7 +64,7 @@
       "kind": "class",
       "line": 8,
       "signature": "class IEnvironmentCaster(ABC)",
-      "reference": "/architecture/environment/typed-configuration#caster-construction"
+      "reference": "/environment/typed-configuration#caster-construction"
     },
     {
       "source": "orionis/environment/contracts/caster.py",
@@ -72,7 +72,7 @@
       "kind": "method",
       "line": 13,
       "signature": "get(self) -> object",
-      "reference": "/architecture/environment/typed-configuration#caster-get",
+      "reference": "/environment/typed-configuration#caster-get",
       "decorators": [
         "abstractmethod"
       ]
@@ -83,7 +83,7 @@
       "kind": "method",
       "line": 44,
       "signature": "to(self, type_hint: str | EnvironmentValueType) -> str",
-      "reference": "/architecture/environment/typed-configuration#caster-to",
+      "reference": "/environment/typed-configuration#caster-to",
       "decorators": [
         "abstractmethod"
       ]
@@ -94,7 +94,7 @@
       "kind": "class",
       "line": 8,
       "signature": "class IEnv(ABC)",
-      "reference": "/architecture/environment/operations-and-reference#env-api"
+      "reference": "/environment/operations-and-reference#env-api"
     },
     {
       "source": "orionis/environment/contracts/env.py",
@@ -102,7 +102,7 @@
       "kind": "method",
       "line": 16,
       "signature": "get(cls, key: str, default: object | None=None) -> object",
-      "reference": "/architecture/environment/operations-and-reference#env-get",
+      "reference": "/environment/operations-and-reference#env-get",
       "decorators": [
         "classmethod",
         "abstractmethod"
@@ -114,7 +114,7 @@
       "kind": "method",
       "line": 41,
       "signature": "set(cls, key: str, value: str | float | bool | list | dict | tuple | set, type_hint: str | EnvironmentValueType | None=None, *, only_os: bool=False) -> bool",
-      "reference": "/architecture/environment/operations-and-reference#env-set",
+      "reference": "/environment/operations-and-reference#env-set",
       "decorators": [
         "classmethod",
         "abstractmethod"
@@ -126,7 +126,7 @@
       "kind": "method",
       "line": 73,
       "signature": "unset(cls, key: str, *, only_os: bool=False) -> bool",
-      "reference": "/architecture/environment/operations-and-reference#env-unset",
+      "reference": "/environment/operations-and-reference#env-unset",
       "decorators": [
         "classmethod",
         "abstractmethod"
@@ -138,7 +138,7 @@
       "kind": "method",
       "line": 99,
       "signature": "all(cls) -> dict[str, Any]",
-      "reference": "/architecture/environment/operations-and-reference#env-all",
+      "reference": "/environment/operations-and-reference#env-all",
       "decorators": [
         "classmethod",
         "abstractmethod"
@@ -150,7 +150,7 @@
       "kind": "method",
       "line": 117,
       "signature": "reload(cls) -> bool",
-      "reference": "/architecture/environment/operations-and-reference#env-reload",
+      "reference": "/environment/operations-and-reference#env-reload",
       "decorators": [
         "classmethod",
         "abstractmethod"
@@ -162,7 +162,7 @@
       "kind": "class",
       "line": 16,
       "signature": "class DotEnv(metaclass=Singleton)",
-      "reference": "/architecture/environment/operations-and-reference#dotenv-service"
+      "reference": "/environment/operations-and-reference#dotenv-service"
     },
     {
       "source": "orionis/environment/core/dot_env.py",
@@ -170,7 +170,7 @@
       "kind": "constructor",
       "line": 26,
       "signature": "__init__(self, path: str | None=None) -> None",
-      "reference": "/architecture/environment/operations-and-reference#dotenv-service",
+      "reference": "/environment/operations-and-reference#dotenv-service",
       "decorators": []
     },
     {
@@ -179,7 +179,7 @@
       "kind": "method",
       "line": 89,
       "signature": "set(self, key: str, value: str | float | bool | list | dict | tuple | set, type_hint: str | EnvironmentValueType | None=None, *, only_os: bool=False) -> bool",
-      "reference": "/architecture/environment/operations-and-reference#env-set",
+      "reference": "/environment/operations-and-reference#env-set",
       "decorators": []
     },
     {
@@ -188,7 +188,7 @@
       "kind": "method",
       "line": 158,
       "signature": "get(self, key: str, default: object | None=None) -> object",
-      "reference": "/architecture/environment/operations-and-reference#env-get",
+      "reference": "/environment/operations-and-reference#env-get",
       "decorators": []
     },
     {
@@ -197,7 +197,7 @@
       "kind": "method",
       "line": 200,
       "signature": "unset(self, key: str, *, only_os: bool=False) -> bool",
-      "reference": "/architecture/environment/operations-and-reference#env-unset",
+      "reference": "/environment/operations-and-reference#env-unset",
       "decorators": []
     },
     {
@@ -206,7 +206,7 @@
       "kind": "method",
       "line": 249,
       "signature": "all(self) -> dict",
-      "reference": "/architecture/environment/operations-and-reference#env-all",
+      "reference": "/environment/operations-and-reference#env-all",
       "decorators": []
     },
     {
@@ -215,7 +215,7 @@
       "kind": "method",
       "line": 381,
       "signature": "reload(self) -> bool",
-      "reference": "/architecture/environment/operations-and-reference#env-reload",
+      "reference": "/environment/operations-and-reference#env-reload",
       "decorators": []
     },
     {
@@ -224,7 +224,7 @@
       "kind": "class",
       "line": 9,
       "signature": "class EnvironmentCaster(IEnvironmentCaster)",
-      "reference": "/architecture/environment/typed-configuration#caster-construction"
+      "reference": "/environment/typed-configuration#caster-construction"
     },
     {
       "source": "orionis/environment/dynamic/caster.py",
@@ -232,7 +232,7 @@
       "kind": "constant",
       "line": 13,
       "signature": "OPTIONS: ClassVar[frozenset[str]] = frozenset((e.value for e in EnvironmentValueType))",
-      "reference": "/architecture/environment/typed-configuration#caster-options"
+      "reference": "/environment/typed-configuration#caster-options"
     },
     {
       "source": "orionis/environment/dynamic/caster.py",
@@ -240,7 +240,7 @@
       "kind": "method",
       "line": 19,
       "signature": "supportedTypes() -> frozenset[str]",
-      "reference": "/architecture/environment/typed-configuration#caster-supported-types",
+      "reference": "/environment/typed-configuration#caster-supported-types",
       "decorators": [
         "staticmethod"
       ]
@@ -251,7 +251,7 @@
       "kind": "method",
       "line": 32,
       "signature": "parseTyped(value_str: str) -> object",
-      "reference": "/architecture/environment/typed-configuration#caster-parse-typed",
+      "reference": "/environment/typed-configuration#caster-parse-typed",
       "decorators": [
         "staticmethod"
       ]
@@ -262,7 +262,7 @@
       "kind": "constructor",
       "line": 89,
       "signature": "__init__(self, raw: str | object) -> None",
-      "reference": "/architecture/environment/typed-configuration#caster-construction",
+      "reference": "/environment/typed-configuration#caster-construction",
       "decorators": []
     },
     {
@@ -271,7 +271,7 @@
       "kind": "method",
       "line": 136,
       "signature": "get(self) -> object",
-      "reference": "/architecture/environment/typed-configuration#caster-get",
+      "reference": "/environment/typed-configuration#caster-get",
       "decorators": []
     },
     {
@@ -280,7 +280,7 @@
       "kind": "method",
       "line": 209,
       "signature": "to(self, type_hint: str | EnvironmentValueType) -> str",
-      "reference": "/architecture/environment/typed-configuration#caster-to",
+      "reference": "/environment/typed-configuration#caster-to",
       "decorators": []
     },
     {
@@ -289,7 +289,7 @@
       "kind": "class",
       "line": 3,
       "signature": "class EnvironmentValueType(Enum)",
-      "reference": "/architecture/environment/typed-configuration#env-types"
+      "reference": "/environment/typed-configuration#env-types"
     },
     {
       "source": "orionis/environment/enums/value_type.py",
@@ -297,7 +297,7 @@
       "kind": "enum-member",
       "line": 32,
       "signature": "BASE64 = 'base64'",
-      "reference": "/architecture/environment/typed-configuration#env-type-base64"
+      "reference": "/environment/typed-configuration#env-type-base64"
     },
     {
       "source": "orionis/environment/enums/value_type.py",
@@ -305,7 +305,7 @@
       "kind": "enum-member",
       "line": 35,
       "signature": "PATH = 'path'",
-      "reference": "/architecture/environment/typed-configuration#env-type-path"
+      "reference": "/environment/typed-configuration#env-type-path"
     },
     {
       "source": "orionis/environment/enums/value_type.py",
@@ -313,7 +313,7 @@
       "kind": "enum-member",
       "line": 38,
       "signature": "STR = 'str'",
-      "reference": "/architecture/environment/typed-configuration#env-type-str"
+      "reference": "/environment/typed-configuration#env-type-str"
     },
     {
       "source": "orionis/environment/enums/value_type.py",
@@ -321,7 +321,7 @@
       "kind": "enum-member",
       "line": 41,
       "signature": "INT = 'int'",
-      "reference": "/architecture/environment/typed-configuration#env-type-int"
+      "reference": "/environment/typed-configuration#env-type-int"
     },
     {
       "source": "orionis/environment/enums/value_type.py",
@@ -329,7 +329,7 @@
       "kind": "enum-member",
       "line": 44,
       "signature": "FLOAT = 'float'",
-      "reference": "/architecture/environment/typed-configuration#env-type-float"
+      "reference": "/environment/typed-configuration#env-type-float"
     },
     {
       "source": "orionis/environment/enums/value_type.py",
@@ -337,7 +337,7 @@
       "kind": "enum-member",
       "line": 47,
       "signature": "BOOL = 'bool'",
-      "reference": "/architecture/environment/typed-configuration#env-type-bool"
+      "reference": "/environment/typed-configuration#env-type-bool"
     },
     {
       "source": "orionis/environment/enums/value_type.py",
@@ -345,7 +345,7 @@
       "kind": "enum-member",
       "line": 50,
       "signature": "LIST = 'list'",
-      "reference": "/architecture/environment/typed-configuration#env-type-list"
+      "reference": "/environment/typed-configuration#env-type-list"
     },
     {
       "source": "orionis/environment/enums/value_type.py",
@@ -353,7 +353,7 @@
       "kind": "enum-member",
       "line": 53,
       "signature": "DICT = 'dict'",
-      "reference": "/architecture/environment/typed-configuration#env-type-dict"
+      "reference": "/environment/typed-configuration#env-type-dict"
     },
     {
       "source": "orionis/environment/enums/value_type.py",
@@ -361,7 +361,7 @@
       "kind": "enum-member",
       "line": 56,
       "signature": "TUPLE = 'tuple'",
-      "reference": "/architecture/environment/typed-configuration#env-type-tuple"
+      "reference": "/environment/typed-configuration#env-type-tuple"
     },
     {
       "source": "orionis/environment/enums/value_type.py",
@@ -369,7 +369,7 @@
       "kind": "enum-member",
       "line": 59,
       "signature": "SET = 'set'",
-      "reference": "/architecture/environment/typed-configuration#env-type-set"
+      "reference": "/environment/typed-configuration#env-type-set"
     },
     {
       "source": "orionis/environment/facade.py",
@@ -377,7 +377,7 @@
       "kind": "class",
       "line": 9,
       "signature": "class Env(IEnv)",
-      "reference": "/architecture/environment/operations-and-reference#env-api"
+      "reference": "/environment/operations-and-reference#env-api"
     },
     {
       "source": "orionis/environment/facade.py",
@@ -385,7 +385,7 @@
       "kind": "method",
       "line": 16,
       "signature": "get(cls, key: str, default: object | None=None) -> object",
-      "reference": "/architecture/environment/operations-and-reference#env-get",
+      "reference": "/environment/operations-and-reference#env-get",
       "decorators": [
         "classmethod"
       ]
@@ -396,7 +396,7 @@
       "kind": "method",
       "line": 41,
       "signature": "set(cls, key: str, value: str | float | bool | list | dict | tuple | set, type_hint: str | EnvironmentValueType | None=None, *, only_os: bool=False) -> bool",
-      "reference": "/architecture/environment/operations-and-reference#env-set",
+      "reference": "/environment/operations-and-reference#env-set",
       "decorators": [
         "classmethod"
       ]
@@ -407,7 +407,7 @@
       "kind": "method",
       "line": 73,
       "signature": "unset(cls, key: str, *, only_os: bool=False) -> bool",
-      "reference": "/architecture/environment/operations-and-reference#env-unset",
+      "reference": "/environment/operations-and-reference#env-unset",
       "decorators": [
         "classmethod"
       ]
@@ -418,7 +418,7 @@
       "kind": "method",
       "line": 99,
       "signature": "all(cls) -> dict[str, Any]",
-      "reference": "/architecture/environment/operations-and-reference#env-all",
+      "reference": "/environment/operations-and-reference#env-all",
       "decorators": [
         "classmethod"
       ]
@@ -429,7 +429,7 @@
       "kind": "method",
       "line": 117,
       "signature": "reload(cls) -> bool",
-      "reference": "/architecture/environment/operations-and-reference#env-reload",
+      "reference": "/environment/operations-and-reference#env-reload",
       "decorators": [
         "classmethod"
       ]
@@ -440,7 +440,7 @@
       "kind": "function",
       "line": 4,
       "signature": "env(key: str, default: object | None=None) -> object",
-      "reference": "/architecture/environment/operations-and-reference#env-helper",
+      "reference": "/environment/operations-and-reference#env-helper",
       "decorators": []
     },
     {
@@ -449,7 +449,7 @@
       "kind": "class",
       "line": 7,
       "signature": "class SecureKeyGenerator",
-      "reference": "/architecture/environment/operations-and-reference#environment-key-generator"
+      "reference": "/environment/operations-and-reference#environment-key-generator"
     },
     {
       "source": "orionis/environment/key/key_generator.py",
@@ -457,7 +457,7 @@
       "kind": "constant",
       "line": 12,
       "signature": "KEY_SIZES: ClassVar[dict[Cipher, int]] = {Cipher.AES_128_CBC: 16, Cipher.AES_256_CBC: 32, Cipher.AES_128_GCM: 16, Cipher.AES_256_GCM: 32}",
-      "reference": "/architecture/environment/operations-and-reference#environment-key-generator"
+      "reference": "/environment/operations-and-reference#environment-key-generator"
     },
     {
       "source": "orionis/environment/key/key_generator.py",
@@ -465,7 +465,7 @@
       "kind": "method",
       "line": 20,
       "signature": "generate(cipher: str | Cipher=Cipher.AES_256_CBC) -> str",
-      "reference": "/architecture/environment/operations-and-reference#environment-key-generator",
+      "reference": "/environment/operations-and-reference#environment-key-generator",
       "decorators": [
         "staticmethod"
       ]
@@ -476,7 +476,7 @@
       "kind": "callable-alias",
       "line": 58,
       "signature": "ValidateKeyName(key: str) -> str",
-      "reference": "/architecture/environment/operations-and-reference#environment-validators"
+      "reference": "/environment/operations-and-reference#environment-validators"
     },
     {
       "source": "orionis/environment/validators/types.py",
@@ -484,7 +484,7 @@
       "kind": "callable-instance",
       "line": 106,
       "signature": "ValidateTypes(*, value: str | float | bool | list | dict | tuple | set, type_hint: str | EnvironmentValueType | None=None) -> str",
-      "reference": "/architecture/environment/operations-and-reference#environment-validators"
+      "reference": "/environment/operations-and-reference#environment-validators"
     }
   ]
 }

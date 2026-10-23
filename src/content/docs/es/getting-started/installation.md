@@ -289,7 +289,7 @@ uv sync --python 3.14
 
 Revisa `.env` y utiliza `.env.reference` como referencia de las opciones adicionales del stack. Algunos valores escritos por el instalador utilizan el prefijo `base64:` de Orionis para preservar su contenido literal. Los valores locales iniciales son SQLite, almacenamiento local, caché en archivos, colas síncronas y sesiones en memoria del proceso.
 
-Para servicios externos, sustituye los valores pendientes de conexión y configura credenciales, bucket o contenedor y permisos del proveedor. El instalador escribe `configure-me` como usuario provisional de base de datos, establece el puerto del driver y no proporciona una contraseña. Oracle requiere además un servicio de conexión, como `DB_SERVICE_NAME`; SQL Server necesita el driver ODBC del sistema indicado por `DB_ODBC_DRIVER`. Continúa con [Bases de datos y ORM](/es/database) y [Almacenamiento](/es/services/storage).
+Para servicios externos, sustituye los valores pendientes de conexión y configura credenciales, bucket o contenedor y permisos del proveedor. El instalador escribe `configure-me` como usuario provisional de base de datos, establece el puerto del driver y no proporciona una contraseña. Oracle requiere además un servicio de conexión, como `DB_SERVICE_NAME`; SQL Server necesita el driver ODBC del sistema indicado por `DB_ODBC_DRIVER`. Continúa con [Bases de datos y ORM](/es/database) y [Almacenamiento](/es/storage).
 
 ### Migraciones y datos iniciales
 
@@ -313,7 +313,7 @@ En una base compatible con seeders, cuando hayas revisado y adaptado los datos i
 uv run python -B reactor migrate --seed
 ```
 
-Los flujos de verificación y recuperación de cuenta de SSR también requieren configurar el envío de correo. El stack no incluye credenciales SMTP; consulta [Correo](/es/services/mail).
+Los flujos de verificación y recuperación de cuenta de SSR también requieren configurar el envío de correo. El stack no incluye credenciales SMTP; consulta [Correo](/es/mail).
 
 ### Iniciar y comprobar la aplicación
 
@@ -328,7 +328,7 @@ El servidor de desarrollo utiliza [http://127.0.0.1:8000](http://127.0.0.1:8000)
 - **Blank:** añade tus rutas; no registra una página en `/` inicialmente.
 - **SSR:** abre `/` para la bienvenida y prepara las tablas antes de utilizar registro e inicio de sesión.
 - **Slim API:** prueba `/api/example` para el endpoint JSON incluido.
-- **Slim MCP:** configura tu cliente MCP para el endpoint `/mcp`; una visita normal del navegador no equivale a una solicitud del protocolo. Sigue [Servidores MCP](/es/protocols/mcp) para declarar herramientas y conectar clientes.
+- **Slim MCP:** configura tu cliente MCP para el endpoint `/mcp`; una visita normal del navegador no equivale a una solicitud del protocolo. Sigue [Servidores MCP](/es/mcp) para declarar herramientas y conectar clientes.
 
 Detén el servidor con Ctrl+C. Si el puerto está ocupado:
 
@@ -336,7 +336,7 @@ Detén el servidor con Ctrl+C. Si el puerto está ocupado:
 uv run python -B reactor serve --port 8001
 ```
 
-Para añadir tus primeras rutas y comprender el arranque, continúa con [Crear y arrancar una aplicación](/es/getting-started/getting-started) y [Ciclo de vida](/es/getting-started/application-lifecycle).
+Para añadir tus primeras rutas y comprender el arranque, continúa con [Crear y arrancar una aplicación](/es/getting-started/quick-start) y [Ciclo de vida](/es/application/lifecycle).
 
 ## Consideraciones y recuperación
 
@@ -354,7 +354,7 @@ uv sync --python 3.14
 uv run python -B reactor key:generate
 ```
 
-La generación de clave conserva una existente; no utilices `--force` como paso de recuperación. Si faltan archivos del stack o existe una incompatibilidad de dependencias, corrige esa causa antes de volver a arrancar. Los problemas de configuración y caché se desarrollan en [Configuración tipada](/es/getting-started/configuration) y [Directorios y caché de arranque](/es/getting-started/paths-and-caching).
+La generación de clave conserva una existente; no utilices `--force` como paso de recuperación. Si faltan archivos del stack o existe una incompatibilidad de dependencias, corrige esa causa antes de volver a arrancar. Los problemas de configuración y caché se desarrollan en [Configuración tipada](/es/application/configuration) y [Directorios y caché de arranque](/es/application/paths-and-caching).
 
 ### Códigos de salida
 

@@ -289,7 +289,7 @@ uv sync --python 3.14
 
 Review `.env` and use `.env.reference` as a reference for the stack's additional options. Some values written by the installer use Orionis's `base64:` prefix to preserve their literal contents. The initial local settings are SQLite, local storage, a file cache, synchronous queues, and process-local memory sessions.
 
-For external services, replace the pending connection values and configure credentials, the bucket or container, and provider permissions. The installer writes `configure-me` as a placeholder database username, sets the driver's port, and does not provide a password. Oracle also requires a connection service, such as `DB_SERVICE_NAME`; SQL Server requires the system ODBC driver named by `DB_ODBC_DRIVER`. Continue with [Database and ORM](/en/database) and [Storage](/en/services/storage).
+For external services, replace the pending connection values and configure credentials, the bucket or container, and provider permissions. The installer writes `configure-me` as a placeholder database username, sets the driver's port, and does not provide a password. Oracle also requires a connection service, such as `DB_SERVICE_NAME`; SQL Server requires the system ODBC driver named by `DB_ODBC_DRIVER`. Continue with [Database and ORM](/en/database) and [Storage](/en/storage).
 
 ### Migrations and initial data
 
@@ -313,7 +313,7 @@ With a database that supports seeders, once you have reviewed and adapted the in
 uv run python -B reactor migrate --seed
 ```
 
-SSR's account verification and recovery flows also require mail delivery configuration. The stack does not include SMTP credentials; see [Mail](/en/services/mail).
+SSR's account verification and recovery flows also require mail delivery configuration. The stack does not include SMTP credentials; see [Mail](/en/mail).
 
 ### Start and check the application
 
@@ -328,7 +328,7 @@ The development server uses [http://127.0.0.1:8000](http://127.0.0.1:8000). Chec
 - **Blank:** add your routes; it does not initially register a page at `/`.
 - **SSR:** open `/` for the welcome page and prepare the tables before using registration and login.
 - **Slim API:** try `/api/example` for the included JSON endpoint.
-- **Slim MCP:** configure your MCP client for the `/mcp` endpoint; an ordinary browser visit is not equivalent to a protocol request. Follow [MCP servers](/en/protocols/mcp) to declare tools and connect clients.
+- **Slim MCP:** configure your MCP client for the `/mcp` endpoint; an ordinary browser visit is not equivalent to a protocol request. Follow [MCP servers](/en/mcp) to declare tools and connect clients.
 
 Stop the server with Ctrl+C. If the port is occupied:
 
@@ -336,7 +336,7 @@ Stop the server with Ctrl+C. If the port is occupied:
 uv run python -B reactor serve --port 8001
 ```
 
-To add your first routes and understand startup, continue with [Creating and starting an application](/en/getting-started/getting-started) and [Application lifecycle](/en/getting-started/application-lifecycle).
+To add your first routes and understand startup, continue with [Creating and starting an application](/en/getting-started/quick-start) and [Application lifecycle](/en/application/lifecycle).
 
 ## Considerations and recovery
 
@@ -354,7 +354,7 @@ uv sync --python 3.14
 uv run python -B reactor key:generate
 ```
 
-Key generation preserves an existing key; do not use `--force` as a recovery step. If stack files are missing or dependencies are incompatible, correct the cause before starting again. Configuration and cache issues are covered in [Typed configuration](/en/getting-started/configuration) and [Directories and bootstrap caching](/en/getting-started/paths-and-caching).
+Key generation preserves an existing key; do not use `--force` as a recovery step. If stack files are missing or dependencies are incompatible, correct the cause before starting again. Configuration and cache issues are covered in [Typed configuration](/en/application/configuration) and [Directories and bootstrap caching](/en/application/paths-and-caching).
 
 ### Exit codes
 

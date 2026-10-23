@@ -5,15 +5,15 @@ import { navigationSections, sitePages } from '../src/utils/documentation-menu.m
 
 // Independent of the inventory: a missing guide cannot silently shrink scope.
 const pages = [
-  ['introspection-overview', '/advanced/introspection'],
-  ['introspection-reflection', '/advanced/introspection/reflection'],
-  ['introspection-callables', '/advanced/introspection/callables'],
-  ['introspection-abstract-classes', '/advanced/introspection/abstract-classes'],
-  ['introspection-concrete-classes', '/advanced/introspection/concrete-classes'],
-  ['introspection-instances', '/advanced/introspection/instances'],
-  ['introspection-dependencies-and-discovery', '/advanced/introspection/dependencies-and-discovery'],
-  ['introspection-modules', '/advanced/introspection/modules'],
-  ['introspection-module-discovery', '/advanced/introspection/module-discovery'],
+  ['introspection-overview', '/utilities/introspection'],
+  ['introspection-reflection', '/utilities/introspection/reflection'],
+  ['introspection-callables', '/utilities/introspection/callables'],
+  ['introspection-abstract-classes', '/utilities/introspection/abstract-classes'],
+  ['introspection-concrete-classes', '/utilities/introspection/concrete-classes'],
+  ['introspection-instances', '/utilities/introspection/instances'],
+  ['introspection-dependencies-and-discovery', '/utilities/introspection/dependencies-and-discovery'],
+  ['introspection-modules', '/utilities/introspection/modules'],
+  ['introspection-module-discovery', '/utilities/introspection/module-discovery'],
 ];
 const classMethods = {
   Reflection: 31, ReflectionCallable: 15, ReflectionAbstract: 66,

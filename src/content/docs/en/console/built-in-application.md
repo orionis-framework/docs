@@ -276,4 +276,4 @@ orionis up
 python -B reactor up
 ```
 
-See [Cache](/en/services/cache), [Views](/en/services/views), [Encryption](/en/security/encryption) and [Testing](/en/testing) for related services. [Command caching](/en/console/command-cache) explains when Reactor's registry is rebuilt.
+See [Cache](/en/cache), [Views](/en/views), [Encryption](/en/cryptography/encryption) and [Testing](/en/testing) for related services. [Command caching](/en/console/command-cache) explains when Reactor's registry is rebuilt.

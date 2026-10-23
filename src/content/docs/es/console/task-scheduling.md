@@ -7,7 +7,7 @@ lastUpdated: false
 
 Una tarea programada indica **cuándo ejecutar un comando registrado en Reactor**. Por ejemplo, generar un informe a las 02:30, limpiar registros cada hora o sincronizar un catálogo de lunes a viernes. El scheduler calcula las próximas ejecuciones y despacha la firma del comando cuando llega su turno.
 
-La agenda se define en `app/console/scheduler.py`. La configuración de horarios y persistencia está en `config/scheduler.py`; `config/queue.py` configura el sistema independiente de [colas y jobs](/es/asynchronous/queues). Una tarea programada también puede ejecutar un comando que envíe jobs a una cola, pero programar ese comando no inicia un worker de colas.
+La agenda se define en `app/console/scheduler.py`. La configuración de horarios y persistencia está en `config/scheduler.py`; `config/queue.py` configura el sistema independiente de [colas y jobs](/es/queues). Una tarea programada también puede ejecutar un comando que envíe jobs a una cola, pero programar ese comando no inicia un worker de colas.
 
 ```mermaid
 flowchart TD
@@ -34,7 +34,7 @@ orionis make:console-command scheduled_report --signature reports:build
 python -B reactor make:console-command scheduled_report --signature reports:build
 ```
 
-El archivo predeterminado es `app/console/commands/scheduled_report_command.py`. Sustituye su contenido por este ejemplo mínimo; en una aplicación real el servicio puede consultar la base de datos y almacenar el resultado mediante [Storage](/es/services/storage):
+El archivo predeterminado es `app/console/commands/scheduled_report_command.py`. Sustituye su contenido por este ejemplo mínimo; en una aplicación real el servicio puede consultar la base de datos y almacenar el resultado mediante [Storage](/es/storage):
 
 ```python
 from orionis.console.base import BaseCommand
@@ -172,4 +172,4 @@ El contenedor construye `ReportSchedulePolicy` para el constructor y `ReportSche
 - [Listeners y eventos](/es/console/scheduler-listeners): callbacks, clases de listener y códigos de salida.
 - [Ejecución y API](/es/console/scheduler-execution): fachada `Schedule`, servicio `ISchedule`, control y apagado.
 
-El scheduler no añade por sí mismo reintentos de negocio ni historial de ejecuciones fallidas. Para ese comportamiento, el comando puede despachar un [job persistente](/es/asynchronous/queues/jobs-and-dispatch) a un backend de colas y dejar su procesamiento al worker correspondiente.
+El scheduler no añade por sí mismo reintentos de negocio ni historial de ejecuciones fallidas. Para ese comportamiento, el comando puede despachar un [job persistente](/es/queues/jobs-and-dispatch) a un backend de colas y dejar su procesamiento al worker correspondiente.

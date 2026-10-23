@@ -237,6 +237,6 @@ No modifica por sí solo el prefijo de descubrimiento de `unittest.TestLoader`: 
 
 Crea un cliente MCP en proceso para una clase de servidor o un servidor ya compilado. Reutiliza la aplicación arrancada por el runner, salvo que proporciones otro contenedor mediante `app=`. `config` admite una configuración `McpConfig`; si se omite se usan los valores predeterminados del cliente.
 
-Las llamadas del cliente abren sus propios scopes; ese aislamiento pertenece al cliente MCP. Consulta los ejemplos completos de [pruebas de servidores MCP](/es/testing/mcp-testing).
+Las llamadas del cliente abren sus propios scopes; ese aislamiento pertenece al cliente MCP. Consulta los ejemplos completos de [pruebas de servidores MCP](/es/mcp/testing).
 
 Continúa con [ejecución y descubrimiento](/es/testing/writing-and-running-tests) y [configuración y resultados](/es/testing/results-and-reference).

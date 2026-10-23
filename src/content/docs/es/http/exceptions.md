@@ -7,7 +7,7 @@ lastUpdated: false
 
 Una excepción puede interrumpir la lectura del cuerpo, un middleware, la resolución de dependencias o una acción del controlador. Las capas HTTP y el kernel transforman los fallos que pueden manejar en una respuesta para el cliente. El resultado depende del tipo de excepción, del modo debug y del momento en que ocurre.
 
-Esta página se centra en **peticiones y respuestas HTTP**. La [guía general de excepciones](/es/architecture/exception-handling), ubicada en la sección independiente **Exceptions**, explica `app.withExceptionHandler(ExceptionHandler)`, los contratos de `failure`, el reporte y los demás contextos del framework.
+Esta página se centra en **peticiones y respuestas HTTP**. La [guía general de excepciones](/es/exceptions), ubicada en la sección independiente **Exceptions**, explica `app.withExceptionHandler(ExceptionHandler)`, los contratos de `failure`, el reporte y los demás contextos del framework.
 
 ## De la excepción a la respuesta HTTP
 
@@ -40,7 +40,7 @@ La configuración se declara mediante `APP_DEBUG` y se consulta desde `config/ap
 APP_DEBUG=bool:true
 ```
 
-Reinicia la aplicación para aplicar su configuración de arranque. Si utilizas compilación, consulta las [consideraciones de registro y configuración](/es/architecture/exception-handling#configuración-compilada-y-procesos-activos).
+Reinicia la aplicación para aplicar su configuración de arranque. Si utilizas compilación, consulta las [consideraciones de registro y configuración](/es/exceptions#configuración-compilada-y-procesos-activos).
 
 El nombre de entorno `APP_ENV` no sustituye este ajuste: un entorno llamado producción con debug activo sigue exponiendo el diagnóstico.
 
@@ -77,7 +77,7 @@ curl -i "http://localhost:8000/http-error-demo?quantity=invalid" -H "Accept: app
 
 `int("invalid")` lanza `ValueError`. El código nativo no lo convierte automáticamente en un error de input `400`: con debug activo, ambas peticiones reciben la página detallada `500`. Con `quantity=3`, el endpoint devuelve `{"quantity":3}`.
 
-Este endpoint demuestra un fallo de programación o una validación omitida. Para una entrada real, declara un [schema de petición](/es/http/requests-and-validation) o trata explícitamente la conversión; conserva este endpoint sólo como demostración local.
+Este endpoint demuestra un fallo de programación o una validación omitida. Para una entrada real, declara un [schema de petición](/es/http/validation) o trata explícitamente la conversión; conserva este endpoint sólo como demostración local.
 
 ## Qué contiene la página y cómo interpretarlo
 
@@ -167,9 +167,9 @@ El kernel puede resolver antes algunos casos con su propia respuesta, por lo que
 | Ruta inexistente con fallback configurado | Ejecuta el fallback correspondiente. |
 | Excepción propia sin tratamiento específico | Política del handler de aplicación; por defecto, `500` genérico o diagnóstico según debug. |
 
-Un JSON mal formado puede lanzar `ValueError`; XML o MessagePack utilizan sus excepciones de decodificación. No hay una regla universal que convierta cualquier excepción de parsing en `400`. Consulta los [errores de lectura de Request](/es/http/forms-and-uploads#errores-de-lectura-y-validación) y el [manejo de validación](/es/validation/controllers-and-http).
+Un JSON mal formado puede lanzar `ValueError`; XML o MessagePack utilizan sus excepciones de decodificación. No hay una regla universal que convierta cualquier excepción de parsing en `400`. Consulta los [errores de lectura de Request](/es/http/requests#errores-de-lectura-y-validación) y el [manejo de validación](/es/validation/controllers-and-http).
 
-Si una condición de dominio necesita una respuesta como `409`, su traducción se define en el [handler de aplicación](/es/architecture/exception-handling/handling-exceptions). Capturar una excepción localmente y devolver una respuesta también es válido cuando ese componente puede resolver el caso.
+Si una condición de dominio necesita una respuesta como `409`, su traducción se define en el [handler de aplicación](/es/exceptions/handling-exceptions). Capturar una excepción localmente y devolver una respuesta también es válido cuando ese componente puede resolver el caso.
 
 ## Diagnóstico en desarrollo y respuesta pública
 
@@ -179,7 +179,7 @@ Para una aplicación expuesta a usuarios, desactiva debug:
 APP_DEBUG=bool:false
 ```
 
-Con el handler nativo, un error no reconocido devuelve `Internal Server Error` sin el traceback. La [guía general](/es/architecture/exception-handling) explica cómo conservar el reporte interno y definir mensajes públicos para errores propios.
+Con el handler nativo, un error no reconocido devuelve `Internal Server Error` sin el traceback. La [guía general](/es/exceptions) explica cómo conservar el reporte interno y definir mensajes públicos para errores propios.
 
 Las plantillas de error escapan el HTML y las respuestas nativas incluyen `Cache-Control: no-cache, no-store, must-revalidate`. El escape evita interpretar texto como HTML; no elimina secretos de los mensajes o del código.
 
@@ -193,4 +193,4 @@ La conversión a una página de error sucede durante el procesamiento de la peti
 
 Si un productor falla cuando ya se enviaron cabeceras, no se puede sustituir esa respuesta por una página de excepción. El transporte intenta cerrar los recursos y propaga el fallo. Los errores de background tampoco cambian un estado HTTP que ya se entregó.
 
-Consulta [respuestas y entrega HTTP](/es/http/responses), [streaming y SSE](/es/http/streaming-and-sse) y la [guía general de excepciones](/es/architecture/exception-handling) para sus respectivos límites.
+Consulta [respuestas y entrega HTTP](/es/http/responses), [streaming y SSE](/es/realtime/streaming-and-sse) y la [guía general de excepciones](/es/exceptions) para sus respectivos límites.

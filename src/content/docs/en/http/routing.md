@@ -20,7 +20,7 @@ Separating them avoids loading browser session processing for endpoints that do 
 
 The context depends on the `withRouting()` argument, rather than the physical filename or URL prefix. A `/api/products` path declared as WEB remains WEB. Registering API routes does not add `/api` to their URLs either: write it in the route or a group.
 
-Both identity resolvers allow guests. To require an identity, use the corresponding authentication middleware; returning JSON from a WEB route neither makes it an API route nor makes it public. See [Middleware](/en/http/middleware-and-security) and [Authentication](/en/security/authentication).
+Both identity resolvers allow guests. To require an identity, use the corresponding authentication middleware; returning JSON from a WEB route neither makes it an API route nor makes it public. See [Middleware](/en/http/middleware) and [Authentication](/en/authentication).
 
 The diagrams show the usual flow of an admitted HTTP request that continues to a route. Shared kernel checks run **before route resolution**, for both API and WEB. Context layers then run, followed by explicit middleware in this order: **application → groups → route**.
 
@@ -108,7 +108,7 @@ Route.get("/products", list_products).name("products.index")
 
 `GET /products` returns `{"products": []}`. The declaration registers the handler; the function executes when a matching request arrives.
 
-HTTP registration methods accept `path` and `action`. An action can be a synchronous or asynchronous Python function, a class with `__call__`, or a `[ProductController, "show"]` pair referencing an imported controller. Keep functions and classes in importable modules. If you omit `action`, complete the route with `.action(ProductController, "show")` before exporting or compiling routes. Controller implementation is covered in [Controllers](/en/http/request-lifecycle).
+HTTP registration methods accept `path` and `action`. An action can be a synchronous or asynchronous Python function, a class with `__call__`, or a `[ProductController, "show"]` pair referencing an imported controller. Keep functions and classes in importable modules. If you omit `action`, complete the route with `.action(ProductController, "show")` before exporting or compiling routes. Controller implementation is covered in [Controllers](/en/http/controllers).
 
 ### Routes to controller methods
 
@@ -199,7 +199,7 @@ The kernel handles OPTIONS before constructing a route's `Request` or executing 
 
 For a path registered with GET and POST, `Allow` is `GET, HEAD, OPTIONS, POST`. For an unknown path, OPTIONS returns `200` with an empty `Allow`; if a fallback exists, it advertises `GET, HEAD, OPTIONS`. Earlier kernel policies can still respond first.
 
-A **CORS preflight** is a separate case: an OPTIONS request with `Origin` and `Access-Control-Request-Method` can be answered earlier with `204` if the origin is allowed. Its `Access-Control-Allow-*` headers come from CORS configuration, rather than the router's method list. If your client uses QUERY across origins, explicitly include it in the allowed CORS methods; the current expansion of `*` does not include it. See [Middleware and HTTP policies](/en/http/middleware-and-security).
+A **CORS preflight** is a separate case: an OPTIONS request with `Origin` and `Access-Control-Request-Method` can be answered earlier with `204` if the origin is allowed. Its `Access-Control-Allow-*` headers come from CORS configuration, rather than the router's method list. If your client uses QUERY across origins, explicitly include it in the allowed CORS methods; the current expansion of `*` does not include it. See [Middleware and HTTP policies](/en/http/middleware).
 
 ## Route parameters
 
@@ -334,4 +334,4 @@ Static routes are checked before dynamic routes. Dynamic routes are sorted by se
 
 Duplicate method/path declarations, structurally equivalent dynamic patterns and incompatible route names cause compilation errors. A group does not provide numeric priority or change its members' API/WEB context.
 
-After adding or changing declarations, restart the process and check cache invalidation if the application uses compiled routes. See [Directories and bootstrap caching](/en/getting-started/paths-and-caching).
+After adding or changing declarations, restart the process and check cache invalidation if the application uses compiled routes. See [Directories and bootstrap caching](/en/application/paths-and-caching).

@@ -7,7 +7,7 @@ lastUpdated: false
 
 A scheduled task describes **when to execute a command registered in Reactor**: build a report at 02:30, clean records hourly, or synchronize a catalog on weekdays. The scheduler calculates upcoming run times and dispatches the command signature when it is due.
 
-Define the agenda in `app/console/scheduler.py`. Timing and persistence settings belong to `config/scheduler.py`; `config/queue.py` configures the separate [queues and jobs](/en/asynchronous/queues) system. A scheduled command can dispatch queue jobs, but scheduling that command does not start a queue worker.
+Define the agenda in `app/console/scheduler.py`. Timing and persistence settings belong to `config/scheduler.py`; `config/queue.py` configures the separate [queues and jobs](/en/queues) system. A scheduled command can dispatch queue jobs, but scheduling that command does not start a queue worker.
 
 ```mermaid
 flowchart TD
@@ -34,7 +34,7 @@ orionis make:console-command scheduled_report --signature reports:build
 python -B reactor make:console-command scheduled_report --signature reports:build
 ```
 
-The default destination is `app/console/commands/scheduled_report_command.py`. Replace its contents with this minimal example; a real application can query its database and write the report through [Storage](/en/services/storage):
+The default destination is `app/console/commands/scheduled_report_command.py`. Replace its contents with this minimal example; a real application can query its database and write the report through [Storage](/en/storage):
 
 ```python
 from orionis.console.base import BaseCommand
@@ -172,4 +172,4 @@ The container builds `ReportSchedulePolicy` for the constructor and `ReportSched
 - [Listeners and events](/en/console/scheduler-listeners): callbacks, listener classes, and exit codes.
 - [Execution and API](/en/console/scheduler-execution): the `Schedule` facade, `ISchedule` service, controls, and shutdown.
 
-The scheduler does not itself add business retries or a failed-execution history. For those requirements, a command can dispatch a [persistent job](/en/asynchronous/queues/jobs-and-dispatch) to a queue backend and leave processing to its queue worker.
+The scheduler does not itself add business retries or a failed-execution history. For those requirements, a command can dispatch a [persistent job](/en/queues/jobs-and-dispatch) to a queue backend and leave processing to its queue worker.

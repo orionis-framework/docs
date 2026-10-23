@@ -128,7 +128,7 @@ Conversion keeps the validator's strict behavior. In this example, `"age": "36"`
 | `request: Request` | To inspect headers, query strings, cookies, metadata, or control body reading. Receiving it does not automatically validate those values. |
 | Both parameters | When you need a validated body and other request data. Import `Request` from `orionis.http`. |
 
-Route parameters still reach the action by name; they are independent of the body schema. See [controllers](/en/http/request-lifecycle) and [Request and payloads](/en/http/forms-and-uploads) for their access mechanisms.
+Route parameters still reach the action by name; they are independent of the body schema. See [controllers](/en/http/controllers) and [Request and payloads](/en/http/requests) for their access mechanisms.
 
 ## HTTP validation errors
 
@@ -163,7 +163,7 @@ For the invalid body `{"name": "x", "email": "bad", "age": 17}`, the API endpoin
 
 `message` summarizes the first failure and the remaining count; `errors` groups messages by field. One operation can report multiple failures. The [error API](/en/validation/validation-and-errors) explains how to inspect and customize them.
 
-A WEB redirect first uses the previous session URL, then an allowed same-origin `Referer`, and finally the current URL as a fallback. Retained input excludes sensitive top-level fields such as `password` and `password_confirmation`. See [sessions and flash data](/en/http/sessions/state-and-flash).
+A WEB redirect first uses the previous session URL, then an allowed same-origin `Referer`, and finally the current URL as a fallback. Retained input excludes sensitive top-level fields such as `password` and `password_confirmation`. See [sessions and flash data](/en/sessions/state-and-flash).
 
 These responses describe schema failures with default handling. Body reading, format, or middleware errors can produce other responses before validation.
 
@@ -243,4 +243,4 @@ class UserImportService:
 
 The service's caller awaits `await service.validate_record(record)` in its own asynchronous context. Rules and exceptions stay the same; data selection and decoding depend on that entry point.
 
-The [HTTP validation introduction](/en/http/requests-and-validation) summarizes this flow. To extend payload checks, continue with the [rule catalog and examples](/en/validation/constraints-and-reference) and [custom rules](/en/validation/application-rules).
+The [HTTP validation introduction](/en/http/validation) summarizes this flow. To extend payload checks, continue with the [rule catalog and examples](/en/validation/constraints-and-reference) and [custom rules](/en/validation/application-rules).

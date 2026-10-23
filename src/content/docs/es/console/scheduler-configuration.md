@@ -5,7 +5,7 @@ editUrl: true
 lastUpdated: false
 ---
 
-El scheduler mantiene definiciones de tareas y sus próximas ejecuciones. Configura ese almacenamiento en `config/scheduler.py`. La configuración de [Queues](/es/asynchronous/queues/configuration) es independiente: los jobs de una cola, sus reservas y sus fallos no se guardan en los stores del scheduler.
+El scheduler mantiene definiciones de tareas y sus próximas ejecuciones. Configura ese almacenamiento en `config/scheduler.py`. La configuración de [Queues](/es/queues/configuration) es independiente: los jobs de una cola, sus reservas y sus fallos no se guardan en los stores del scheduler.
 
 ## Configuración general
 

@@ -34,41 +34,41 @@ La tabla agrupa las declaraciones por archivo; el JSON contiene el destino indiv
 | `orionis/console/commands/db/show.py` | 1 | [commands](/es/database/commands) |
 | `orionis/console/commands/db/table.py` | 1 | [commands](/es/database/commands) |
 | `orionis/console/commands/db/wipe.py` | 1 | [commands](/es/database/commands) |
-| `orionis/console/commands/make/database_migration.py` | 2 | [commands](/es/database/commands) · [migrations-and-seeders](/es/database/migrations-and-seeders) |
+| `orionis/console/commands/make/database_migration.py` | 2 | [commands](/es/database/commands) · [migrations-and-seeders](/es/database/migrations) |
 | `orionis/console/commands/make/database_schema.py` | 2 | [commands](/es/database/commands) · [schema](/es/database/schema) |
 | `orionis/console/commands/make/database_seeder.py` | 2 | [commands](/es/database/commands) · [seeders](/es/database/seeders) |
 | `orionis/console/commands/make/factory.py` | 1 | [commands](/es/database/commands) |
-| `orionis/console/commands/make/test.py` | 1 | [testing](/es/database/orm/testing) |
-| `orionis/console/commands/migrate/fresh.py` | 2 | [commands](/es/database/commands) · [migrations-and-seeders](/es/database/migrations-and-seeders) |
-| `orionis/console/commands/migrate/migrate.py` | 2 | [commands](/es/database/commands) · [migrations-and-seeders](/es/database/migrations-and-seeders) |
-| `orionis/console/commands/migrate/refresh.py` | 2 | [commands](/es/database/commands) · [migrations-and-seeders](/es/database/migrations-and-seeders) |
-| `orionis/console/commands/migrate/reset.py` | 2 | [commands](/es/database/commands) · [migrations-and-seeders](/es/database/migrations-and-seeders) |
-| `orionis/console/commands/migrate/rollback.py` | 2 | [commands](/es/database/commands) · [migrations-and-seeders](/es/database/migrations-and-seeders) |
-| `orionis/console/commands/migrate/status.py` | 2 | [commands](/es/database/commands) · [migrations-and-seeders](/es/database/migrations-and-seeders) |
+| `orionis/console/commands/make/test.py` | 1 | [testing](/es/orm/testing) |
+| `orionis/console/commands/migrate/fresh.py` | 2 | [commands](/es/database/commands) · [migrations-and-seeders](/es/database/migrations) |
+| `orionis/console/commands/migrate/migrate.py` | 2 | [commands](/es/database/commands) · [migrations-and-seeders](/es/database/migrations) |
+| `orionis/console/commands/migrate/refresh.py` | 2 | [commands](/es/database/commands) · [migrations-and-seeders](/es/database/migrations) |
+| `orionis/console/commands/migrate/reset.py` | 2 | [commands](/es/database/commands) · [migrations-and-seeders](/es/database/migrations) |
+| `orionis/console/commands/migrate/rollback.py` | 2 | [commands](/es/database/commands) · [migrations-and-seeders](/es/database/migrations) |
+| `orionis/console/commands/migrate/status.py` | 2 | [commands](/es/database/commands) · [migrations-and-seeders](/es/database/migrations) |
 | `orionis/console/commands/seed/seed.py` | 1 | [seeders](/es/database/seeders) |
 | `orionis/console/commands/support/install.py` | 7 | [drivers](/es/database/drivers) |
-| `orionis/console/commands/test/test.py` | 1 | [testing](/es/database/orm/testing) |
+| `orionis/console/commands/test/test.py` | 1 | [testing](/es/orm/testing) |
 | `orionis/database/compiler.py` | 9 | [runtime-api](/es/database/runtime-api) |
 | `orionis/database/connection.py` | 19 | [runtime-api](/es/database/runtime-api) |
 | `orionis/database/connection_manager.py` | 9 | [connections](/es/database/connections) |
 | `orionis/database/contracts/connection.py` | 18 | [runtime-api](/es/database/runtime-api) |
 | `orionis/database/contracts/connection_manager.py` | 8 | [connections](/es/database/connections) |
-| `orionis/database/contracts/migration.py` | 3 | [migrations-and-seeders](/es/database/migrations-and-seeders) |
-| `orionis/database/contracts/migrator.py` | 7 | [migrations-and-seeders](/es/database/migrations-and-seeders) |
+| `orionis/database/contracts/migration.py` | 3 | [migrations-and-seeders](/es/database/migrations) |
+| `orionis/database/contracts/migrator.py` | 7 | [migrations-and-seeders](/es/database/migrations) |
 | `orionis/database/contracts/schema.py` | 6 | [schema](/es/database/schema) |
 | `orionis/database/contracts/transaction.py` | 3 | [transactions](/es/database/transactions) |
 | `orionis/database/dialect.py` | 5 | [runtime-api](/es/database/runtime-api) |
 | `orionis/database/entities/result.py` | 3 | [runtime-api](/es/database/runtime-api) |
 | `orionis/database/exceptions.py` | 7 | [runtime-api](/es/database/runtime-api) |
-| `orionis/database/migrations/context.py` | 2 | [migrations-and-seeders](/es/database/migrations-and-seeders) |
-| `orionis/database/migrations/events.py` | 9 | [migrations-and-seeders](/es/database/migrations-and-seeders) |
-| `orionis/database/migrations/migrator.py` | 8 | [migrations-and-seeders](/es/database/migrations-and-seeders) |
+| `orionis/database/migrations/context.py` | 2 | [migrations-and-seeders](/es/database/migrations) |
+| `orionis/database/migrations/events.py` | 9 | [migrations-and-seeders](/es/database/migrations) |
+| `orionis/database/migrations/migrator.py` | 8 | [migrations-and-seeders](/es/database/migrations) |
 | `orionis/database/provider.py` | 3 | [runtime-api](/es/database/runtime-api) |
 | `orionis/database/redshift.py` | 9 | [runtime-api](/es/database/runtime-api) |
 | `orionis/database/schema/blueprint.py` | 10 | [schema](/es/database/schema) · [schema-modifiers](/es/database/schema-modifiers) |
 | `orionis/database/schema/column.py` | 41 | [column-types](/es/database/column-types) |
 | `orionis/database/schema/comment.py` | 3 | [schema-modifiers](/es/database/schema-modifiers) |
-| `orionis/database/schema/definition_bucket.py` | 8 | [schema-and-type-reference](/es/database/orm/schema-and-type-reference) |
+| `orionis/database/schema/definition_bucket.py` | 8 | [schema-and-type-reference](/es/orm/schema-and-type-reference) |
 | `orionis/database/schema/definitions.py` | 1 | [schema](/es/database/schema) |
 | `orionis/database/schema/foreign.py` | 3 | [schema-modifiers](/es/database/schema-modifiers) |
 | `orionis/database/schema/index.py` | 3 | [schema-modifiers](/es/database/schema-modifiers) |
@@ -109,48 +109,48 @@ La tabla agrupa las declaraciones por archivo; el JSON contiene el destino indiv
 | `orionis/foundation/config/database/enums/sqlite_journal.py` | 7 | [configuration](/es/database/configuration) |
 | `orionis/foundation/config/database/enums/sqlite_synchronous.py` | 5 | [configuration](/es/database/configuration) |
 | `orionis/foundation/config/database/enums/sqlserver_charset.py` | 29 | [configuration](/es/database/configuration) |
-| `orionis/orm/attributes.py` | 12 | [model-api](/es/database/orm/model-api) |
-| `orionis/orm/collections/collection.py` | 1 | [collections-and-pagination](/es/database/orm/collections-and-pagination) |
-| `orionis/orm/collections/paginator.py` | 13 | [collections-and-pagination](/es/database/orm/collections-and-pagination) |
+| `orionis/orm/attributes.py` | 12 | [model-api](/es/orm/model-api) |
+| `orionis/orm/collections/collection.py` | 1 | [collections-and-pagination](/es/orm/collections-and-pagination) |
+| `orionis/orm/collections/paginator.py` | 13 | [collections-and-pagination](/es/orm/collections-and-pagination) |
 | `orionis/orm/contracts/base_builder.py` | 70 | [joins-and-subqueries](/es/database/joins-and-subqueries) · [query-builder](/es/database/query-builder) · [query-filters](/es/database/query-filters) · [query-writes](/es/database/query-writes) |
-| `orionis/orm/contracts/belongs_to_many_relation.py` | 6 | [relationship-operations](/es/database/orm/relationship-operations) |
-| `orionis/orm/contracts/builder.py` | 11 | [collections-and-pagination](/es/database/orm/collections-and-pagination) · [eager-loading](/es/database/orm/eager-loading) · [model-api](/es/database/orm/model-api) |
+| `orionis/orm/contracts/belongs_to_many_relation.py` | 6 | [relationship-operations](/es/orm/relationship-operations) |
+| `orionis/orm/contracts/builder.py` | 11 | [collections-and-pagination](/es/orm/collections-and-pagination) · [eager-loading](/es/orm/eager-loading) · [model-api](/es/orm/model-api) |
 | `orionis/orm/contracts/query_builder.py` | 12 | [db-facade](/es/database/db-facade) |
 | `orionis/orm/contracts/raw_builder.py` | 8 | [query-builder](/es/database/query-builder) |
-| `orionis/orm/contracts/relation.py` | 6 | [relationship-operations](/es/database/orm/relationship-operations) |
-| `orionis/orm/events.py` | 5 | [events](/es/database/orm/events) |
-| `orionis/orm/exceptions/__init__.py` | 7 | [model-api](/es/database/orm/model-api) |
-| `orionis/orm/factories/exceptions.py` | 6 | [factories-and-testing](/es/database/orm/factories-and-testing) |
-| `orionis/orm/factories/factory.py` | 14 | [factories-and-testing](/es/database/orm/factories-and-testing) |
-| `orionis/orm/factories/fake.py` | 18 | [faker](/es/database/orm/faker) |
-| `orionis/orm/factories/sequence.py` | 4 | [factories-and-testing](/es/database/orm/factories-and-testing) |
-| `orionis/orm/metaclass.py` | 29 | [orm](/es/database/orm) · [events](/es/database/orm/events) · [model-api](/es/database/orm/model-api) |
-| `orionis/orm/model.py` | 37 | [model-api](/es/database/orm/model-api) · [models-and-attributes](/es/database/orm/models-and-attributes) · [scopes](/es/database/orm/scopes) |
+| `orionis/orm/contracts/relation.py` | 6 | [relationship-operations](/es/orm/relationship-operations) |
+| `orionis/orm/events.py` | 5 | [events](/es/orm/events) |
+| `orionis/orm/exceptions/__init__.py` | 7 | [model-api](/es/orm/model-api) |
+| `orionis/orm/factories/exceptions.py` | 6 | [factories-and-testing](/es/orm/factories) |
+| `orionis/orm/factories/factory.py` | 14 | [factories-and-testing](/es/orm/factories) |
+| `orionis/orm/factories/fake.py` | 18 | [faker](/es/faker) |
+| `orionis/orm/factories/sequence.py` | 4 | [factories-and-testing](/es/orm/factories) |
+| `orionis/orm/metaclass.py` | 29 | [orm](/es/orm) · [events](/es/orm/events) · [model-api](/es/orm/model-api) |
+| `orionis/orm/model.py` | 37 | [model-api](/es/orm/model-api) · [models-and-attributes](/es/orm/models-and-attributes) · [scopes](/es/orm/scopes) |
 | `orionis/orm/provider.py` | 3 | [runtime-api](/es/database/runtime-api) |
 | `orionis/orm/query/base_builder.py` | 73 | [joins-and-subqueries](/es/database/joins-and-subqueries) · [query-builder](/es/database/query-builder) · [query-filters](/es/database/query-filters) · [query-plans](/es/database/query-plans) · [query-writes](/es/database/query-writes) |
-| `orionis/orm/query/builder.py` | 22 | [collections-and-pagination](/es/database/orm/collections-and-pagination) · [eager-loading](/es/database/orm/eager-loading) · [model-api](/es/database/orm/model-api) · [scopes](/es/database/orm/scopes) · [soft-deletes](/es/database/orm/soft-deletes) |
+| `orionis/orm/query/builder.py` | 22 | [collections-and-pagination](/es/orm/collections-and-pagination) · [eager-loading](/es/orm/eager-loading) · [model-api](/es/orm/model-api) · [scopes](/es/orm/scopes) · [soft-deletes](/es/orm/soft-deletes) |
 | `orionis/orm/query/expressions.py` | 111 | [query-plans](/es/database/query-plans) |
 | `orionis/orm/query/join_clause.py` | 5 | [joins-and-subqueries](/es/database/joins-and-subqueries) · [query-plans](/es/database/query-plans) |
 | `orionis/orm/query/raw_builder.py` | 8 | [query-builder](/es/database/query-builder) |
 | `orionis/orm/query_builder.py` | 13 | [db-facade](/es/database/db-facade) |
-| `orionis/orm/relations/belongs_to.py` | 6 | [relationship-operations](/es/database/orm/relationship-operations) |
-| `orionis/orm/relations/belongs_to_many.py` | 18 | [relationship-operations](/es/database/orm/relationship-operations) |
-| `orionis/orm/relations/has_many.py` | 3 | [relationship-operations](/es/database/orm/relationship-operations) |
-| `orionis/orm/relations/has_one.py` | 3 | [relationship-operations](/es/database/orm/relationship-operations) |
-| `orionis/orm/relations/has_one_or_many.py` | 5 | [relationship-operations](/es/database/orm/relationship-operations) |
-| `orionis/orm/relations/mixin.py` | 8 | [relationship-operations](/es/database/orm/relationship-operations) · [relationships](/es/database/orm/relationships) |
-| `orionis/orm/relations/relation.py` | 9 | [relationship-operations](/es/database/orm/relationship-operations) |
-| `orionis/orm/resolver.py` | 5 | [model-api](/es/database/orm/model-api) |
-| `orionis/orm/schema/column/definition.py` | 48 | [schema-and-type-reference](/es/database/orm/schema-and-type-reference) · [schema-modifiers](/es/database/schema-modifiers) |
-| `orionis/orm/schema/column/options.py` | 29 | [schema-and-type-reference](/es/database/orm/schema-and-type-reference) |
-| `orionis/orm/schema/constraints/composite_foreign_key.py` | 6 | [schema-and-type-reference](/es/database/orm/schema-and-type-reference) |
-| `orionis/orm/schema/constraints/foreign_reference.py` | 6 | [schema-and-type-reference](/es/database/orm/schema-and-type-reference) |
-| `orionis/orm/schema/constraints/table_index.py` | 5 | [schema-and-type-reference](/es/database/orm/schema-and-type-reference) |
-| `orionis/orm/schema/constraints/unique_constraint.py` | 4 | [schema-and-type-reference](/es/database/orm/schema-and-type-reference) |
-| `orionis/orm/schema/table.py` | 13 | [schema-and-type-reference](/es/database/orm/schema-and-type-reference) |
+| `orionis/orm/relations/belongs_to.py` | 6 | [relationship-operations](/es/orm/relationship-operations) |
+| `orionis/orm/relations/belongs_to_many.py` | 18 | [relationship-operations](/es/orm/relationship-operations) |
+| `orionis/orm/relations/has_many.py` | 3 | [relationship-operations](/es/orm/relationship-operations) |
+| `orionis/orm/relations/has_one.py` | 3 | [relationship-operations](/es/orm/relationship-operations) |
+| `orionis/orm/relations/has_one_or_many.py` | 5 | [relationship-operations](/es/orm/relationship-operations) |
+| `orionis/orm/relations/mixin.py` | 8 | [relationship-operations](/es/orm/relationship-operations) · [relationships](/es/orm/relationships) |
+| `orionis/orm/relations/relation.py` | 9 | [relationship-operations](/es/orm/relationship-operations) |
+| `orionis/orm/resolver.py` | 5 | [model-api](/es/orm/model-api) |
+| `orionis/orm/schema/column/definition.py` | 48 | [schema-and-type-reference](/es/orm/schema-and-type-reference) · [schema-modifiers](/es/database/schema-modifiers) |
+| `orionis/orm/schema/column/options.py` | 29 | [schema-and-type-reference](/es/orm/schema-and-type-reference) |
+| `orionis/orm/schema/constraints/composite_foreign_key.py` | 6 | [schema-and-type-reference](/es/orm/schema-and-type-reference) |
+| `orionis/orm/schema/constraints/foreign_reference.py` | 6 | [schema-and-type-reference](/es/orm/schema-and-type-reference) |
+| `orionis/orm/schema/constraints/table_index.py` | 5 | [schema-and-type-reference](/es/orm/schema-and-type-reference) |
+| `orionis/orm/schema/constraints/unique_constraint.py` | 4 | [schema-and-type-reference](/es/orm/schema-and-type-reference) |
+| `orionis/orm/schema/table.py` | 13 | [schema-and-type-reference](/es/orm/schema-and-type-reference) |
 | `orionis/orm/schema/types/big_integer.py` | 2 | [column-types](/es/database/column-types) |
 | `orionis/orm/schema/types/boolean.py` | 2 | [column-types](/es/database/column-types) |
-| `orionis/orm/schema/types/column_type.py` | 40 | [schema-and-type-reference](/es/database/orm/schema-and-type-reference) |
+| `orionis/orm/schema/types/column_type.py` | 40 | [schema-and-type-reference](/es/orm/schema-and-type-reference) |
 | `orionis/orm/schema/types/date.py` | 2 | [column-types](/es/database/column-types) |
 | `orionis/orm/schema/types/date_time.py` | 2 | [column-types](/es/database/column-types) |
 | `orionis/orm/schema/types/double.py` | 2 | [column-types](/es/database/column-types) |
@@ -188,13 +188,13 @@ La tabla agrupa las declaraciones por archivo; el JSON contiene el destino indiv
 | `orionis/orm/schema/types/unicode.py` | 2 | [column-types](/es/database/column-types) |
 | `orionis/orm/schema/types/unicode_text.py` | 2 | [column-types](/es/database/column-types) |
 | `orionis/orm/schema/types/uuid_type.py` | 2 | [column-types](/es/database/column-types) |
-| `orionis/orm/soft_deletes.py` | 4 | [soft-deletes](/es/database/orm/soft-deletes) |
-| `orionis/orm/state.py` | 8 | [model-api](/es/database/orm/model-api) |
+| `orionis/orm/soft_deletes.py` | 4 | [soft-deletes](/es/orm/soft-deletes) |
+| `orionis/orm/state.py` | 8 | [model-api](/es/orm/model-api) |
 | `orionis/support/facades/db.py` | 2 | [db-facade](/es/database/db-facade) |
-| `orionis/support/types/collection.py` | 61 | [collections-and-pagination](/es/database/orm/collections-and-pagination) |
-| `orionis/test/cases/case.py` | 3 | [testing](/es/database/orm/testing) |
-| `orionis/test/contracts/engine.py` | 8 | [testing](/es/database/orm/testing) |
-| `orionis/test/core/engine.py` | 9 | [testing](/es/database/orm/testing) |
+| `orionis/support/types/collection.py` | 61 | [collections-and-pagination](/es/orm/collections-and-pagination) |
+| `orionis/test/cases/case.py` | 3 | [testing](/es/orm/testing) |
+| `orionis/test/contracts/engine.py` | 8 | [testing](/es/orm/testing) |
+| `orionis/test/core/engine.py` | 9 | [testing](/es/orm/testing) |
 
 ## Validar y mantener el inventario
 
@@ -215,7 +215,7 @@ Actualiza la explicación, los ejemplos y el destino del símbolo al cambiar el 
 - Cuatro tipos de columna declarados sin builder de compilación: StrictArray, MatchType, NumericCommon y SchemaType; diferencias de tipos por motor en [column-types](/es/database/column-types).
 - Transacciones por tarea, savepoints, cancelación y alcance real de bloqueos en [transactions](/es/database/transactions).
 - Operaciones masivas sin eventos por instancia, límites de escritura y serialización en [query-writes](/es/database/query-writes).
-- Cuatro relaciones soportadas; asociaciones y limitaciones de pivots en [relationship-operations](/es/database/orm/relationship-operations).
-- Factories sin transacción implícita y Faker con disponibilidad por locale en [faker](/es/database/orm/faker).
+- Cuatro relaciones soportadas; asociaciones y limitaciones de pivots en [relationship-operations](/es/orm/relationship-operations).
+- Factories sin transacción implícita y Faker con disponibilidad por locale en [faker](/es/faker).
 
-Los ejemplos y pruebas usan SQLite temporal y los componentes reales del framework. La compilación DDL se contrastó con cinco dialectos; eso no sustituye ejecutar cada servidor externo. El catálogo Faker ejecuta cada ejemplo en un locale disponible y documenta las dependencias opcionales de image y xml. La [guía de pruebas](/es/database/orm/testing) permite reproducir los escenarios de persistencia, relaciones, transacciones, migraciones y seeders.
+Los ejemplos y pruebas usan SQLite temporal y los componentes reales del framework. La compilación DDL se contrastó con cinco dialectos; eso no sustituye ejecutar cada servidor externo. El catálogo Faker ejecuta cada ejemplo en un locale disponible y documenta las dependencias opcionales de image y xml. La [guía de pruebas](/es/orm/testing) permite reproducir los escenarios de persistencia, relaciones, transacciones, migraciones y seeders.

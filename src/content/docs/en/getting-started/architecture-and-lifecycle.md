@@ -49,7 +49,7 @@ flowchart TD
     I --> J["Close uploads, scope, and reservation"]
 ```
 
-Explore these contracts in [HTTP controllers](/en/http/request-lifecycle), [Middleware and security](/en/http/middleware-and-security), and [Scopes and concurrency](/en/architecture/service-container/scopes-and-concurrency). Specialized flows are covered in [WebSockets](/en/http/websockets), [Streaming and SSE](/en/http/streaming-and-sse), and [MCP](/en/protocols/mcp).
+Explore these contracts in [HTTP controllers](/en/http/controllers), [Middleware and security](/en/http/middleware), and [Scopes and concurrency](/en/application/container/scopes-and-concurrency). Specialized flows are covered in [WebSockets](/en/realtime/websocket), [Streaming and SSE](/en/realtime/streaming-and-sse), and [MCP](/en/mcp).
 
 ## Project structure
 
@@ -112,7 +112,7 @@ The tree omits secondary files and other `resources/` folders, which are outside
 | `app/console/` | Application commands in `commands/` and task declarations in `scheduler.py`. |
 | `app/exceptions/` | Customize exception handling through `handler.py`. |
 
-The table describes locations, not automatic execution of every component. To implement them, continue with [Service container](/en/architecture/service-container), [Validation](/en/validation/declaring-schemas), [Commands](/en/console/commands-and-arguments), [Task scheduling](/en/console/task-scheduling) and [Exceptions](/en/architecture/exception-handling).
+The table describes locations, not automatic execution of every component. To implement them, continue with [Service container](/en/application/container), [Validation](/en/validation/declaring-schemas), [Commands](/en/console/commands-and-arguments), [Task scheduling](/en/console/task-scheduling) and [Exceptions](/en/exceptions).
 
 ## The bootstrap directory and application lifecycle
 
@@ -189,7 +189,7 @@ app.create()
 
 **compile().** Enables bootstrap metadata caching in `storage/framework/bootstrap`; it does not compile application Python code. It checks invalidation paths and restores a valid snapshot, or allows it to be rebuilt. Within directories, it recursively examines `*.py` files; explicitly listed files such as `.env` also participate. Including `resources` therefore does not watch every template or translation.
 
-It runs before component registration because a valid snapshot restores compiled configuration and makes the `with…` methods reuse it. This is not live reload: after changing bootstrap configuration, invalidate the snapshot when necessary and restart the process. See [Directories and bootstrap caching](/en/getting-started/paths-and-caching).
+It runs before component registration because a valid snapshot restores compiled configuration and makes the `with…` methods reuse it. This is not live reload: after changing bootstrap configuration, invalidate the snapshot when necessary and restart the process. See [Directories and bootstrap caching](/en/application/paths-and-caching).
 
 **register_lifespan_callbacks().** Registers functions for events; importing this file does not execute them.
 
@@ -199,13 +199,13 @@ It runs before component registration because a valid snapshot restores compiled
 
 **withExceptionHandler().** Selects the class that reports and transforms exceptions when the runtime needs it. Registration does not execute its exception-handling methods.
 
-**withProviders().** Adds providers to the container registry. During `create()`, eager providers are instantiated and their `register()` methods run; synchronous `boot()` methods run then, while asynchronous ones wait for asynchronous startup. Deferred providers resolve when their service is requested. See [Providers](/en/architecture/service-container/providers-and-facades).
+**withProviders().** Adds providers to the container registry. During `create()`, eager providers are instantiated and their `register()` methods run; synchronous `boot()` methods run then, while asynchronous ones wait for asynchronous startup. Deferred providers resolve when their service is requested. See [Providers](/en/application/container/providers).
 
 **withMiddleware().** Registers global HTTP pipeline classes. The kernel prepares and executes them; they do not process a request during `create()`. In normal HTTP processing they run after route resolution and its context layers.
 
 **create().** Registers the application as `IApplication`, loads and validates configuration, directory paths, and component metadata, prepares providers, sets timezone/locale, and retains worker policies. It saves the configuration cache when rebuilding is required. It is idempotent: an already created application does not repeat this preparation.
 
-Make `with…` registrations before `create()`. A true `isCreated` does not mean the HTTP kernel is ready: `create()` does not open a port, run STARTUP/SHUTDOWN callbacks, or await asynchronous `boot()` methods. The server or Reactor owns those phases. Integrations without these runtimes can use `await app.boot()`: it creates the application and awaits providers without running HTTP/CLI events. See [Application lifecycle and resources](/en/getting-started/application-lifecycle).
+Make `with…` registrations before `create()`. A true `isCreated` does not mean the HTTP kernel is ready: `create()` does not open a port, run STARTUP/SHUTDOWN callbacks, or await asynchronous `boot()` methods. The server or Reactor owns those phases. Integrations without these runtimes can use `await app.boot()`: it creates the application and awaits providers without running HTTP/CLI events. See [Application lifecycle and resources](/en/application/lifecycle).
 
 ### The bootstrap/lifespan.py file
 
@@ -312,7 +312,7 @@ The application must be able to import its bootstrap before running the command.
 
 Files in `config/` customize application subsystems through frozen dataclasses that inherit core entities. During application creation, Orionis obtains core defaults, discovers local dataclasses and applies their configuration. The filename identifies the section: `config/cache.py` supplies `cache`.
 
-A stack does not need to include all sixteen files. A section without a local file uses its core entities, which also read environment variables. The values below are the defaults in the examined local files when their variables are absent; a local override can differ from its inherited entity. See [Typed configuration](/en/getting-started/configuration) to inspect effective values.
+A stack does not need to include all sixteen files. A section without a local file uses its core entities, which also read environment variables. The values below are the defaults in the examined local files when their variables are absent; a local override can differ from its inherited entity. See [Typed configuration](/en/application/configuration) to inspect effective values.
 
 ### `app.py`: identity and environment
 
@@ -320,11 +320,11 @@ Defines the application name, environment, debugging, localization and encryptio
 
 ### `auth.py`: identity and authentication
 
-Selects `AUTH_GUARD=session`, with `token` as an alternative; `AUTH_MODEL=app.models.user.User` and `AUTH_USERNAME=email` identify the model and login field. It configures sessions, personal tokens, password recovery and persistent login. The local file defaults `AUTH_REDIRECT_TO` to `/login`, while the core entity uses `None`, retaining the standard 401 response. These settings do not create models, tables or routes. Continue with [Authentication](/en/security/authentication).
+Selects `AUTH_GUARD=session`, with `token` as an alternative; `AUTH_MODEL=app.models.user.User` and `AUTH_USERNAME=email` identify the model and login field. It configures sessions, personal tokens, password recovery and persistent login. The local file defaults `AUTH_REDIRECT_TO` to `/login`, while the core entity uses `None`, retaining the standard 401 response. These settings do not create models, tables or routes. Continue with [Authentication](/en/authentication).
 
 ### `cache.py`: cache stores
 
-`CACHE_STORE=file` selects file storage; `CACHE_FILE_PATH=storage/framework/cache/data` sets its location. The configuration also declares `memory`, `redis`, `memcached` and `database` stores. `CACHE_PREFIX` adds a prefix to cache keys: the local file defaults to an empty string, while the core defaults to `orionis`. External stores require an available service; declaring their settings does not install it. See [Cache](/en/services/cache).
+`CACHE_STORE=file` selects file storage; `CACHE_FILE_PATH=storage/framework/cache/data` sets its location. The configuration also declares `memory`, `redis`, `memcached` and `database` stores. `CACHE_PREFIX` adds a prefix to cache keys: the local file defaults to an empty string, while the core defaults to `orionis`. External stores require an available service; declaring their settings does not install it. See [Cache](/en/cache).
 
 ### `database.py`: connections and engines
 
@@ -332,11 +332,11 @@ Selects `AUTH_GUARD=session`, with `token` as an alternative; `AUTH_MODEL=app.mo
 
 ### `filesystems.py`: storage disks
 
-`FILESYSTEM_DISK=local` selects the default disk. `LOCAL_PATH=storage/app/private` and `PUBLIC_PATH=storage/app/public` separate private and public storage; `PUBLIC_URL=/static` sets the public URL prefix. The configuration also declares credentials, regions and destinations for S3, Azure and GCS. These settings do not provision cloud infrastructure or expose private files. See [Storage](/en/services/storage).
+`FILESYSTEM_DISK=local` selects the default disk. `LOCAL_PATH=storage/app/private` and `PUBLIC_PATH=storage/app/public` separate private and public storage; `PUBLIC_URL=/static` sets the public URL prefix. The configuration also declares credentials, regions and destinations for S3, Azure and GCS. These settings do not provision cloud infrastructure or expose private files. See [Storage](/en/storage).
 
 ### `hashing.py`: passwords and costs
 
-`HASH_DRIVER=argon2` selects Argon2id; `bcrypt` is the alternative. `ARGON_MEMORY=65536` specifies memory in KiB, `ARGON_THREADS=4` its parallelism and `ARGON_TIME=3` its iterations. `BCRYPT_ROUNDS=12` controls bcrypt's cost. These settings affect hash generation and verification, rather than the reversible encryption configured in `app.py`. See [Hashing](/en/security/hashing).
+`HASH_DRIVER=argon2` selects Argon2id; `bcrypt` is the alternative. `ARGON_MEMORY=65536` specifies memory in KiB, `ARGON_THREADS=4` its parallelism and `ARGON_TIME=3` its iterations. `BCRYPT_ROUNDS=12` controls bcrypt's cost. These settings affect hash generation and verification, rather than the reversible encryption configured in `app.py`. See [Hashing](/en/cryptography/hashing).
 
 ### `http.py`: HTTP server policies
 
@@ -348,19 +348,19 @@ Groups body and multipart limits, WebSockets, proxies, hosts, CORS, CSRF and rat
 
 ### `mail.py`: transport and sender
 
-`MAIL_MAILER=smtp` selects SMTP; the `file` transport instead writes to `MAIL_FILE_PATH=storage/mail`. `MAIL_PORT=587` and `MAIL_ENCRYPTION=TLS` are the initial SMTP settings. Host, username, password and sender address start empty; `MAIL_FROM_NAME` uses `APP_NAME` when available. These defaults alone do not provide a usable SMTP connection. See [Mail](/en/services/mail).
+`MAIL_MAILER=smtp` selects SMTP; the `file` transport instead writes to `MAIL_FILE_PATH=storage/mail`. `MAIL_PORT=587` and `MAIL_ENCRYPTION=TLS` are the initial SMTP settings. Host, username, password and sender address start empty; `MAIL_FROM_NAME` uses `APP_NAME` when available. These defaults alone do not provide a usable SMTP connection. See [Mail](/en/mail).
 
 ### `mcp.py`: MCP protocol limits
 
-`MCP_DEFAULT_PAGE_SIZE=50` and `MCP_MAX_PAGE_SIZE=100` control pagination. `MCP_MAX_REQUEST_SIZE` falls back to `HTTP_MAX_BODY_SIZE`, then to 1 MiB; concurrency falls back to `HTTP_MAX_CONCURRENT_REQUESTS`, then to 32. These are environment variables, rather than effective `http.py` values. The configuration also limits subscriptions, tool search and responses. `CORS_ALLOW_ORIGINS` supplies trusted origins: an empty allowlist rejects MCP HTTP requests carrying `Origin`. Servers are registered through AI routes. See [MCP](/en/protocols/mcp).
+`MCP_DEFAULT_PAGE_SIZE=50` and `MCP_MAX_PAGE_SIZE=100` control pagination. `MCP_MAX_REQUEST_SIZE` falls back to `HTTP_MAX_BODY_SIZE`, then to 1 MiB; concurrency falls back to `HTTP_MAX_CONCURRENT_REQUESTS`, then to 32. These are environment variables, rather than effective `http.py` values. The configuration also limits subscriptions, tool search and responses. `CORS_ALLOW_ORIGINS` supplies trusted origins: an empty allowlist rejects MCP HTTP requests carrying `Origin`. Servers are registered through AI routes. See [MCP](/en/mcp).
 
 ### `queue.py`: job execution
 
-`QUEUE_CONNECTION=sync` executes jobs in the dispatching process; alternatives are `database` and `redis`. `QUEUE_TABLE=jobs` and `QUEUE_FAILED_TABLE=failed_jobs` name tables without creating them. Worker defaults include `QUEUE_WORKER_CONCURRENCY=1`, `QUEUE_WORKER_TIMEOUT=60.0` seconds and `QUEUE_WORKER_TRIES=3`. Configuring a backend does not start a worker. See [Queues](/en/asynchronous/queues).
+`QUEUE_CONNECTION=sync` executes jobs in the dispatching process; alternatives are `database` and `redis`. `QUEUE_TABLE=jobs` and `QUEUE_FAILED_TABLE=failed_jobs` name tables without creating them. Worker defaults include `QUEUE_WORKER_CONCURRENCY=1`, `QUEUE_WORKER_TIMEOUT=60.0` seconds and `QUEUE_WORKER_TRIES=3`. Configuring a backend does not start a worker. See [Queues](/en/queues).
 
 ### `realtime.py`: invocations and groups
 
-Controls realtime hub limits: `REALTIME_MAX_MESSAGE_SIZE=1048576` bytes, `REALTIME_MAX_CONCURRENT_INVOCATIONS=16` and `REALTIME_MAX_PENDING_CLIENT_INVOCATIONS=32` per connection. `REALTIME_INVOCATION_TIMEOUT` and `REALTIME_CLIENT_RESULT_TIMEOUT` default to 30 seconds; `REALTIME_MAX_GROUPS_PER_CONNECTION=64` limits membership. These settings regulate resources and execution; they neither register hubs nor configure an external broker. See [Realtime](/en/asynchronous/realtime).
+Controls realtime hub limits: `REALTIME_MAX_MESSAGE_SIZE=1048576` bytes, `REALTIME_MAX_CONCURRENT_INVOCATIONS=16` and `REALTIME_MAX_PENDING_CLIENT_INVOCATIONS=32` per connection. `REALTIME_INVOCATION_TIMEOUT` and `REALTIME_CLIENT_RESULT_TIMEOUT` default to 30 seconds; `REALTIME_MAX_GROUPS_PER_CONNECTION=64` limits membership. These settings regulate resources and execution; they neither register hubs nor configure an external broker. See [Realtime](/en/realtime).
 
 ### `scheduler.py`: task storage and execution
 
@@ -368,7 +368,7 @@ Controls realtime hub limits: `REALTIME_MAX_MESSAGE_SIZE=1048576` bytes, `REALTI
 
 ### `session.py`: persistence and cookies
 
-`SESSION_DRIVER=memory` keeps sessions in the process; `file`, `database` and `cache` are alternatives. `SESSION_LIFETIME=120` is measured in minutes. `SESSION_FILES=storage/framework/sessions` applies to the file driver. The default cookie is `sessionid`, with `SESSION_HTTP_ONLY=True`, `SESSION_SECURE=False` and SameSite `lax`. One worker's memory does not provide shared storage across processes. See [Sessions](/en/http/sessions).
+`SESSION_DRIVER=memory` keeps sessions in the process; `file`, `database` and `cache` are alternatives. `SESSION_LIFETIME=120` is measured in minutes. `SESSION_FILES=storage/framework/sessions` applies to the file driver. The default cookie is `sessionid`, with `SESSION_HTTP_ONLY=True`, `SESSION_SECURE=False` and SameSite `lax`. One worker's memory does not provide shared storage across processes. See [Sessions](/en/sessions).
 
 ### `testing.py`: discovery and results
 
@@ -376,7 +376,7 @@ Configures the test runner: `TESTING_START_DIR=tests`, `TESTING_FILE_PATTERN=tes
 
 ### `view.py`: Jinja2 templates
 
-`VIEW_PATHS=["resources/views"]` identifies template search directories. `VIEW_CACHE_SIZE=400` limits the in-memory LRU cache: `0` disables it and `-1` removes the limit. `VIEW_CACHE_PATH=storage/framework/views` enables disk bytecode caching; `None` disables it. `APP_DEBUG=True` controls automatic reload and `VIEW_AUTOESCAPE=True` enables HTML escaping. This does not mean every view is compiled at startup. See [Views](/en/services/views).
+`VIEW_PATHS=["resources/views"]` identifies template search directories. `VIEW_CACHE_SIZE=400` limits the in-memory LRU cache: `0` disables it and `-1` removes the limit. `VIEW_CACHE_PATH=storage/framework/views` enables disk bytecode caching; `None` disables it. `APP_DEBUG=True` controls automatic reload and `VIEW_AUTOESCAPE=True` enables HTML escaping. This does not mean every view is compiled at startup. See [Views](/en/views).
 
 ### Environment variables and defaults
 
@@ -425,13 +425,13 @@ Its four folders separate persistence responsibilities:
 | `schemas/` | Table definitions containing columns, types and constraints. For example, `USERS_V1` is a `TableDefinition` used by a migration. |
 | `seeders/` | Insert initial or example data. Request them explicitly with `migrate --seed`; review the administrator seeder and its credentials before running it. |
 
-These schemas describe relational storage; those in `app/http/schemas/` validate input. Continue with [Factories and testing](/en/database/orm/factories-and-testing), [Database schemas](/en/database/schema) and [Migrations and seeders](/en/database/migrations-and-seeders).
+These schemas describe relational storage; those in `app/http/schemas/` validate input. Continue with [Factories and testing](/en/orm/factories), [Database schemas](/en/database/schema) and [Migrations and seeders](/en/database/migrations).
 
 ## The resources directory
 
-`resources/lang/` includes `en.json` and `es.json`, translation dictionaries selected using the configured locale and fallback. The system also supports grouped files such as `es/messages.json`, although SSR does not create that structure. See [Localization](/en/services/localization).
+`resources/lang/` includes `en.json` and `es.json`, translation dictionaries selected using the configured locale and fallback. The system also supports grouped files such as `es/messages.json`, although SSR does not create that structure. See [Localization](/en/localization).
 
-`resources/views/` contains Jinja templates: pages, layouts, partials and emails. With the initial settings, `response.view("home.index")` looks for `resources/views/home/index.html`. The engine renders asynchronously and supports layout inheritance and partial includes. See [Views](/en/services/views).
+`resources/views/` contains Jinja templates: pages, layouts, partials and emails. With the initial settings, `response.view("home.index")` looks for `resources/views/home/index.html`. The engine renders asynchronously and supports layout inheritance and partial includes. See [Views](/en/views).
 
 ## The routes directory
 
@@ -464,13 +464,13 @@ app.withRouting(
 
 The three API files are a proposed organization: create them with their HTTP route declarations before using this fragment. The `v1` directory organizes files; URL prefixes are declared in routes. Configured files are validated; registering their locations does not immediately execute all their handlers.
 
-`health` is different: it accepts a string or `None` and represents the health URL, not a file or a list. When omitted or set to `None`, the application uses `/up`. See [HTTP routing](/en/http/routing) and [MCP servers](/en/protocols/mcp).
+`health` is different: it accepts a string or `None` and represents the health URL, not a file or a list. When omitted or set to `None`, the application uses `/up`. See [HTTP routing](/en/http/routing) and [MCP servers](/en/mcp).
 
 ## The storage directory
 
 `storage/app/private/` is the initial root of the `local` disk, suitable for internal documents. That disk does not provide public URLs. `storage/app/public/` belongs to the `public` disk, whose initial URL is `/static`; `asset()` uses this disk by default.
 
-When running `reactor serve`, Orionis configures the public directory mount in Granian. No symbolic link is required. Another ASGI server needs its own static-file configuration or a proxy. That mount does not publish the private location. See [Storage](/en/services/storage).
+When running `reactor serve`, Orionis configures the public directory mount in Granian. No symbolic link is required. Another ASGI server needs its own static-file configuration or a proxy. That mount does not publish the private location. See [Storage](/en/storage).
 
 `storage/framework/` holds artifacts according to configuration and usage:
 
@@ -483,9 +483,9 @@ When running `reactor serve`, Orionis configures the public directory mount in G
 | `cache/data/` | Values stored when the file cache store is used. |
 | `cache/testing/` | JSON results only when `testing.cache_results` is enabled. |
 
-The first three entries are files without extensions inside the path selected by `compile()` in SSR. Provider metadata does not imply a separate `services/` directory. Bootstrap invalidation monitors Python files in registered directories and explicit files such as `.env`; including `resources` does not automatically monitor HTML/JSON changes. Views have their own cache. See [Directories and caching](/en/getting-started/paths-and-caching).
+The first three entries are files without extensions inside the path selected by `compile()` in SSR. Provider metadata does not imply a separate `services/` directory. Bootstrap invalidation monitors Python files in registered directories and explicit files such as `.env`; including `resources` does not automatically monitor HTML/JSON changes. Views have their own cache. See [Directories and caching](/en/application/paths-and-caching).
 
-`storage/logs/` receives logs according to the configured channels. For example, the initial `stack` channel uses `storage/logs/stack.log`; other channels can rotate files or use another path. See [Logging](/en/services/logging).
+`storage/logs/` receives logs according to the configured channels. For example, the initial `stack` channel uses `storage/logs/stack.log`; other channels can rotate files or use another path. See [Logging](/en/logging).
 
 ## The tests directory
 
@@ -504,7 +504,7 @@ Save it, for example, as `tests/test_project.py` and run `uv run python -B react
 
 ## Root files
 
-`.env` contains concrete environment values. `.env.example` provides the minimal base copied during installation; `.env.reference` documents additional options and examples without being loaded automatically as configuration. Files in `config/` determine how these variables are consumed. See [Configuration](/en/getting-started/configuration).
+`.env` contains concrete environment values. `.env.example` provides the minimal base copied during installation; `.env.reference` documents additional options and examples without being loaded automatically as configuration. Files in `config/` determine how these variables are consumed. See [Configuration](/en/application/configuration).
 
 `pyproject.toml` declares metadata and dependencies; `uv.lock` records their resolution and `.python-version` guides interpreter selection. `uv sync` prepares the project's `.venv` from these files.
 

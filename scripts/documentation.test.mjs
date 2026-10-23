@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import remarkMermaid from '../src/plugins/remark-mermaid.mjs';
 import path from 'node:path';
 import { root, validateCatalog, within, stripFrontmatter, markdownLinks, headingIds, parser } from './documentation-lib.mjs';
-import { createSidebar, flattenSidebar, documentationCatalog, documentationNavigation, navigationSections, resolveNavigation, sitePages, documentationPages, getPageBySlug, getTranslations } from '../src/utils/documentation-menu.mjs';
+import { createSidebar, createRedirects, flattenSidebar, documentationCatalog, documentationNavigation, navigationSections, resolveNavigation, validateRouteOrganization, validateLegacyRedirects, sitePages, documentationPages, getPageBySlug, getTranslations } from '../src/utils/documentation-menu.mjs';
 
 const groupedBuildSections = ['getting-started', 'http', 'realtime', 'mcp', 'views', 'localization', 'authentication', 'sessions', 'cryptography', 'validation'];
 const groupedSections = new Set([...groupedBuildSections, 'database', 'orm', 'faker', 'storage', 'cache', 'mail', 'queues', 'console', 'environment', 'application', 'logging', 'exceptions', 'deployment', 'testing', 'utilities']);
@@ -175,21 +175,119 @@ test('navigation rejects malformed, duplicated, missing, reordered, and unsuppor
     assert.throws(() => resolveNavigation(copy), expectedError);
   }
 });
-test('regrouping navigation preserves page IDs, page records, and both locale routes', () => {
+test('reordering navigation requires the catalog to follow without changing IDs or locale routes', () => {
   const copy = structuredClone(documentationNavigation);
   const index = copy.sections.findIndex((section) => section.id === 'contribute');
   copy.sections[index].pageIds.reverse();
-  const resolved = resolveNavigation(copy);
-  assert.deepEqual(resolved[index].pages.map((page) => page.id), copy.sections[index].pageIds);
-  assert.deepEqual(resolved.flatMap((section) => section.pages).sort((a, b) => a.id.localeCompare(b.id)), [...sitePages].sort((a, b) => a.id.localeCompare(b.id)));
-  for (const section of resolved) for (const page of section.pages) {
+  assert.throws(() => resolveNavigation(copy), /Catalog page order must match/);
+  const catalogCopy = structuredClone(documentationCatalog);
+  const byId = new Map(catalogCopy.pages.map((page) => [page.id, page]));
+  catalogCopy.pages = copy.sections.flatMap((section) => section.pageIds.map((id) => byId.get(id)));
+  const resolved = validateRouteOrganization(catalogCopy, copy);
+  assert.deepEqual(resolved.map((page) => page.id), copy.sections.flatMap((section) => section.pageIds));
+  assert.deepEqual([...resolved].sort((a, b) => a.id.localeCompare(b.id)), [...sitePages].sort((a, b) => a.id.localeCompare(b.id)));
+  for (const page of resolved) {
     for (const locale of documentationCatalog.locales) assert.equal(getPageBySlug(page.slug[locale]).id, page.id);
+  }
+});
+
+test('canonical route roots and catalog order agree with every navigation section', () => {
+  assert.deepEqual(validateRouteOrganization(), sitePages);
+  assert.deepEqual(sitePages.map((page) => page.id), documentationNavigation.sections.flatMap((section) => section.pageIds));
+  const wrongOrder = structuredClone(documentationCatalog);
+  [wrongOrder.pages[0], wrongOrder.pages[1]] = [wrongOrder.pages[1], wrongOrder.pages[0]];
+  assert.throws(() => validateRouteOrganization(wrongOrder), /Catalog page order must match/);
+  for (const sectionId of ['http', 'orm', 'faker', 'application', 'utilities', 'contribute']) {
+    const copy = structuredClone(documentationCatalog);
+    const pageId = documentationNavigation.sections.find((section) => section.id === sectionId).pageIds[0];
+    const page = copy.pages.find((entry) => entry.id === pageId);
+    for (const locale of copy.locales) page.slug[locale] = `/${locale}/${sectionId}-other/guide`;
+    assert.throws(() => validateRouteOrganization(copy), /Canonical route must belong to navigation section/);
+  }
+});
+
+test('canonical chapter names describe their menu content without redundant index pages', () => {
+  const expected = {
+    'foundation-getting-started': 'getting-started/quick-start',
+    'http-request-lifecycle': 'http/controllers',
+    'http-forms-and-uploads': 'http/requests',
+    'http-requests-and-validation': 'http/validation',
+    'http-middleware-and-security': 'http/middleware',
+    'mcp-servers-and-tools': 'mcp/servers-and-routes',
+    'mcp-resources-and-prompts': 'mcp/resources',
+    'view-configuration-and-extensions': 'views/configuration-and-cache',
+    'database-migrations-and-seeders': 'database/migrations',
+    'orm-factories-and-testing': 'orm/factories',
+    'console-progress-and-debugging': 'console/progress',
+    'container-providers-and-facades': 'application/container/providers',
+    'aio-async-execution': 'application/async',
+  };
+  for (const [id, suffix] of Object.entries(expected)) for (const locale of documentationCatalog.locales) {
+    assert.equal(getPageBySlug(`/${locale}/${suffix}`)?.id, id);
+  }
+  for (const id of ['orm-events-and-scopes', 'aio-overview']) assert.ok(!sitePages.some((page) => page.id === id), id);
+});
+
+test('localized menu names are trimmed and sibling names are distinct', () => {
+  const cases = [
+    [(_, nav) => { nav.bands[0].title.es = ' '; }, /Invalid localized navigation name/],
+    [(_, nav) => { nav.sections[0].title.en += ' '; }, /Invalid localized navigation name/],
+    [(_, nav) => { nav.sections[1].title.es = nav.sections[0].title.es; }, /Duplicate sibling navigation label/],
+    [(_, nav) => { nav.sections[0].groups[1].title.en = nav.sections[0].groups[0].title.en; }, /Duplicate sibling navigation label/],
+    [(catalog) => { catalog.pages[0].label.es = ' Introducción'; }, /Invalid localized navigation name/],
+    [(catalog) => { catalog.pages[1].label.en = catalog.pages[0].label.en; }, /Duplicate sibling navigation label/],
+  ];
+  for (const [mutate, expectedError] of cases) {
+    const catalog = structuredClone(documentationCatalog), nav = structuredClone(documentationNavigation);
+    mutate(catalog, nav);
+    assert.throws(() => validateRouteOrganization(catalog, nav), expectedError);
+  }
+});
+
+test('legacy redirects lead directly to canonical pages without chains, cycles, or shadows', () => {
+  const valid = { 'legacy-start': 'getting-started', 'legacy-contributors': 'contribute/contributors' };
+  assert.deepEqual(validateLegacyRedirects(valid), valid);
+  const cases = [
+    [{ 'legacy-start': 'missing-page' }, /Invalid legacy redirect target/],
+    [{ 'legacy-start': 'legacy-other', 'legacy-other': 'http' }, /Legacy redirect chain or cycle/],
+    [{ 'legacy-start': 'legacy-other', 'legacy-other': 'legacy-start' }, /Legacy redirect chain or cycle/],
+    [{ 'legacy-start': 'legacy-start' }, /Legacy redirect chain or cycle/],
+    [{ http: 'getting-started' }, /Legacy redirect shadows canonical page/],
+    [{ 'contribute/contributors': 'getting-started' }, /Legacy redirect shadows canonical page/],
+    [{ '../outside': 'getting-started' }, /Invalid legacy redirect path/],
+    [{ 'legacy-start': 'https://example.com' }, /Invalid legacy redirect path/],
+  ];
+  for (const [redirects, expectedError] of cases) assert.throws(() => validateLegacyRedirects(redirects), expectedError);
+  const redirects = createRedirects(), sources = new Set(Object.keys(redirects));
+  for (const [source, destination] of Object.entries(redirects)) {
+    assert.ok(!getPageBySlug(source), source);
+    assert.ok(getPageBySlug(destination), destination);
+    assert.ok(!sources.has(destination), `${source} -> ${destination}`);
+  }
+});
+
+test('published addresses remain available after canonical menu reorganization', () => {
+  const redirects = createRedirects();
+  const examples = {
+    'http/request-lifecycle': 'http/controllers',
+    'http/forms-and-uploads': 'http/requests',
+    'http/websockets': 'realtime/websocket',
+    'testing/mcp-testing': 'mcp/testing',
+    'database/orm': 'orm',
+    'database/orm/faker': 'faker',
+    'architecture/service-container': 'application/container',
+    'asynchronous/event-loops': 'application/async',
+    'database/orm/events-and-scopes': 'orm/events',
+    'advanced/introspection': 'utilities/introspection',
+  };
+  for (const locale of documentationCatalog.locales) for (const [oldPath, newPath] of Object.entries(examples)) {
+    assert.equal(redirects[`/${locale}/${oldPath}`], `/${locale}/${newPath}`);
   }
 });
 
 test('utilities provide dedicated helper and metadata groups while retaining existing references', () => {
   const section = navigationSections.find((entry) => entry.id === 'utilities');
-  assert.deepEqual(section.title, { es: 'Utilidades y metadatos', en: 'Utilities and metadata' });
+  assert.deepEqual(section.title, { es: 'Utilidades', en: 'Utilities' });
   assert.deepEqual(section.groups.map((group) => group.id), ['utilities-helpers', 'utilities-metadata', 'utilities-introspection', 'utilities-reference']);
   const helpers = ['collection', 'dot-dict', 'sentinel', 'std-class', 'stringable', 'workers', 'freeze-thaw', 'performance-counter'];
   assert.deepEqual(section.groups[0].pageIds, helpers.map((name) => `helper-${name}`));
@@ -211,7 +309,7 @@ test('the menu makes realtime, MCP, and application services distinct visible ca
   for (const section of navigationSections) for (const locale of documentationCatalog.locales) assert.ok(section.title[locale]);
 });
 
-test('introspection has a complete nine-guide subgroup without losing its previous routes', () => {
+test('introspection has a complete nine-guide subgroup under its canonical root', () => {
   const section = navigationSections.find((item) => item.id === 'utilities');
   const group = section.groups.find((item) => item.id === 'utilities-introspection');
   assert.deepEqual(group.title, { es: 'Introspección', en: 'Introspection' });
@@ -221,7 +319,7 @@ test('introspection has a complete nine-guide subgroup without losing its previo
   assert.ok(references.pageIds.every((id) => !id.startsWith('introspection-')));
   for (const locale of documentationCatalog.locales) {
     for (const suffix of ['overview', 'reflection', 'dependencies-and-discovery']) {
-      const page = getPageBySlug(`/${locale}/advanced/introspection${suffix === 'overview' ? '' : `/${suffix}`}`);
+      const page = getPageBySlug(`/${locale}/utilities/introspection${suffix === 'overview' ? '' : `/${suffix}`}`);
       assert.equal(page.id, `introspection-${suffix}`);
     }
     for (const page of group.pages) assert.equal(getPageBySlug(page.slug[locale]).id, page.id);
@@ -233,7 +331,7 @@ test('retained contribution pages switch languages through their stable IDs', ()
   assert.deepEqual(getTranslations(page.id).map((item) => item.slug), ['/en/contribute/contributors', '/es/contribute/contributors']);
 });
 
-test('Logs has an independent menu and preserves the previous logging URLs', () => {
+test('Logs has an independent menu and coherent logging URLs', () => {
   const logs = navigationSections.find((section) => section.id === 'logging');
   assert.equal(logs.title.es, 'Logs');
   assert.equal(logs.band, 'operate');
@@ -244,7 +342,7 @@ test('Logs has an independent menu and preserves the previous logging URLs', () 
   }
   for (const locale of ['es', 'en']) {
     for (const suffix of ['', '/writing-logs', '/rotation-and-lifecycle']) {
-      assert.ok(logs.pageIds.includes(getPageBySlug(`/${locale}/services/logging${suffix}`).id));
+      assert.ok(logs.pageIds.includes(getPageBySlug(`/${locale}/logging${suffix}`).id));
     }
   }
   assert.equal(navigationSections.find((section) => section.id === 'deployment').title.es, 'Despliegue');
@@ -252,7 +350,7 @@ test('Logs has an independent menu and preserves the previous logging URLs', () 
 
 test('Exceptions has an independent menu while HTTP exceptions retain their specific chapter', () => {
   const exceptions = navigationSections.find((section) => section.id === 'exceptions');
-  assert.equal(exceptions.title.es, 'Exceptions');
+  assert.equal(exceptions.title.es, 'Excepciones');
   assert.equal(exceptions.title.en, 'Exceptions');
   assert.equal(exceptions.band, 'operate');
   assert.deepEqual(exceptions.pageIds, ['failure-overview', 'failure-handling-exceptions', 'failure-contexts-and-transports', 'failure-policies-and-reference']);
@@ -264,7 +362,7 @@ test('Exceptions has an independent menu while HTTP exceptions retain their spec
   assert.equal(navigationSections.find((section) => section.id === 'deployment').title.es, 'Despliegue');
   for (const locale of ['es', 'en']) {
     for (const suffix of ['', '/handling-exceptions', '/policies-and-reference']) {
-      assert.ok(exceptions.pageIds.includes(getPageBySlug(`/${locale}/architecture/exception-handling${suffix}`).id));
+      assert.ok(exceptions.pageIds.includes(getPageBySlug(`/${locale}/exceptions${suffix}`).id));
     }
   }
 });
@@ -280,9 +378,9 @@ test('Deployment exposes preparation and three platform guides as peers in its o
     assert.ok(section.pageIds.every((id) => !deployment.pageIds.includes(id)), section.id);
   }
   for (const locale of ['es', 'en']) {
-    assert.equal(getPageBySlug(`/${locale}/getting-started/deployment-and-reference`).id, 'foundation-deployment-and-reference');
+    assert.equal(getPageBySlug(`/${locale}/deployment`).id, 'foundation-deployment-and-reference');
     for (const platform of ['windows-server', 'linux', 'docker']) {
-      assert.ok(deployment.pageIds.includes(getPageBySlug(`/${locale}/getting-started/deployment/${platform}`).id));
+      assert.ok(deployment.pageIds.includes(getPageBySlug(`/${locale}/deployment/${platform}`).id));
     }
   }
 });
@@ -316,9 +414,9 @@ test('Database, ORM, and Faker have independent trees in data order with stable 
   for (const id of ['orm-overview', 'orm-model-api', 'orm-relationships', 'orm-eager-loading', 'orm-soft-deletes', 'orm-scopes', 'orm-events', 'orm-factories-and-testing']) assert.ok(orm.pageIds.includes(id), id);
   assert.deepEqual(faker.pageIds, ['orm-faker', 'orm-faker-reference-a-d', 'orm-faker-reference-e-h', 'orm-faker-reference-i-l', 'orm-faker-reference-m-p', 'orm-faker-reference-q-t', 'orm-faker-reference-u-z']);
   assert.ok(orm.pageIds.every((id) => !faker.pageIds.includes(id)));
-  assert.ok(database.pages.every((page) => !page.slug.en.includes('/database/orm')));
-  assert.ok(orm.pages.every((page) => page.slug.en.startsWith('/en/database/orm')));
-  assert.ok(faker.pages.every((page) => page.slug.en.startsWith('/en/database/orm/faker')));
+  assert.ok(database.pages.every((page) => !page.slug.en.includes('/orm')));
+  assert.ok(orm.pages.every((page) => page.slug.en.startsWith('/en/orm')));
+  assert.ok(faker.pages.every((page) => page.slug.en.startsWith('/en/faker')));
   const sidebar = createSidebar();
   for (const id of ['database', 'orm', 'faker']) {
     const group = sectionSidebar(sidebar, id);

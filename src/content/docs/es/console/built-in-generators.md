@@ -183,7 +183,7 @@ Crea un controlador resource o invokable.
 
 Por defecto genera `index`, `create`, `store`, `show`, `edit`, `update` y `destroy`. `--invoke` (`False` por defecto) cambia esa estructura por una sola acción `__call__` cuando se activa. `--api` (`False` por defecto) cambia el import y las anotaciones de retorno de `HttpResponse` a `JSONResponse`; se puede combinar con `--invoke`. Las acciones generadas contienen documentación y todavía deben implementarse: la anotación no construye una respuesta ni convierte valores por sí sola.
 
-**Destino predeterminado:** `app/http/request-lifecycle`. Sufijo de clase/archivo: `Controller`.
+**Destino predeterminado:** `app/http/controllers`. Sufijo de clase/archivo: `Controller`.
 
 ```shell
 orionis make:http-controller user --invoke --api
@@ -476,4 +476,4 @@ orionis make:test services/report
 python -B reactor make:test services/report
 ```
 
-La generación prepara código: no registra providers, crea tablas, publica endpoints ni ejecuta jobs por sí misma. Consulta [Controladores](/es/http/request-lifecycle), [Middleware](/es/http/middleware-and-security), [Schemas](/es/validation), [ORM](/es/database/orm), [Mail](/es/services/mail), [Queues](/es/asynchronous/queues), [Realtime](/es/asynchronous/realtime) y [MCP](/es/protocols/mcp) para implementar cada componente.
+La generación prepara código: no registra providers, crea tablas, publica endpoints ni ejecuta jobs por sí misma. Consulta [Controladores](/es/http/controllers), [Middleware](/es/http/middleware), [Schemas](/es/validation), [ORM](/es/orm), [Mail](/es/mail), [Queues](/es/queues), [Realtime](/es/realtime) y [MCP](/es/mcp) para implementar cada componente.

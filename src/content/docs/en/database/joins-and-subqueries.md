@@ -5,7 +5,7 @@ editUrl: true
 lastUpdated: false
 ---
 
-Joins relate SQL sources and return rows from one query. [ORM relationships](/en/database/orm/relationships) describe model associations and loading; they are distinct APIs.
+Joins relate SQL sources and return rows from one query. [ORM relationships](/en/orm/relationships) describe model associations and loading; they are distinct APIs.
 
 Use aliases and qualified names for unambiguous resolution. A subquery accepts a builder, `SelectPlan` or synchronous callback configuring a fresh builder. `selectSub`, `whereExists`, `whereIn`, `joinSub` and `union` share normalization. Plans are incorporated by reference; finish configuring or clone them before reuse.
 
@@ -479,4 +479,4 @@ from orionis.orm.query.join_clause import JoinClause
 query = JoinClause().on("p.category_id", "=", "c.id").conditions()
 ```
 
-[DB facade](/en/database/db-facade) · [ORM queries](/en/database/orm/querying) · [Testing scenario](/en/database/orm/testing)
+[DB facade](/en/database/db-facade) · [ORM queries](/en/orm/querying) · [Testing scenario](/en/orm/testing)

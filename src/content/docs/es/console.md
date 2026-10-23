@@ -7,7 +7,7 @@ lastUpdated: false
 
 La consola de Orionis permite exponer operaciones de tu aplicación como comandos, con argumentos tipados, ayuda, salida interactiva e inyección de dependencias. **Reactor** los ejecuta. El **scheduler** decide cuándo ejecutar comandos programados mediante la fachada pública **`Schedule`**.
 
-`Scheduler` es el nombre habitual de la clase de tu aplicación que extiende `BaseScheduler`; no es el nombre de la fachada exportada. Su configuración pertenece a `config/scheduler.py`. `config/queue.py` configura [Queues](/es/asynchronous/queues), cuyo almacenamiento de jobs y workers tiene un ciclo de vida distinto.
+`Scheduler` es el nombre habitual de la clase de tu aplicación que extiende `BaseScheduler`; no es el nombre de la fachada exportada. Su configuración pertenece a `config/scheduler.py`. `config/queue.py` configura [Queues](/es/queues), cuyo almacenamiento de jobs y workers tiene un ciclo de vida distinto.
 
 ## Ejecutar el CLI
 
@@ -118,8 +118,8 @@ Los eventos de tareas pertenecen al scheduler: una ejecución manual de Reactor 
 | Registrar una clase/método en rutas | [Comandos por rutas](/es/console/command-routing) |
 | Escribir mensajes y tablas | [Texto, tablas y salida](/es/console/console-output) |
 | Solicitar datos al operador | [Preguntas y entrada interactiva](/es/console/interactive-input) |
-| Mostrar avance y gestionar esperas | [Progreso](/es/console/progress-and-debugging) |
-| Ejecutar y consultar comandos desde código | [Fachada Reactor](/es/console/output-and-programmatic-execution) |
+| Mostrar avance y gestionar esperas | [Progreso](/es/console/progress) |
+| Ejecutar y consultar comandos desde código | [Fachada Reactor](/es/console/reactor-and-injection) |
 | Configurar descubrimiento e invalidación | [Caché de comandos](/es/console/command-cache) |
 | Crear el scheduler de aplicación | [Programar tareas](/es/console/task-scheduling) |
 | Programar un comando con argumentos | [Schedule.command()](/es/console/scheduler-execution#schedule-command) |

@@ -163,4 +163,4 @@ orionis schedule:work
 python -B reactor schedule:work
 ```
 
-Consulta [Workers de colas](/es/asynchronous/queues/workers-and-failures), [Reintentos y fallos](/es/asynchronous/queues/failures-and-retries), [Programación de tareas](/es/console/task-scheduling) y [MCP](/es/protocols/mcp) para configurar los servicios y sus componentes.
+Consulta [Workers de colas](/es/queues/workers), [Reintentos y fallos](/es/queues/failures-and-retries), [Programación de tareas](/es/console/task-scheduling) y [MCP](/es/mcp) para configurar los servicios y sus componentes.

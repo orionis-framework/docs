@@ -927,16 +927,16 @@ NATIVE_TEST_FILES = ('tests/introspection/abstract/contracts/test_reflection.py'
  'tests/introspection/test_reflection.py')
 
 CLASS_GUIDES = {
-    "Reflection": ("introspection-reflection", "/advanced/introspection/reflection"),
-    "ReflectionCallable": ("introspection-callables", "/advanced/introspection/callables"),
-    "ReflectionAbstract": ("introspection-abstract-classes", "/advanced/introspection/abstract-classes"),
-    "ReflectionConcrete": ("introspection-concrete-classes", "/advanced/introspection/concrete-classes"),
-    "ReflectionInstance": ("introspection-instances", "/advanced/introspection/instances"),
-    "ReflectDependencies": ("introspection-dependencies-and-discovery", "/advanced/introspection/dependencies-and-discovery"),
-    "Signature": ("introspection-dependencies-and-discovery", "/advanced/introspection/dependencies-and-discovery"),
-    "Argument": ("introspection-dependencies-and-discovery", "/advanced/introspection/dependencies-and-discovery"),
-    "ReflectionModule": ("introspection-modules", "/advanced/introspection/modules"),
-    "ModuleInspector": ("introspection-module-discovery", "/advanced/introspection/module-discovery"),
+    "Reflection": ("introspection-reflection", "/utilities/introspection/reflection"),
+    "ReflectionCallable": ("introspection-callables", "/utilities/introspection/callables"),
+    "ReflectionAbstract": ("introspection-abstract-classes", "/utilities/introspection/abstract-classes"),
+    "ReflectionConcrete": ("introspection-concrete-classes", "/utilities/introspection/concrete-classes"),
+    "ReflectionInstance": ("introspection-instances", "/utilities/introspection/instances"),
+    "ReflectDependencies": ("introspection-dependencies-and-discovery", "/utilities/introspection/dependencies-and-discovery"),
+    "Signature": ("introspection-dependencies-and-discovery", "/utilities/introspection/dependencies-and-discovery"),
+    "Argument": ("introspection-dependencies-and-discovery", "/utilities/introspection/dependencies-and-discovery"),
+    "ReflectionModule": ("introspection-modules", "/utilities/introspection/modules"),
+    "ModuleInspector": ("introspection-module-discovery", "/utilities/introspection/module-discovery"),
 }
 EXPECTED_CLASS_METHOD_COUNTS = {
     "Reflection": 31, "ReflectionCallable": 15, "ReflectionAbstract": 66,
@@ -950,52 +950,52 @@ EXPECTED_EXPORTS = [
 INTEGRATIONS = {
     "orionis/_exports.py": {
         "symbols": ["resolve_export"],
-        "references": ["/advanced/introspection"],
+        "references": ["/utilities/introspection"],
         "purpose": "Curated lazy imports resolve and cache only declared package exports.",
     },
     "orionis/support/entities/base.py": {
         "symbols": ["BaseEntity.getFields", "BaseEntity.toDict"],
-        "references": ["/advanced/introspection/dependencies-and-discovery#signature-method-getfields"],
+        "references": ["/utilities/introspection/dependencies-and-discovery#signature-method-getfields"],
         "purpose": "Signature inherits getFields and overrides toDict with a shallow ordered-argument copy.",
     },
     "orionis/container/container.py": {
         "symbols": ["Container.make", "Container.call", "Container.invoke", "Container.__resolveSignature", "Container.__resolveSchemaArgument", "Container.__resolveArgument"],
-        "references": ["/advanced/introspection/dependencies-and-discovery"],
+        "references": ["/utilities/introspection/dependencies-and-discovery"],
         "purpose": "Actual DI supplies explicit arguments, resolves registered services/defaults and validates HTTP schemas; reflection itself only describes parameters.",
     },
     "orionis/container/entities/invocation.py": {
         "symbols": ["callable_plan", "constructor_plan", "warm_controller_plan"],
-        "references": ["/advanced/introspection/dependencies-and-discovery"],
+        "references": ["/utilities/introspection/dependencies-and-discovery"],
         "purpose": "Invocation plans reuse dependency metadata without retaining receivers and add constructor-local annotation resolution.",
     },
     "orionis/foundation/application.py": {
         "symbols": ["Application.__loadConfig", "Application.__loadProviders", "Application.__loadHTTPKernel", "Application.__resolveAndValidateRoutingFiles"],
-        "references": ["/advanced/introspection/module-discovery"],
+        "references": ["/utilities/introspection/module-discovery"],
         "purpose": "Application configuration discovery uses ModuleInspector for frozen dataclasses.",
     },
     "orionis/console/core/loader.py": {
         "symbols": ["Loader.__loadCustomCommands"],
-        "references": ["/advanced/introspection/module-discovery"],
+        "references": ["/utilities/introspection/module-discovery"],
         "purpose": "Custom command discovery scans module paths, then imports and filters locally declared command classes.",
     },
     "orionis/database/migrations/migrator.py": {
         "symbols": ["Migrator.__discover"],
-        "references": ["/advanced/introspection/modules", "/advanced/introspection/module-discovery"],
+        "references": ["/utilities/introspection/modules", "/utilities/introspection/module-discovery"],
         "purpose": "Migration discovery combines source scanning, module reflection and imported classes.",
     },
     "orionis/database/seeders/runner.py": {
         "symbols": ["SeederRunner.__discover"],
-        "references": ["/advanced/introspection/modules", "/advanced/introspection/module-discovery"],
+        "references": ["/utilities/introspection/modules", "/utilities/introspection/module-discovery"],
         "purpose": "Seeder discovery consumes module discovery/reflection rather than automatic service injection.",
     },
     "orionis/queues/manager.py": {
         "symbols": ["_discover_jobs"],
-        "references": ["/advanced/introspection/module-discovery#moduleinspector-method-discovermodules"],
+        "references": ["/utilities/introspection/module-discovery#moduleinspector-method-discovermodules"],
         "purpose": "Job registration discovers module paths, imports modules and filters locally declared non-abstract BaseJob subclasses; this consumer does not use loadClass.",
     },
     "orionis/realtime/metadata.py": {
         "symbols": ["_method_plan"],
-        "references": ["/advanced/introspection/callables#reflectioncallable-method-getsignature"],
+        "references": ["/utilities/introspection/callables#reflectioncallable-method-getsignature"],
         "purpose": "Realtime separately validates remote parameter annotations after obtaining an inspect.Signature.",
     },
 }
@@ -1080,7 +1080,7 @@ def extract(framework: Path) -> dict:
             item = {"source": source, "symbol": name, "line": node.lineno,
                     "signature": signature(node)}
             if source.endswith("/__init__.py"):
-                plumbing.append({**item, "reference": "/advanced/introspection",
+                plumbing.append({**item, "reference": "/utilities/introspection",
                                  "reason": "Lazy package export hook; not a native reflector method."})
             else:
                 excluded.append({**item, "reason": "Private dependency analysis helper; observable behavior is documented through public reflection methods."})
@@ -1198,11 +1198,11 @@ def extract(framework: Path) -> dict:
         "internalStateExcluded": state,
         "packagePlumbing": plumbing,
         "generatedApi": [
-            {"owner": "Argument", "reference": "/advanced/introspection/dependencies-and-discovery#argument-generated-protocols",
+            {"owner": "Argument", "reference": "/utilities/introspection/dependencies-and-discovery#argument-generated-protocols",
              "decorator": "dataclass(slots=True, kw_only=True, frozen=True)",
              "methods": ["__init__", "__repr__", "__eq__", "__hash__", "__setattr__", "__delattr__", "__replace__", "__getstate__", "__setstate__"],
              "note": "Generated by Python dataclasses; initialization validates through the separately counted explicit __post_init__. Hashing requires hashable field values."},
-            {"owner": "Signature", "reference": "/advanced/introspection/dependencies-and-discovery#signature-generated-protocols",
+            {"owner": "Signature", "reference": "/utilities/introspection/dependencies-and-discovery#signature-generated-protocols",
              "decorator": "dataclass(frozen=True, kw_only=True)",
              "methods": ["__init__", "__repr__", "__eq__", "__hash__", "__setattr__", "__delattr__", "__replace__"],
              "note": "Generated methods are not native source declarations. Frozen fields still contain mutable dictionaries, which also make the generated hash fail for ordinary signatures."},
@@ -1210,7 +1210,7 @@ def extract(framework: Path) -> dict:
         "inheritedApi": [{
             "owner": "Signature", "origin": "orionis.support.entities.base.BaseEntity",
             "methods": ["getFields"],
-            "reference": "/advanced/introspection/dependencies-and-discovery#signature-method-getfields",
+            "reference": "/utilities/introspection/dependencies-and-discovery#signature-method-getfields",
             "note": "Inherited getFields describes dataclass fields; Signature.toDict is an explicit override and is counted among its own methods.",
         }],
         "entries": entries,

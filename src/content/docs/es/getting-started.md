@@ -10,9 +10,9 @@ Construye tu aplicación a partir del esqueleto oficial y añade las funciones q
 ## Tu primera sesión de desarrollo
 
 1. [Instala y crea un proyecto](/es/getting-started/installation): prepara uv y Git, elige un stack y crea el entorno de la aplicación.
-2. [Arranca la aplicación](/es/getting-started/getting-started): ejecuta el servidor desde la raíz del proyecto y abre la URL indicada en consola.
-3. [Configura la aplicación](/es/getting-started/configuration): utiliza `.env` para los valores de cada entorno y `config/` para los ajustes tipados.
-4. [Añade tu primera ruta HTTP](/es/http/routing) y elige entre [plantillas](/es/services/views) y una API JSON.
+2. [Arranca la aplicación](/es/getting-started/quick-start): ejecuta el servidor desde la raíz del proyecto y abre la URL indicada en consola.
+3. [Configura la aplicación](/es/application/configuration): utiliza `.env` para los valores de cada entorno y `config/` para los ajustes tipados.
+4. [Añade tu primera ruta HTTP](/es/http/routing) y elige entre [plantillas](/es/views) y una API JSON.
 5. [Escribe y ejecuta una prueba](/es/testing/writing-and-running-tests) antes de incorporar persistencia, autenticación, trabajos en segundo plano, Realtime o MCP.
 
 Los comandos de las guías de aplicación usan `uv run python -B reactor ...` desde la raíz del proyecto generado. Esta invocación selecciona el entorno de ese proyecto. La invocación independiente `uvx --from orionis-installer ...` sirve para crear un proyecto nuevo.
@@ -34,14 +34,13 @@ Foundation también define entidades congeladas para cada subsistema, metadata c
 ## Recorrido del módulo
 
 - [Arquitectura y ciclo de vida de la aplicación](/es/getting-started/architecture-and-lifecycle)
-- [Ciclo de vida y recursos de aplicación](/es/getting-started/application-lifecycle)
-- [Configuración tipada y valores en ejecución](/es/getting-started/configuration)
-- [Preparar un despliegue](/es/getting-started/deployment-and-reference)
-- [Crear y arrancar una aplicación](/es/getting-started/getting-started)
-- [Directorios y caché de arranque](/es/getting-started/paths-and-caching)
+- [Ciclo de vida y recursos de aplicación](/es/application/lifecycle)
+- [Configuración tipada y valores en ejecución](/es/application/configuration)
+- [Preparar un despliegue](/es/deployment)
+- [Crear y arrancar una aplicación](/es/getting-started/quick-start)
+- [Directorios y caché de arranque](/es/application/paths-and-caching)
 
-Continúa por: [environment](/es/architecture/environment) · [container](/es/architecture/service-container) · [http](/es/http) · [console](/es/console).
+Continúa por: [environment](/es/environment) · [container](/es/application/container) · [http](/es/http) · [console](/es/console).
 
 
 - [Instalación y primer proyecto](/es/getting-started/installation)
-

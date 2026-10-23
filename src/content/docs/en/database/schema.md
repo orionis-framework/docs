@@ -5,7 +5,7 @@ editUrl: true
 lastUpdated: false
 ---
 
-A physical schema describes tables, columns, keys, and indexes. **Defining a model does not create its table.** `Schema` turns a `Blueprint` or `TableDefinition` into connection operations; the ORM shares those metadata for query compilation. Organize persistent changes in [migrations](/en/database/migrations-and-seeders).
+A physical schema describes tables, columns, keys, and indexes. **Defining a model does not create its table.** `Schema` turns a `Blueprint` or `TableDefinition` into connection operations; the ORM shares those metadata for query compilation. Organize persistent changes in [migrations](/en/database/migrations).
 
 ## Creating a table
 
@@ -187,7 +187,7 @@ class ProjectsV1Schema:
     )
 ```
 
-Save the example in database/schemas/projects_v1_schema.py. `TableDefinition` contains the logical name, columns, and constraints. A model metaclass accepts table_definition = ProjectsV1Schema.table_definition. Freeze V1: introduce V2 and another migration to evolve the schema instead of changing an applied migration. Nested directories are created automatically; an existing file raises `FileExistsError` and there is no --force. Names, relative paths, suffixes, and rejections follow the [migration generator](/en/database/migrations-and-seeders#generating-a-migration).
+Save the example in database/schemas/projects_v1_schema.py. `TableDefinition` contains the logical name, columns, and constraints. A model metaclass accepts table_definition = ProjectsV1Schema.table_definition. Freeze V1: introduce V2 and another migration to evolve the schema instead of changing an applied migration. Nested directories are created automatically; an existing file raises `FileExistsError` and there is no --force. Names, relative paths, suffixes, and rejections follow the [migration generator](/en/database/migrations#generating-a-migration).
 
 <a id="blueprint-api"></a>
 
@@ -209,7 +209,7 @@ definitions = table.definitions()
 
 Creation preserves an existing table using checkfirst=True and returns True; it neither compares columns nor updates the structure. `IConnection.createTable`(definition, if_not_exists=False) is the lower level exposing strict creation. The connection prefix applies to structured tables and references; do not duplicate it in name. Raw SQL receives no such transformation.
 
-The code exposes no `Schema.table`, alter, rename, hasTable, or dropIfExists. [Alterations](/en/database/schema-alterations) require explicit backend SQL. See [all types](/en/database/column-types), [modifiers and keys](/en/database/schema-modifiers), and [`TableDefinition`](/en/database/orm/schema-and-type-reference) to complete a declaration.
+The code exposes no `Schema.table`, alter, rename, hasTable, or dropIfExists. [Alterations](/en/database/schema-alterations) require explicit backend SQL. See [all types](/en/database/column-types), [modifiers and keys](/en/database/schema-modifiers), and [`TableDefinition`](/en/orm/schema-and-type-reference) to complete a declaration.
 
 Declaring the same column name more than once causes `Schema` to retain the last definition; it neither creates two columns nor reports a duplicate. Declare each name once to avoid accidentally replacing options.
 

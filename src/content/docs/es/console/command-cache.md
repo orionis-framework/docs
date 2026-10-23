@@ -89,7 +89,7 @@ Los comandos `bootstrap:*` activan un contexto transitorio de recuperación que 
 
 ## API pública del loader
 
-La implementación `orionis.console.core.loader.Loader` utiliza `IApplication`. Para el trabajo habitual usa [Reactor](/es/console/output-and-programmatic-execution); estas operaciones sirven para inspección e integración del registro.
+La implementación `orionis.console.core.loader.Loader` utiliza `IApplication`. Para el trabajo habitual usa [Reactor](/es/console/reactor-and-injection); estas operaciones sirven para inspección e integración del registro.
 
 | Método | Resultado y comportamiento |
 | --- | --- |

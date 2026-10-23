@@ -205,4 +205,4 @@ orionis seed --database sqlite
 python -B reactor seed --database sqlite
 ```
 
-Migration, schema, seeder and factory generators are covered in [Code generators](/en/console/built-in-generators). See the [Database command reference](/en/database/commands) and [Migrations and seeders](/en/database/migrations-and-seeders) for file/table/data design.
+Migration, schema, seeder and factory generators are covered in [Code generators](/en/console/built-in-generators). See the [Database command reference](/en/database/commands) and [Migrations and seeders](/en/database/migrations) for file/table/data design.

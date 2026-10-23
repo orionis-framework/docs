@@ -16,7 +16,7 @@ SOURCE_FILES = ("config/queue.py", "orionis/support/facades/queue.py")
 
 
 def destination(file: str, owner: str, name: str, kind: str) -> str:
-    base = "/asynchronous/queues/"
+    base = "/queues/"
     if file.startswith("orionis/foundation/config/queue") or file == "config/queue.py":
         config_name = "queue" if owner == "BootstrapQueue" else owner.lower()
         return base + "configuration#config-" + config_name
@@ -44,9 +44,9 @@ def destination(file: str, owner: str, name: str, kind: str) -> str:
     if owner == "JobEnvelope":
         return base + "jobs-and-dispatch#job-envelope"
     if owner in {"IWorker", "Worker"}:
-        return base + "workers-and-failures#worker-" + ("construction" if construction else name.lower())
+        return base + "workers#worker-" + ("construction" if construction else name.lower())
     if owner == "WorkerOptions":
-        return base + "workers-and-failures#worker-options"
+        return base + "workers#worker-options"
     if owner == "JobContext":
         return base + "failures-and-retries#job-context" + ("" if construction else "-" + name.lower())
     if owner in {"IFailedJobRepository", "DatabaseFailedJobRepository"}:
@@ -54,7 +54,7 @@ def destination(file: str, owner: str, name: str, kind: str) -> str:
     if owner == "FailedJob":
         return base + "failures-and-retries#failed-job"
     if owner == "ReservedJob":
-        return base + "workers-and-failures#reserved-job"
+        return base + "workers#reserved-job"
     if owner in {"IQueueDriver", "SyncQueueDriver", "DatabaseQueueDriver", "RedisQueueDriver"}:
         return base + "api-reference#driver-" + ("construction" if construction else name.lower())
     if name == "eligible_clauses":

@@ -36,7 +36,7 @@ AUXILIARY_REFERENCES = {
 def reference_for(source: str) -> str:
     """Provide initial mappings; later additions require explicit review."""
     if source.endswith("/clients/mcp.py"):
-        return "/testing/mcp-testing"
+        return "/mcp/testing"
     if source.endswith("/cases/case.py"):
         return "/testing/cases-and-decorators"
     if source.endswith("/commands/make/test.py"):

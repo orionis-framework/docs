@@ -13,11 +13,11 @@ Esta página conecta las referencias completas y describe las herramientas de in
 | --- | --- |
 | `BaseCommand` / `IBaseCommand` | [Estructura, constructor y handle](/es/console/creating-commands#base-command); [getArgument, getArguments y setArguments](/es/console/commands-and-arguments#base-getargument). |
 | `Argument` / `ArgumentAction` | [Declaración, acciones y lectura de argumentos](/es/console/commands-and-arguments). |
-| Reactor / `IReactor` | [command, hasCommand, info y call](/es/console/output-and-programmatic-execution). |
+| Reactor / `IReactor` | [command, hasCommand, info y call](/es/console/reactor-and-injection). |
 | Loader / `ILoader` | [Descubrimiento, persistencia y cuatro métodos](/es/console/command-cache#loader-api). |
 | Builder de comando / `ICommand` | [timestamp, description, arguments y get](/es/console/command-routing#fluent-api). |
-| `Console` / `IConsole` | [Salida](/es/console/console-output), [preguntas](/es/console/interactive-input) y [progreso](/es/console/progress-and-debugging). |
-| Auxiliares de salida y contratos | [Executor y HelpCommand](/es/console/console-output); [ProgressBar](/es/console/progress-and-debugging). |
+| `Console` / `IConsole` | [Salida](/es/console/console-output), [preguntas](/es/console/interactive-input) y [progreso](/es/console/progress). |
+| Auxiliares de salida y contratos | [Executor y HelpCommand](/es/console/console-output); [ProgressBar](/es/console/progress). |
 | `BaseScheduler`, Schedule / `ISchedule` | [Registro](/es/console/task-scheduling), [Schedule.command()](/es/console/scheduler-execution#schedule-command) y [API completa](/es/console/scheduler-execution). |
 | Builder de tarea / `ITask` | [Configuradores y todas las frecuencias](/es/console/scheduler-frequencies). |
 | `ScheduleStore` / `IScheduleStore` | [Stores, drivers y configuración](/es/console/scheduler-configuration). |
@@ -187,7 +187,7 @@ Estas funciones de infraestructura coordinan el arranque y restauran su contexto
 | `stdio.protocol_stdio(arguments: Sequence[str] \| None) -> Generator[None]` | Para `mcp:start`, redirige diagnóstico stdout a stderr conservando el primer writer binario del protocolo; para otros comandos deja la salida normal. |
 | `stdio.protocol_stdout() -> BinaryIO \| None` | Devuelve el writer binario original dentro de ese contexto, o `None`. |
 
-El feedback se omite con redirección/pipes, CI, terminales no aptos y MCP. Los contextos de protocolo no convierten otros comandos en servidores MCP. Consulta [los comandos de transporte](/es/console/built-in-workers) y [Servidores MCP](/es/protocols/mcp) para esa integración.
+El feedback se omite con redirección/pipes, CI, terminales no aptos y MCP. Los contextos de protocolo no convierten otros comandos en servidores MCP. Consulta [los comandos de transporte](/es/console/built-in-workers) y [Servidores MCP](/es/mcp) para esa integración.
 
 <a id="coverage"></a>
 

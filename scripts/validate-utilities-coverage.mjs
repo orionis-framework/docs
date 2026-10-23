@@ -5,15 +5,15 @@ import { navigationSections, sitePages } from '../src/utils/documentation-menu.m
 
 // This list is deliberately independent of the source snapshot and navigation.
 const pages = [
-  ['helper-collection', 'Collection', '/advanced/data-utilities/collection'],
-  ['helper-dot-dict', 'DotDict', '/advanced/data-utilities/dot-dict'],
-  ['helper-sentinel', 'Sentinel', '/advanced/data-utilities/sentinel'],
-  ['helper-std-class', 'StdClass', '/advanced/data-utilities/std-class'],
-  ['helper-stringable', 'Stringable', '/advanced/data-utilities/stringable'],
-  ['helper-workers', 'Workers', '/advanced/data-utilities/workers'],
-  ['helper-freeze-thaw', 'FreezeThaw', '/advanced/data-utilities/freeze-thaw'],
-  ['helper-performance-counter', 'PerformanceCounter', '/advanced/data-utilities/performance-counter'],
-  ['metadata-overview', 'Metadata', '/advanced/framework-metadata'],
+  ['helper-collection', 'Collection', '/utilities/helpers/collection'],
+  ['helper-dot-dict', 'DotDict', '/utilities/helpers/dot-dict'],
+  ['helper-sentinel', 'Sentinel', '/utilities/helpers/sentinel'],
+  ['helper-std-class', 'StdClass', '/utilities/helpers/std-class'],
+  ['helper-stringable', 'Stringable', '/utilities/helpers/stringable'],
+  ['helper-workers', 'Workers', '/utilities/helpers/workers'],
+  ['helper-freeze-thaw', 'FreezeThaw', '/utilities/helpers/freeze-thaw'],
+  ['helper-performance-counter', 'PerformanceCounter', '/utilities/helpers/performance-counter'],
+  ['metadata-overview', 'Metadata', '/utilities/metadata'],
 ];
 const nativeSources = [
   'orionis/support/types/collection.py', 'orionis/support/types/stringable.py',

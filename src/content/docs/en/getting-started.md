@@ -10,9 +10,9 @@ Build your application from the official skeleton, then add the features your pr
 ## Your first development session
 
 1. [Install and create a project](/en/getting-started/installation): prepare uv and Git, choose a stack, and create the application's environment.
-2. [Start the application](/en/getting-started/getting-started): run the server from the project root and open the URL shown in the console.
-3. [Configure the application](/en/getting-started/configuration): use `.env` for deployment values and `config/` for typed settings.
-4. [Add your first HTTP route](/en/http/routing), then choose [templates](/en/services/views) or a JSON API.
+2. [Start the application](/en/getting-started/quick-start): run the server from the project root and open the URL shown in the console.
+3. [Configure the application](/en/application/configuration): use `.env` for deployment values and `config/` for typed settings.
+4. [Add your first HTTP route](/en/http/routing), then choose [templates](/en/views) or a JSON API.
 5. [Write and run a test](/en/testing/writing-and-running-tests) before adding persistence, authentication, background jobs, Realtime, or MCP.
 
 Commands in the application guides use `uv run python -B reactor ...` from the generated project root. This selects that project's environment. The separate `uvx --from orionis-installer ...` invocation creates a new project.
@@ -34,14 +34,13 @@ Foundation also defines frozen configuration entities for every major subsystem,
 ## Module learning path
 
 - [Application architecture and lifecycle](/en/getting-started/architecture-and-lifecycle)
-- [Application lifecycle and resource ownership](/en/getting-started/application-lifecycle)
-- [Typed configuration and runtime values](/en/getting-started/configuration)
-- [Prepare a deployment](/en/getting-started/deployment-and-reference)
-- [Creating and starting an application](/en/getting-started/getting-started)
-- [Directories and bootstrap caching](/en/getting-started/paths-and-caching)
+- [Application lifecycle and resource ownership](/en/application/lifecycle)
+- [Typed configuration and runtime values](/en/application/configuration)
+- [Prepare a deployment](/en/deployment)
+- [Creating and starting an application](/en/getting-started/quick-start)
+- [Directories and bootstrap caching](/en/application/paths-and-caching)
 
-Continue with: [environment](/en/architecture/environment) · [container](/en/architecture/service-container) · [http](/en/http) · [console](/en/console).
+Continue with: [environment](/en/environment) · [container](/en/application/container) · [http](/en/http) · [console](/en/console).
 
 
 - [Installation and your first project](/en/getting-started/installation)
-

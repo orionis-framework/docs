@@ -470,7 +470,7 @@
       "kind": "class",
       "line": 20,
       "signature": "class McpTestResponse",
-      "reference": "/testing/mcp-testing"
+      "reference": "/mcp/testing"
     },
     {
       "source": "orionis/test/clients/mcp.py",
@@ -478,7 +478,7 @@
       "kind": "field",
       "line": 23,
       "signature": "message: dict[str, Any]",
-      "reference": "/testing/mcp-testing"
+      "reference": "/mcp/testing"
     },
     {
       "source": "orionis/test/clients/mcp.py",
@@ -486,7 +486,7 @@
       "kind": "field",
       "line": 24,
       "signature": "notifications: tuple[dict[str, object], ...] = ()",
-      "reference": "/testing/mcp-testing"
+      "reference": "/mcp/testing"
     },
     {
       "source": "orionis/test/clients/mcp.py",
@@ -494,7 +494,7 @@
       "kind": "method",
       "line": 26,
       "signature": "assertOk(self) -> None",
-      "reference": "/testing/mcp-testing",
+      "reference": "/mcp/testing",
       "decorators": []
     },
     {
@@ -503,7 +503,7 @@
       "kind": "method",
       "line": 42,
       "signature": "assertTextContains(self, text: str) -> None",
-      "reference": "/testing/mcp-testing",
+      "reference": "/mcp/testing",
       "decorators": []
     },
     {
@@ -512,7 +512,7 @@
       "kind": "class",
       "line": 61,
       "signature": "class McpTestClient",
-      "reference": "/testing/mcp-testing"
+      "reference": "/mcp/testing"
     },
     {
       "source": "orionis/test/clients/mcp.py",
@@ -520,7 +520,7 @@
       "kind": "constructor",
       "line": 66,
       "signature": "__init__(self, app: IContainer, server: type[Server] | CompiledMcpServer, config: McpConfig | None=None) -> None",
-      "reference": "/testing/mcp-testing",
+      "reference": "/mcp/testing",
       "decorators": []
     },
     {
@@ -529,7 +529,7 @@
       "kind": "method",
       "line": 103,
       "signature": "async stream(self, method: str, params: dict[str, object] | None=None, *, meta: dict[str, object] | None=None, request_id: str | int=1) -> AsyncIterator[dict[str, object]]",
-      "reference": "/testing/mcp-testing",
+      "reference": "/mcp/testing",
       "decorators": []
     },
     {
@@ -538,7 +538,7 @@
       "kind": "method",
       "line": 158,
       "signature": "async request(self, method: str, params: dict[str, object] | None=None, *, meta: dict[str, object] | None=None, request_id: str | int=1) -> McpTestResponse",
-      "reference": "/testing/mcp-testing",
+      "reference": "/mcp/testing",
       "decorators": []
     },
     {
@@ -547,7 +547,7 @@
       "kind": "method",
       "line": 199,
       "signature": "async tool(self, name: str, arguments: dict[str, object] | None=None) -> McpTestResponse",
-      "reference": "/testing/mcp-testing",
+      "reference": "/mcp/testing",
       "decorators": []
     },
     {

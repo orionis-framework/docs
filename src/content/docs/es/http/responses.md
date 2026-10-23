@@ -352,7 +352,7 @@ Route.get("/responses/product-page", product_page)
 
 Los argumentos con nombre son contexto: `response.view("page", status_code=201)` pasa una variable a la plantilla; no configura el estado HTTP. Para cambiarlo, espera la respuesta y asigna `result.status_code = 201` antes de devolverla. Esperar dos veces el mismo pendiente vuelve a renderizarlo.
 
-Consulta [vistas y renderizado](/es/services/views/rendering-templates) para nombres de plantilla, configuración y helpers de formularios.
+Consulta [vistas y renderizado](/es/views/rendering-templates) para nombres de plantilla, configuración y helpers de formularios.
 
 ## Redirecciones y datos flash
 
@@ -406,7 +406,7 @@ Regístralo en `routes/web.py` y utiliza tu ruta GET `/profile` para presentar e
 | `withErrors(errors)` | Normaliza errores de un mapping o de una excepción de validación. |
 | `getFlashData()` | Consulta el diccionario encolado, o `None` si no hay datos. |
 
-El middleware de sesión aplica el estado antes de entregar la respuesta; sin ese ciclo de sesión no hay persistencia flash. `withInput()` excluye nombres sensibles conocidos de primer nivel, como `password`; no filtra recursivamente todos los secretos posibles. Consulta [sesión y datos flash](/es/http/sessions/state-and-flash).
+El middleware de sesión aplica el estado antes de entregar la respuesta; sin ese ciclo de sesión no hay persistencia flash. `withInput()` excluye nombres sensibles conocidos de primer nivel, como `password`; no filtra recursivamente todos los secretos posibles. Consulta [sesión y datos flash](/es/sessions/state-and-flash).
 
 ## Cabeceras y estado de la respuesta
 
@@ -498,11 +498,11 @@ curl -i -X POST http://localhost:8000/responses/preferences
 
 `withCookies(mapping)` acepta un valor de texto por nombre o un mapping con las opciones de `setCookie`. Cada cookie produce una cabecera independiente.
 
-`deleteCookie(key, *, path="/", domain=None)` y su variante fluida `withoutCookie(...)` emiten expiración pasada y `Max-Age=0`. Usa el path y domain con los que se creó la cookie. La respuesta emite los atributos solicitados; el almacenamiento y las reglas de aceptación corresponden al cliente. Para estado de aplicación gestionado en el servidor, consulta [sesiones](/es/http/sessions).
+`deleteCookie(key, *, path="/", domain=None)` y su variante fluida `withoutCookie(...)` emiten expiración pasada y `Max-Age=0`. Usa el path y domain con los que se creó la cookie. La respuesta emite los atributos solicitados; el almacenamiento y las reglas de aceptación corresponden al cliente. Para estado de aplicación gestionado en el servidor, consulta [sesiones](/es/sessions).
 
 ## Archivos y descargas
 
-Utiliza la fachada `Storage` para obtener los archivos desde los discos configurados y entregar su contenido mediante `response.stream()`. La ruta `reports/users.csv` es relativa al disco `local`, definido en `config/filesystems.py`; consulta [Storage](/es/services/storage).
+Utiliza la fachada `Storage` para obtener los archivos desde los discos configurados y entregar su contenido mediante `response.stream()`. La ruta `reports/users.csv` es relativa al disco `local`, definido en `config/filesystems.py`; consulta [Storage](/es/storage).
 
 El helper `prepare_report()` crea el archivo de demostración. Ejecútalo con `await prepare_report()` desde un comando o método asíncrono de la aplicación iniciada antes de probar las rutas:
 
@@ -648,7 +648,7 @@ La respuesta configura `text/event-stream; charset=utf-8` y, si no existen, `Cac
 
 SSE observa la desconexión del cliente, cancela la entrega y espera la limpieza del productor. En ASGI toma control del canal receive durante el envío: lee en el handler los datos de petición que necesites antes de devolver el stream.
 
-El ejemplo es finito. Los campos id y retry no implementan por sí mismos almacenamiento, replay ni un productor de heartbeat; los comentarios pueden utilizarse para emitir esos mensajes explícitamente. Consulta [streaming y SSE](/es/http/streaming-and-sse) para clientes y cancelación.
+El ejemplo es finito. Los campos id y retry no implementan por sí mismos almacenamiento, replay ni un productor de heartbeat; los comentarios pueden utilizarse para emitir esos mensajes explícitamente. Consulta [streaming y SSE](/es/realtime/streaming-and-sse) para clientes y cancelación.
 
 ## Trabajo después de enviar la respuesta
 
@@ -682,7 +682,7 @@ Route.get("/responses/background/multiple", multiple_background)
 
 El adaptador espera el trabajo después de una entrega correcta y del cierre del stream. `BackgroundTasks` ejecuta sus tareas en orden y se detiene si una falla. Los errores ocurridos después del envío no cambian el estado que ya recibió el cliente.
 
-El trabajo sigue dentro del ciclo de la petición y retrasa su finalización. No es una cola persistente ni una tarea desvinculada: una desconexión SSE, un envío fallido o la caída del proceso pueden impedirlo. Para ejecución persistente, consulta [colas y jobs](/es/asynchronous/queues).
+El trabajo sigue dentro del ciclo de la petición y retrasa su finalización. No es una cola persistente ni una tarea desvinculada: una desconexión SSE, un envío fallido o la caída del proceso pueden impedirlo. Para ejecución persistente, consulta [colas y jobs](/es/queues).
 
 El adaptador llama a `await result.runBackground()`; no lo invoques de nuevo dentro del controlador si quieres conservar ese momento de ejecución.
 
@@ -741,7 +741,7 @@ El flujo es el mismo para funciones y controladores:
 5. Tras una entrega correcta y su limpieza, espera el background.
 6. Finalmente, el kernel cierra Request, sale del scope del contenedor y libera la capacidad de esa petición.
 
-Las [opciones de middleware](/es/http/middleware-and-security) permiten modificar la respuesta antes de enviarla. Después de iniciar el envío, no se pueden sustituir sus cabeceras o estado desde el productor.
+Las [opciones de middleware](/es/http/middleware) permiten modificar la respuesta antes de enviarla. Después de iniciar el envío, no se pueden sustituir sus cabeceras o estado desde el productor.
 
 ### HEAD y metadatos de transporte
 

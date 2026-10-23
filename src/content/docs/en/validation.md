@@ -96,7 +96,7 @@ See the format of `errors`, `failures` and messages in [Validation and errors](/
 3. [Complete native constraints and rules reference](/en/validation/constraints-and-reference): signatures, parameters, accepted values, and examples for all 47 public declarations.
 4. [Application rules and custom rules](/en/validation/application-rules): the asynchronous contract, I/O, and reuse.
 5. [Validation and errors](/en/validation/validation-and-errors): asynchronous execution, collections, failures, and messages.
-6. [Schemas in HTTP controllers](/en/validation/controllers-and-http): automatic input validation, HTTP errors and schemas as responses. The [HTTP introduction](/en/http/requests-and-validation) summarizes this integration.
+6. [Schemas in HTTP controllers](/en/validation/controllers-and-http): automatic input validation, HTTP errors and schemas as responses. The [HTTP introduction](/en/http/validation) summarizes this integration.
 
 File, network and database rules need the context or services described in their reference. A schema does not configure those services itself.
 

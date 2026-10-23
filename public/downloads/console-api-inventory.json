@@ -1029,7 +1029,7 @@
       "kind": "class",
       "line": 8,
       "signature": "class IReactor",
-      "reference": "/console/output-and-programmatic-execution#reactor-construction"
+      "reference": "/console/reactor-and-injection#reactor-construction"
     },
     {
       "source": "orionis/console/core/contracts/reactor.py",
@@ -1037,7 +1037,7 @@
       "kind": "method",
       "line": 11,
       "signature": "command(self, signature: str, handler: list[type[Any] | str | None] | str) -> ICommand",
-      "reference": "/console/output-and-programmatic-execution#reactor-command"
+      "reference": "/console/reactor-and-injection#reactor-command"
     },
     {
       "source": "orionis/console/core/contracts/reactor.py",
@@ -1045,7 +1045,7 @@
       "kind": "method",
       "line": 33,
       "signature": "async hasCommand(self, signature: str) -> bool",
-      "reference": "/console/output-and-programmatic-execution#reactor-hascommand"
+      "reference": "/console/reactor-and-injection#reactor-hascommand"
     },
     {
       "source": "orionis/console/core/contracts/reactor.py",
@@ -1053,7 +1053,7 @@
       "kind": "method",
       "line": 49,
       "signature": "async info(self) -> list[dict]",
-      "reference": "/console/output-and-programmatic-execution#reactor-info"
+      "reference": "/console/reactor-and-injection#reactor-info"
     },
     {
       "source": "orionis/console/core/contracts/reactor.py",
@@ -1061,7 +1061,7 @@
       "kind": "method",
       "line": 64,
       "signature": "async call(self, signature: str, args: list[str] | None=None) -> int",
-      "reference": "/console/output-and-programmatic-execution#reactor-call"
+      "reference": "/console/reactor-and-injection#reactor-call"
     },
     {
       "source": "orionis/console/core/loader.py",
@@ -1117,7 +1117,7 @@
       "kind": "class",
       "line": 19,
       "signature": "class Reactor",
-      "reference": "/console/output-and-programmatic-execution#reactor-construction"
+      "reference": "/console/reactor-and-injection#reactor-construction"
     },
     {
       "source": "orionis/console/core/reactor.py",
@@ -1125,7 +1125,7 @@
       "kind": "method",
       "line": 23,
       "signature": "__init__(self, app: IApplication, loader: Loader, executer: Executor, logger: ILogger, catch: ICatch, performance_counter: PerformanceCounter) -> None",
-      "reference": "/console/output-and-programmatic-execution#reactor-construction"
+      "reference": "/console/reactor-and-injection#reactor-construction"
     },
     {
       "source": "orionis/console/core/reactor.py",
@@ -1133,7 +1133,7 @@
       "kind": "method",
       "line": 156,
       "signature": "command(self, signature: str, handler: list[type[Any] | str | None] | str) -> ICommand",
-      "reference": "/console/output-and-programmatic-execution#reactor-command"
+      "reference": "/console/reactor-and-injection#reactor-command"
     },
     {
       "source": "orionis/console/core/reactor.py",
@@ -1141,7 +1141,7 @@
       "kind": "method",
       "line": 183,
       "signature": "async hasCommand(self, signature: str) -> bool",
-      "reference": "/console/output-and-programmatic-execution#reactor-hascommand"
+      "reference": "/console/reactor-and-injection#reactor-hascommand"
     },
     {
       "source": "orionis/console/core/reactor.py",
@@ -1149,7 +1149,7 @@
       "kind": "method",
       "line": 199,
       "signature": "async info(self) -> list[dict]",
-      "reference": "/console/output-and-programmatic-execution#reactor-info"
+      "reference": "/console/reactor-and-injection#reactor-info"
     },
     {
       "source": "orionis/console/core/reactor.py",
@@ -1157,7 +1157,7 @@
       "kind": "method",
       "line": 244,
       "signature": "async call(self, signature: str, args: list[str] | None=None) -> int",
-      "reference": "/console/output-and-programmatic-execution#reactor-call"
+      "reference": "/console/reactor-and-injection#reactor-call"
     },
     {
       "source": "orionis/console/dynamic/contracts/progress_bar.py",
@@ -1165,7 +1165,7 @@
       "kind": "class",
       "line": 4,
       "signature": "class IProgressBar",
-      "reference": "/console/progress-and-debugging#progress-bar"
+      "reference": "/console/progress#progress-bar"
     },
     {
       "source": "orionis/console/dynamic/contracts/progress_bar.py",
@@ -1173,7 +1173,7 @@
       "kind": "method",
       "line": 7,
       "signature": "start(self) -> None",
-      "reference": "/console/progress-and-debugging#progress-bar-start"
+      "reference": "/console/progress#progress-bar-start"
     },
     {
       "source": "orionis/console/dynamic/contracts/progress_bar.py",
@@ -1181,7 +1181,7 @@
       "kind": "method",
       "line": 20,
       "signature": "advance(self, increment: int=1) -> None",
-      "reference": "/console/progress-and-debugging#progress-bar-advance"
+      "reference": "/console/progress#progress-bar-advance"
     },
     {
       "source": "orionis/console/dynamic/contracts/progress_bar.py",
@@ -1189,7 +1189,7 @@
       "kind": "method",
       "line": 43,
       "signature": "finish(self) -> None",
-      "reference": "/console/progress-and-debugging#progress-bar-finish"
+      "reference": "/console/progress#progress-bar-finish"
     },
     {
       "source": "orionis/console/dynamic/progress_bar.py",
@@ -1197,7 +1197,7 @@
       "kind": "class",
       "line": 5,
       "signature": "class ProgressBar",
-      "reference": "/console/progress-and-debugging#progress-bar"
+      "reference": "/console/progress#progress-bar"
     },
     {
       "source": "orionis/console/dynamic/progress_bar.py",
@@ -1205,7 +1205,7 @@
       "kind": "method",
       "line": 7,
       "signature": "__init__(self, total: int=100, width: int=50) -> None",
-      "reference": "/console/progress-and-debugging#progress-bar-construction"
+      "reference": "/console/progress#progress-bar-construction"
     },
     {
       "source": "orionis/console/dynamic/progress_bar.py",
@@ -1213,7 +1213,7 @@
       "kind": "method",
       "line": 62,
       "signature": "start(self) -> None",
-      "reference": "/console/progress-and-debugging#progress-bar-start"
+      "reference": "/console/progress#progress-bar-start"
     },
     {
       "source": "orionis/console/dynamic/progress_bar.py",
@@ -1221,7 +1221,7 @@
       "kind": "method",
       "line": 79,
       "signature": "advance(self, increment: int=1) -> None",
-      "reference": "/console/progress-and-debugging#progress-bar-advance"
+      "reference": "/console/progress#progress-bar-advance"
     },
     {
       "source": "orionis/console/dynamic/progress_bar.py",
@@ -1229,7 +1229,7 @@
       "kind": "method",
       "line": 104,
       "signature": "finish(self) -> None",
-      "reference": "/console/progress-and-debugging#progress-bar-finish"
+      "reference": "/console/progress#progress-bar-finish"
     },
     {
       "source": "orionis/console/entities/command.py",
@@ -3741,7 +3741,7 @@
       "kind": "method",
       "line": 25,
       "signature": "progressBar(self) -> IProgressBar",
-      "reference": "/console/progress-and-debugging#console-progressbar"
+      "reference": "/console/progress#console-progressbar"
     },
     {
       "source": "orionis/console/output/console.py",
@@ -3997,7 +3997,7 @@
       "kind": "method",
       "line": 999,
       "signature": "async sleep(self, seconds: float) -> None",
-      "reference": "/console/progress-and-debugging#console-sleep"
+      "reference": "/console/progress#console-sleep"
     },
     {
       "source": "orionis/console/output/contracts/console.py",
@@ -4013,7 +4013,7 @@
       "kind": "method",
       "line": 15,
       "signature": "progressBar(self) -> IProgressBar",
-      "reference": "/console/progress-and-debugging#console-progressbar"
+      "reference": "/console/progress#console-progressbar"
     },
     {
       "source": "orionis/console/output/contracts/console.py",
@@ -4269,7 +4269,7 @@
       "kind": "method",
       "line": 681,
       "signature": "async sleep(self, seconds: float) -> None",
-      "reference": "/console/progress-and-debugging#console-sleep"
+      "reference": "/console/progress#console-sleep"
     },
     {
       "source": "orionis/console/output/contracts/executor.py",

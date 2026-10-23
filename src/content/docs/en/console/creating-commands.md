@@ -70,7 +70,7 @@ The first invocation prints two greetings. `--times 0` returns `2`; a valid invo
 
 ## Structure and discovery
 
-Import `BaseCommand` from `orionis.console.base`. It extends `Console` and the `IBaseCommand` contract: inside a command, use `self.writeLine()`, `self.table()`, `self.ask()` and the other [output](/en/console/console-output) and [question](/en/console/interactive-input) methods. For [progress](/en/console/progress-and-debugging), the inherited `self.progressBar` property provides a bar; retain that instance before updating it. You do not need another `Console` instance or a `ProgressBar` import inside a command.
+Import `BaseCommand` from `orionis.console.base`. It extends `Console` and the `IBaseCommand` contract: inside a command, use `self.writeLine()`, `self.table()`, `self.ask()` and the other [output](/en/console/console-output) and [question](/en/console/interactive-input) methods. For [progress](/en/console/progress), the inherited `self.progressBar` property provides a bar; retain that instance before updating it. You do not need another `Console` instance or a `ProgressBar` import inside a command.
 
 | Member | Type and default | Purpose |
 | --- | --- | --- |
@@ -193,4 +193,4 @@ python -B reactor app:parse-count 0
 
 The first invocation returns `2` from the command. The second reaches Reactor's exception flow: it logs, delegates to `ICatch` and returns `1` if that handling completes successfully. Catching an error without returning a nonzero code can make the command appear successful.
 
-For ordinary command completion, return the code from `handle()`; `exitSuccess()` and `exitError()` are [process termination operations](/en/console/console-output) with different effects. Help and parser errors use `SystemExit`; see [programmatic execution](/en/console/output-and-programmatic-execution) before handling them from another component.
+For ordinary command completion, return the code from `handle()`; `exitSuccess()` and `exitError()` are [process termination operations](/en/console/console-output) with different effects. Help and parser errors use `SystemExit`; see [programmatic execution](/en/console/reactor-and-injection) before handling them from another component.

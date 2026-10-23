@@ -5,7 +5,7 @@ editUrl: true
 lastUpdated: false
 ---
 
-Builder writes operate on row sets. They return `InsertResult` or counts and do not create or save each [model instance](/en/database/orm/model-api).
+Builder writes operate on row sets. They return `InsertResult` or counts and do not create or save each [model instance](/en/orm/model-api).
 
 `update()` and `delete()` construct plans containing the table and its `where` conditions. Joins, ordering, limits and offset are not transferred. `limit(1).delete()` **does not restrict deletion to one row**. The plan also omits the table alias: a WHERE qualified with that alias may fail during a write; use an unaliased target-table column. Select an explicit key or key set in `where` to delimit a write.
 
@@ -140,4 +140,4 @@ async def run_example():
 
 **Errors:** `QueryException` on compilation/execution failure; the connection layer sanitizes messages and suppresses chained driver causes.
 
-[DB facade](/en/database/db-facade) · [ORM queries](/en/database/orm/querying) · [Testing scenario](/en/database/orm/testing)
+[DB facade](/en/database/db-facade) · [ORM queries](/en/orm/querying) · [Testing scenario](/en/orm/testing)

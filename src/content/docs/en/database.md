@@ -5,7 +5,7 @@ editUrl: true
 lastUpdated: false
 ---
 
-Database manages named SQL connections and provides query, transaction, schema, migration and seeder infrastructure. You can execute SQL, use the query builder or work with [ORM](/en/database/orm) models. All three alternatives share the manager and transactions.
+Database manages named SQL connections and provides query, transaction, schema, migration and seeder infrastructure. You can execute SQL, use the query builder or work with [ORM](/en/orm) models. All three alternatives share the manager and transactions.
 
 Await I/O operations with `await`. Selecting a connection, building a query and defining a table are synchronous operations; terminal operations such as `get()` or `insert()` execute SQL.
 
@@ -42,7 +42,7 @@ flowchart TD
 
 ## First query from a controller
 
-Configure a connection and create tables through [migrations](/en/database/migrations-and-seeders). This example assumes a `notes` table with `id` and `body` columns. Register the controller through [HTTP routes](/en/http/routing):
+Configure a connection and create tables through [migrations](/en/database/migrations). This example assumes a `notes` table with `id` and `body` columns. Register the controller through [HTTP routes](/en/http/routing):
 
 ```python
 from orionis.http import JSONResponse
@@ -83,8 +83,8 @@ Import the facade from `orionis.support.facades`. Application boot registers its
 - [SQL and results](/en/database/raw-queries): bindings, return values and errors.
 - [Query builder](/en/database/query-builder): model-less queries.
 - [Transactions](/en/database/transactions): contexts, savepoints and concurrency.
-- [Schemas](/en/database/schema), [migrations and seeders](/en/database/migrations-and-seeders).
+- [Schemas](/en/database/schema), [migrations and seeders](/en/database/migrations).
 - [Dialects and production](/en/database/dialects-and-production).
 - [Connection and compilation API](/en/database/runtime-api).
 
-Use `DB` without model instances; its builder returns collections of dictionaries and does not dispatch model events. Use the [ORM](/en/database/orm) for entity state, casts, scopes, events, relationships and factories.
+Use `DB` without model instances; its builder returns collections of dictionaries and does not dispatch model events. Use the [ORM](/en/orm) for entity state, casts, scopes, events, relationships and factories.

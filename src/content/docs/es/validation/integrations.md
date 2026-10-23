@@ -112,7 +112,7 @@ Mcp.local("contacts", ContactServer)
 
 Un cliente llama a `contact-preview` con `arguments` como `{"email": "ada@example.com"}`. El tool recibe un `ContactSchema` y produce `structuredContent` con esos datos. No devuelve un Schema directamente: `McpResponse.structured` lo normaliza como contenido MCP.
 
-Consulta [servidores y tools MCP](/es/protocols/mcp/servers-and-tools) y [transportes y configuración](/es/protocols/mcp/transports-and-configuration) para integrar este registro con el arranque y conectar un cliente.
+Consulta [servidores y tools MCP](/es/mcp/servers-and-routes) y [transportes y configuración](/es/mcp/stdio-and-configuration) para integrar este registro con el arranque y conectar un cliente.
 
 Cuando el input y el output son clases Orionis Schema, ambas conversiones esperan las reglas asíncronas. El output declarado se comprueba antes de publicar un resultado exitoso. Los errores se expresan en el resultado MCP:
 
@@ -191,7 +191,7 @@ Un resultado válido contiene `{"type": "completion", "id": "preview-1", "result
 
 El retorno Schema es serializable mediante el codec de la conexión, pero `-> ContactSchema` no activa validación de salida. Si necesitas comprobar datos producidos por el método, valida explícitamente antes de devolverlos.
 
-Consulta [hubs y métodos](/es/asynchronous/realtime/hubs-and-methods) y [protocolo y streaming](/es/asynchronous/realtime/protocol-and-streaming) para el montaje de la conexión y el resto del intercambio de mensajes.
+Consulta [hubs y métodos](/es/realtime/hubs-and-methods) y [protocolo y streaming](/es/realtime/protocol-and-streaming) para el montaje de la conexión y el resto del intercambio de mensajes.
 
 ## WebSocket: validar el mensaje explícitamente
 

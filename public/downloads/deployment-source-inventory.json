@@ -4,7 +4,7 @@
   "areas": [
     {
       "area": "application-entrypoints-and-bootstrap",
-      "reference": "/getting-started/deployment-and-reference",
+      "reference": "/deployment",
       "sources": [
         "bootstrap/app.py",
         "orionis/foundation/application.py"
@@ -12,7 +12,7 @@
     },
     {
       "area": "python-and-server-dependencies",
-      "reference": "/getting-started/deployment-and-reference",
+      "reference": "/deployment",
       "sources": [
         "pyproject.toml",
         ".python-version"
@@ -20,14 +20,14 @@
     },
     {
       "area": "native-serve-command",
-      "reference": "/getting-started/deployment-and-reference",
+      "reference": "/deployment",
       "sources": [
         "orionis/console/commands/serve/serve.py"
       ]
     },
     {
       "area": "environment-and-key",
-      "reference": "/getting-started/deployment-and-reference",
+      "reference": "/deployment",
       "sources": [
         "config/app.py",
         "orionis/environment/core/dot_env.py",
@@ -37,21 +37,21 @@
     },
     {
       "area": "bootstrap-cache-invalidation",
-      "reference": "/getting-started/deployment-and-reference",
+      "reference": "/deployment",
       "sources": [
         "orionis/console/commands/support/optimize_clear.py"
       ]
     },
     {
       "area": "public-disk",
-      "reference": "/getting-started/deployment-and-reference",
+      "reference": "/deployment",
       "sources": [
         "config/filesystems.py"
       ]
     },
     {
       "area": "maintenance",
-      "reference": "/getting-started/deployment-and-reference",
+      "reference": "/deployment",
       "sources": [
         "orionis/console/commands/support/maintenance.py",
         "orionis/console/commands/support/down.py",
@@ -60,7 +60,7 @@
     },
     {
       "area": "migration-cli",
-      "reference": "/getting-started/deployment-and-reference",
+      "reference": "/deployment",
       "sources": [
         "orionis/console/commands/migrate/base.py",
         "orionis/console/commands/migrate/migrate.py",
@@ -69,14 +69,14 @@
     },
     {
       "area": "session-persistence",
-      "reference": "/getting-started/deployment-and-reference",
+      "reference": "/deployment",
       "sources": [
         "config/session.py"
       ]
     },
     {
       "area": "trusted-proxies",
-      "reference": "/getting-started/deployment/reverse-proxies",
+      "reference": "/deployment/reverse-proxies",
       "sources": [
         "orionis/http/layer/shared/proxies.py",
         "orionis/foundation/config/http/entitites/proxies.py",
@@ -85,14 +85,14 @@
     },
     {
       "area": "request-client-and-url",
-      "reference": "/getting-started/deployment/reverse-proxies",
+      "reference": "/deployment/reverse-proxies",
       "sources": [
         "orionis/http/request.py"
       ]
     },
     {
       "area": "http-security-and-payload-limits",
-      "reference": "/getting-started/deployment/reverse-proxies",
+      "reference": "/deployment/reverse-proxies",
       "sources": [
         "orionis/http/kernel.py",
         "orionis/foundation/config/http/entitites/body.py",
@@ -101,14 +101,14 @@
     },
     {
       "area": "websocket-origins",
-      "reference": "/getting-started/deployment/reverse-proxies",
+      "reference": "/deployment/reverse-proxies",
       "sources": [
         "orionis/foundation/config/http/entitites/websocket.py"
       ]
     },
     {
       "area": "health-and-default-responses",
-      "reference": "/http/default-responses",
+      "reference": "/deployment/health-and-default-responses",
       "sources": [
         "orionis/http/default/responses.py",
         "orionis/http/routes/router.py"
@@ -116,14 +116,14 @@
     },
     {
       "area": "native-serve-tests",
-      "reference": "/getting-started/deployment-and-reference",
+      "reference": "/deployment",
       "sources": [
         "tests/console/commands/serve/test_serve_command.py"
       ]
     },
     {
       "area": "native-proxy-tests",
-      "reference": "/getting-started/deployment/reverse-proxies",
+      "reference": "/deployment/reverse-proxies",
       "sources": [
         "tests/http/layer/shared/test_proxies.py"
       ]

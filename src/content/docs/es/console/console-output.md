@@ -24,7 +24,7 @@ class ImportSummaryCommand(BaseCommand):
         return 0
 ```
 
-Los métodos heredados son síncronos, excepto [`sleep()`](/es/console/progress-and-debugging#console-sleep). Usarlos dentro de `async handle()` no convierte la escritura o las preguntas en operaciones asíncronas. Los métodos de texto escriben en stdout; `error()` tampoco cambia automáticamente a stderr ni altera el código de salida.
+Los métodos heredados son síncronos, excepto [`sleep()`](/es/console/progress#console-sleep). Usarlos dentro de `async handle()` no convierte la escritura o las preguntas en operaciones asíncronas. Los métodos de texto escriben en stdout; `error()` tampoco cambia automáticamente a stderr ni altera el código de salida.
 
 Los encabezados de estado con `timestamp=True` resuelven la hora mediante la fachada `DateTime`, disponible en la aplicación iniciada. Para una utilidad independiente usa `timestamp=False`. Las variantes de color emiten códigos ANSI; no interpretan marcado Rich como `[bold]`.
 
@@ -376,7 +376,7 @@ class AnsiOutputCommand(BaseCommand):
         return 0
 ```
 
-Continúa con [preguntas interactivas](/es/console/interactive-input), [progreso](/es/console/progress-and-debugging) o [ejecución programática](/es/console/output-and-programmatic-execution).
+Continúa con [preguntas interactivas](/es/console/interactive-input), [progreso](/es/console/progress) o [ejecución programática](/es/console/reactor-and-injection).
 
 <a id="console-outside-commands"></a>
 ## Usar Console fuera de un comando

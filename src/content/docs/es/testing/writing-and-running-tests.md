@@ -112,4 +112,4 @@ Puedes separar reglas sin I/O en `tests/unit` e integraciones en `tests/integrat
 
 El comando utiliza los proveedores y la configuración de la aplicación. No cambia automáticamente `APP_ENV`, conexiones de base de datos o drivers a un entorno aislado. Configura los recursos de prueba antes del bootstrap; revisa [inyección y aislamiento](/es/testing/dependency-injection) antes de probar persistencia.
 
-Continúa con [el ciclo de vida y los decoradores](/es/testing/cases-and-decorators). Las pruebas de componentes MCP tienen su [guía específica](/es/testing/mcp-testing).
+Continúa con [el ciclo de vida y los decoradores](/es/testing/cases-and-decorators). Las pruebas de componentes MCP tienen su [guía específica](/es/mcp/testing).

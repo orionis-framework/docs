@@ -67,7 +67,7 @@ async function runGuideExamples() {
         assert.ok(locales.length && locales.every(locale => ["es", "en"].includes(locale)));
         for (const locale of locales) {
             const markdown = await fs.readFile(new URL(
-                `../src/content/docs/${locale}/asynchronous/realtime/javascript-client.md`,
+                `../src/content/docs/${locale}/realtime/javascript-client.md`,
                 import.meta.url,
             ), "utf8");
             for (const [id, code] of markedExamples(markdown)) {
@@ -228,7 +228,7 @@ try {
     // Execute the actual documented module over a native WebSocket. DOM doubles
     // verify UI logic; this does not claim a real-browser rendering check.
     const chatMarkdown = await fs.readFile(new URL(
-        "../src/content/docs/es/asynchronous/realtime/chat.md", import.meta.url,
+        "../src/content/docs/es/realtime/chat.md", import.meta.url,
     ), "utf8");
     const html = chatMarkdown.replace(/\r\n?/g, "\n").match(/```html\n([\s\S]*?)\n```/)[1];
     const inline = html.match(/<script type="module">([\s\S]*?)<\/script>/)[1];

@@ -20,7 +20,7 @@ Separarlos evita cargar el tratamiento de sesión de navegador en endpoints que 
 
 El contexto depende del argumento de `withRouting()`, no del nombre físico del archivo ni del prefijo de URL. Un path `/api/products` declarado como WEB sigue siendo WEB. El registro API tampoco añade `/api` a sus URLs: debes escribirlo en la ruta o en un grupo.
 
-Ambos resolutores de identidad permiten invitados. Para exigir una identidad, utiliza el middleware de autenticación correspondiente; devolver JSON desde una ruta WEB no la convierte en API ni la hace pública. Consulta [Middlewares](/es/http/middleware-and-security) y [Autenticación](/es/security/authentication).
+Ambos resolutores de identidad permiten invitados. Para exigir una identidad, utiliza el middleware de autenticación correspondiente; devolver JSON desde una ruta WEB no la convierte en API ni la hace pública. Consulta [Middlewares](/es/http/middleware) y [Autenticación](/es/authentication).
 
 Los gráficos muestran el flujo habitual de una petición HTTP admitida que continúa hasta una ruta. Los controles compartidos del kernel se ejecutan **antes de resolver la ruta**, tanto en API como en WEB. Después se aplican las capas del contexto y los middleware explícitos, en este orden: **aplicación → grupos → ruta**.
 
@@ -108,7 +108,7 @@ Route.get("/products", list_products).name("products.index")
 
 `GET /products` devuelve `{"products": []}`. La declaración registra el manejador; la función se ejecuta al recibir una petición que coincide.
 
-Los métodos HTTP reciben `path` y `action`. Una acción puede ser una función Python síncrona o asíncrona, una clase con `__call__` o una pareja `[ProductController, "show"]` que referencia un controlador importado. Conserva las funciones y clases en módulos importables. Si omites `action`, completa la ruta con `.action(ProductController, "show")` antes de exportar o compilar las rutas. La implementación de controladores se explica en [Controladores](/es/http/request-lifecycle).
+Los métodos HTTP reciben `path` y `action`. Una acción puede ser una función Python síncrona o asíncrona, una clase con `__call__` o una pareja `[ProductController, "show"]` que referencia un controlador importado. Conserva las funciones y clases en módulos importables. Si omites `action`, completa la ruta con `.action(ProductController, "show")` antes de exportar o compilar las rutas. La implementación de controladores se explica en [Controladores](/es/http/controllers).
 
 ### Rutas a métodos de un controlador
 
@@ -199,7 +199,7 @@ El kernel atiende OPTIONS antes de construir el `Request` de una ruta y de ejecu
 
 Para un path registrado con GET y POST, `Allow` es `GET, HEAD, OPTIONS, POST`. En un path desconocido, OPTIONS devuelve `200` con `Allow` vacío; si hay fallback, anuncia `GET, HEAD, OPTIONS`. Las políticas previas del kernel todavía pueden responder antes.
 
-El **preflight CORS** es otro caso: un OPTIONS con `Origin` y `Access-Control-Request-Method` puede resolverse antes con `204` si el origen está permitido. Sus encabezados `Access-Control-Allow-*` proceden de la configuración CORS, no de la enumeración del router. Si tu cliente usa QUERY entre orígenes, inclúyelo expresamente en los métodos CORS permitidos; la expansión actual de `*` no lo incluye. Consulta [Middlewares y políticas HTTP](/es/http/middleware-and-security).
+El **preflight CORS** es otro caso: un OPTIONS con `Origin` y `Access-Control-Request-Method` puede resolverse antes con `204` si el origen está permitido. Sus encabezados `Access-Control-Allow-*` proceden de la configuración CORS, no de la enumeración del router. Si tu cliente usa QUERY entre orígenes, inclúyelo expresamente en los métodos CORS permitidos; la expansión actual de `*` no lo incluye. Consulta [Middlewares y políticas HTTP](/es/http/middleware).
 
 ## Parámetros de ruta
 
@@ -334,4 +334,4 @@ Las rutas estáticas se consultan antes que las dinámicas. Las dinámicas se or
 
 Los duplicados del mismo método/path, los patrones dinámicos estructuralmente equivalentes y los nombres de ruta incompatibles producen errores de compilación. Un grupo no aporta prioridad numérica ni cambia el contexto API/WEB de sus miembros.
 
-Al añadir o cambiar declaraciones, reinicia el proceso y comprueba la invalidación de la caché si la aplicación utiliza rutas compiladas. Consulta [Directorios y caché de arranque](/es/getting-started/paths-and-caching).
+Al añadir o cambiar declaraciones, reinicia el proceso y comprueba la invalidación de la caché si la aplicación utiliza rutas compiladas. Consulta [Directorios y caché de arranque](/es/application/paths-and-caching).

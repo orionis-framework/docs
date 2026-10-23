@@ -6,7 +6,7 @@
     "docs:validate": "node scripts/validate-documentation.mjs",
     "docs:test": "node --test scripts/documentation.test.mjs scripts/contributors.test.mjs",
     "docs:examples": "node scripts/check-code-examples.mjs",
-    "docs:coverage": "node scripts/validate-database-orm-coverage.mjs",
+    "docs:coverage": "node scripts/validate-api-coverage.mjs",
     "postbuild": "node scripts/validate-documentation.mjs --built",
     "dev": "astro dev",
     "build": "astro build",

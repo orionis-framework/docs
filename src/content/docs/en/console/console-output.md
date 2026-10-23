@@ -24,7 +24,7 @@ class ImportSummaryCommand(BaseCommand):
         return 0
 ```
 
-Inherited methods are synchronous except [`sleep()`](/en/console/progress-and-debugging#console-sleep). Calling them inside `async handle()` does not make output or prompts asynchronous. Text methods write to stdout; `error()` does not automatically use stderr or change the exit code.
+Inherited methods are synchronous except [`sleep()`](/en/console/progress#console-sleep). Calling them inside `async handle()` does not make output or prompts asynchronous. Text methods write to stdout; `error()` does not automatically use stderr or change the exit code.
 
 Status messages with `timestamp=True` obtain the time through the `DateTime` facade, available in a booted application. Use `timestamp=False` in standalone utilities. Styled methods emit ANSI codes; they do not interpret Rich markup such as `[bold]`.
 
@@ -376,7 +376,7 @@ class AnsiOutputCommand(BaseCommand):
         return 0
 ```
 
-Continue with [interactive questions](/en/console/interactive-input), [progress](/en/console/progress-and-debugging) or [programmatic execution](/en/console/output-and-programmatic-execution).
+Continue with [interactive questions](/en/console/interactive-input), [progress](/en/console/progress) or [programmatic execution](/en/console/reactor-and-injection).
 
 <a id="console-outside-commands"></a>
 ## Use Console outside a command

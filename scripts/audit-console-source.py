@@ -57,7 +57,7 @@ def destination(file: str, owner: str, name: str, kind: str) -> str:
             return base + "commands-and-arguments#base-" + name.lower()
         return base + "creating-commands#" + ("base-construction" if name in {"__init__", "handle"} else "base-command")
     if owner in {"Reactor", "IReactor"}:
-        return base + "output-and-programmatic-execution#reactor-" + ("construction" if construction else name.lower())
+        return base + "reactor-and-injection#reactor-" + ("construction" if construction else name.lower())
     if owner in {"Loader", "ILoader"}:
         return base + "command-cache#loader-api"
     if owner in {"ICommand", "Command"}:
@@ -89,9 +89,9 @@ def destination(file: str, owner: str, name: str, kind: str) -> str:
         if name in {"ask", "confirm", "secret", "anticipate", "choice"}:
             return base + "interactive-input#console-" + name.lower()
         if name in {"progressBar", "sleep"}:
-            return base + "progress-and-debugging#console-" + name.lower()
+            return base + "progress#console-" + name.lower()
         return base + "console-output#console-" + name.lower()
-    for classes, page, prefix in [({"Executor","IExecutor"},"console-output","executor"),({"HelpCommand","IHelpCommand"},"console-output","help-command"),({"ProgressBar","IProgressBar"},"progress-and-debugging","progress-bar")]:
+    for classes, page, prefix in [({"Executor","IExecutor"},"console-output","executor"),({"HelpCommand","IHelpCommand"},"console-output","help-command"),({"ProgressBar","IProgressBar"},"progress","progress-bar")]:
         if owner in classes:
             suffix = "" if kind == "class" else "-construction" if name == "__init__" else "-constants" if kind in {"constant","field"} else "-" + name.lower()
             return base + page + "#" + prefix + suffix

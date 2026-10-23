@@ -501,7 +501,7 @@
       "icon": "validation",
       "title": {
         "en": "Schemas and validation",
-        "es": "Schemas y validación"
+        "es": "Esquemas y validación"
       },
       "pageIds": [
         "schemas-overview",
@@ -672,7 +672,6 @@
         "orm-eager-loading",
         "orm-soft-deletes",
         "orm-events",
-        "orm-events-and-scopes",
         "orm-factories-and-testing",
         "orm-testing"
       ],
@@ -722,8 +721,7 @@
           },
           "pageIds": [
             "orm-soft-deletes",
-            "orm-events",
-            "orm-events-and-scopes"
+            "orm-events"
           ]
         },
         {
@@ -789,8 +787,8 @@
       "band": "data",
       "icon": "storage",
       "title": {
-        "en": "Files and cloud storage",
-        "es": "Archivos y storage cloud"
+        "en": "File storage",
+        "es": "Almacenamiento de archivos"
       },
       "pageIds": [
         "storage-overview",
@@ -1185,7 +1183,6 @@
         "container-scopes-and-concurrency",
         "container-providers-and-facades",
         "container-facades",
-        "aio-overview",
         "aio-async-execution"
       ],
       "groups": [
@@ -1244,7 +1241,6 @@
             "en": "Asynchronous execution"
           },
           "pageIds": [
-            "aio-overview",
             "aio-async-execution"
           ]
         }
@@ -1294,7 +1290,7 @@
       "band": "operate",
       "icon": "exceptions",
       "title": {
-        "es": "Exceptions",
+        "es": "Excepciones",
         "en": "Exceptions"
       },
       "pageIds": [
@@ -1417,8 +1413,8 @@
       "band": "resources",
       "icon": "advanced",
       "title": {
-        "es": "Utilidades y metadatos",
-        "en": "Utilities and metadata"
+        "es": "Utilidades",
+        "en": "Utilities"
       },
       "pageIds": [
         "helper-collection",

@@ -7,13 +7,13 @@ lastUpdated: false
 
 `DB.table("products")` crea un `RawQueryBuilder` nuevo. `Model.query()` crea un `ModelQueryBuilder` que comparte sus cláusulas; cambia cómo hidrata, serializa y aplica políticas del modelo. Las cláusulas devuelven el mismo builder y son síncronas: espera únicamente los terminales asíncronos.
 
-Los ejemplos de esta referencia requieren una aplicación iniciada y las tablas `products` y `categories` del escenario de [testing](/es/database/orm/testing). Los bloques son funciones de servicio/controlador o consultas que puedes ejecutar dentro de una acción `async`. Los ejemplos de escritura modifican esas tablas de ejemplo.
+Los ejemplos de esta referencia requieren una aplicación iniciada y las tablas `products` y `categories` del escenario de [testing](/es/orm/testing). Los bloques son funciones de servicio/controlador o consultas que puedes ejecutar dentro de una acción `async`. Los ejemplos de escritura modifican esas tablas de ejemplo.
 
 No compartas un builder mutable entre peticiones o tareas. El gateway `DB` sí es compartido: crea un builder para cada consulta y usa `clone()` para ramificar.
 
 ## Resultados de tablas y modelos
 
-`get()` devuelve `Collection`, no una lista Python. Las tablas crudas contienen diccionarios; las consultas de modelo contienen modelos. `first()` devuelve una fila/modelo o `None`. `value()` puede devolver `None` tanto por ausencia de fila como por un valor NULL. `pluck()` devuelve una colección de valores. Consulta [colecciones y paginación](/es/database/orm/collections-and-pagination) para interpretar sus estructuras.
+`get()` devuelve `Collection`, no una lista Python. Las tablas crudas contienen diccionarios; las consultas de modelo contienen modelos. `first()` devuelve una fila/modelo o `None`. `value()` puede devolver `None` tanto por ausencia de fila como por un valor NULL. `pluck()` devuelve una colección de valores. Consulta [colecciones y paginación](/es/orm/collections-and-pagination) para interpretar sus estructuras.
 
 Para filtrar, unir y escribir continúa con [condiciones](/es/database/query-filters), [joins](/es/database/joins-and-subqueries) y [escrituras](/es/database/query-writes).
 
@@ -761,4 +761,4 @@ async def run_example():
 
 **Errores:** `QueryException` si la compilación o ejecución falla; la capa de conexión sanea el mensaje y suprime la causa encadenada del driver.
 
-[Fachada DB](/es/database/db-facade) · [Consultas ORM](/es/database/orm/querying) · [Escenario de pruebas](/es/database/orm/testing)
+[Fachada DB](/es/database/db-facade) · [Consultas ORM](/es/orm/querying) · [Escenario de pruebas](/es/orm/testing)

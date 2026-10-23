@@ -87,7 +87,7 @@ TESTING_METHOD_PATTERN=test*
 TESTING_CACHE_RESULTS=bool:true
 ```
 
-Los prefijos producen tipos reales al construir la configuración. `Env` se utiliza en archivos de configuración; durante la ejecución, accede a estos valores mediante `IApplication.config()`. Consulta [Entorno](/es/architecture/environment) para configurar su carga y persistencia.
+Los prefijos producen tipos reales al construir la configuración. `Env` se utiliza en archivos de configuración; durante la ejecución, accede a estos valores mediante `IApplication.config()`. Consulta [Entorno](/es/environment) para configurar su carga y persistencia.
 
 Para fijar opciones directamente en `config/testing.py`, conserva la clase y sustituye los campos correspondientes:
 
@@ -208,7 +208,7 @@ Cada entrada corresponde a un `TestResult` inmutable:
 
 Los cuatro primeros campos son obligatorios al construir `TestResult`; los restantes admiten `None`. El procesador utiliza `[]` cuando no extrae código. `toDict()` devuelve la representación usada por el motor. Un `skip` ordinario no almacena el motivo como campo separado; un fallo esperado conserva diagnósticos aunque se exporte como `SKIPPED`.
 
-Los nombres de archivo tienen resolución de un segundo: dos ejecuciones en ese segundo usan la misma ruta y la última puede reemplazar la anterior. No hay retención automática ni un selector del nombre. Estos archivos son informes; no evitan volver a ejecutar pruebas. Si utilizas configuración compilada, aplica el procedimiento de [caché de la aplicación](/es/getting-started/paths-and-caching) para actualizarla.
+Los nombres de archivo tienen resolución de un segundo: dos ejecuciones en ese segundo usan la misma ruta y la última puede reemplazar la anterior. No hay retención automática ni un selector del nombre. Estos archivos son informes; no evitan volver a ejecutar pruebas. Si utilizas configuración compilada, aplica el procedimiento de [caché de la aplicación](/es/application/paths-and-caching) para actualizarla.
 
 ## Motor y fachada Test
 

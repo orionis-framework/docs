@@ -24,7 +24,7 @@ for (const [source, hash] of Object.entries(inventory.hashes)) {
 }
 const symbols = new Set(), documents = new Map();
 for (const integration of inventory.integrations || []) {
-  if (!inventory.hashes[integration.source] || !integration.reference?.startsWith('/architecture/exception-handling/contexts-and-transports#context-')) {
+  if (!inventory.hashes[integration.source] || !integration.reference?.startsWith('/exceptions/contexts-and-transports#context-')) {
     throw new Error(`Invalid Exceptions transport integration: ${integration.source}`);
   }
   const [destination, anchor] = integration.reference.split('#');

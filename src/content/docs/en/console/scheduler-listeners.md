@@ -254,8 +254,8 @@ flowchart TD
     G -->|No| I[Callback completes]
 ```
 
-Reactor catches ordinary command exceptions, sends them to the [global handler](/en/architecture/exception-handling), and normally returns `1`. The Orionis scheduler observes a **callable completing without an exception**, emitting `EXECUTED` with `retval=1`. Observe command failures by inspecting the code in `onTaskExecuted()` as well as implementing `onTaskError()`.
+Reactor catches ordinary command exceptions, sends them to the [global handler](/en/exceptions), and normally returns `1`. The Orionis scheduler observes a **callable completing without an exception**, emitting `EXECUTED` with `retval=1`. Observe command failures by inspecting the code in `onTaskExecuted()` as well as implementing `onTaskError()`.
 
 When a listener raises `Exception`, Orionis logs the error and invokes `ICatch.exception()` asynchronously. If that handler also fails, Orionis logs the secondary error. This neither reruns the command nor rolls back its effects. Async listeners are tracked in a task set; shutdown waits for already-pending listeners before requesting scheduler closure. Callbacks are not persisted or replayed after restart.
 
-`MISSED`, `MAX_INSTANCES`, `ERROR`, and nonzero returns do not create business retries. Dispatch [Queue jobs](/en/asynchronous/queues/failures-and-retries) from the command for persistent retry policies, and observe both components separately.
+`MISSED`, `MAX_INSTANCES`, `ERROR`, and nonzero returns do not create business retries. Dispatch [Queue jobs](/en/queues/failures-and-retries) from the command for persistent retry policies, and observe both components separately.

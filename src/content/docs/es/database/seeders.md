@@ -16,7 +16,7 @@ python -B reactor make:database-seeder default_flags
 
 name: str es obligatorio. El comando usa database_seeders, normalmente database/seeders. default_flags crea default_flags_seeder.py y DefaultFlagsSeeder; añade el sufijo `Seeder` solo si falta. El stub importa `Seeder` y genera async def run(self) -> None vacío. No hay flags de sobrescritura ni selección de modelo. Se admiten subdirectorios y se crean automáticamente; se rechazan rutas absolutas, . y .., componentes vacíos o nombres que no forman módulos. Los archivos existentes no se sobrescriben.
 
-Completa el archivo generado. La tabla flags pertenece a la [migración de ejemplo](/es/database/migrations-and-seeders).
+Completa el archivo generado. La tabla flags pertenece a la [migración de ejemplo](/es/database/migrations).
 
 ```python
 from orionis.database import Seeder
@@ -91,7 +91,7 @@ class DefaultFlagsSeeder(Seeder):
         await self._db.table("flags").insert({"name": "enabled"})
 ```
 
-Consulta también [`Faker`](/es/database/orm/faker) para datos simulados.
+Consulta también [`Faker`](/es/faker) para datos simulados.
 
 ## Modelos y factories
 
@@ -126,7 +126,7 @@ class DemoProductsSeeder(Seeder):
         await ProductFactory().count(20).create()
 ```
 
-Los registros tienen valores repetidos deliberadamente y la tabla no declara UNIQUE(name). Para variaciones, secuencias, `Faker`, relaciones y estados utiliza la [guía de factories](/es/database/orm/factories-and-testing). No esperes que `Factory` cree tablas o asigne relaciones por sí sola.
+Los registros tienen valores repetidos deliberadamente y la tabla no declara UNIQUE(name). Para variaciones, secuencias, `Faker`, relaciones y estados utiliza la [guía de factories](/es/orm/factories). No esperes que `Factory` cree tablas o asigne relaciones por sí sola.
 
 <a id="seederrunner-seed"></a>
 
@@ -139,7 +139,7 @@ SeederRunner(app: IApplication, conn_manager: IConnectionManager)
 async seed(*, connection: str | None=None, events: SeederEvents | None=None) -> list[str]
 ```
 
-seed devuelve list[str] de identidades completadas por esa llamada en orden, o [] cuando no hay pendientes o las reclamó otra ejecución. connection=None usa default; events=None desactiva progreso. `SeederEvents` es alias de `MigrationEvents` y utiliza callbacks síncronos on_start(name), on_success(name, elapsed) y on_error(name, elapsed). Las propiedades default son None. Ver [eventos de migración](/es/database/migrations-and-seeders#progreso-y-errores) para su firma y métodos started/succeeded/failed.
+seed devuelve list[str] de identidades completadas por esa llamada en orden, o [] cuando no hay pendientes o las reclamó otra ejecución. connection=None usa default; events=None desactiva progreso. `SeederEvents` es alias de `MigrationEvents` y utiliza callbacks síncronos on_start(name), on_success(name, elapsed) y on_error(name, elapsed). Las propiedades default son None. Ver [eventos de migración](/es/database/migrations#progreso-y-errores) para su firma y métodos started/succeeded/failed.
 
 ```python
 from orionis.console.base.command import BaseCommand

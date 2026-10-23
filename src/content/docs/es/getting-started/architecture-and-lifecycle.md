@@ -49,7 +49,7 @@ flowchart TD
     I --> J["Cerrar uploads, scope y reserva"]
 ```
 
-Amplía estos contratos en [Controladores HTTP](/es/http/request-lifecycle), [Middleware y seguridad](/es/http/middleware-and-security) y [Scopes y concurrencia](/es/architecture/service-container/scopes-and-concurrency). Los flujos específicos se explican en [WebSockets](/es/http/websockets), [Streaming y SSE](/es/http/streaming-and-sse) y [MCP](/es/protocols/mcp).
+Amplía estos contratos en [Controladores HTTP](/es/http/controllers), [Middleware y seguridad](/es/http/middleware) y [Scopes y concurrencia](/es/application/container/scopes-and-concurrency). Los flujos específicos se explican en [WebSockets](/es/realtime/websocket), [Streaming y SSE](/es/realtime/streaming-and-sse) y [MCP](/es/mcp).
 
 ## Estructura del proyecto
 
@@ -112,7 +112,7 @@ El árbol omite archivos secundarios y las otras carpetas de `resources/`, fuera
 | `app/console/` | Comandos propios en `commands/` y declaración de tareas en `scheduler.py`. |
 | `app/exceptions/` | Personalizar el tratamiento de excepciones mediante `handler.py`. |
 
-La tabla describe ubicaciones, no una ejecución automática de todos sus componentes. Para implementarlos, continúa con [Contenedor de servicios](/es/architecture/service-container), [Validación](/es/validation/declaring-schemas), [Comandos](/es/console/commands-and-arguments), [Programación de tareas](/es/console/task-scheduling) y [Excepciones](/es/architecture/exception-handling).
+La tabla describe ubicaciones, no una ejecución automática de todos sus componentes. Para implementarlos, continúa con [Contenedor de servicios](/es/application/container), [Validación](/es/validation/declaring-schemas), [Comandos](/es/console/commands-and-arguments), [Programación de tareas](/es/console/task-scheduling) y [Excepciones](/es/exceptions).
 
 ## Directorio bootstrap y ciclo de vida de la aplicación
 
@@ -189,7 +189,7 @@ app.create()
 
 **compile().** Activa la caché de metadatos de arranque en `storage/framework/bootstrap`; no compila el código Python de la aplicación. Comprueba las rutas de invalidación y recupera una instantánea válida, o permite reconstruirla. En directorios examina recursivamente archivos `*.py`; los archivos indicados expresamente, como `.env`, también participan. Por ello, incluir `resources` no vigila cambios en todas sus plantillas o traducciones.
 
-Se llama antes de registrar componentes porque una instantánea válida restaura la configuración compilada y hace que los métodos `with…` reutilicen esa información. No es un sistema de recarga en vivo: después de cambiar el bootstrap hay que invalidar la instantánea cuando corresponda y reiniciar el proceso. Consulta [Directorios y caché](/es/getting-started/paths-and-caching).
+Se llama antes de registrar componentes porque una instantánea válida restaura la configuración compilada y hace que los métodos `with…` reutilicen esa información. No es un sistema de recarga en vivo: después de cambiar el bootstrap hay que invalidar la instantánea cuando corresponda y reiniciar el proceso. Consulta [Directorios y caché](/es/application/paths-and-caching).
 
 **register_lifespan_callbacks().** Registra funciones para eventos; no las ejecuta al importar este archivo.
 
@@ -199,13 +199,13 @@ Se llama antes de registrar componentes porque una instantánea válida restaura
 
 **withExceptionHandler().** Selecciona la clase que reporta y transforma excepciones cuando el runtime la necesita. Registrar el handler no ejecuta sus métodos de tratamiento.
 
-**withProviders().** Incorpora proveedores al registro del contenedor. Durante `create()` se instancian los eager providers y se llama a su `register()`; los `boot()` síncronos se ejecutan entonces y los asíncronos quedan pendientes hasta el arranque asíncrono. Los providers diferidos se resuelven cuando se solicita su servicio. Consulta [Providers](/es/architecture/service-container/providers-and-facades).
+**withProviders().** Incorpora proveedores al registro del contenedor. Durante `create()` se instancian los eager providers y se llama a su `register()`; los `boot()` síncronos se ejecutan entonces y los asíncronos quedan pendientes hasta el arranque asíncrono. Los providers diferidos se resuelven cuando se solicita su servicio. Consulta [Providers](/es/application/container/providers).
 
 **withMiddleware().** Registra las clases globales del pipeline HTTP. Su preparación y ejecución pertenecen al kernel; no procesan una petición durante `create()`. En el recorrido HTTP normal se ejecutan después de resolver la ruta y sus capas de contexto.
 
 **create().** Registra la propia aplicación como `IApplication`, carga y valida configuración, rutas de directorios y metadatos de componentes, prepara providers, establece zona horaria/locale y conserva las políticas del worker. Guarda la caché de configuración cuando debe reconstruirse. Es idempotente: una aplicación ya creada no repite esa preparación.
 
-Los registros `with…` se realizan antes de `create()`. Que `isCreated` sea verdadero no significa que el kernel HTTP esté listo: `create()` no abre un puerto, no ejecuta callbacks STARTUP/SHUTDOWN ni espera los `boot()` asíncronos. El servidor o Reactor conducen esas fases. Para una integración sin esos runtimes existe `await app.boot()`: crea la aplicación y espera providers, sin ejecutar sus eventos HTTP/CLI. Consulta [Ciclo de vida y recursos](/es/getting-started/application-lifecycle).
+Los registros `with…` se realizan antes de `create()`. Que `isCreated` sea verdadero no significa que el kernel HTTP esté listo: `create()` no abre un puerto, no ejecuta callbacks STARTUP/SHUTDOWN ni espera los `boot()` asíncronos. El servidor o Reactor conducen esas fases. Para una integración sin esos runtimes existe `await app.boot()`: crea la aplicación y espera providers, sin ejecutar sus eventos HTTP/CLI. Consulta [Ciclo de vida y recursos](/es/application/lifecycle).
 
 ### Archivo bootstrap/lifespan.py
 
@@ -312,7 +312,7 @@ La aplicación debe poder importar su bootstrap para ejecutar el comando. Si eli
 
 Los archivos de `config/` personalizan los subsistemas de la aplicación mediante dataclasses inmutables que heredan entidades del núcleo. Durante la creación, Orionis obtiene los valores del núcleo, descubre las dataclasses locales y aplica su configuración. El nombre del archivo identifica la sección: `config/cache.py` corresponde a `cache`.
 
-No es obligatorio conservar los dieciséis archivos en todos los stacks. Una sección sin archivo local utiliza las entidades del núcleo, que también consultan variables de entorno. Los valores de las fichas siguientes son los predeterminados de los archivos locales examinados cuando sus variables están ausentes; una personalización puede diferir de la entidad heredada. Consulta [Configuración tipada](/es/getting-started/configuration) para acceder a los valores efectivos.
+No es obligatorio conservar los dieciséis archivos en todos los stacks. Una sección sin archivo local utiliza las entidades del núcleo, que también consultan variables de entorno. Los valores de las fichas siguientes son los predeterminados de los archivos locales examinados cuando sus variables están ausentes; una personalización puede diferir de la entidad heredada. Consulta [Configuración tipada](/es/application/configuration) para acceder a los valores efectivos.
 
 ### `app.py`: identidad y entorno
 
@@ -320,11 +320,11 @@ Define nombre, entorno, depuración, localización y cifrado. `APP_NAME` utiliza
 
 ### `auth.py`: identidad y autenticación
 
-Selecciona `AUTH_GUARD=session`, con alternativa `token`; `AUTH_MODEL=app.models.user.User` y `AUTH_USERNAME=email` identifican el modelo y su campo de acceso. Configura sesiones, tokens personales, recuperación de contraseña y acceso persistente. El archivo propone `AUTH_REDIRECT_TO=/login`, mientras la entidad del núcleo usa `None`, que conserva la respuesta 401. Configurar estas opciones no crea el modelo, sus tablas ni las rutas. Continúa con [Autenticación](/es/security/authentication).
+Selecciona `AUTH_GUARD=session`, con alternativa `token`; `AUTH_MODEL=app.models.user.User` y `AUTH_USERNAME=email` identifican el modelo y su campo de acceso. Configura sesiones, tokens personales, recuperación de contraseña y acceso persistente. El archivo propone `AUTH_REDIRECT_TO=/login`, mientras la entidad del núcleo usa `None`, que conserva la respuesta 401. Configurar estas opciones no crea el modelo, sus tablas ni las rutas. Continúa con [Autenticación](/es/authentication).
 
 ### `cache.py`: almacenes de caché
 
-`CACHE_STORE=file` selecciona almacenamiento en archivos; `CACHE_FILE_PATH=storage/framework/cache/data` define su ubicación. También declara almacenes `memory`, `redis`, `memcached` y `database`. `CACHE_PREFIX` añade un prefijo a las claves: este archivo utiliza una cadena vacía como predeterminado; el núcleo utiliza `orionis`. Las conexiones externas necesitan su servicio disponible; declarar sus opciones no lo instala. Consulta [Caché](/es/services/cache).
+`CACHE_STORE=file` selecciona almacenamiento en archivos; `CACHE_FILE_PATH=storage/framework/cache/data` define su ubicación. También declara almacenes `memory`, `redis`, `memcached` y `database`. `CACHE_PREFIX` añade un prefijo a las claves: este archivo utiliza una cadena vacía como predeterminado; el núcleo utiliza `orionis`. Las conexiones externas necesitan su servicio disponible; declarar sus opciones no lo instala. Consulta [Caché](/es/cache).
 
 ### `database.py`: conexiones y motores
 
@@ -332,11 +332,11 @@ Selecciona `AUTH_GUARD=session`, con alternativa `token`; `AUTH_MODEL=app.models
 
 ### `filesystems.py`: discos de almacenamiento
 
-`FILESYSTEM_DISK=local` selecciona el disco predeterminado. `LOCAL_PATH=storage/app/private` y `PUBLIC_PATH=storage/app/public` separan almacenamiento privado y público; `PUBLIC_URL=/static` define el prefijo público. También configura credenciales, región y destino de S3, Azure y GCS. Esas opciones no crean infraestructura cloud ni convierten los archivos privados en públicos. Consulta [Almacenamiento](/es/services/storage).
+`FILESYSTEM_DISK=local` selecciona el disco predeterminado. `LOCAL_PATH=storage/app/private` y `PUBLIC_PATH=storage/app/public` separan almacenamiento privado y público; `PUBLIC_URL=/static` define el prefijo público. También configura credenciales, región y destino de S3, Azure y GCS. Esas opciones no crean infraestructura cloud ni convierten los archivos privados en públicos. Consulta [Almacenamiento](/es/storage).
 
 ### `hashing.py`: contraseñas y costes
 
-`HASH_DRIVER=argon2` selecciona Argon2id; `bcrypt` es la alternativa. `ARGON_MEMORY=65536` expresa memoria en KiB, `ARGON_THREADS=4` el paralelismo y `ARGON_TIME=3` las iteraciones. `BCRYPT_ROUNDS=12` controla el coste de bcrypt. Estos parámetros afectan al cálculo y comprobación de hashes, no al cifrado reversible configurado en `app.py`. Consulta [Hashing](/es/security/hashing).
+`HASH_DRIVER=argon2` selecciona Argon2id; `bcrypt` es la alternativa. `ARGON_MEMORY=65536` expresa memoria en KiB, `ARGON_THREADS=4` el paralelismo y `ARGON_TIME=3` las iteraciones. `BCRYPT_ROUNDS=12` controla el coste de bcrypt. Estos parámetros afectan al cálculo y comprobación de hashes, no al cifrado reversible configurado en `app.py`. Consulta [Hashing](/es/cryptography/hashing).
 
 ### `http.py`: políticas del servidor HTTP
 
@@ -348,19 +348,19 @@ Agrupa límites de cuerpos y multipart, WebSocket, proxies, hosts, CORS, CSRF y 
 
 ### `mail.py`: transporte y remitente
 
-`MAIL_MAILER=smtp` selecciona SMTP; también existe el transporte `file`, que escribe en `MAIL_FILE_PATH=storage/mail`. `MAIL_PORT=587` y `MAIL_ENCRYPTION=TLS` son los valores iniciales de SMTP. Host, usuario, contraseña y dirección del remitente comienzan vacíos; `MAIL_FROM_NAME` utiliza `APP_NAME` si existe. Estos valores no constituyen por sí solos una conexión SMTP lista para enviar. Consulta [Correo](/es/services/mail).
+`MAIL_MAILER=smtp` selecciona SMTP; también existe el transporte `file`, que escribe en `MAIL_FILE_PATH=storage/mail`. `MAIL_PORT=587` y `MAIL_ENCRYPTION=TLS` son los valores iniciales de SMTP. Host, usuario, contraseña y dirección del remitente comienzan vacíos; `MAIL_FROM_NAME` utiliza `APP_NAME` si existe. Estos valores no constituyen por sí solos una conexión SMTP lista para enviar. Consulta [Correo](/es/mail).
 
 ### `mcp.py`: límites del protocolo MCP
 
-`MCP_DEFAULT_PAGE_SIZE=50` y `MCP_MAX_PAGE_SIZE=100` controlan paginación. `MCP_MAX_REQUEST_SIZE` recurre a `HTTP_MAX_BODY_SIZE` y después a 1 MiB; la concurrencia recurre a `HTTP_MAX_CONCURRENT_REQUESTS` y después a 32. Son variables de entorno, no los valores efectivos de `http.py`. También limita suscripciones, búsqueda de herramientas y respuestas. `CORS_ALLOW_ORIGINS` aporta los orígenes admitidos: una lista vacía rechaza una petición MCP HTTP que presente `Origin`. Los servidores se registran en las rutas AI. Consulta [MCP](/es/protocols/mcp).
+`MCP_DEFAULT_PAGE_SIZE=50` y `MCP_MAX_PAGE_SIZE=100` controlan paginación. `MCP_MAX_REQUEST_SIZE` recurre a `HTTP_MAX_BODY_SIZE` y después a 1 MiB; la concurrencia recurre a `HTTP_MAX_CONCURRENT_REQUESTS` y después a 32. Son variables de entorno, no los valores efectivos de `http.py`. También limita suscripciones, búsqueda de herramientas y respuestas. `CORS_ALLOW_ORIGINS` aporta los orígenes admitidos: una lista vacía rechaza una petición MCP HTTP que presente `Origin`. Los servidores se registran en las rutas AI. Consulta [MCP](/es/mcp).
 
 ### `queue.py`: ejecución de trabajos
 
-`QUEUE_CONNECTION=sync` ejecuta trabajos en el proceso que los despacha; las alternativas son `database` y `redis`. `QUEUE_TABLE=jobs` y `QUEUE_FAILED_TABLE=failed_jobs` nombran tablas; no las crean. El worker propone `QUEUE_WORKER_CONCURRENCY=1`, `QUEUE_WORKER_TIMEOUT=60.0` segundos y `QUEUE_WORKER_TRIES=3`. Configurar un backend no inicia un worker. Consulta [Colas](/es/asynchronous/queues).
+`QUEUE_CONNECTION=sync` ejecuta trabajos en el proceso que los despacha; las alternativas son `database` y `redis`. `QUEUE_TABLE=jobs` y `QUEUE_FAILED_TABLE=failed_jobs` nombran tablas; no las crean. El worker propone `QUEUE_WORKER_CONCURRENCY=1`, `QUEUE_WORKER_TIMEOUT=60.0` segundos y `QUEUE_WORKER_TRIES=3`. Configurar un backend no inicia un worker. Consulta [Colas](/es/queues).
 
 ### `realtime.py`: invocaciones y grupos
 
-Controla los límites de los hubs en tiempo real: `REALTIME_MAX_MESSAGE_SIZE=1048576` bytes, `REALTIME_MAX_CONCURRENT_INVOCATIONS=16` y `REALTIME_MAX_PENDING_CLIENT_INVOCATIONS=32` por conexión. `REALTIME_INVOCATION_TIMEOUT` y `REALTIME_CLIENT_RESULT_TIMEOUT` utilizan 30 segundos; `REALTIME_MAX_GROUPS_PER_CONNECTION=64` limita las membresías. Estas opciones regulan recursos y ejecución; no registran hubs ni configuran un broker externo. Consulta [Tiempo real](/es/asynchronous/realtime).
+Controla los límites de los hubs en tiempo real: `REALTIME_MAX_MESSAGE_SIZE=1048576` bytes, `REALTIME_MAX_CONCURRENT_INVOCATIONS=16` y `REALTIME_MAX_PENDING_CLIENT_INVOCATIONS=32` por conexión. `REALTIME_INVOCATION_TIMEOUT` y `REALTIME_CLIENT_RESULT_TIMEOUT` utilizan 30 segundos; `REALTIME_MAX_GROUPS_PER_CONNECTION=64` limita las membresías. Estas opciones regulan recursos y ejecución; no registran hubs ni configuran un broker externo. Consulta [Tiempo real](/es/realtime).
 
 ### `scheduler.py`: almacenamiento y ejecución de tareas
 
@@ -368,7 +368,7 @@ Controla los límites de los hubs en tiempo real: `REALTIME_MAX_MESSAGE_SIZE=104
 
 ### `session.py`: persistencia y cookie
 
-`SESSION_DRIVER=memory` mantiene sesiones en el proceso; admite `file`, `database` y `cache`. `SESSION_LIFETIME=120` está expresado en minutos. `SESSION_FILES=storage/framework/sessions` corresponde al driver de archivos. La cookie predeterminada es `sessionid`, con `SESSION_HTTP_ONLY=True`, `SESSION_SECURE=False` y SameSite `lax`. La memoria de un worker no es un almacén compartido entre procesos. Consulta [Sesiones](/es/http/sessions).
+`SESSION_DRIVER=memory` mantiene sesiones en el proceso; admite `file`, `database` y `cache`. `SESSION_LIFETIME=120` está expresado en minutos. `SESSION_FILES=storage/framework/sessions` corresponde al driver de archivos. La cookie predeterminada es `sessionid`, con `SESSION_HTTP_ONLY=True`, `SESSION_SECURE=False` y SameSite `lax`. La memoria de un worker no es un almacén compartido entre procesos. Consulta [Sesiones](/es/sessions).
 
 ### `testing.py`: descubrimiento y resultados
 
@@ -376,7 +376,7 @@ Configura el ejecutor de pruebas: `TESTING_START_DIR=tests`, `TESTING_FILE_PATTE
 
 ### `view.py`: plantillas Jinja2
 
-`VIEW_PATHS=["resources/views"]` determina dónde buscar plantillas. `VIEW_CACHE_SIZE=400` limita la caché LRU en memoria: `0` la desactiva y `-1` elimina el límite. `VIEW_CACHE_PATH=storage/framework/views` habilita caché de bytecode en disco; `None` la desactiva. `APP_DEBUG=True` controla la recarga automática y `VIEW_AUTOESCAPE=True` activa escape HTML. Esto no significa que todas las vistas se compilen al iniciar. Consulta [Vistas](/es/services/views).
+`VIEW_PATHS=["resources/views"]` determina dónde buscar plantillas. `VIEW_CACHE_SIZE=400` limita la caché LRU en memoria: `0` la desactiva y `-1` elimina el límite. `VIEW_CACHE_PATH=storage/framework/views` habilita caché de bytecode en disco; `None` la desactiva. `APP_DEBUG=True` controla la recarga automática y `VIEW_AUTOESCAPE=True` activa escape HTML. Esto no significa que todas las vistas se compilen al iniciar. Consulta [Vistas](/es/views).
 
 ### Variables de entorno y predeterminados
 
@@ -425,13 +425,13 @@ Sus cuatro carpetas separan responsabilidades de persistencia:
 | `schemas/` | Definiciones de tablas con columnas, tipos y restricciones. Por ejemplo, `USERS_V1` es un `TableDefinition` utilizado por una migración. |
 | `seeders/` | Insertan datos iniciales o de ejemplo. Se solicitan explícitamente con `migrate --seed`; revisa el seeder administrativo y sus credenciales antes de ejecutarlo. |
 
-Estos schemas describen almacenamiento relacional; los de `app/http/schemas/` validan entradas. Amplía en [Factories y pruebas](/es/database/orm/factories-and-testing), [Esquemas de base de datos](/es/database/schema) y [Migraciones y seeders](/es/database/migrations-and-seeders).
+Estos schemas describen almacenamiento relacional; los de `app/http/schemas/` validan entradas. Amplía en [Factories y pruebas](/es/orm/factories), [Esquemas de base de datos](/es/database/schema) y [Migraciones y seeders](/es/database/migrations).
 
 ## Directorio resources
 
-`resources/lang/` incluye `en.json` y `es.json`, diccionarios de traducción seleccionados según el locale y fallback configurados. El sistema también admite archivos agrupados como `es/messages.json`, aunque esa estructura no viene creada en SSR. Consulta [Localización](/es/services/localization).
+`resources/lang/` incluye `en.json` y `es.json`, diccionarios de traducción seleccionados según el locale y fallback configurados. El sistema también admite archivos agrupados como `es/messages.json`, aunque esa estructura no viene creada en SSR. Consulta [Localización](/es/localization).
 
-`resources/views/` contiene plantillas Jinja: páginas, layouts, parciales y correos. Con los valores iniciales, `response.view("home.index")` busca `resources/views/home/index.html`. El motor realiza renderizado asíncrono y permite herencia de layouts e inclusión de parciales. Consulta [Vistas](/es/services/views).
+`resources/views/` contiene plantillas Jinja: páginas, layouts, parciales y correos. Con los valores iniciales, `response.view("home.index")` busca `resources/views/home/index.html`. El motor realiza renderizado asíncrono y permite herencia de layouts e inclusión de parciales. Consulta [Vistas](/es/views).
 
 ## Directorio routes
 
@@ -464,13 +464,13 @@ app.withRouting(
 
 Los tres archivos API son una organización propuesta: debes crearlos con sus declaraciones de rutas HTTP antes de usar el fragmento. La carpeta `v1` organiza los archivos; el prefijo de URL se declara en las rutas. Los archivos configurados se validan; registrar su ubicación no equivale a ejecutar inmediatamente todos sus manejadores.
 
-`health` es distinto: acepta una cadena o `None` y representa la URL de salud, no un archivo ni una lista. Si falta o vale `None`, la aplicación utiliza `/up`. Consulta [Rutas HTTP](/es/http/routing) y [Servidores MCP](/es/protocols/mcp).
+`health` es distinto: acepta una cadena o `None` y representa la URL de salud, no un archivo ni una lista. Si falta o vale `None`, la aplicación utiliza `/up`. Consulta [Rutas HTTP](/es/http/routing) y [Servidores MCP](/es/mcp).
 
 ## Directorio storage
 
 `storage/app/private/` es la raíz inicial del disco `local`, apropiada para documentos internos. Ese disco no proporciona URL pública. `storage/app/public/` es la del disco `public`, cuya URL inicial es `/static`; `asset()` utiliza este disco por defecto.
 
-Al ejecutar `reactor serve`, Orionis configura el montaje de la carpeta pública en Granian. No requiere un enlace simbólico. Otro servidor ASGI necesita su propia configuración de estáticos o un proxy. La ubicación privada no se publica mediante ese montaje. Consulta [Almacenamiento](/es/services/storage).
+Al ejecutar `reactor serve`, Orionis configura el montaje de la carpeta pública en Granian. No requiere un enlace simbólico. Otro servidor ASGI necesita su propia configuración de estáticos o un proxy. La ubicación privada no se publica mediante ese montaje. Consulta [Almacenamiento](/es/storage).
 
 `storage/framework/` guarda artefactos según la configuración y el uso:
 
@@ -483,9 +483,9 @@ Al ejecutar `reactor serve`, Orionis configura el montaje de la carpeta pública
 | `cache/data/` | Valores del store de caché en archivos cuando se utiliza. |
 | `cache/testing/` | Resultados JSON sólo si `testing.cache_results` está activado. |
 
-Las tres primeras entradas son archivos sin extensión dentro del path elegido por `compile()` en SSR. Los metadatos de providers no implican un directorio `services/` separado. La caché de vistas tiene su propia política, independiente de la instantánea de bootstrap. Consulta [Directorios y caché](/es/getting-started/paths-and-caching).
+Las tres primeras entradas son archivos sin extensión dentro del path elegido por `compile()` en SSR. Los metadatos de providers no implican un directorio `services/` separado. La caché de vistas tiene su propia política, independiente de la instantánea de bootstrap. Consulta [Directorios y caché](/es/application/paths-and-caching).
 
-`storage/logs/` recibe los registros según los canales configurados. Por ejemplo, el canal inicial `stack` usa `storage/logs/stack.log`; otros canales pueden rotar archivos o usar otra ruta. Consulta [Logging](/es/services/logging).
+`storage/logs/` recibe los registros según los canales configurados. Por ejemplo, el canal inicial `stack` usa `storage/logs/stack.log`; otros canales pueden rotar archivos o usar otra ruta. Consulta [Logging](/es/logging).
 
 ## Directorio tests
 
@@ -504,7 +504,7 @@ Guárdalo, por ejemplo, en `tests/test_project.py` y ejecuta `uv run python -B r
 
 ## Archivos de la raíz
 
-`.env` contiene valores concretos del entorno. `.env.example` ofrece la base mínima que se copia al instalar; `.env.reference` documenta opciones y ejemplos adicionales, sin cargarse automáticamente como configuración. Los archivos de `config/` determinan cómo se consumen esas variables. Consulta [Configuración](/es/getting-started/configuration).
+`.env` contiene valores concretos del entorno. `.env.example` ofrece la base mínima que se copia al instalar; `.env.reference` documenta opciones y ejemplos adicionales, sin cargarse automáticamente como configuración. Los archivos de `config/` determinan cómo se consumen esas variables. Consulta [Configuración](/es/application/configuration).
 
 `pyproject.toml` declara metadatos y dependencias; `uv.lock` registra su resolución y `.python-version` orienta la selección del intérprete. `uv sync` prepara la `.venv` del proyecto según esos archivos.
 

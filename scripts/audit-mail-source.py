@@ -16,7 +16,7 @@ SOURCE_FILES = ("config/mail.py", "orionis/support/facades/mail.py")
 
 
 def destination(file: str, owner: str, name: str, kind: str) -> str:
-    base = "/services/mail/"
+    base = "/mail/"
     if file.startswith("orionis/foundation/config/mail") or file == "config/mail.py":
         return base + "configuration#config-" + ("mail" if owner == "BootstrapMail" else owner.lower())
     if file.endswith("facades/mail.py"):

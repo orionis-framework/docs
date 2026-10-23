@@ -14,6 +14,71 @@ const groupedSections = new Set([
 ]);
 const navigationId = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
+function localizedNames(values, locales, context) {
+  for (const locale of locales) {
+    const name = values?.[locale];
+    if (typeof name !== 'string' || !name || name !== name.trim()) throw new Error(`Invalid localized navigation name: ${context}/${locale}`);
+  }
+}
+
+function distinctNames(items, locales, context, names = (item) => item.title) {
+  for (const locale of locales) {
+    const seen = new Set();
+    for (const item of items) {
+      localizedNames(names(item), locales, `${context}/${item.id}`);
+      const name = names(item)[locale].normalize('NFC').toLocaleLowerCase(locale);
+      if (seen.has(name)) throw new Error(`Duplicate sibling navigation label: ${context}/${locale}/${name}`);
+      seen.add(name);
+    }
+  }
+}
+
+// Keep the editable catalog, physical Markdown routes, and visible menu in one order.
+export function validateRouteOrganization(catalogConfig = catalog, navigationConfig = navigation) {
+  const locales = catalogConfig.locales;
+  const pages = new Map(catalogConfig.pages.map((page) => [page.id, page]));
+  const orderedIds = navigationConfig.sections.flatMap((section) => section.pageIds);
+  if (JSON.stringify(catalogConfig.pages.map((page) => page.id)) !== JSON.stringify(orderedIds)) throw new Error('Catalog page order must match the flattened navigation order.');
+  distinctNames(navigationConfig.bands, locales, 'bands');
+  distinctNames([...navigationConfig.sections, ...(navigationConfig.externalLinks || [])], locales, 'sections');
+  for (const section of navigationConfig.sections) {
+    if (!navigationId.test(section.id)) throw new Error(`Invalid navigation section ID: ${section.id}`);
+    for (const id of section.pageIds) {
+      const page = pages.get(id);
+      if (!page) throw new Error(`Unknown navigation page: ${id}`);
+      localizedNames(page.title, locales, `page/${id}`);
+      if (page.label !== undefined) localizedNames(page.label, locales, `page-label/${id}`);
+      for (const locale of locales) {
+        const prefix = `/${locale}/${section.id}`;
+        if (page.slug?.[locale] !== prefix && !page.slug?.[locale]?.startsWith(`${prefix}/`)) throw new Error(`Canonical route must belong to navigation section ${section.id}: ${page.slug?.[locale]}`);
+      }
+    }
+    const pageNames = (page) => page.label || page.title;
+    if (section.groups) {
+      distinctNames(section.groups, locales, `groups/${section.id}`);
+      for (const group of section.groups) distinctNames(group.pageIds.map((id) => pages.get(id)), locales, `pages/${group.id}`, pageNames);
+    } else distinctNames(section.pageIds.map((id) => pages.get(id)), locales, `pages/${section.id}`, pageNames);
+  }
+  return catalogConfig.pages;
+}
+
+// Every old address must lead directly to a final page, including custom Astro pages.
+export function validateLegacyRedirects(redirectConfig = legacyRedirects, catalogConfig = catalog) {
+  if (!redirectConfig || typeof redirectConfig !== 'object' || Array.isArray(redirectConfig)) throw new Error('Invalid legacy redirect configuration.');
+  const slugs = new Set(catalogConfig.pages.flatMap((page) => Object.values(page.slug)));
+  const relativePath = /^[a-z0-9][a-z0-9_-]*(?:\/[a-z0-9][a-z0-9_-]*)*$/;
+  for (const [oldPath, newPath] of Object.entries(redirectConfig)) {
+    if (!relativePath.test(oldPath) || typeof newPath !== 'string' || !relativePath.test(newPath)) throw new Error(`Invalid legacy redirect path: ${oldPath} -> ${newPath}`);
+    if (Object.hasOwn(redirectConfig, newPath)) throw new Error(`Legacy redirect chain or cycle: ${oldPath} -> ${newPath}`);
+    for (const locale of catalogConfig.locales) {
+      const source = `/${locale}/${oldPath}`, destination = `/${locale}/${newPath}`;
+      if (slugs.has(source)) throw new Error(`Legacy redirect shadows canonical page: ${source}`);
+      if (!slugs.has(destination)) throw new Error(`Invalid legacy redirect target: ${destination}`);
+    }
+  }
+  return redirectConfig;
+}
+
 // Flatten configured sidebar groups without changing their leaf order.
 export function flattenSidebar(items) {
   return items.flatMap((item) => item.items ? flattenSidebar(item.items) : [item]);
@@ -65,6 +130,7 @@ export function resolveNavigation(config = navigation) {
   for (const band of config.bands) {
     if (!sections.some((section) => section.band === band.id) || catalog.locales.some((locale) => !band.title[locale])) throw new Error(`Incomplete navigation band: ${band.id}`);
   }
+  validateRouteOrganization(catalog, config);
   return sections;
 }
 export const navigationSections = resolveNavigation();
@@ -118,11 +184,9 @@ export function createSidebar() {
 
 export function createRedirects() {
   const redirects = { '/': '/en/getting-started', '/en/': '/en/getting-started', '/es/': '/es/getting-started' };
-  const slugs = new Set(documentationPages.flatMap((page) => Object.values(page.slug)));
-  for (const locale of catalog.locales) for (const [oldPath, newPath] of Object.entries(legacyRedirects)) {
+  for (const locale of catalog.locales) for (const [oldPath, newPath] of Object.entries(validateLegacyRedirects())) {
     const source = `/${locale}/${oldPath}`, destination = `/${locale}/${newPath}`;
-    if (!slugs.has(destination)) throw new Error(`Invalid legacy redirect target: ${destination}`);
-    if (!slugs.has(source)) redirects[source] = destination;
+    redirects[source] = destination;
   }
   return redirects;
 }

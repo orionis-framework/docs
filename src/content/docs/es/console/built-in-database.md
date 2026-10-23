@@ -205,4 +205,4 @@ orionis seed --database sqlite
 python -B reactor seed --database sqlite
 ```
 
-Los generadores de migraciones, schemas, seeders y factories están en [Generadores de código](/es/console/built-in-generators). Para diseñar archivos, tablas y datos consulta la [referencia de comandos Database](/es/database/commands) y [Migraciones y seeders](/es/database/migrations-and-seeders).
+Los generadores de migraciones, schemas, seeders y factories están en [Generadores de código](/es/console/built-in-generators). Para diseñar archivos, tablas y datos consulta la [referencia de comandos Database](/es/database/commands) y [Migraciones y seeders](/es/database/migrations).

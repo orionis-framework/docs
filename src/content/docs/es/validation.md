@@ -96,7 +96,7 @@ Consulta el formato de `errors`, `failures` y los mensajes en [Validación y err
 3. [Referencia completa de restricciones y reglas nativas](/es/validation/constraints-and-reference): firmas, parámetros, valores admitidos y ejemplos de las 47 declaraciones públicas.
 4. [Reglas de aplicación y reglas personalizadas](/es/validation/application-rules): contrato asíncrono, I/O y reutilización.
 5. [Validación y errores](/es/validation/validation-and-errors): ejecución asíncrona, colecciones, fallos y mensajes.
-6. [Schemas en controladores HTTP](/es/validation/controllers-and-http): entrada automática, errores HTTP y schemas como respuestas. La [introducción de HTTP](/es/http/requests-and-validation) resume esta integración.
+6. [Schemas en controladores HTTP](/es/validation/controllers-and-http): entrada automática, errores HTTP y schemas como respuestas. La [introducción de HTTP](/es/http/validation) resume esta integración.
 
 Las reglas de archivos, red o base de datos necesitan el contexto o los servicios indicados en su referencia. Un schema por sí solo no configura esos servicios.
 

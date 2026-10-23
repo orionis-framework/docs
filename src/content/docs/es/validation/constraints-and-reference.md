@@ -1392,7 +1392,7 @@ class AvatarSchema(Schema):
     ]
 ```
 
-`object` conserva el objeto de archivo y deja las comprobaciones a las reglas. `Between(1, 2048)` exige entre 1 y 2048 KiB; no son píxeles ni bytes. Este schema no procesa multipart por sí mismo: recibe los objetos proporcionados por el sistema de [peticiones y archivos](/es/http/forms-and-uploads).
+`object` conserva el objeto de archivo y deja las comprobaciones a las reglas. `Between(1, 2048)` exige entre 1 y 2048 KiB; no son píxeles ni bytes. Este schema no procesa multipart por sí mismo: recibe los objetos proporcionados por el sistema de [peticiones y archivos](/es/http/requests).
 
 ### Probar los archivos desde una petición
 

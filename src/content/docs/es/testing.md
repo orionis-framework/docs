@@ -18,7 +18,7 @@ El componente de pruebas de Orionis integra el descubrimiento de casos, el conte
 | [Dependencias y aislamiento](/es/testing/dependency-injection) | Inyectar servicios, resolverlos en fixtures y controlar scopes y recursos persistentes. |
 | [Resultados y configuración](/es/testing/results-and-reference) | Configurar `config/testing.py`, elegir verbosidad, filtrar la suite y guardar resultados JSON. |
 
-Las [pruebas de Database y ORM](/es/database/orm/testing) y las [pruebas MCP](/es/testing/mcp-testing) conservan sus guías específicas en los menús de esos componentes.
+Las [pruebas de Database y ORM](/es/orm/testing) y las [pruebas MCP](/es/mcp/testing) conservan sus guías específicas en los menús de esos componentes.
 
 ## Flujo de ejecución
 

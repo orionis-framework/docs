@@ -35,7 +35,7 @@ class TestPrices(TestCase):
         self.assertEqual(calculator.total(Decimal("10")), Decimal("12.00"))
 ```
 
-Para contratos abstractos, registra su implementación en un [proveedor del contenedor](/es/architecture/service-container/providers-and-facades). También puedes recibir `IApplication` y acceder a `app.config(...)`, `await app.make(...)` o `await app.invoke(...)`. Los helpers llamados directamente por tu código reciben los argumentos que tú les pases; no se inyectan por el mero hecho de pertenecer al caso.
+Para contratos abstractos, registra su implementación en un [proveedor del contenedor](/es/application/container/providers). También puedes recibir `IApplication` y acceder a `app.config(...)`, `await app.make(...)` o `await app.invoke(...)`. Los helpers llamados directamente por tu código reciben los argumentos que tú les pases; no se inyectan por el mero hecho de pertenecer al caso.
 
 ### Resolver servicios scoped
 
@@ -106,7 +106,7 @@ Para obtener un servicio directamente utiliza `await self.app.make(ContratoOClas
 
 El motor ejecuta la suite síncrona en un executor. No propaga automáticamente a ese hilo el contexto del scope CLI; no dependas de él dentro del caso. Abre el scope en el propio método o fixture antes de resolver servicios scoped. El contenedor sí resuelve los constructores de los **servicios** que necesita el método; la instancia de `TestCase` la crea el loader de pruebas.
 
-Una prueba de reglas puras no necesita sustituir la aplicación completa. Para integraciones utiliza datos exclusivos, almacenes destinados a pruebas y limpieza explícita. No hay rollback automático de base de datos por heredar de `TestCase`; la guía de [pruebas de Database y ORM](/es/database/orm/testing) explica sus mecanismos específicos.
+Una prueba de reglas puras no necesita sustituir la aplicación completa. Para integraciones utiliza datos exclusivos, almacenes destinados a pruebas y limpieza explícita. No hay rollback automático de base de datos por heredar de `TestCase`; la guía de [pruebas de Database y ORM](/es/orm/testing) explica sus mecanismos específicos.
 
 ## Elegir el entorno antes de ejecutar
 
@@ -119,6 +119,6 @@ APP_DEBUG=bool:false
 
 Esto selecciona el entorno de aplicación; no convierte automáticamente una base de datos de producción en una base de pruebas. Configura sus conexiones, discos y servicios de acuerdo con tu proyecto. Las variables se leen en `config/`; desde la prueba recibe `IApplication` y utiliza `app.config(...)`.
 
-Si mantienes caché compilada de bootstrap entre ejecuciones, revisa sus [rutas e invalidación](/es/getting-started/paths-and-caching) al cambiar configuración. Evita reutilizar sin revisión la caché de otro entorno. Para sustituir colaboradores durante una prueba puedes utilizar `unittest.mock` y contextos de parcheo; consulta [dobles de prueba](/es/testing/cases-and-decorators#dobles-de-prueba).
+Si mantienes caché compilada de bootstrap entre ejecuciones, revisa sus [rutas e invalidación](/es/application/paths-and-caching) al cambiar configuración. Evita reutilizar sin revisión la caché de otro entorno. Para sustituir colaboradores durante una prueba puedes utilizar `unittest.mock` y contextos de parcheo; consulta [dobles de prueba](/es/testing/cases-and-decorators#dobles-de-prueba).
 
-El runner no crea una petición HTTP ni carga un payload para los parámetros del caso. Para probar una regla o schema invócalo con los datos de tu fixture; para peticiones MCP utiliza [el cliente MCP de pruebas](/es/testing/mcp-testing), cuyo scope por petición pertenece a esa integración.
+El runner no crea una petición HTTP ni carga un payload para los parámetros del caso. Para probar una regla o schema invócalo con los datos de tu fixture; para peticiones MCP utiliza [el cliente MCP de pruebas](/es/mcp/testing), cuyo scope por petición pertenece a esa integración.

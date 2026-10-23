@@ -7,13 +7,13 @@ lastUpdated: false
 
 `DB.table("products")` creates a fresh `RawQueryBuilder`. `Model.query()` creates a `ModelQueryBuilder` sharing its clauses; hydration, serialization and model policies differ. Clauses are synchronous and return the same builder: await only asynchronous terminals.
 
-Reference examples require a booted application and the `products` and `categories` tables from the [testing scenario](/en/database/orm/testing). Blocks are service/controller functions or queries you can run inside an `async` action. Write examples modify those sample tables.
+Reference examples require a booted application and the `products` and `categories` tables from the [testing scenario](/en/orm/testing). Blocks are service/controller functions or queries you can run inside an `async` action. Write examples modify those sample tables.
 
 Do not share a mutable builder across requests or tasks. The `DB` gateway itself is shared: create a builder for every query and use `clone()` to branch.
 
 ## Table and model results
 
-`get()` returns `Collection`, not a Python list. Raw tables contain dictionaries; model queries contain models. `first()` returns a row/model or `None`. `value()` may return `None` for either a missing row or SQL NULL. `pluck()` returns a value collection. See [collections and pagination](/en/database/orm/collections-and-pagination) for their structures.
+`get()` returns `Collection`, not a Python list. Raw tables contain dictionaries; model queries contain models. `first()` returns a row/model or `None`. `value()` may return `None` for either a missing row or SQL NULL. `pluck()` returns a value collection. See [collections and pagination](/en/orm/collections-and-pagination) for their structures.
 
 Continue with [conditions](/en/database/query-filters), [joins](/en/database/joins-and-subqueries) and [writes](/en/database/query-writes).
 
@@ -761,4 +761,4 @@ async def run_example():
 
 **Errors:** `QueryException` on compilation/execution failure; the connection layer sanitizes messages and suppresses chained driver causes.
 
-[DB facade](/en/database/db-facade) · [ORM queries](/en/database/orm/querying) · [Testing scenario](/en/database/orm/testing)
+[DB facade](/en/database/db-facade) · [ORM queries](/en/orm/querying) · [Testing scenario](/en/orm/testing)

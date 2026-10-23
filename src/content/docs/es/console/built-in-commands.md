@@ -109,4 +109,4 @@ Reactor devuelve el entero retornado por `handle()`; un retorno que no es entero
 
 No todos los comandos convierten sus errores internos en una excepción o en un retorno `1`: los generadores comunes imprimen ciertos errores y retornan `None`. Sus páginas explican esta limitación y los códigos específicos de comandos como `packages`, `test`, `db:wipe` y workers. Usa conjuntamente la salida del comando, su código y el resultado esperado.
 
-Para encadenar comandos desde código e inyectar servicios consulta la guía de [Reactor y ejecución programática](/es/console/output-and-programmatic-execution).
+Para encadenar comandos desde código e inyectar servicios consulta la guía de [Reactor y ejecución programática](/es/console/reactor-and-injection).

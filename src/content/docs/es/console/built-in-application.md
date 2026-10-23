@@ -276,4 +276,4 @@ orionis up
 python -B reactor up
 ```
 
-Para el funcionamiento de los servicios relacionados consulta [Cache](/es/services/cache), [Vistas](/es/services/views), [Cifrado](/es/security/encryption) y [Testing](/es/testing). La [caché de comandos](/es/console/command-cache) explica cuándo se reconstruye el registro de Reactor.
+Para el funcionamiento de los servicios relacionados consulta [Cache](/es/cache), [Vistas](/es/views), [Cifrado](/es/cryptography/encryption) y [Testing](/es/testing). La [caché de comandos](/es/console/command-cache) explica cuándo se reconstruye el registro de Reactor.

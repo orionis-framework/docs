@@ -346,4 +346,4 @@ Timestamps(*, timezone: bool=True) -> None
 
 `Comment.text` conserva el comentario normalizado; `PrimaryKey.columns` es la tupla de columnas; `ForeignKey.foreign` conserva `CompositeForeignKey`; `Index.constraint` conserva `TableIndex`; `Unique.constraint` conserva `UniqueConstraint`. `Timestamps`(timezone=True) tiene un default distinto de `Blueprint.timestamps`(timezone=False): el marcador conserva timezone pero no es una columna, y la ruta pública de uso es table.timestamps(). No intentes pasarlo como una factoría de columna.
 
-La forma estructurada de esas restricciones, las propiedades de `ColumnOptions` y las claves compuestas se documentan en [definiciones del ORM](/es/database/orm/schema-and-type-reference). Para renombrar, eliminar o cambiar restricciones existentes consulta [alteraciones](/es/database/schema-alterations).
+La forma estructurada de esas restricciones, las propiedades de `ColumnOptions` y las claves compuestas se documentan en [definiciones del ORM](/es/orm/schema-and-type-reference). Para renombrar, eliminar o cambiar restricciones existentes consulta [alteraciones](/es/database/schema-alterations).

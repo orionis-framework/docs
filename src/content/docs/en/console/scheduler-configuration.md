@@ -5,7 +5,7 @@ editUrl: true
 lastUpdated: false
 ---
 
-The scheduler maintains task definitions and their next run times. Configure that storage in `config/scheduler.py`. [Queues configuration](/en/asynchronous/queues/configuration) is separate: queue jobs, reservations, and failures are not stored in scheduler stores.
+The scheduler maintains task definitions and their next run times. Configure that storage in `config/scheduler.py`. [Queues configuration](/en/queues/configuration) is separate: queue jobs, reservations, and failures are not stored in scheduler stores.
 
 ## General configuration
 

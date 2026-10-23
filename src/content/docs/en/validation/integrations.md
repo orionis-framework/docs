@@ -112,7 +112,7 @@ Mcp.local("contacts", ContactServer)
 
 A client calls `contact-preview` with `arguments` such as `{"email": "ada@example.com"}`. The tool receives a `ContactSchema` and produces `structuredContent` containing those data. It does not return a bare Schema: `McpResponse.structured` normalizes it as MCP content.
 
-See [MCP servers and tools](/en/protocols/mcp/servers-and-tools) and [transports and configuration](/en/protocols/mcp/transports-and-configuration) to integrate this registration with application boot and connect a client.
+See [MCP servers and tools](/en/mcp/servers-and-routes) and [transports and configuration](/en/mcp/stdio-and-configuration) to integrate this registration with application boot and connect a client.
 
 When the input and output are Orionis Schema classes, both conversions await asynchronous rules. The declared output is checked before a successful result is published. Errors appear in the MCP result:
 
@@ -191,7 +191,7 @@ A valid result contains `{"type": "completion", "id": "preview-1", "result": {"e
 
 A Schema result is serializable through the connection codec, but `-> ContactSchema` does not activate output validation. If you need to check data produced by the method, validate explicitly before returning them.
 
-See [hubs and methods](/en/asynchronous/realtime/hubs-and-methods) and [protocol and streaming](/en/asynchronous/realtime/protocol-and-streaming) for connection setup and the rest of the message exchange.
+See [hubs and methods](/en/realtime/hubs-and-methods) and [protocol and streaming](/en/realtime/protocol-and-streaming) for connection setup and the rest of the message exchange.
 
 ## WebSocket: validate the message explicitly
 

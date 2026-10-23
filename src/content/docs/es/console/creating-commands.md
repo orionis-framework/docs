@@ -70,7 +70,7 @@ La primera ejecución imprime dos saludos. `--times 0` devuelve `2`; un envío v
 
 ## Estructura y descubrimiento
 
-`BaseCommand` se importa desde `orionis.console.base`. Extiende `Console` y el contrato `IBaseCommand`: dentro del comando utiliza `self.writeLine()`, `self.table()`, `self.ask()` y los demás métodos de [salida](/es/console/console-output) y [preguntas](/es/console/interactive-input). Para [progreso](/es/console/progress-and-debugging), la propiedad heredada `self.progressBar` proporciona una barra; guarda esa instancia antes de actualizarla. No necesitas construir otro `Console` ni importar `ProgressBar` dentro del comando.
+`BaseCommand` se importa desde `orionis.console.base`. Extiende `Console` y el contrato `IBaseCommand`: dentro del comando utiliza `self.writeLine()`, `self.table()`, `self.ask()` y los demás métodos de [salida](/es/console/console-output) y [preguntas](/es/console/interactive-input). Para [progreso](/es/console/progress), la propiedad heredada `self.progressBar` proporciona una barra; guarda esa instancia antes de actualizarla. No necesitas construir otro `Console` ni importar `ProgressBar` dentro del comando.
 
 | Miembro | Tipo y predeterminado | Función |
 | --- | --- | --- |
@@ -193,4 +193,4 @@ python -B reactor app:parse-count 0
 
 La primera llamada devuelve `2` desde el comando. La segunda llega al tratamiento de excepciones de Reactor: escribe en logs, delega a `ICatch` y devuelve `1` si ese tratamiento termina correctamente. Capturar un error y terminar sin un retorno distinto de cero puede hacer que el comando se interprete como exitoso.
 
-Para terminar un comando normal, devuelve el código desde `handle()`; `exitSuccess()` y `exitError()` son [operaciones de terminación del proceso](/es/console/console-output), con efectos diferentes. La ayuda y los errores del parser utilizan `SystemExit`; consulta [la ejecución programática](/es/console/output-and-programmatic-execution) antes de capturarlos desde otro componente.
+Para terminar un comando normal, devuelve el código desde `handle()`; `exitSuccess()` y `exitError()` son [operaciones de terminación del proceso](/es/console/console-output), con efectos diferentes. La ayuda y los errores del parser utilizan `SystemExit`; consulta [la ejecución programática](/es/console/reactor-and-injection) antes de capturarlos desde otro componente.

@@ -21,10 +21,10 @@ for (const [scope, entries] of [['declaration', mapped], ['supplement', inventor
     seen.add(key);
     for (const locale of ['es', 'en']) {
       const url = entry.docs?.[locale];
-      if (!url?.startsWith(`/${locale}/database`)) { errors.push(`Missing localized reference: ${key}:${locale}`); continue; }
+      if (typeof url !== 'string' || !url.startsWith(`/${locale}/`)) { errors.push(`Missing localized reference: ${key}:${locale}`); continue; }
       const [route, anchor] = url.split('#');
       const relative = `${route.slice(1)}.md`;
-      if (!/^(es|en)\/database(?:\/[a-z0-9-]+)*\.md$/.test(relative) || !anchor) { errors.push(`Invalid documentation destination: ${url}`); continue; }
+      if (!/^(es|en)\/(?:database|orm|faker)(?:\/[a-z0-9-]+)*\.md$/.test(relative) || !anchor) { errors.push(`Invalid documentation destination: ${url}`); continue; }
       if (!cache.has(relative)) {
         try { cache.set(relative, headingIds(await fs.readFile(path.join(root, 'src/content/docs', relative), 'utf8'))); }
         catch (error) { errors.push(`Missing documentation file: ${relative}`); cache.set(relative, new Set()); }

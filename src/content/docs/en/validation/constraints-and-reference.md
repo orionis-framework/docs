@@ -1392,7 +1392,7 @@ class AvatarSchema(Schema):
     ]
 ```
 
-`object` preserves the file object and leaves checks to the rules. `Between(1, 2048)` requires between 1 and 2048 KiB, rather than pixels or bytes. This schema does not itself process multipart data: it receives objects supplied by the [request and upload system](/en/http/forms-and-uploads).
+`object` preserves the file object and leaves checks to the rules. `Between(1, 2048)` requires between 1 and 2048 KiB, rather than pixels or bytes. This schema does not itself process multipart data: it receives objects supplied by the [request and upload system](/en/http/requests).
 
 ### Testing files through a request
 

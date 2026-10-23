@@ -25,7 +25,7 @@ AUXILIARY_FILES = (
 
 
 def destination(owner: str, name: str) -> str:
-    base = "/architecture/environment/"
+    base = "/environment/"
     if owner in {"Env", "IEnv"}:
         anchor = f"env-{name}" if name in {"get", "set", "unset", "all", "reload"} else "env-api"
     elif owner == "DotEnv":

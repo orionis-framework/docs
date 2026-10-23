@@ -254,8 +254,8 @@ flowchart TD
     G -->|No| I[Termina el callback]
 ```
 
-Reactor captura las excepciones ordinarias del comando, las envía al [manejador global](/es/architecture/exception-handling) y normalmente retorna `1`. El scheduler de Orionis observa ese retorno como **ejecución del callable sin excepción**, por lo que emite `EXECUTED` con `retval=1`. Para observar fallos de comando revisa el código en `onTaskExecuted()` además de implementar `onTaskError()`.
+Reactor captura las excepciones ordinarias del comando, las envía al [manejador global](/es/exceptions) y normalmente retorna `1`. El scheduler de Orionis observa ese retorno como **ejecución del callable sin excepción**, por lo que emite `EXECUTED` con `retval=1`. Para observar fallos de comando revisa el código en `onTaskExecuted()` además de implementar `onTaskError()`.
 
 Si un listener lanza `Exception`, Orionis registra el fallo y llama a `ICatch.exception()` de forma asíncrona. Si ese manejador también falla, registra ese segundo error. Esto no repite el comando ni revierte sus efectos. Los listeners async se mantienen en un conjunto de tareas y el apagado espera a los ya pendientes antes de solicitar el cierre del scheduler; no almacena ni reproduce sus callbacks después de reiniciar.
 
-`MISSED`, `MAX_INSTANCES`, `ERROR` y un retorno no cero no crean reintentos de negocio. Para trabajo con políticas de reintento persistentes, despacha [jobs de Queues](/es/asynchronous/queues/failures-and-retries) desde el comando y observa ambos componentes por separado.
+`MISSED`, `MAX_INSTANCES`, `ERROR` y un retorno no cero no crean reintentos de negocio. Para trabajo con políticas de reintento persistentes, despacha [jobs de Queues](/es/queues/failures-and-retries) desde el comando y observa ambos componentes por separado.

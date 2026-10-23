@@ -16,7 +16,7 @@ SOURCE_FILES = ("config/cache.py", "orionis/support/facades/cache.py")
 
 
 def destination(file: str, owner: str, name: str, kind: str) -> str:
-    base = "/services/cache/"
+    base = "/cache/"
     if file.startswith("orionis/foundation/config/cache") or file == "config/cache.py":
         return base + "configuration#config-" + ("cache" if owner in {"BootstrapCache", "Cache"} else owner.lower())
     if file.endswith("facades/cache.py"):

@@ -352,7 +352,7 @@ Route.get("/responses/product-page", product_page)
 
 Named arguments are context: `response.view("page", status_code=201)` passes a variable to the template; it does not configure the HTTP status. To change it, await the response and assign `result.status_code = 201` before returning it. Awaiting the same pending view twice renders it again.
 
-See [views and rendering](/en/services/views/rendering-templates) for template names, configuration and form helpers.
+See [views and rendering](/en/views/rendering-templates) for template names, configuration and form helpers.
 
 ## Redirects and flash data
 
@@ -406,7 +406,7 @@ Register it in `routes/web.py` and use your GET `/profile` route to display the 
 | `withErrors(errors)` | Normalizes errors from a mapping or a validation exception. |
 | `getFlashData()` | Reads the queued dictionary, or `None` when there is no data. |
 
-Session middleware applies the state before delivering the response; without that session cycle, flash data does not persist. `withInput()` excludes known sensitive names at the top level, such as `password`; it does not recursively filter every possible secret. See [sessions and flash data](/en/http/sessions/state-and-flash).
+Session middleware applies the state before delivering the response; without that session cycle, flash data does not persist. `withInput()` excludes known sensitive names at the top level, such as `password`; it does not recursively filter every possible secret. See [sessions and flash data](/en/sessions/state-and-flash).
 
 ## Response headers and status
 
@@ -498,11 +498,11 @@ curl -i -X POST http://localhost:8000/responses/preferences
 
 `withCookies(mapping)` accepts a text value for each name or a mapping with `setCookie` options. Each cookie produces a separate header.
 
-`deleteCookie(key, *, path="/", domain=None)` and its fluent variant `withoutCookie(...)` emit past expiration and `Max-Age=0`. Use the path and domain with which the cookie was created. The response emits the requested attributes; storage and acceptance rules belong to the client. For application state managed on the server, see [sessions](/en/http/sessions).
+`deleteCookie(key, *, path="/", domain=None)` and its fluent variant `withoutCookie(...)` emit past expiration and `Max-Age=0`. Use the path and domain with which the cookie was created. The response emits the requested attributes; storage and acceptance rules belong to the client. For application state managed on the server, see [sessions](/en/sessions).
 
 ## Files and downloads
 
-Use the `Storage` facade to obtain files from configured disks and deliver their content through `response.stream()`. The `reports/users.csv` path is relative to the `local` disk defined in `config/filesystems.py`; see [Storage](/en/services/storage).
+Use the `Storage` facade to obtain files from configured disks and deliver their content through `response.stream()`. The `reports/users.csv` path is relative to the `local` disk defined in `config/filesystems.py`; see [Storage](/en/storage).
 
 The `prepare_report()` helper creates the demonstration file. Run `await prepare_report()` from a command or asynchronous method in the booted application before trying the routes:
 
@@ -648,7 +648,7 @@ The response sets `text/event-stream; charset=utf-8` and, when absent, `Cache-Co
 
 SSE observes client disconnection, cancels delivery and awaits producer cleanup. In ASGI, it takes control of the receive channel during delivery: read any request data you need in the handler before returning the stream.
 
-The example is finite. The id and retry fields do not themselves implement storage, replay or a heartbeat producer; comments can be used to emit those messages explicitly. See [streaming and SSE](/en/http/streaming-and-sse) for clients and cancellation.
+The example is finite. The id and retry fields do not themselves implement storage, replay or a heartbeat producer; comments can be used to emit those messages explicitly. See [streaming and SSE](/en/realtime/streaming-and-sse) for clients and cancellation.
 
 ## Work after sending the response
 
@@ -682,7 +682,7 @@ Route.get("/responses/background/multiple", multiple_background)
 
 The adapter awaits the work after successful delivery and stream closure. `BackgroundTasks` executes its tasks in order and stops if one fails. Errors occurring after delivery do not change the status the client has already received.
 
-The work remains inside the request cycle and delays its completion. It is not a persistent queue or a detached task: an SSE disconnection, delivery failure or process crash can prevent it from running. For persistent execution, see [queues and jobs](/en/asynchronous/queues).
+The work remains inside the request cycle and delays its completion. It is not a persistent queue or a detached task: an SSE disconnection, delivery failure or process crash can prevent it from running. For persistent execution, see [queues and jobs](/en/queues).
 
 The adapter calls `await result.runBackground()`; do not call it again inside the controller if you want to preserve that execution timing.
 
@@ -741,7 +741,7 @@ The flow is the same for functions and controllers:
 5. After successful delivery and cleanup, it awaits the background work.
 6. Finally, the kernel closes Request, leaves the container scope and releases the capacity for that request.
 
-[Middleware options](/en/http/middleware-and-security) allow you to modify the response before sending it. Once delivery has started, the producer cannot replace its headers or status.
+[Middleware options](/en/http/middleware) allow you to modify the response before sending it. Once delivery has started, the producer cannot replace its headers or status.
 
 ### HEAD and transport metadata
 

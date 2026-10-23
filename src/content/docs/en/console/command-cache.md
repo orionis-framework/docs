@@ -89,7 +89,7 @@ python -B reactor optimize
 
 ## Public loader API
 
-`orionis.console.core.loader.Loader` uses `IApplication`. Use [Reactor](/en/console/output-and-programmatic-execution) for ordinary work; these operations support registry inspection and integration.
+`orionis.console.core.loader.Loader` uses `IApplication`. Use [Reactor](/en/console/reactor-and-injection) for ordinary work; these operations support registry inspection and integration.
 
 | Method | Result and behavior |
 | --- | --- |

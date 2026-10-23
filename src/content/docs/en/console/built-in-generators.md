@@ -183,7 +183,7 @@ Create a resource or invokable controller.
 
 Generate `index`, `create`, `store`, `show`, `edit`, `update` and `destroy` by default. Enabling `--invoke` (default `False`) replaces these with one `__call__` action. `--api` (default `False`) changes the import and return annotations from `HttpResponse` to `JSONResponse`; both flags can be combined. Generated actions contain documentation and still need implementation: an annotation neither constructs a response nor converts values by itself.
 
-**Default destination:** `app/http/request-lifecycle`. Class/file suffix: `Controller`.
+**Default destination:** `app/http/controllers`. Class/file suffix: `Controller`.
 
 ```shell
 orionis make:http-controller user --invoke --api
@@ -476,4 +476,4 @@ orionis make:test services/report
 python -B reactor make:test services/report
 ```
 
-Generation produces scaffolding; it does not register providers, create tables, publish endpoints or run jobs. See [Controllers](/en/http/request-lifecycle), [Middleware](/en/http/middleware-and-security), [Schemas](/en/validation), [ORM](/en/database/orm), [Mail](/en/services/mail), [Queues](/en/asynchronous/queues), [Realtime](/en/asynchronous/realtime) and [MCP](/en/protocols/mcp) for component implementation.
+Generation produces scaffolding; it does not register providers, create tables, publish endpoints or run jobs. See [Controllers](/en/http/controllers), [Middleware](/en/http/middleware), [Schemas](/en/validation), [ORM](/en/orm), [Mail](/en/mail), [Queues](/en/queues), [Realtime](/en/realtime) and [MCP](/en/mcp) for component implementation.

@@ -10,8 +10,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 MANIFEST = ROOT / "public/downloads/deployment-source-inventory.json"
-COMMON = "/getting-started/deployment-and-reference"
-PROXY = "/getting-started/deployment/reverse-proxies"
+COMMON = "/deployment"
+PROXY = "/deployment/reverse-proxies"
 AREAS = {
     "application-entrypoints-and-bootstrap": (COMMON, ["bootstrap/app.py", "orionis/foundation/application.py"]),
     "python-and-server-dependencies": (COMMON, ["pyproject.toml", ".python-version"]),
@@ -26,7 +26,7 @@ AREAS = {
     "request-client-and-url": (PROXY, ["orionis/http/request.py"]),
     "http-security-and-payload-limits": (PROXY, ["orionis/http/kernel.py", "orionis/foundation/config/http/entitites/body.py", "orionis/foundation/config/http/entitites/security.py"]),
     "websocket-origins": (PROXY, ["orionis/foundation/config/http/entitites/websocket.py"]),
-    "health-and-default-responses": ("/http/default-responses", ["orionis/http/default/responses.py", "orionis/http/routes/router.py"]),
+    "health-and-default-responses": ("/deployment/health-and-default-responses", ["orionis/http/default/responses.py", "orionis/http/routes/router.py"]),
     "native-serve-tests": (COMMON, ["tests/console/commands/serve/test_serve_command.py"]),
     "native-proxy-tests": (PROXY, ["tests/http/layer/shared/test_proxies.py"]),
 }

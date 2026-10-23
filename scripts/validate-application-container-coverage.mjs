@@ -9,14 +9,14 @@ const pageIds = [
   'foundation-bootstrap-options', 'foundation-configuration', 'foundation-paths-and-caching',
   'container-overview', 'container-bindings-and-invocation', 'container-scopes-and-concurrency',
   'container-providers-and-facades', 'container-facades',
-  'aio-overview', 'aio-async-execution',
+  'aio-async-execution',
 ];
 const groupIds = ['application-lifecycle', 'application-bootstrap', 'application-container', 'application-services', 'application-async'];
 const section = navigationSections.find((entry) => entry.id === 'application');
 if (JSON.stringify(section?.pageIds) !== JSON.stringify(pageIds)
   || JSON.stringify(section?.groups?.map((group) => group.id)) !== JSON.stringify(groupIds)
   || JSON.stringify(section.groups.flatMap((group) => group.pageIds)) !== JSON.stringify(pageIds)) {
-  throw new Error('Application and Container must retain 14 guides in five ordered groups.');
+  throw new Error('Application and Container must retain 13 guides in five ordered groups.');
 }
 if (navigationSections.some((entry) => entry.id !== 'application' && entry.pageIds.some((id) => pageIds.includes(id)))) {
   throw new Error('Application and Container guides must occur only in their own category.');
@@ -75,4 +75,4 @@ async function checkDeclarations(entries, detailed) {
 
 await checkDeclarations(inventory.entries, true);
 await checkDeclarations(inventory.configurationReferences, false);
-console.log(`Application and Container coverage valid: ${inventory.entries.length} detailed API declarations, ${inventory.configurationReferences.length} separate configuration cross-references, ${Object.keys(inventory.hashes).length} source files and 14 guides per locale.`);
+console.log(`Application and Container coverage valid: ${inventory.entries.length} detailed API declarations, ${inventory.configurationReferences.length} separate configuration cross-references, ${Object.keys(inventory.hashes).length} source files and 13 guides per locale.`);

@@ -62,7 +62,7 @@ If foreign keys, SQL views, triggers, or indexes exist, design a rebuild specifi
 
 ## Indexes, keys, and other operations
 
-For new tables, use [primaryKey, unique, index, and foreignKey](/en/database/schema-modifiers), or [`TableDefinition`](/en/database/orm/schema-and-type-reference) for composite foreign keys. Existing tables need backend SQL for CREATE/DROP INDEX, ALTER CONSTRAINT, type changes, and referential actions. Orionis adds no API automatically checking compatibility.
+For new tables, use [primaryKey, unique, index, and foreignKey](/en/database/schema-modifiers), or [`TableDefinition`](/en/orm/schema-and-type-reference) for composite foreign keys. Existing tables need backend SQL for CREATE/DROP INDEX, ALTER CONSTRAINT, type changes, and referential actions. Orionis adds no API automatically checking compatibility.
 
 Creation SQL uses types from the [catalog](/en/database/column-types); types without builders also fail during a rebuild. Key/unique enforcement and indexing differ between SQLite, traditional engines, and Redshift. A physical composite key also does not expand `Model.primary_key` capabilities.
 
@@ -70,4 +70,4 @@ Creation SQL uses types from the [catalog](/en/database/column-types); types wit
 
 Add a new migration for every change. An existing table does not prove that its structure matches `TableDefinition`, and `Schema` exposes no reflection to compare them. Each file and its history share a transaction; actual DDL atomicity and locking depend on the backend. An exception following DDL with implicit commit may require manual repair even though the migration record was never committed.
 
-See [migrations](/en/database/migrations-and-seeders) for batches, connection selection, and failures, and [testing](/en/database/orm/factories-and-testing) to verify evolution without touching real application databases.
+See [migrations](/en/database/migrations) for batches, connection selection, and failures, and [testing](/en/orm/factories) to verify evolution without touching real application databases.
