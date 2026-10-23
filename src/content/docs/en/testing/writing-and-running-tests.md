@@ -1,143 +1,115 @@
 ---
 title: "Writing and running tests"
-description: "Create tests/unit/test_arithmetic.py with this complete module (create the directories if necessary):"
+description: "Generate a TestCase with make:test, replace the skipped placeholder with assertions and run sync or async cases through Reactor."
 editUrl: true
 lastUpdated: false
 ---
 
-## Quick start
+## Create a case with `make:test`
 
-Create `tests/unit/test_arithmetic.py` with this complete module (create the directories if necessary):
-
-```python
-from orionis.test import TestCase
-
-class TestArithmetic(TestCase):
-    async def testAddition(self) -> None:
-        self.assertEqual(2 + 2, 4)
-```
-
-Run the suite from the project root:
-
-```powershell
-uv run python -B reactor test
-uv run python -B reactor test --start-dir tests/unit --file-pattern "test_arithmetic.py" --no-panel --verbosity 1
-```
-
-The second command selects the new file and should report one passing test with exit code 0. The first command runs the whole configured suite, including other tests your project already contains. A file must match `test_*.py` and its methods must match `test*` unless you change the configured patterns.
-
-To select methods or stop at the first failure:
+From the application root, choose one alternative:
 
 ```shell
-uv run python -B reactor test --method-pattern "testAddition*" --fail-fast 1
+orionis make:test unit/price
 ```
 
-`--fail-fast` takes `0` or `1`; it is not a flag without a value. If no tests are found, inspect the start directory and both patterns before treating the run as validation.
+```shell
+python -B reactor make:test unit/price
+```
 
-## Core concepts
+If you prefer uv to select the project environment, use `uv run python -B reactor make:test unit/price`. All three commands generate the same file; do not run them consecutively to create one case.
 
-### Application-aware cases
+The generator takes **one required `name` argument** and supports `-h`/`--help`. It has no flags for choosing another base class or overwriting files. The destination comes from `app.path("tests")`, normally `tests/`:
 
-`TestCase` extends `unittest.IsolatedAsyncioTestCase`. At construction it wraps only the selected test method—not lifecycle hooks—and executes that method through `Application.invoke()`. This gives test methods the same automatic dependency resolution as application callables. Sync and async test methods are both accepted by the application invocation path.
+| Supplied name | Default file | Generated class |
+| --- | --- | --- |
+| `price` | `tests/test_price.py` | `TestPrice` |
+| `unit/price` | `tests/unit/test_price.py` | `TestPrice` |
+| `feature/test_order` | `tests/feature/test_order.py` | `TestOrder` |
 
-Each case gets an isolated event loop. The slow-callback threshold is set to one second while asyncio debug behavior remains active. The method-name matcher is held in a `ContextVar`, so concurrent discovery contexts do not overwrite one another.
+It adds `test_` to the filename when missing, lowercases filenames and directories, and builds the class name from `_`-separated segments. It does not automatically convert CamelCase to snake_case: prefer names such as `order_total`. It creates required directories and rejects absolute paths, empty components, `.`/`..` and invalid module names. If the file exists, it reports the error and preserves it; edit the file directly or choose another name.
 
-### Discovery and execution
+## Understand the generated template
 
-`TestingEngine` walks the configured directory recursively, including directories without `__init__.py`, loads matching files, and filters individual methods. It creates a fresh suite for every run and executes the synchronous `unittest` runner in an executor so the caller's event loop is not blocked.
-
-### Structured results
-
-`TestResultProcessor` converts successes, failures, errors, skips, expected failures, unexpected successes, and subtest outcomes into `TestResult` entities. A result records status, timing, location, documentation, exception details, traceback, and nearby source code. Optional JSON caching serializes these entities under `storage/framework/cache/testing`.
-
-### Protocol-level MCP tests
-
-`McpTestClient` compiles a server once, sends encoded JSON-RPC messages through `McpDispatcher`, and creates a fresh container scope for each request or stream. `McpTestResponse` exposes the decoded final message plus collected notifications and concise assertions for success and returned text.
-
-## Common workflows
-
-### Test resolved dependencies
-
-Annotate the test method like any application-invoked callable. Orionis resolves the parameter when the runner invokes the case:
+For `unit/price`, the stub produces this class:
 
 ```python
-from uuid import uuid4
-from orionis.cache.contracts.cache_manager import ICacheManager
 from orionis.test import TestCase
 
-class TestHealth(TestCase):
-    async def testCache(self, cache: ICacheManager) -> None:
-        key = f"tests:health:{uuid4().hex}"
-        try:
-            await cache.set(key, "ok", ttl=10)
-            self.assertEqual(await cache.get(key), "ok")
-        finally:
-            await cache.delete(key)
+class TestPrice(TestCase):
+    """Describe the application behavior covered by this test case."""
+
+    async def testExample(self) -> None:
+        """
+        Describe one expected behavior and add its assertions.
+
+        Returns
+        -------
+        None
+            The test completes after its assertions pass.
+        """
+        self.skipTest("Replace this placeholder with assertions.")
 ```
 
-### Assert an MCP response
+**All Orionis test cases must inherit from `TestCase`, imported with `from orionis.test import TestCase`.** The template creates an asynchronous method with an explicit skip; it does not yet check behavior. Replace `skipTest(...)` with application operations and assertions before treating that functionality as covered.
+
+Filenames match `test_*.py` by default; method names must start with `test`. Class names do not have to use that prefix, although the generator uses it for a clear convention.
+
+## Write a complete first test
+
+Replace `tests/unit/test_price.py` with this module. The function represents an example rule; in your application, import the service or function being tested.
 
 ```python
-from orionis.test import McpTestResponse
+from orionis.test import TestCase
 
-response = McpTestResponse({
-    "jsonrpc": "2.0",
-    "id": 1,
-    "result": {
-        "content": [{"type": "text", "text": "Hello, Ada"}],
-        "isError": False,
-    },
-})
-response.assertOk()
-response.assertTextContains("Ada")
-assert response.notifications == ()
+
+def final_price(cents: int) -> int:
+    if cents < 0:
+        raise ValueError("Price cannot be negative")
+    return cents + cents // 5
+
+
+class TestPrice(TestCase):
+    def testTotal(self) -> None:
+        self.assertEqual(final_price(1000), 1200)
+
+    async def testRejectsNegative(self) -> None:
+        with self.assertRaisesRegex(ValueError, "cannot be negative"):
+            final_price(-1)
 ```
 
-### Inspect a structured result
+The first method is synchronous and the second asynchronous: both are supported. Inside an `async` method, use `await` when the called service requires it; you do not need `asyncio.run()`. Test methods finish without returning a business result: assertions determine whether they pass or fail.
 
-```python
-from orionis.test.entities.result import TestResult
-from orionis.test.enums.status import TestStatus
+## Run and select cases
 
-result = TestResult(
-    id="case-1",
-    name="tests.unit.TestUsers.testCreate",
-    status=TestStatus.PASSED,
-    execution_time=0.012,
-)
+With the project environment active, choose the direct command or Reactor:
 
-payload = result.toDict()
-assert payload["status"] == "PASSED"
-assert payload["execution_time"] == 0.012
+```shell
+orionis test
 ```
 
-## Configuration
+```shell
+python -B reactor test
+```
 
-The `testing` configuration entity reads these environment variables:
+Run only the preceding file from the same root:
 
-| Environment variable | Default | Meaning |
-| --- | --- | --- |
-| `TESTING_VERBOSITY` | `2` | `0` silent, `1` compact, `2` detailed. |
-| `TESTING_FAIL_FAST` | `False` | Stop after the first failure or error. |
-| `TESTING_START_DIR` | `tests` | Discovery root. |
-| `TESTING_FILE_PATTERN` | `test_*.py` | File glob. |
-| `TESTING_METHOD_PATTERN` | `test*` | Method glob. |
-| `TESTING_CACHE_RESULTS` | `False` | Persist structured results as JSON. |
+```shell
+python -B reactor test --start-dir tests/unit --file-pattern "test_price.py" --no-panel --verbosity 1
+```
 
-CLI arguments override the corresponding configured values. `--no-panel` suppresses the Rich start and summary panels independently of per-test verbosity.
+It should run two passing methods. To select one:
 
-## Integration with Orionis
+```shell
+python -B reactor test --start-dir tests/unit --file-pattern "test_price.py" --method-pattern "testRejects*" --fail-fast 1
+```
 
-`TestingProvider` binds `ITestingEngine` as a singleton and pins the `Test` facade at boot. The `reactor test` command resolves that engine, applies command-line overrides, runs it, and derives the process status from the returned structured results.
+`--method-pattern` filters the `test*` candidates found by the loader; it does not enable methods named `checkSomething`. `--fail-fast` takes an integer value; it is not a valueless switch. See all options, defaults and JSON output in [Results and configuration](/en/testing/results-and-reference).
 
-`TestCase.mcp()` reuses the already booted application by default. Pass `app=` only when a test deliberately owns another compatible container. This prevents an MCP test client from silently creating a parallel application with different bindings.
+## Organize tests
 
-## Isolate test state
+You can separate rules without I/O under `tests/unit` and integrations under `tests/integration` or `tests/feature`. These are project conventions, not special engine categories. Discovery traverses subdirectories; the starting directory should be inside the project and importable from its root. Keep the working directory at that root when running Reactor.
 
-Each case uses an isolated event loop; the application, its singletons, and external data may remain shared. The base does not promise database rollback, cache flushing, or a separate scope per method. Use temporary or memory stores, unique keys, and explicit cleanup. The cache example deletes its key in `finally`. To resolve a scoped service, enter `async with app.beginScope()` and resolve it inside that block; do not request it as an argument before the scope exists. The `setUp` and `asyncSetUp` hooks retain their unittest signatures and do not receive automatic injection.
+The command uses application providers and configuration. It does not automatically change `APP_ENV`, database connections or drivers to an isolated environment. Configure test resources before bootstrap; review [injection and isolation](/en/testing/dependency-injection) before testing persistence.
 
-## Reference and next steps
-
-[case.py](https://github.com/orionis-framework/framework/blob/470229f78a5db61263ce887bcdd16bc98f9141db/orionis/test/cases/case.py) · [engine.py](https://github.com/orionis-framework/framework/blob/470229f78a5db61263ce887bcdd16bc98f9141db/orionis/test/core/engine.py) · [test_example.py](https://github.com/orionis-framework/framework/blob/470229f78a5db61263ce887bcdd16bc98f9141db/tests/test_example.py)
-
-[Return to the module index](/en/testing).
+Continue with [lifecycle and decorators](/en/testing/cases-and-decorators). MCP component tests have their [own guide](/en/testing/mcp-testing).

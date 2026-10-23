@@ -17,6 +17,24 @@ The package deliberately has two levels of API. `orionis.support.facades` and `o
 - The Orionis runtime and its declared dependencies. This module directly uses `pendulum`, `dotty-dict`, and `psutil`.
 - A bootstrapped Orionis application before calling service-backed facades. `DateTime` is a standalone class and does not require the container for ordinary date operations.
 
+## Helpers and Metadata references
+
+Each helper has its own guide covering imports, parameters, returns, examples and access patterns:
+
+| Utility | Main use |
+| --- | --- |
+| [Collection](/en/advanced/data-utilities/collection) | Transform, filter, group and serialize in-memory data. |
+| [DotDict](/en/advanced/data-utilities/dot-dict) | Access nested dictionaries through attributes. |
+| [Sentinel](/en/advanced/data-utilities/sentinel) | Distinguish omitted data with `MISSING`. |
+| [StdClass](/en/advanced/data-utilities/std-class) | Group dynamic attributes and export them to a dictionary. |
+| [Stringable](/en/advanced/data-utilities/stringable) | Transform and inspect immutable strings. |
+| [Workers](/en/advanced/data-utilities/workers) | Estimate concurrency from CPU and a memory budget. |
+| [FreezeThaw](/en/advanced/data-utilities/freeze-thaw) | Convert containers between frozen and mutable forms. |
+| [PerformanceCounter](/en/advanced/data-utilities/performance-counter) | Measure synchronous and asynchronous intervals. |
+| [Metadata](/en/advanced/framework-metadata) | Read the installed framework's identity and version. |
+
+Construct data-bearing types explicitly; class methods, static methods and constants do not require the container. Each reference explains where injection applies. These utilities do not hydrate request data by themselves.
+
 ## Module learning path
 
 - [Transforming collections and strings](/en/advanced/data-utilities/collections-and-strings)

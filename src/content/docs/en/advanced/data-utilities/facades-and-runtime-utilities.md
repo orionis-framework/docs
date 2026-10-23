@@ -5,6 +5,8 @@ editUrl: true
 lastUpdated: false
 ---
 
+The detailed [Workers](/en/advanced/data-utilities/workers) and [PerformanceCounter](/en/advanced/data-utilities/performance-counter) references cover signatures, contexts and injection. Other services retain their module guides.
+
 ## Core concepts
 
 ### Facades
@@ -19,7 +21,7 @@ Most facades are process-wide. `Session` is scoped, so its resolution follows th
 
 ### Entities and structures
 
-`BaseEntity` is meant to be combined with `@dataclass`. It serializes nested dataclasses and enum fields through `toDict()` and describes field types, defaults, and metadata through `getFields()`. `FreezeThaw` recursively converts dictionaries to read-only mapping proxies and sequences to tuples, while preserving repeated references inside the traversed graph.
+`BaseEntity` is meant to be combined with `@dataclass`. It serializes nested dataclasses and enum fields through `toDict()` and describes field types, defaults, and metadata through `getFields()`. `FreezeThaw` converts dictionaries to read-only mapping proxies and sequences to tuples, with the cycle and shared-reference limits described in its reference.
 
 ### Cross-cutting helpers
 
@@ -64,7 +66,7 @@ Except for `DateTime`, these classes obtain their target from the container. Con
 - `DotDict(mapping)`: key and attribute access; `export()` recursively restores dictionaries and `copy()` recursively copies nested mappings.
 - `StdClass(**kwargs)`: dynamic attributes with reserved method and dunder names rejected; supports `fromDict`, `toDict`, `update`, and `remove`.
 - `Stringable(value)`: immutable fluent text wrapper with casing, matching, replacement, encoding, hashing, parsing, truncation, and validation helpers.
-- `MISSING`: falsey sentinel whose representation is `MISSING`.
+- `MISSING`: falsey sentinel whose representation is `<MISSING>`.
 - `BaseEntity`: `toDict()` and `getFields()` for dataclass entities.
 - `FreezeThaw.freeze()` / `thaw()`: recursive immutable/mutable conversions.
 - `PerformanceCounter`: `start`/`stop`, `astart`/`astop`, context-manager APIs, and duration conversions.

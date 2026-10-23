@@ -1,31 +1,54 @@
 ---
-title: "Application testing"
-description: "Start by saving one case under tests/ and running it through the generated application's Reactor entry point. This boots the same providers and dependency bindings used by your…"
+title: "Testing"
+description: "Create sync and async TestCase tests with dependencies, fixtures, decorators and configurable results through Reactor."
 editUrl: true
 lastUpdated: false
 ---
 
-Start by saving one case under `tests/` and running it through the generated application's Reactor entry point. This boots the same providers and dependency bindings used by your application. The shortest path is [Writing and running tests](/en/testing/writing-and-running-tests); continue with [MCP integration tests](/en/testing/mcp-testing) when your project exposes tools.
+Orionis testing integrates case discovery, the application container and asynchronous execution with `unittest` assertions. It checks rules, services and integrations using the same application that registers providers and configuration.
 
-Use dedicated test data and explicit cleanup when a case accesses persistence or external services. An isolated asyncio loop does not provide an isolated database or automatically undo writes.
+**Every case must inherit from `TestCase`, imported with `from orionis.test import TestCase`.** It supports `def` and `async def` methods; the selected method runs with automatic dependency resolution. Each case has an isolated event loop, while the container and external data may remain shared.
 
-## Overview
+## Recommended path
 
-`orionis.test` is Orionis's asynchronous testing layer on top of Python's `unittest`. It supplies an application-aware `TestCase`, a configurable discovery and execution engine, structured test results, Rich console reporting, and an in-process MCP client that exercises the real JSON-RPC serialization and dispatcher path.
+| Guide | What you will learn |
+| --- | --- |
+| [Writing and running tests](/en/testing/writing-and-running-tests) | Generate a case with `make:test`, replace the initial skip with assertions and run files or methods. |
+| [TestCase and decorators](/en/testing/cases-and-decorators) | Use hooks, cleanups, contexts, skips, expected failures, subtests and mocks. |
+| [Dependencies and isolation](/en/testing/dependency-injection) | Inject services, resolve them in fixtures and control scopes and persistent resources. |
+| [Results and configuration](/en/testing/results-and-reference) | Configure `config/testing.py`, choose verbosity, filter the suite and save JSON results. |
 
-The package is designed for framework and application tests that need Orionis dependency injection without abandoning familiar `unittest` assertions, fixtures, skips, expected failures, or subtests.
+[Database and ORM tests](/en/database/orm/testing) and [MCP tests](/en/testing/mcp-testing) retain dedicated guides in their respective component menus.
 
-## Requirements
+## Execution flow
 
-- Python 3.14 or newer.
-- A normal Orionis application layout when tests require application services.
-- Test modules named by the configured file glob and methods named by the configured method glob.
-- An MCP server declaration and bootable application container for MCP integration tests.
+```mermaid
+flowchart TD
+    C["orionis test / python -B reactor test"] --> A["Application bootstrap and providers"]
+    A --> O["CLI options override config/testing.py"]
+    O --> D["Discover files and filter test methods"]
+    D --> R["Runner in executor"]
+    R --> T["TestCase: hooks and method through Application.invoke"]
+    T --> X["Assertions, cleanup and loop shutdown"]
+    X --> E["TestResult and console output"]
+    E --> J["JSON file when cache_results is enabled"]
+    E --> S["Command exit status"]
+```
 
-## Module learning path
+The runner uses one loop per case to execute and clean up asynchronous operations; methods do not need `asyncio.run()`. Skip and expected-failure decorators come from `unittest`: Orionis exports no testing decorators of its own.
 
-- [Writing and running tests](/en/testing/writing-and-running-tests)
-- [Testing MCP tools in process](/en/testing/mcp-testing)
-- [Results, configuration, and reference](/en/testing/results-and-reference)
+Normal execution starts from the project root:
 
-Continue with: [foundation](/en/getting-started) · [mcp](/en/protocols/mcp).
+```shell
+python -B reactor test
+```
+
+You can also run `orionis test` or `uv run python -B reactor test`. You do not need another runner to use this component. Running cases directly through `unittest.main()` does not bootstrap the Orionis application for injection.
+
+## Configure the suite environment
+
+`config/testing.py` defines six options: verbosity, fail-fast, starting directory, filename pattern, method pattern and result persistence. The command can override the corresponding execution settings. JSON is saved to disk; there is no `--json` flag that turns stdout into a JSON report.
+
+The command does not automatically choose another database or change `APP_ENV` to `testing`. Prepare configuration and test resources before bootstrap. Inheriting from `TestCase` does not enable rollback, file cleanup or an independent container scope per case; arrange cleanup with the documented mechanisms.
+
+The [source and API reference inventory](/downloads/testing-api-inventory.json) distinguishes Orionis declarations from inherited `unittest` tools. Start by [creating your first test](/en/testing/writing-and-running-tests).

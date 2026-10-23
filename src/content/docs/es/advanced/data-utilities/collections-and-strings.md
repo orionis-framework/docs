@@ -5,6 +5,8 @@ editUrl: true
 lastUpdated: false
 ---
 
+La referencia completa de cada tipo está en [Collection](/es/advanced/data-utilities/collection) y [Stringable](/es/advanced/data-utilities/stringable). Esta página combina ambas utilidades en un flujo de trabajo.
+
 ## Inicio rápido
 
 ```python

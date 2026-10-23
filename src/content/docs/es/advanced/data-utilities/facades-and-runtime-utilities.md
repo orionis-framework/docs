@@ -5,6 +5,8 @@ editUrl: true
 lastUpdated: false
 ---
 
+Las referencias detalladas de [Workers](/es/advanced/data-utilities/workers) y [PerformanceCounter](/es/advanced/data-utilities/performance-counter) incluyen sus firmas, contextos e inyección. Los demás servicios mantienen sus guías de módulo.
+
 ## Conceptos principales
 
 ### Fachadas
@@ -19,7 +21,7 @@ La mayoría de fachadas operan en todo el proceso. `Session` está vinculada a u
 
 ### Entidades y estructuras
 
-`BaseEntity` está pensado para combinarse con `@dataclass`. Serializa dataclasses anidados y campos enum mediante `toDict()` y describe tipos, valores predeterminados y metadatos mediante `getFields()`. `FreezeThaw` convierte recursivamente diccionarios en proxies de mapeo de solo lectura y secuencias en tuplas, preservando referencias repetidas dentro del grafo recorrido.
+`BaseEntity` está pensado para combinarse con `@dataclass`. Serializa dataclasses anidados y campos enum mediante `toDict()` y describe tipos, valores predeterminados y metadatos mediante `getFields()`. `FreezeThaw` convierte recursivamente diccionarios en proxies de mapeo de solo lectura y secuencias en tuplas, con los límites de ciclos y referencias compartidas descritos en su referencia.
 
 ### Auxiliares transversales
 

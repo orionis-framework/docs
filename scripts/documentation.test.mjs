@@ -6,8 +6,8 @@ import { root, validateCatalog, within, stripFrontmatter, markdownLinks, heading
 import { createSidebar, flattenSidebar, documentationCatalog, documentationNavigation, navigationSections, resolveNavigation, sitePages, documentationPages, getPageBySlug, getTranslations } from '../src/utils/documentation-menu.mjs';
 
 const groupedBuildSections = ['getting-started', 'http', 'realtime', 'mcp', 'views', 'localization', 'authentication', 'sessions', 'cryptography', 'validation'];
-const groupedSections = new Set([...groupedBuildSections, 'database', 'orm', 'faker', 'storage', 'cache', 'mail', 'queues', 'console', 'environment', 'application', 'logging', 'exceptions', 'deployment']);
-const flatSections = ['testing', 'utilities', 'contribute'];
+const groupedSections = new Set([...groupedBuildSections, 'database', 'orm', 'faker', 'storage', 'cache', 'mail', 'queues', 'console', 'environment', 'application', 'logging', 'exceptions', 'deployment', 'testing', 'utilities']);
+const flatSections = ['contribute'];
 const buildPageIds = {
   'getting-started': ['foundation-overview', 'foundation-installation', 'foundation-getting-started', 'foundation-architecture-and-lifecycle'],
   http: ['http-overview', 'http-routing', 'http-middleware-and-security', 'http-request-lifecycle', 'http-requests-and-validation', 'http-forms-and-uploads', 'http-responses', 'http-exceptions'],
@@ -98,7 +98,7 @@ test('capability navigation rejects unknown, duplicate, or omitted pages and inv
   const cases = [
     [(copy) => { copy.sections[0].pageIds[0] = 'missing-page'; }, /Unknown navigation page/],
     [(copy) => { copy.sections[1].pageIds.push(copy.sections[0].pageIds[0]); }, /Duplicate navigation page/],
-    [(copy) => { copy.sections.find((section) => section.id === 'testing').pageIds.shift(); }, /Pages without navigation/],
+    [(copy) => { copy.sections.find((section) => section.id === 'contribute').pageIds.shift(); }, /Pages without navigation/],
     [(copy) => { copy.sections[0].band = 'missing-band'; }, /Invalid navigation band\/order/],
     [(copy) => { copy.bands.push(structuredClone(copy.bands[0])); }, /Duplicate navigation band/],
     [(copy) => { copy.sections[0].band = copy.bands[1].id; }, /Invalid navigation band\/order/],
@@ -147,7 +147,7 @@ test('navigation rejects malformed, duplicated, missing, reordered, and unsuppor
   const database = (copy) => copy.sections.find((section) => section.id === 'database');
   const groupError = /navigation subgroup|navigation groups/i;
   const cases = [
-    [(copy) => { const section = copy.sections.find((entry) => entry.id === 'testing'); section.groups = [{ id: 'unsupported', title: { en: 'Unsupported', es: 'No permitido' }, pageIds: [...section.pageIds] }]; }, groupError],
+    [(copy) => { const section = copy.sections.find((entry) => entry.id === 'contribute'); section.groups = [{ id: 'unsupported', title: { en: 'Unsupported', es: 'No permitido' }, pageIds: [...section.pageIds] }]; }, groupError],
     [(copy) => { database(copy).groups = []; }, groupError],
     [(copy) => { delete database(copy).groups; }, groupError],
     [(copy) => { database(copy).groups[0].id = ''; }, groupError],
@@ -177,13 +177,28 @@ test('navigation rejects malformed, duplicated, missing, reordered, and unsuppor
 });
 test('regrouping navigation preserves page IDs, page records, and both locale routes', () => {
   const copy = structuredClone(documentationNavigation);
-  const index = copy.sections.findIndex((section) => section.id === 'testing');
+  const index = copy.sections.findIndex((section) => section.id === 'contribute');
   copy.sections[index].pageIds.reverse();
   const resolved = resolveNavigation(copy);
   assert.deepEqual(resolved[index].pages.map((page) => page.id), copy.sections[index].pageIds);
   assert.deepEqual(resolved.flatMap((section) => section.pages).sort((a, b) => a.id.localeCompare(b.id)), [...sitePages].sort((a, b) => a.id.localeCompare(b.id)));
   for (const section of resolved) for (const page of section.pages) {
     for (const locale of documentationCatalog.locales) assert.equal(getPageBySlug(page.slug[locale]).id, page.id);
+  }
+});
+
+test('utilities provide dedicated helper and metadata groups while retaining existing references', () => {
+  const section = navigationSections.find((entry) => entry.id === 'utilities');
+  assert.deepEqual(section.title, { es: 'Utilidades y metadatos', en: 'Utilities and metadata' });
+  assert.deepEqual(section.groups.map((group) => group.id), ['utilities-helpers', 'utilities-metadata', 'utilities-reference']);
+  const helpers = ['collection', 'dot-dict', 'sentinel', 'std-class', 'stringable', 'workers', 'freeze-thaw', 'performance-counter'];
+  assert.deepEqual(section.groups[0].pageIds, helpers.map((name) => `helper-${name}`));
+  assert.deepEqual(section.groups[0].pages.map((page) => page.title.en), ['Collection', 'DotDict', 'Sentinel', 'StdClass', 'Stringable', 'Workers', 'FreezeThaw', 'PerformanceCounter']);
+  assert.deepEqual(section.groups[1].pageIds, ['metadata-overview']);
+  assert.deepEqual(section.groups[2].pageIds, ['support-overview', 'support-collections-and-strings', 'support-entities-and-structures', 'support-facades-and-runtime-utilities', 'introspection-overview', 'introspection-reflection', 'introspection-dependencies-and-discovery']);
+  for (const locale of documentationCatalog.locales) {
+    for (const page of section.pages) assert.equal(getPageBySlug(page.slug[locale]).id, page.id);
+    assert.equal(section.groups[1].pages[0].title[locale], 'Metadata');
   }
 });
 test('the menu makes realtime, MCP, and application services distinct visible capabilities', () => {
@@ -252,6 +267,21 @@ test('Deployment exposes preparation and three platform guides as peers in its o
     for (const platform of ['windows-server', 'linux', 'docker']) {
       assert.ok(deployment.pageIds.includes(getPageBySlug(`/${locale}/getting-started/deployment/${platform}`).id));
     }
+  }
+});
+
+test('Testing has its own renamed category and keeps specialized guides in their components', () => {
+  const testing = navigationSections.find((section) => section.id === 'testing');
+  assert.deepEqual(testing.title, { es: 'Pruebas', en: 'Testing' });
+  assert.equal(testing.band, 'operate');
+  assert.deepEqual(testing.pageIds, ['test-overview', 'test-writing-and-running-tests', 'test-cases-and-decorators', 'test-dependency-injection', 'test-results-and-reference']);
+  assert.deepEqual(testing.groups.map((group) => group.pageIds.length), [3, 2]);
+  assert.ok(navigationSections.find((section) => section.id === 'mcp').pageIds.includes('test-mcp-testing'));
+  assert.ok(navigationSections.find((section) => section.id === 'orm').pageIds.includes('orm-testing'));
+  for (const locale of ['es', 'en']) {
+    assert.equal(getPageBySlug(`/${locale}/testing`).id, 'test-overview');
+    assert.ok(testing.pageIds.includes(getPageBySlug(`/${locale}/testing/cases-and-decorators`).id));
+    assert.ok(testing.pageIds.includes(getPageBySlug(`/${locale}/testing/dependency-injection`).id));
   }
 });
 

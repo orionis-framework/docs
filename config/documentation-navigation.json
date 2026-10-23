@@ -1376,13 +1376,40 @@
       "band": "operate",
       "icon": "testing",
       "title": {
-        "en": "Application testing",
-        "es": "Pruebas de aplicaciones"
+        "es": "Pruebas",
+        "en": "Testing"
       },
       "pageIds": [
         "test-overview",
         "test-writing-and-running-tests",
+        "test-cases-and-decorators",
+        "test-dependency-injection",
         "test-results-and-reference"
+      ],
+      "groups": [
+        {
+          "id": "testing-writing",
+          "title": {
+            "es": "Casos de prueba",
+            "en": "Test cases"
+          },
+          "pageIds": [
+            "test-overview",
+            "test-writing-and-running-tests",
+            "test-cases-and-decorators"
+          ]
+        },
+        {
+          "id": "testing-application-and-results",
+          "title": {
+            "es": "Aplicación y resultados",
+            "en": "Application and results"
+          },
+          "pageIds": [
+            "test-dependency-injection",
+            "test-results-and-reference"
+          ]
+        }
       ]
     },
     {
@@ -1390,18 +1417,71 @@
       "band": "resources",
       "icon": "advanced",
       "title": {
-        "en": "Utilities and extensions",
-        "es": "Utilidades y extensión"
+        "es": "Utilidades y metadatos",
+        "en": "Utilities and metadata"
       },
       "pageIds": [
+        "helper-collection",
+        "helper-dot-dict",
+        "helper-sentinel",
+        "helper-std-class",
+        "helper-stringable",
+        "helper-workers",
+        "helper-freeze-thaw",
+        "helper-performance-counter",
+        "metadata-overview",
         "support-overview",
         "support-collections-and-strings",
         "support-entities-and-structures",
         "support-facades-and-runtime-utilities",
         "introspection-overview",
         "introspection-reflection",
-        "introspection-dependencies-and-discovery",
-        "metadata-overview"
+        "introspection-dependencies-and-discovery"
+      ],
+      "groups": [
+        {
+          "id": "utilities-helpers",
+          "title": {
+            "es": "Helpers",
+            "en": "Helpers"
+          },
+          "pageIds": [
+            "helper-collection",
+            "helper-dot-dict",
+            "helper-sentinel",
+            "helper-std-class",
+            "helper-stringable",
+            "helper-workers",
+            "helper-freeze-thaw",
+            "helper-performance-counter"
+          ]
+        },
+        {
+          "id": "utilities-metadata",
+          "title": {
+            "es": "Metadata",
+            "en": "Metadata"
+          },
+          "pageIds": [
+            "metadata-overview"
+          ]
+        },
+        {
+          "id": "utilities-reference",
+          "title": {
+            "es": "Extensión e introspección",
+            "en": "Extensions and introspection"
+          },
+          "pageIds": [
+            "support-overview",
+            "support-collections-and-strings",
+            "support-entities-and-structures",
+            "support-facades-and-runtime-utilities",
+            "introspection-overview",
+            "introspection-reflection",
+            "introspection-dependencies-and-discovery"
+          ]
+        }
       ]
     },
     {

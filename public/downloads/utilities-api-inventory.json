@@ -1,0 +1,4681 @@
+{
+  "schemaVersion": 1,
+  "scope": "Nine explicitly named native source files. Count only own public methods, implemented Python dunders, public classes, StdClass.RESERVED, exported MISSING and ten metadata constants. The private sentinel implementation class is tracked explicitly because its two dunders define the exported marker's behavior. Contract declarations, curated exports, Container integration, private helpers, private state, inherited stdlib behavior and native test declarations are separate and never inflate the own-method total.",
+  "nativeSources": [
+    "orionis/support/types/collection.py",
+    "orionis/support/types/stringable.py",
+    "orionis/support/types/dot_dict.py",
+    "orionis/support/types/std.py",
+    "orionis/support/types/sentinel.py",
+    "orionis/support/system/workers.py",
+    "orionis/support/structures/freezer.py",
+    "orionis/support/performance/counter.py",
+    "orionis/metadata/framework.py"
+  ],
+  "counts": {
+    "mappedNativeDeclarations": 272,
+    "publicClasses": 7,
+    "sentinelImplementationClasses": 1,
+    "ownMethods": 252,
+    "publicMethods": 221,
+    "implementedDunders": 31,
+    "publicClassAttributes": 1,
+    "exportedMarkers": 1,
+    "metadataConstants": 10,
+    "contractDeclarations": 72,
+    "privateHelpersExcluded": 11,
+    "nativeTestFiles": 16,
+    "declaredNativeTestMethods": 734
+  },
+  "perClass": {
+    "Collection": {
+      "source": "orionis/support/types/collection.py",
+      "publicMethods": 48,
+      "implementedDunders": 13,
+      "totalOwnMethods": 61
+    },
+    "Stringable": {
+      "source": "orionis/support/types/stringable.py",
+      "publicMethods": 146,
+      "implementedDunders": 2,
+      "totalOwnMethods": 148
+    },
+    "DotDict": {
+      "source": "orionis/support/types/dot_dict.py",
+      "publicMethods": 3,
+      "implementedDunders": 3,
+      "totalOwnMethods": 6
+    },
+    "StdClass": {
+      "source": "orionis/support/types/std.py",
+      "publicMethods": 4,
+      "implementedDunders": 6,
+      "totalOwnMethods": 10
+    },
+    "_MISSING_TYPE": {
+      "source": "orionis/support/types/sentinel.py",
+      "publicMethods": 0,
+      "implementedDunders": 2,
+      "totalOwnMethods": 2
+    },
+    "Workers": {
+      "source": "orionis/support/system/workers.py",
+      "publicMethods": 2,
+      "implementedDunders": 0,
+      "totalOwnMethods": 2
+    },
+    "FreezeThaw": {
+      "source": "orionis/support/structures/freezer.py",
+      "publicMethods": 2,
+      "implementedDunders": 0,
+      "totalOwnMethods": 2
+    },
+    "PerformanceCounter": {
+      "source": "orionis/support/performance/counter.py",
+      "publicMethods": 16,
+      "implementedDunders": 5,
+      "totalOwnMethods": 21
+    }
+  },
+  "hashes": {
+    "orionis/container/container.py": "a5cecd54238512e6c80819c352ac093f926793fafb56dcfb997783b0718e6c37",
+    "orionis/container/facades/facade.py": "85b9d448f4da31eb8a8f0c0131b3a7cd4b04f511c6e1b74a996ce59ca0e5e909",
+    "orionis/container/facades/meta.py": "87cac316a12e6462a8c811a8ad7a82885b64be754ab9e68d3050b6986d970b03",
+    "orionis/encrypter/contracts/encrypter.py": "c838617ed224f836280e85a60e91b9e4f19d5cd873533fe301c11672b6505dc5",
+    "orionis/encrypter/encrypter.py": "6d327c9a45219774255c5dcffd8af20ba7f841db1acbc86cdef3d7c8c922220f",
+    "orionis/http/__init__.py": "6e635a67a408c71bbb4ca81ce9ad42a29c748222553dfcc6093c0d08598be823",
+    "orionis/http/responses.py": "72aa6de6485bfc87b158303567c8568ad7dd859a4182e15f9ea0a20ff6cbcf8f",
+    "orionis/metadata/__init__.py": "1ef23dccd5d4c7aeef3a207b1a15a50002300e0353b5e4feb3e51c0f9c649b53",
+    "orionis/metadata/framework.py": "4fb53b761904ac97dd046157c2451dc10315519825b064082fb1278558728601",
+    "orionis/support/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "orionis/support/facades/__init__.py": "263aa38dc408d791eda7a9acbbdc0cdb2237b99429b2bfe7d246860adc3c228b",
+    "orionis/support/facades/datetime.py": "3df0811976fef9e17f521a602180c0030cd2e02fe17eaf9088c41e9ec5b61065",
+    "orionis/support/facades/encrypter.py": "5868acd2fd7838e83857d459d85b1b220e79ebf8b49c04ddab9fc84c1faa2a37",
+    "orionis/support/performance/__init__.py": "79922d1819e15352d561034567253e66c1de3e05ba18f806dd30f017498cc9ee",
+    "orionis/support/performance/contracts/counter.py": "ddb57326ee01c3eda605aab10de03f3c5b622d238b885414b3fcd19b14842bb2",
+    "orionis/support/performance/counter.py": "e6f332db2edb5a9cbbfecf8df453b697a4b923d587b487c027aaa92bb3436d53",
+    "orionis/support/structures/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "orionis/support/structures/freezer.py": "0fdf293240af591d3c2518379f22549049ae59a3f753307265feae6d675bb304",
+    "orionis/support/system/__init__.py": "8760b39e199ea465752cc0a1ce0a074e52b214a63555037b6fae98eebc52d718",
+    "orionis/support/system/contracts/workers.py": "598f335f6e3f00a4f2227d681d6d472b6680834f7a4b1660ce855ace624c1c2f",
+    "orionis/support/system/workers.py": "29d18330b27041e70ce493edab2df8bc2f869ae8a10275f6923b162f93d6f6cb",
+    "orionis/support/types/__init__.py": "0e1c6c5d78d500f00aeeabfb32547e55f6c96cb7f38ecbc2ffe27a34c44521d2",
+    "orionis/support/types/collection.py": "1008c1a68f47ef28dba688ed5faa5d1fa43f54f403ec218a3c4e9cc63d33b58f",
+    "orionis/support/types/contracts/collection.py": "4d13b1f8f45df45a2bbca18d0dd0d9741e24df9a85007a0f8262f78c05266a44",
+    "orionis/support/types/contracts/std.py": "56eda8fed3242c4f72608eb3b82ceeba0693f44b2e6ca4efc2b5412cd70dcd0d",
+    "orionis/support/types/dot_dict.py": "71400b6a2a79b55386889d3c4365d71212d549c86dce18d0235fefa2b5905381",
+    "orionis/support/types/sentinel.py": "1d05dd026151a3e2e9d1025a678ca72856b1df0de9a124dca8bed0cebf659c89",
+    "orionis/support/types/std.py": "f7d34b639196c6c1fb5b67c68bafad42c0a2a6ae30751a283928def00f3ef567",
+    "orionis/support/types/stringable.py": "e62cbd6fa8b19296c73421bbb19e2f50551b12ba8e102c18cdc9d6351bfc4747",
+    "tests/metadata/test_framework.py": "0b41dc820810a562c5835d2d717ca7a47a05a96964211a44f29b5efef69513d4",
+    "tests/metadata/test_package.py": "7bdab83193e11ae20edf6abc566ec58bbeb97438e398f8c02b6c34148c1cbaa2",
+    "tests/support/performance/test_counter.py": "4796d376e2f2187b42aa49c81dd822587d8c1e5fcb2c8f5c253e2535f3c6b86a",
+    "tests/support/structures/test_freezer.py": "8f4b6d04c8b88bdc8c84e2b7839f2f221c12858c3339b276825e132cb5019d6e",
+    "tests/support/system/test_workers.py": "e8068561ea43769f3402c285568dd7f468cdc77580aedd8532f901efe50818b4",
+    "tests/support/types/test_basics.py": "813eadbe5c3f2f24e8cf608ed8716aafb43568740489b1b3cf74394edec3df35",
+    "tests/support/types/test_case.py": "26401a07f0568908baaf06e54bc860d201448ea2775f802f889604307df109b8",
+    "tests/support/types/test_collection.py": "f0cc416433b4fac1460cb677efd03cf23d648f9a464b15399f8b9267c3cd08da",
+    "tests/support/types/test_conditionals.py": "44c8aa990651cab3c32914c0997d9f41529f7e7007b658750f7d7c85e0270459",
+    "tests/support/types/test_dot_dict.py": "86d67ad89b5bd57232449afd0dc2b949e2388a55407825e707a54eb192ddcedc",
+    "tests/support/types/test_encoding.py": "a6284bb14995f8088f6ffe1453eb57a9ea95557e0c3f181b44cf0e43c35e3172",
+    "tests/support/types/test_manipulation.py": "8d0f8123c87298ba4ec46ef79386f80788cb4870b2135898b74b19943711a919",
+    "tests/support/types/test_plural.py": "43ff1356f411b8abdaf50f377b41f11cb6747aca9a362ee34125b89c6a80f05b",
+    "tests/support/types/test_sentinel.py": "d513698c70cccd1d2524fe86ee8fa666c9d6aeddd8fc7cb76479c9eb74f8ec19",
+    "tests/support/types/test_std.py": "79caac4e19397308de85671f7ae8c98017f77a70177f0e6a2442e2ae58832547",
+    "tests/support/types/test_validation.py": "1bd6526140a097901bd6d876488f3660ee000d38b574bdfe5eb095443f246ac3"
+  },
+  "exports": {
+    "orionis/support/__init__.py": {
+      "names": [],
+      "destinations": {},
+      "purpose": "Curated package imports; structures has no FreezeThaw re-export."
+    },
+    "orionis/support/types/__init__.py": {
+      "names": [
+        "MISSING",
+        "Collection",
+        "DotDict",
+        "StdClass",
+        "Stringable"
+      ],
+      "destinations": {
+        "MISSING": [
+          "orionis.support.types.sentinel",
+          "MISSING"
+        ],
+        "Collection": [
+          "orionis.support.types.collection",
+          "Collection"
+        ],
+        "DotDict": [
+          "orionis.support.types.dot_dict",
+          "DotDict"
+        ],
+        "StdClass": [
+          "orionis.support.types.std",
+          "StdClass"
+        ],
+        "Stringable": [
+          "orionis.support.types.stringable",
+          "Stringable"
+        ]
+      },
+      "purpose": "Curated package imports; structures has no FreezeThaw re-export."
+    },
+    "orionis/support/system/__init__.py": {
+      "names": [
+        "Workers"
+      ],
+      "destinations": {
+        "Workers": [
+          "orionis.support.system.workers",
+          "Workers"
+        ]
+      },
+      "purpose": "Curated package imports; structures has no FreezeThaw re-export."
+    },
+    "orionis/support/performance/__init__.py": {
+      "names": [
+        "PerformanceCounter"
+      ],
+      "destinations": {
+        "PerformanceCounter": [
+          "orionis.support.performance.counter",
+          "PerformanceCounter"
+        ]
+      },
+      "purpose": "Curated package imports; structures has no FreezeThaw re-export."
+    },
+    "orionis/support/structures/__init__.py": {
+      "names": [],
+      "destinations": {},
+      "purpose": "Curated package imports; structures has no FreezeThaw re-export."
+    },
+    "orionis/metadata/__init__.py": {
+      "names": [
+        "API",
+        "AUTHOR",
+        "AUTHOR_EMAIL",
+        "DESCRIPTION",
+        "DOCS",
+        "FRAMEWORK",
+        "NAME",
+        "PYTHON_REQUIRES",
+        "SKELETON",
+        "VERSION"
+      ],
+      "destinations": {
+        "API": [
+          "orionis.metadata.framework",
+          "API"
+        ],
+        "AUTHOR": [
+          "orionis.metadata.framework",
+          "AUTHOR"
+        ],
+        "AUTHOR_EMAIL": [
+          "orionis.metadata.framework",
+          "AUTHOR_EMAIL"
+        ],
+        "DESCRIPTION": [
+          "orionis.metadata.framework",
+          "DESCRIPTION"
+        ],
+        "DOCS": [
+          "orionis.metadata.framework",
+          "DOCS"
+        ],
+        "FRAMEWORK": [
+          "orionis.metadata.framework",
+          "FRAMEWORK"
+        ],
+        "NAME": [
+          "orionis.metadata.framework",
+          "NAME"
+        ],
+        "PYTHON_REQUIRES": [
+          "orionis.metadata.framework",
+          "PYTHON_REQUIRES"
+        ],
+        "SKELETON": [
+          "orionis.metadata.framework",
+          "SKELETON"
+        ],
+        "VERSION": [
+          "orionis.metadata.framework",
+          "VERSION"
+        ]
+      },
+      "purpose": "Curated package imports; structures has no FreezeThaw re-export."
+    }
+  },
+  "contracts": [
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection",
+      "kind": "contract-class",
+      "line": 8,
+      "signature": "class ICollection(ABC)",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection"
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.take",
+      "kind": "contract-method",
+      "line": 11,
+      "signature": "take(self, number: int) -> ICollection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-take",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.first",
+      "kind": "contract-method",
+      "line": 30,
+      "signature": "first(self, callback: Callable | None=None) -> object",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-first",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.last",
+      "kind": "contract-method",
+      "line": 50,
+      "signature": "last(self, callback: Callable | None=None) -> object",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-last",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.all",
+      "kind": "contract-method",
+      "line": 69,
+      "signature": "all(self) -> list[Any]",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-all",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.avg",
+      "kind": "contract-method",
+      "line": 80,
+      "signature": "avg(self, key: str | None=None) -> float",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-avg",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.max",
+      "kind": "contract-method",
+      "line": 100,
+      "signature": "max(self, key: str | None=None) -> object",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-max",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.min",
+      "kind": "contract-method",
+      "line": 119,
+      "signature": "min(self, key: str | None=None) -> object",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-min",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.chunk",
+      "kind": "contract-method",
+      "line": 138,
+      "signature": "chunk(self, size: int) -> ICollection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-chunk",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.collapse",
+      "kind": "contract-method",
+      "line": 157,
+      "signature": "collapse(self) -> ICollection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-collapse",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.contains",
+      "kind": "contract-method",
+      "line": 168,
+      "signature": "contains(self, key: str | Callable, value: object=None) -> bool",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-contains",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.count",
+      "kind": "contract-method",
+      "line": 190,
+      "signature": "count(self) -> int",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-count",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.diff",
+      "kind": "contract-method",
+      "line": 201,
+      "signature": "diff(self, items: list[Any] | ICollection) -> ICollection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-diff",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.each",
+      "kind": "contract-method",
+      "line": 220,
+      "signature": "each(self, callback: Callable) -> ICollection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-each",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.every",
+      "kind": "contract-method",
+      "line": 239,
+      "signature": "every(self, callback: Callable) -> bool",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-every",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.filter",
+      "kind": "contract-method",
+      "line": 258,
+      "signature": "filter(self, callback: Callable) -> ICollection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-filter",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.flatten",
+      "kind": "contract-method",
+      "line": 277,
+      "signature": "flatten(self) -> ICollection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-flatten",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.forget",
+      "kind": "contract-method",
+      "line": 288,
+      "signature": "forget(self, *keys: int | str) -> ICollection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-forget",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.forPage",
+      "kind": "contract-method",
+      "line": 307,
+      "signature": "forPage(self, page: int, number: int) -> ICollection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-forpage",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.get",
+      "kind": "contract-method",
+      "line": 329,
+      "signature": "get(self, key: int | str, default: object=None) -> object",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-get",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.implode",
+      "kind": "contract-method",
+      "line": 351,
+      "signature": "implode(self, glue: str=',', key: str | None=None) -> str",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-implode",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.isEmpty",
+      "kind": "contract-method",
+      "line": 373,
+      "signature": "isEmpty(self) -> bool",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-isempty",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.map",
+      "kind": "contract-method",
+      "line": 384,
+      "signature": "map(self, callback: Callable) -> ICollection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-map",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.mapInto",
+      "kind": "contract-method",
+      "line": 403,
+      "signature": "mapInto(self, cls: type, method: str | None=None, **kwargs: object) -> ICollection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-mapinto",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.merge",
+      "kind": "contract-method",
+      "line": 428,
+      "signature": "merge(self, items: list[Any] | ICollection) -> ICollection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-merge",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.pluck",
+      "kind": "contract-method",
+      "line": 452,
+      "signature": "pluck(self, value: str, key: str | None=None) -> ICollection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-pluck",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.pop",
+      "kind": "contract-method",
+      "line": 474,
+      "signature": "pop(self) -> object",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-pop",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.prepend",
+      "kind": "contract-method",
+      "line": 485,
+      "signature": "prepend(self, value: object) -> ICollection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-prepend",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.pull",
+      "kind": "contract-method",
+      "line": 504,
+      "signature": "pull(self, key: int | str) -> object",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-pull",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.push",
+      "kind": "contract-method",
+      "line": 523,
+      "signature": "push(self, value: object) -> ICollection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-push",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.put",
+      "kind": "contract-method",
+      "line": 542,
+      "signature": "put(self, key: int | str, value: object) -> ICollection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-put",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.random",
+      "kind": "contract-method",
+      "line": 564,
+      "signature": "random(self, count: int | None=None) -> object | ICollection | None",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-random",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.reduce",
+      "kind": "contract-method",
+      "line": 589,
+      "signature": "reduce(self, callback: Callable, initial: object=0) -> object",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-reduce",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.reject",
+      "kind": "contract-method",
+      "line": 611,
+      "signature": "reject(self, callback: Callable) -> ICollection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-reject",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.reverse",
+      "kind": "contract-method",
+      "line": 630,
+      "signature": "reverse(self) -> ICollection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-reverse",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.serialize",
+      "kind": "contract-method",
+      "line": 641,
+      "signature": "serialize(self) -> list[Any]",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-serialize",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.shift",
+      "kind": "contract-method",
+      "line": 652,
+      "signature": "shift(self) -> object",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-shift",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.sort",
+      "kind": "contract-method",
+      "line": 663,
+      "signature": "sort(self, key: str | None=None) -> ICollection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-sort",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.sum",
+      "kind": "contract-method",
+      "line": 682,
+      "signature": "sum(self, key: str | None=None) -> float",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-sum",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.toJson",
+      "kind": "contract-method",
+      "line": 701,
+      "signature": "toJson(self, **kwargs: object) -> str",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-tojson",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.groupBy",
+      "kind": "contract-method",
+      "line": 720,
+      "signature": "groupBy(self, key: str) -> ICollection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-groupby",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.transform",
+      "kind": "contract-method",
+      "line": 741,
+      "signature": "transform(self, callback: Callable) -> ICollection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-transform",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.unique",
+      "kind": "contract-method",
+      "line": 760,
+      "signature": "unique(self, key: str | None=None) -> ICollection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-unique",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.where",
+      "kind": "contract-method",
+      "line": 779,
+      "signature": "where(self, key: str, *args: object) -> ICollection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-where",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.whereIn",
+      "kind": "contract-method",
+      "line": 801,
+      "signature": "whereIn(self, key: str, values: list[Any] | ICollection) -> ICollection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-wherein",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.whereNotIn",
+      "kind": "contract-method",
+      "line": 823,
+      "signature": "whereNotIn(self, key: str, values: list[Any] | ICollection) -> ICollection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-wherenotin",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.zip",
+      "kind": "contract-method",
+      "line": 845,
+      "signature": "zip(self, items: list[Any] | ICollection) -> ICollection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-zip",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/collection.py",
+      "symbol": "ICollection.setAppends",
+      "kind": "contract-method",
+      "line": 869,
+      "signature": "setAppends(self, appends: list[str]) -> ICollection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-setappends",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/std.py",
+      "symbol": "IStdClass",
+      "kind": "contract-class",
+      "line": 3,
+      "signature": "class IStdClass(ABC)",
+      "pageId": "helper-std-class",
+      "reference": "/advanced/data-utilities/std-class"
+    },
+    {
+      "source": "orionis/support/types/contracts/std.py",
+      "symbol": "IStdClass.toDict",
+      "kind": "contract-method",
+      "line": 8,
+      "signature": "toDict(self) -> dict",
+      "pageId": "helper-std-class",
+      "reference": "/advanced/data-utilities/std-class#stdclass-method-todict",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/std.py",
+      "symbol": "IStdClass.update",
+      "kind": "contract-method",
+      "line": 19,
+      "signature": "update(self, **kwargs: object) -> None",
+      "pageId": "helper-std-class",
+      "reference": "/advanced/data-utilities/std-class#stdclass-method-update",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/contracts/std.py",
+      "symbol": "IStdClass.remove",
+      "kind": "contract-method",
+      "line": 40,
+      "signature": "remove(self, *attributes: str) -> None",
+      "pageId": "helper-std-class",
+      "reference": "/advanced/data-utilities/std-class#stdclass-method-remove",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/system/contracts/workers.py",
+      "symbol": "IWorkers",
+      "kind": "contract-class",
+      "line": 5,
+      "signature": "class IWorkers(ABC)",
+      "pageId": "helper-workers",
+      "reference": "/advanced/data-utilities/workers"
+    },
+    {
+      "source": "orionis/support/system/contracts/workers.py",
+      "symbol": "IWorkers.setRamPerWorker",
+      "kind": "contract-method",
+      "line": 8,
+      "signature": "setRamPerWorker(cls, ram_per_worker: float) -> None",
+      "pageId": "helper-workers",
+      "reference": "/advanced/data-utilities/workers#workers-method-setramperworker",
+      "decorators": [
+        "classmethod",
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/system/contracts/workers.py",
+      "symbol": "IWorkers.calculate",
+      "kind": "contract-method",
+      "line": 35,
+      "signature": "calculate(cls) -> int",
+      "pageId": "helper-workers",
+      "reference": "/advanced/data-utilities/workers#workers-method-calculate",
+      "decorators": [
+        "classmethod",
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/performance/contracts/counter.py",
+      "symbol": "IPerformanceCounter",
+      "kind": "contract-class",
+      "line": 4,
+      "signature": "class IPerformanceCounter(ABC)",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter"
+    },
+    {
+      "source": "orionis/support/performance/contracts/counter.py",
+      "symbol": "IPerformanceCounter.start",
+      "kind": "contract-method",
+      "line": 8,
+      "signature": "start(self) -> IPerformanceCounter",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-start",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/performance/contracts/counter.py",
+      "symbol": "IPerformanceCounter.astart",
+      "kind": "contract-method",
+      "line": 21,
+      "signature": "async astart(self) -> IPerformanceCounter",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-astart",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": true
+    },
+    {
+      "source": "orionis/support/performance/contracts/counter.py",
+      "symbol": "IPerformanceCounter.stop",
+      "kind": "contract-method",
+      "line": 34,
+      "signature": "stop(self) -> IPerformanceCounter",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-stop",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/performance/contracts/counter.py",
+      "symbol": "IPerformanceCounter.astop",
+      "kind": "contract-method",
+      "line": 55,
+      "signature": "async astop(self) -> IPerformanceCounter",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-astop",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": true
+    },
+    {
+      "source": "orionis/support/performance/contracts/counter.py",
+      "symbol": "IPerformanceCounter.elapsedTime",
+      "kind": "contract-method",
+      "line": 74,
+      "signature": "elapsedTime(self) -> float",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-elapsedtime",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/performance/contracts/counter.py",
+      "symbol": "IPerformanceCounter.aelapsedTime",
+      "kind": "contract-method",
+      "line": 90,
+      "signature": "async aelapsedTime(self) -> float",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-aelapsedtime",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": true
+    },
+    {
+      "source": "orionis/support/performance/contracts/counter.py",
+      "symbol": "IPerformanceCounter.getMicroseconds",
+      "kind": "contract-method",
+      "line": 106,
+      "signature": "getMicroseconds(self) -> float",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-getmicroseconds",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/performance/contracts/counter.py",
+      "symbol": "IPerformanceCounter.agetMicroseconds",
+      "kind": "contract-method",
+      "line": 119,
+      "signature": "async agetMicroseconds(self) -> float",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-agetmicroseconds",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": true
+    },
+    {
+      "source": "orionis/support/performance/contracts/counter.py",
+      "symbol": "IPerformanceCounter.getMilliseconds",
+      "kind": "contract-method",
+      "line": 130,
+      "signature": "getMilliseconds(self) -> float",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-getmilliseconds",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/performance/contracts/counter.py",
+      "symbol": "IPerformanceCounter.agetMilliseconds",
+      "kind": "contract-method",
+      "line": 143,
+      "signature": "async agetMilliseconds(self) -> float",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-agetmilliseconds",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": true
+    },
+    {
+      "source": "orionis/support/performance/contracts/counter.py",
+      "symbol": "IPerformanceCounter.getSeconds",
+      "kind": "contract-method",
+      "line": 154,
+      "signature": "getSeconds(self) -> float",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-getseconds",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/performance/contracts/counter.py",
+      "symbol": "IPerformanceCounter.agetSeconds",
+      "kind": "contract-method",
+      "line": 165,
+      "signature": "async agetSeconds(self) -> float",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-agetseconds",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": true
+    },
+    {
+      "source": "orionis/support/performance/contracts/counter.py",
+      "symbol": "IPerformanceCounter.getMinutes",
+      "kind": "contract-method",
+      "line": 176,
+      "signature": "getMinutes(self) -> float",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-getminutes",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/performance/contracts/counter.py",
+      "symbol": "IPerformanceCounter.agetMinutes",
+      "kind": "contract-method",
+      "line": 187,
+      "signature": "async agetMinutes(self) -> float",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-agetminutes",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": true
+    },
+    {
+      "source": "orionis/support/performance/contracts/counter.py",
+      "symbol": "IPerformanceCounter.restart",
+      "kind": "contract-method",
+      "line": 198,
+      "signature": "restart(self) -> IPerformanceCounter",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-restart",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/performance/contracts/counter.py",
+      "symbol": "IPerformanceCounter.arestart",
+      "kind": "contract-method",
+      "line": 212,
+      "signature": "async arestart(self) -> IPerformanceCounter",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-arestart",
+      "decorators": [
+        "abstractmethod"
+      ],
+      "async": true
+    }
+  ],
+  "integrations": [
+    {
+      "source": "orionis/container/container.py",
+      "reviewedSymbols": [
+        {
+          "symbol": "Container.instance",
+          "signature": "instance(self, abstract: type[Any] | None, instance: object, *, alias: str | None=None, override: bool=False) -> bool"
+        },
+        {
+          "symbol": "Container.transient",
+          "signature": "transient(self, abstract: type[Any] | None, concrete: type[Any], *, alias: str | None=None, override: bool=False) -> bool"
+        },
+        {
+          "symbol": "Container.singleton",
+          "signature": "singleton(self, abstract: type[Any] | None, concrete: type[Any], *, alias: str | None=None, override: bool=False) -> bool"
+        },
+        {
+          "symbol": "Container.make",
+          "signature": "async make(self, key: type[Any] | str, *args: tuple[Any, ...], **kwargs: dict[str, Any]) -> Any"
+        },
+        {
+          "symbol": "Container.call",
+          "signature": "async call(self, instance: object, method_name: str, *args: object, **kwargs: object) -> Any"
+        }
+      ],
+      "references": [
+        "/advanced/data-utilities/collection",
+        "/advanced/data-utilities/stringable",
+        "/advanced/data-utilities/dot-dict",
+        "/advanced/data-utilities/std-class",
+        "/advanced/data-utilities/sentinel",
+        "/advanced/data-utilities/workers",
+        "/advanced/data-utilities/freeze-thaw",
+        "/advanced/data-utilities/performance-counter"
+      ],
+      "purpose": "Concrete auto-resolution, constructor injection, initialized instance binding and contract registration. Data values must be supplied explicitly; MISSING is an exported object, not an injectable public class."
+    },
+    {
+      "source": "orionis/support/facades/datetime.py",
+      "references": [
+        "/advanced/data-utilities/stringable#stringable-method-todate"
+      ],
+      "purpose": "Reviewed support for Stringable date/encryption calls and runnable service/controller examples; auxiliary API is not counted as helper declarations."
+    },
+    {
+      "source": "orionis/support/facades/encrypter.py",
+      "references": [
+        "/advanced/data-utilities/stringable#stringable-method-encrypt",
+        "/advanced/data-utilities/stringable#stringable-method-decrypt"
+      ],
+      "purpose": "Reviewed support for Stringable date/encryption calls and runnable service/controller examples; auxiliary API is not counted as helper declarations."
+    },
+    {
+      "source": "orionis/encrypter/contracts/encrypter.py",
+      "references": [
+        "/advanced/data-utilities/stringable#stringable-method-encrypt",
+        "/advanced/data-utilities/stringable#stringable-method-decrypt"
+      ],
+      "purpose": "Reviewed support for Stringable date/encryption calls and runnable service/controller examples; auxiliary API is not counted as helper declarations."
+    },
+    {
+      "source": "orionis/encrypter/encrypter.py",
+      "references": [
+        "/advanced/data-utilities/stringable#stringable-method-encrypt",
+        "/advanced/data-utilities/stringable#stringable-method-decrypt"
+      ],
+      "purpose": "Reviewed support for Stringable date/encryption calls and runnable service/controller examples; auxiliary API is not counted as helper declarations."
+    },
+    {
+      "source": "orionis/container/facades/facade.py",
+      "references": [
+        "/advanced/data-utilities/stringable#stringable-method-encrypt",
+        "/advanced/data-utilities/stringable#stringable-method-decrypt"
+      ],
+      "purpose": "Reviewed support for Stringable date/encryption calls and runnable service/controller examples; auxiliary API is not counted as helper declarations."
+    },
+    {
+      "source": "orionis/container/facades/meta.py",
+      "references": [
+        "/advanced/data-utilities/stringable#stringable-method-encrypt",
+        "/advanced/data-utilities/stringable#stringable-method-decrypt"
+      ],
+      "purpose": "Reviewed support for Stringable date/encryption calls and runnable service/controller examples; auxiliary API is not counted as helper declarations."
+    },
+    {
+      "source": "orionis/support/facades/__init__.py",
+      "references": [
+        "/advanced/data-utilities/stringable#stringable-method-encrypt",
+        "/advanced/data-utilities/stringable#stringable-method-todate"
+      ],
+      "purpose": "Reviewed support for Stringable date/encryption calls and runnable service/controller examples; auxiliary API is not counted as helper declarations."
+    },
+    {
+      "source": "orionis/http/__init__.py",
+      "references": [
+        "/advanced/data-utilities/stringable#stringable-method-encrypt",
+        "/advanced/data-utilities/stringable#stringable-method-decrypt"
+      ],
+      "purpose": "Reviewed support for Stringable date/encryption calls and runnable service/controller examples; auxiliary API is not counted as helper declarations."
+    },
+    {
+      "source": "orionis/http/responses.py",
+      "references": [
+        "/advanced/data-utilities/stringable#stringable-method-encrypt",
+        "/advanced/data-utilities/stringable#stringable-method-decrypt"
+      ],
+      "purpose": "Reviewed support for Stringable date/encryption calls and runnable service/controller examples; auxiliary API is not counted as helper declarations."
+    }
+  ],
+  "nativeTests": {
+    "scope": "AST-declared methods in these exact native modules; this discovery snapshot does not claim tests were executed.",
+    "files": [
+      {
+        "source": "tests/support/types/test_basics.py",
+        "declaredTestMethods": 58
+      },
+      {
+        "source": "tests/support/types/test_case.py",
+        "declaredTestMethods": 45
+      },
+      {
+        "source": "tests/support/types/test_collection.py",
+        "declaredTestMethods": 107
+      },
+      {
+        "source": "tests/support/types/test_conditionals.py",
+        "declaredTestMethods": 37
+      },
+      {
+        "source": "tests/support/types/test_dot_dict.py",
+        "declaredTestMethods": 40
+      },
+      {
+        "source": "tests/support/types/test_encoding.py",
+        "declaredTestMethods": 29
+      },
+      {
+        "source": "tests/support/types/test_manipulation.py",
+        "declaredTestMethods": 91
+      },
+      {
+        "source": "tests/support/types/test_plural.py",
+        "declaredTestMethods": 23
+      },
+      {
+        "source": "tests/support/types/test_sentinel.py",
+        "declaredTestMethods": 16
+      },
+      {
+        "source": "tests/support/types/test_std.py",
+        "declaredTestMethods": 46
+      },
+      {
+        "source": "tests/support/types/test_validation.py",
+        "declaredTestMethods": 97
+      },
+      {
+        "source": "tests/support/system/test_workers.py",
+        "declaredTestMethods": 32
+      },
+      {
+        "source": "tests/support/structures/test_freezer.py",
+        "declaredTestMethods": 33
+      },
+      {
+        "source": "tests/support/performance/test_counter.py",
+        "declaredTestMethods": 42
+      },
+      {
+        "source": "tests/metadata/test_framework.py",
+        "declaredTestMethods": 33
+      },
+      {
+        "source": "tests/metadata/test_package.py",
+        "declaredTestMethods": 5
+      }
+    ]
+  },
+  "excludedDeclarations": [
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection._getUniqueItemsWithoutKey",
+      "line": 1138,
+      "signature": "_getUniqueItemsWithoutKey(self) -> Collection",
+      "reason": "Private implementation helper; observable behavior belongs to the mapped public operations."
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection._getUniqueItemsByKey",
+      "line": 1158,
+      "signature": "_getUniqueItemsByKey(self, key: str) -> Collection",
+      "reason": "Private implementation helper; observable behavior belongs to the mapped public operations."
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection._addUniqueItem",
+      "line": 1180,
+      "signature": "_addUniqueItem(self, comparison: Any, item: Any, keys: set[Any], items: list[Any]) -> None",
+      "reason": "Private implementation helper; observable behavior belongs to the mapped public operations."
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.__getValue",
+      "line": 1438,
+      "signature": "__getValue(self, key: str | Callable | None) -> list[Any] | None",
+      "reason": "Private implementation helper; observable behavior belongs to the mapped public operations."
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.__dataGet",
+      "line": 1474,
+      "signature": "__dataGet(self, item: object, key: str, default: object=None) -> object",
+      "reason": "Private implementation helper; observable behavior belongs to the mapped public operations."
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.__value",
+      "line": 1515,
+      "signature": "__value(self, value: object) -> object",
+      "reason": "Private implementation helper; observable behavior belongs to the mapped public operations."
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.__checkIsCallable",
+      "line": 1538,
+      "signature": "__checkIsCallable(self, callback: object, *, raise_exception: bool=True) -> bool",
+      "reason": "Private implementation helper; observable behavior belongs to the mapped public operations."
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.__makeComparison",
+      "line": 1572,
+      "signature": "__makeComparison(self, a: object, b: object, op: str) -> bool",
+      "reason": "Private implementation helper; observable behavior belongs to the mapped public operations."
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.__getItems",
+      "line": 1835,
+      "signature": "__getItems(cls, items: list[Any] | Collection | object) -> list[Any] | object",
+      "reason": "Private implementation helper; observable behavior belongs to the mapped public operations."
+    },
+    {
+      "source": "orionis/support/system/workers.py",
+      "symbol": "_get_cpu_count",
+      "line": 8,
+      "signature": "_get_cpu_count() -> int",
+      "reason": "Private implementation helper; observable behavior belongs to the mapped public operations."
+    },
+    {
+      "source": "orionis/support/structures/freezer.py",
+      "symbol": "FreezeThaw._isContainer",
+      "line": 15,
+      "signature": "_isContainer(obj: object) -> bool",
+      "reason": "Private implementation helper; observable behavior belongs to the mapped public operations."
+    }
+  ],
+  "internalStateExcluded": [
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "_OPERATORS",
+      "signature": "_OPERATORS: dict[str, Any] = {'<': operator.lt, '<=': operator.le, '==': operator.eq, '!=': operator.ne, '>': operator.gt, '>=': operator.ge}",
+      "reason": "Private module constant or cache; not public helper API."
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "_MISSING",
+      "signature": "_MISSING: object = object()",
+      "reason": "Private module constant or cache; not public helper API."
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.__slots__",
+      "signature": "__slots__ = ()",
+      "reason": "Private state or Python layout metadata; not a functional public declaration."
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "_RE_CAMEL_SEP",
+      "signature": "_RE_CAMEL_SEP = re.compile('[_\\\\-\\\\s]+')",
+      "reason": "Private module constant or cache; not public helper API."
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "_RE_KEBAB_CAMEL",
+      "signature": "_RE_KEBAB_CAMEL = re.compile('([a-z0-9])([A-Z])')",
+      "reason": "Private module constant or cache; not public helper API."
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "_RE_KEBAB_SEP",
+      "signature": "_RE_KEBAB_SEP = re.compile('[_\\\\s]+')",
+      "reason": "Private module constant or cache; not public helper API."
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "_RE_KEBAB_MULTI",
+      "signature": "_RE_KEBAB_MULTI = re.compile('-+')",
+      "reason": "Private module constant or cache; not public helper API."
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "_RE_SQUISH",
+      "signature": "_RE_SQUISH = re.compile('\\\\s+')",
+      "reason": "Private module constant or cache; not public helper API."
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "_RE_NUMBERS",
+      "signature": "_RE_NUMBERS = re.compile('\\\\D')",
+      "reason": "Private module constant or cache; not public helper API."
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "_RE_HEADLINE",
+      "signature": "_RE_HEADLINE = re.compile('\\\\b\\\\w+\\\\b')",
+      "reason": "Private module constant or cache; not public helper API."
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "_RE_UCSPLIT",
+      "signature": "_RE_UCSPLIT = re.compile('[A-Z][a-z]*|[a-z]+|\\\\d+')",
+      "reason": "Private module constant or cache; not public helper API."
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "_RE_PASCAL_WORDS",
+      "signature": "_RE_PASCAL_WORDS = re.compile('[A-Z][a-z]*|[a-z]+')",
+      "reason": "Private module constant or cache; not public helper API."
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "_RE_STRIP_TAGS",
+      "signature": "_RE_STRIP_TAGS = re.compile('<[^>]*>')",
+      "reason": "Private module constant or cache; not public helper API."
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "_ULID_RE",
+      "signature": "_ULID_RE = re.compile('^[0123456789ABCDEFGHJKMNPQRSTVWXYZ]{26}$')",
+      "reason": "Private module constant or cache; not public helper API."
+    },
+    {
+      "source": "orionis/support/types/dot_dict.py",
+      "symbol": "DotDict.__slots__",
+      "signature": "__slots__ = ()",
+      "reason": "Private state or Python layout metadata; not a functional public declaration."
+    },
+    {
+      "source": "orionis/support/types/dot_dict.py",
+      "symbol": "_MISSING",
+      "signature": "_MISSING = object()",
+      "reason": "Private module constant or cache; not public helper API."
+    },
+    {
+      "source": "orionis/support/types/std.py",
+      "symbol": "_DUNDER",
+      "signature": "_DUNDER = '__'",
+      "reason": "Private module constant or cache; not public helper API."
+    },
+    {
+      "source": "orionis/support/system/workers.py",
+      "symbol": "Workers.__slots__",
+      "signature": "__slots__ = ()",
+      "reason": "Private state or Python layout metadata; not a functional public declaration."
+    },
+    {
+      "source": "orionis/support/system/workers.py",
+      "symbol": "Workers._ram_per_worker_bytes",
+      "signature": "_ram_per_worker_bytes: int = _DEFAULT_RAM_PER_WORKER_BYTES",
+      "reason": "Private state or Python layout metadata; not a functional public declaration."
+    },
+    {
+      "source": "orionis/support/system/workers.py",
+      "symbol": "_CPU_COUNT",
+      "signature": "_CPU_COUNT: int = _get_cpu_count()",
+      "reason": "Private module constant or cache; not public helper API."
+    },
+    {
+      "source": "orionis/support/system/workers.py",
+      "symbol": "_RAM_TOTAL_BYTES",
+      "signature": "_RAM_TOTAL_BYTES: int = psutil.virtual_memory().total",
+      "reason": "Private module constant or cache; not public helper API."
+    },
+    {
+      "source": "orionis/support/system/workers.py",
+      "symbol": "_BYTES_PER_GB",
+      "signature": "_BYTES_PER_GB: int = 1 << 30",
+      "reason": "Private module constant or cache; not public helper API."
+    },
+    {
+      "source": "orionis/support/system/workers.py",
+      "symbol": "_DEFAULT_RAM_PER_WORKER_BYTES",
+      "signature": "_DEFAULT_RAM_PER_WORKER_BYTES: int = 1 << 29",
+      "reason": "Private module constant or cache; not public helper API."
+    },
+    {
+      "source": "orionis/support/system/workers.py",
+      "symbol": "_ERR_INVALID_RAM_PER_WORKER",
+      "signature": "_ERR_INVALID_RAM_PER_WORKER: str = 'RAM per worker must be a finite positive value.'",
+      "reason": "Private module constant or cache; not public helper API."
+    },
+    {
+      "source": "orionis/support/system/workers.py",
+      "symbol": "_ERR_RAM_PER_WORKER_TOO_SMALL",
+      "signature": "_ERR_RAM_PER_WORKER_TOO_SMALL: str = 'RAM per worker must be at least one byte.'",
+      "reason": "Private module constant or cache; not public helper API."
+    },
+    {
+      "source": "orionis/support/structures/freezer.py",
+      "symbol": "_CONTAINER_TYPES",
+      "signature": "_CONTAINER_TYPES: tuple[type, ...] = (dict, list, tuple, MappingProxyType)",
+      "reason": "Private module constant or cache; not public helper API."
+    },
+    {
+      "source": "orionis/support/structures/freezer.py",
+      "symbol": "_MUTABLE_TYPES",
+      "signature": "_MUTABLE_TYPES: tuple[type, ...] = (dict, list, tuple)",
+      "reason": "Private module constant or cache; not public helper API."
+    },
+    {
+      "source": "orionis/support/performance/counter.py",
+      "symbol": "PerformanceCounter.__slots__",
+      "signature": "__slots__ = ('_diff_time', '_is_async_mode', '_start_time')",
+      "reason": "Private state or Python layout metadata; not a functional public declaration."
+    },
+    {
+      "source": "orionis/support/performance/counter.py",
+      "symbol": "_ERR_NOT_MEASURED",
+      "signature": "_ERR_NOT_MEASURED: str = 'Counter has not been started and stopped properly.'",
+      "reason": "Private module constant or cache; not public helper API."
+    },
+    {
+      "source": "orionis/support/performance/counter.py",
+      "symbol": "_ERR_NOT_STARTED",
+      "signature": "_ERR_NOT_STARTED: str = 'Counter has not been started.'",
+      "reason": "Private module constant or cache; not public helper API."
+    },
+    {
+      "source": "orionis/support/performance/counter.py",
+      "symbol": "_ERR_USE_ASTOP",
+      "signature": "_ERR_USE_ASTOP: str = 'Cannot use stop() after astart(). Use astop() instead.'",
+      "reason": "Private module constant or cache; not public helper API."
+    },
+    {
+      "source": "orionis/support/performance/counter.py",
+      "symbol": "_ERR_USE_STOP",
+      "signature": "_ERR_USE_STOP: str = 'Cannot use astop() after start(). Use stop() instead.'",
+      "reason": "Private module constant or cache; not public helper API."
+    }
+  ],
+  "inheritedApi": [
+    {
+      "owner": "DotDict",
+      "origin": "builtins.dict/object",
+      "reference": "/advanced/data-utilities/dot-dict#dotdict-protocol-dictionary",
+      "publicMethods": [
+        "clear",
+        "fromkeys",
+        "items",
+        "keys",
+        "pop",
+        "popitem",
+        "setdefault",
+        "update",
+        "values"
+      ],
+      "protocols": [
+        "construction",
+        "indexing",
+        "iteration",
+        "length",
+        "membership",
+        "comparison",
+        "union",
+        "representation"
+      ],
+      "copyAndSerializationReference": "/advanced/data-utilities/dot-dict#dotdict-protocol-copy-serialization"
+    },
+    {
+      "owner": "Stringable",
+      "origin": "builtins.str",
+      "reference": "/advanced/data-utilities/stringable#stringable-constructor",
+      "protocols": [
+        "construction",
+        "length",
+        "iteration",
+        "containment",
+        "comparison",
+        "hashing",
+        "formatting",
+        "truthiness",
+        "concatenation",
+        "multiplication"
+      ],
+      "note": "Only __getitem__ and __str__ are declared by Orionis; inherited str methods are not extra native declarations."
+    },
+    {
+      "owner": "StdClass",
+      "origin": "builtins.object",
+      "reference": "/advanced/data-utilities/std-class#stdclass-protocol-attributes",
+      "copyAndSerializationReference": "/advanced/data-utilities/std-class#stdclass-protocol-copy-serialization"
+    },
+    {
+      "owner": "MISSING",
+      "origin": "builtins.object",
+      "reference": "/advanced/data-utilities/sentinel#sentinel-protocol-identity",
+      "copyAndSerializationReference": "/advanced/data-utilities/sentinel#sentinel-protocol-copy-serialization"
+    },
+    {
+      "owner": "FreezeThaw",
+      "origin": "builtins.object; returned built-in containers",
+      "reference": "/advanced/data-utilities/freeze-thaw#freezethaw-protocol-serialization",
+      "note": "The helper declares no custom copy or serialization dunder."
+    }
+  ],
+  "entries": [
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection",
+      "kind": "class",
+      "line": 31,
+      "signature": "class Collection(ICollection)",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection"
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.__hash__",
+      "kind": "special-method",
+      "line": 35,
+      "signature": "__hash__(self) -> int",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-hash",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.__init__",
+      "kind": "constructor",
+      "line": 47,
+      "signature": "__init__(self, items: list[Any] | None=None) -> None",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-init",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.take",
+      "kind": "method",
+      "line": 67,
+      "signature": "take(self, number: int) -> Collection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-take",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.first",
+      "kind": "method",
+      "line": 89,
+      "signature": "first(self, callback: Callable | None=None) -> object",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-first",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.last",
+      "kind": "method",
+      "line": 116,
+      "signature": "last(self, callback: Callable | None=None) -> object",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-last",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.all",
+      "kind": "method",
+      "line": 143,
+      "signature": "all(self) -> list[Any]",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-all",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.avg",
+      "kind": "method",
+      "line": 154,
+      "signature": "avg(self, key: str | None=None) -> float",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-avg",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.max",
+      "kind": "method",
+      "line": 187,
+      "signature": "max(self, key: str | None=None) -> object",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-max",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.min",
+      "kind": "method",
+      "line": 213,
+      "signature": "min(self, key: str | None=None) -> object",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-min",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.chunk",
+      "kind": "method",
+      "line": 238,
+      "signature": "chunk(self, size: int) -> Collection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-chunk",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.collapse",
+      "kind": "method",
+      "line": 264,
+      "signature": "collapse(self) -> Collection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-collapse",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.contains",
+      "kind": "method",
+      "line": 279,
+      "signature": "contains(self, key: str | Callable, value: object=None) -> bool",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-contains",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.count",
+      "kind": "method",
+      "line": 310,
+      "signature": "count(self) -> int",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-count",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.diff",
+      "kind": "method",
+      "line": 322,
+      "signature": "diff(self, items: list[Any] | Collection) -> Collection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-diff",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.each",
+      "kind": "method",
+      "line": 348,
+      "signature": "each(self, callback: Callable) -> Collection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-each",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.every",
+      "kind": "method",
+      "line": 375,
+      "signature": "every(self, callback: Callable) -> bool",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-every",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.filter",
+      "kind": "method",
+      "line": 396,
+      "signature": "filter(self, callback: Callable) -> Collection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-filter",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.flatten",
+      "kind": "method",
+      "line": 417,
+      "signature": "flatten(self) -> Collection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-flatten",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.forget",
+      "kind": "method",
+      "line": 451,
+      "signature": "forget(self, *keys: int | str) -> Collection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-forget",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.forPage",
+      "kind": "method",
+      "line": 474,
+      "signature": "forPage(self, page: int, number: int) -> Collection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-forpage",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.get",
+      "kind": "method",
+      "line": 506,
+      "signature": "get(self, key: int | str, default: object=None) -> object",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-get",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.implode",
+      "kind": "method",
+      "line": 532,
+      "signature": "implode(self, glue: str=',', key: str | None=None) -> str",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-implode",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.isEmpty",
+      "kind": "method",
+      "line": 567,
+      "signature": "isEmpty(self) -> bool",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-isempty",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.map",
+      "kind": "method",
+      "line": 579,
+      "signature": "map(self, callback: Callable) -> Collection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-map",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.mapInto",
+      "kind": "method",
+      "line": 600,
+      "signature": "mapInto(self, cls: type, method: str | None=None, **kwargs: object) -> Collection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-mapinto",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.merge",
+      "kind": "method",
+      "line": 644,
+      "signature": "merge(self, items: list[Any] | Collection) -> Collection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-merge",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.pluck",
+      "kind": "method",
+      "line": 675,
+      "signature": "pluck(self, value: str, key: str | None=None) -> Collection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-pluck",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.pop",
+      "kind": "method",
+      "line": 715,
+      "signature": "pop(self) -> object",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-pop",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.prepend",
+      "kind": "method",
+      "line": 731,
+      "signature": "prepend(self, value: object) -> Collection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-prepend",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.pull",
+      "kind": "method",
+      "line": 752,
+      "signature": "pull(self, key: int | str) -> object",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-pull",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.push",
+      "kind": "method",
+      "line": 774,
+      "signature": "push(self, value: object) -> Collection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-push",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.put",
+      "kind": "method",
+      "line": 795,
+      "signature": "put(self, key: int | str, value: object) -> Collection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-put",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.random",
+      "kind": "method",
+      "line": 819,
+      "signature": "random(self, count: int | None=None) -> object | Collection | None",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-random",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.reduce",
+      "kind": "method",
+      "line": 865,
+      "signature": "reduce(self, callback: Callable, initial: object=0) -> object",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-reduce",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.reject",
+      "kind": "method",
+      "line": 888,
+      "signature": "reject(self, callback: Callable) -> Collection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-reject",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.reverse",
+      "kind": "method",
+      "line": 911,
+      "signature": "reverse(self) -> Collection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-reverse",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.serialize",
+      "kind": "method",
+      "line": 924,
+      "signature": "serialize(self) -> list[Any]",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-serialize",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.shift",
+      "kind": "method",
+      "line": 977,
+      "signature": "shift(self) -> object",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-shift",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.sort",
+      "kind": "method",
+      "line": 989,
+      "signature": "sort(self, key: str | None=None) -> Collection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-sort",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.sum",
+      "kind": "method",
+      "line": 1015,
+      "signature": "sum(self, key: str | None=None) -> float",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-sum",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.toJson",
+      "kind": "method",
+      "line": 1039,
+      "signature": "toJson(self, **kwargs: object) -> str",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-tojson",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.groupBy",
+      "kind": "method",
+      "line": 1059,
+      "signature": "groupBy(self, key: str) -> Collection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-groupby",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.transform",
+      "kind": "method",
+      "line": 1088,
+      "signature": "transform(self, callback: Callable) -> Collection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-transform",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.unique",
+      "kind": "method",
+      "line": 1110,
+      "signature": "unique(self, key: str | None=None) -> Collection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-unique",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.where",
+      "kind": "method",
+      "line": 1216,
+      "signature": "where(self, key: str, *args: object) -> Collection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-where",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.whereIn",
+      "kind": "method",
+      "line": 1264,
+      "signature": "whereIn(self, key: str, values: list[Any] | Collection) -> Collection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-wherein",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.whereNotIn",
+      "kind": "method",
+      "line": 1311,
+      "signature": "whereNotIn(self, key: str, values: list[Any] | Collection) -> Collection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-wherenotin",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.zip",
+      "kind": "method",
+      "line": 1358,
+      "signature": "zip(self, items: list[Any] | Collection) -> Collection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-zip",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.setAppends",
+      "kind": "method",
+      "line": 1393,
+      "signature": "setAppends(self, appends: list[str]) -> Collection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-setappends",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.addRelation",
+      "kind": "method",
+      "line": 1414,
+      "signature": "addRelation(self, relation_data: dict[str, Any]) -> Collection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-addrelation",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.__iter__",
+      "kind": "special-method",
+      "line": 1609,
+      "signature": "__iter__(self) -> Iterator[Any]",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-iter",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.__eq__",
+      "kind": "special-method",
+      "line": 1621,
+      "signature": "__eq__(self, other: object) -> bool",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-eq",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.__getitem__",
+      "kind": "special-method",
+      "line": 1643,
+      "signature": "__getitem__(self, item: int | slice) -> object | Collection",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-getitem",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.__setitem__",
+      "kind": "special-method",
+      "line": 1665,
+      "signature": "__setitem__(self, key: int | str, value: object) -> None",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-setitem",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.__delitem__",
+      "kind": "special-method",
+      "line": 1688,
+      "signature": "__delitem__(self, key: int | str) -> None",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-delitem",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.__ne__",
+      "kind": "special-method",
+      "line": 1708,
+      "signature": "__ne__(self, other: object) -> bool",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-ne",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.__len__",
+      "kind": "special-method",
+      "line": 1730,
+      "signature": "__len__(self) -> int",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-len",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.__le__",
+      "kind": "special-method",
+      "line": 1742,
+      "signature": "__le__(self, other: object) -> bool",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-le",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.__lt__",
+      "kind": "special-method",
+      "line": 1765,
+      "signature": "__lt__(self, other: object) -> bool",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-lt",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.__ge__",
+      "kind": "special-method",
+      "line": 1788,
+      "signature": "__ge__(self, other: object) -> bool",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-ge",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/collection.py",
+      "symbol": "Collection.__gt__",
+      "kind": "special-method",
+      "line": 1811,
+      "signature": "__gt__(self, other: object) -> bool",
+      "pageId": "helper-collection",
+      "reference": "/advanced/data-utilities/collection#collection-method-gt",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable",
+      "kind": "class",
+      "line": 28,
+      "signature": "class Stringable(str)",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable"
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.after",
+      "kind": "method",
+      "line": 34,
+      "signature": "after(self, search: str) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-after",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.afterLast",
+      "kind": "method",
+      "line": 54,
+      "signature": "afterLast(self, search: str) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-afterlast",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.append",
+      "kind": "method",
+      "line": 74,
+      "signature": "append(self, *values: str) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-append",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.newLine",
+      "kind": "method",
+      "line": 96,
+      "signature": "newLine(self, count: int=1) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-newline",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.before",
+      "kind": "method",
+      "line": 114,
+      "signature": "before(self, search: str) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-before",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.beforeLast",
+      "kind": "method",
+      "line": 134,
+      "signature": "beforeLast(self, search: str) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-beforelast",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.contains",
+      "kind": "method",
+      "line": 158,
+      "signature": "contains(self, needles: str | Iterable[str], *, ignore_case: bool=False) -> bool",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-contains",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.endsWith",
+      "kind": "method",
+      "line": 200,
+      "signature": "endsWith(self, needles: str | Iterable[str]) -> bool",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-endswith",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.exactly",
+      "kind": "method",
+      "line": 223,
+      "signature": "exactly(self, value: str) -> bool",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-exactly",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.isEmpty",
+      "kind": "method",
+      "line": 245,
+      "signature": "isEmpty(self) -> bool",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-isempty",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.isNotEmpty",
+      "kind": "method",
+      "line": 257,
+      "signature": "isNotEmpty(self) -> bool",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-isnotempty",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.lower",
+      "kind": "method",
+      "line": 268,
+      "signature": "lower(self) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-lower",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.upper",
+      "kind": "method",
+      "line": 280,
+      "signature": "upper(self) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-upper",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.reverse",
+      "kind": "method",
+      "line": 292,
+      "signature": "reverse(self) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-reverse",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.repeat",
+      "kind": "method",
+      "line": 304,
+      "signature": "repeat(self, times: int) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-repeat",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.replace",
+      "kind": "method",
+      "line": 326,
+      "signature": "replace(self, search: str | Iterable[str], replace: str | Iterable[str], *, case_sensitive: bool=True) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-replace",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.stripTags",
+      "kind": "method",
+      "line": 377,
+      "signature": "stripTags(self, allowed_tags: str | None=None) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-striptags",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.toBase64",
+      "kind": "method",
+      "line": 397,
+      "signature": "toBase64(self) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-tobase64",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.fromBase64",
+      "kind": "method",
+      "line": 409,
+      "signature": "fromBase64(self, *, strict: bool=False) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-frombase64",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.md5",
+      "kind": "method",
+      "line": 440,
+      "signature": "md5(self) -> str",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-md5",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.sha1",
+      "kind": "method",
+      "line": 452,
+      "signature": "sha1(self) -> str",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-sha1",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.sha256",
+      "kind": "method",
+      "line": 464,
+      "signature": "sha256(self) -> str",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-sha256",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.length",
+      "kind": "method",
+      "line": 476,
+      "signature": "length(self) -> int",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-length",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.value",
+      "kind": "method",
+      "line": 488,
+      "signature": "value(self) -> str",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-value",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.toInteger",
+      "kind": "method",
+      "line": 500,
+      "signature": "toInteger(self, base: int=10) -> int",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-tointeger",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.toFloat",
+      "kind": "method",
+      "line": 526,
+      "signature": "toFloat(self) -> float",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-tofloat",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.toBoolean",
+      "kind": "method",
+      "line": 547,
+      "signature": "toBoolean(self) -> bool",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-toboolean",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.__getitem__",
+      "kind": "special-method",
+      "line": 562,
+      "signature": "__getitem__(self, key: int | slice) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-getitem",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.__str__",
+      "kind": "special-method",
+      "line": 579,
+      "signature": "__str__(self) -> str",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-str",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.isAlnum",
+      "kind": "method",
+      "line": 591,
+      "signature": "isAlnum(self) -> bool",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-isalnum",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.isAlpha",
+      "kind": "method",
+      "line": 602,
+      "signature": "isAlpha(self) -> bool",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-isalpha",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.isDecimal",
+      "kind": "method",
+      "line": 613,
+      "signature": "isDecimal(self) -> bool",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-isdecimal",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.isDigit",
+      "kind": "method",
+      "line": 624,
+      "signature": "isDigit(self) -> bool",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-isdigit",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.isIdentifier",
+      "kind": "method",
+      "line": 635,
+      "signature": "isIdentifier(self) -> bool",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-isidentifier",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.isLower",
+      "kind": "method",
+      "line": 646,
+      "signature": "isLower(self) -> bool",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-islower",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.isNumeric",
+      "kind": "method",
+      "line": 657,
+      "signature": "isNumeric(self) -> bool",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-isnumeric",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.isPrintable",
+      "kind": "method",
+      "line": 668,
+      "signature": "isPrintable(self) -> bool",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-isprintable",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.isSpace",
+      "kind": "method",
+      "line": 679,
+      "signature": "isSpace(self) -> bool",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-isspace",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.isTitle",
+      "kind": "method",
+      "line": 690,
+      "signature": "isTitle(self) -> bool",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-istitle",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.isUpper",
+      "kind": "method",
+      "line": 701,
+      "signature": "isUpper(self) -> bool",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-isupper",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.lStrip",
+      "kind": "method",
+      "line": 712,
+      "signature": "lStrip(self, chars: str | None=None) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-lstrip",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.rStrip",
+      "kind": "method",
+      "line": 732,
+      "signature": "rStrip(self, chars: str | None=None) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-rstrip",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.swapCase",
+      "kind": "method",
+      "line": 753,
+      "signature": "swapCase(self) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-swapcase",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.zFill",
+      "kind": "method",
+      "line": 772,
+      "signature": "zFill(self, width: int) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-zfill",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.ascii",
+      "kind": "method",
+      "line": 792,
+      "signature": "ascii(self) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-ascii",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.camel",
+      "kind": "method",
+      "line": 808,
+      "signature": "camel(self) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-camel",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.kebab",
+      "kind": "method",
+      "line": 829,
+      "signature": "kebab(self) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-kebab",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.snake",
+      "kind": "method",
+      "line": 845,
+      "signature": "snake(self, delimiter: str='_') -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-snake",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.studly",
+      "kind": "method",
+      "line": 869,
+      "signature": "studly(self) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-studly",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.pascal",
+      "kind": "method",
+      "line": 886,
+      "signature": "pascal(self) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-pascal",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.slug",
+      "kind": "method",
+      "line": 898,
+      "signature": "slug(self, separator: str='-', dictionary: dict[str, str] | None=None) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-slug",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.title",
+      "kind": "method",
+      "line": 951,
+      "signature": "title(self) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-title",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.headline",
+      "kind": "method",
+      "line": 963,
+      "signature": "headline(self) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-headline",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.apa",
+      "kind": "method",
+      "line": 981,
+      "signature": "apa(self) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-apa",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.ucfirst",
+      "kind": "method",
+      "line": 1014,
+      "signature": "ucfirst(self) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-ucfirst",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.lcfirst",
+      "kind": "method",
+      "line": 1028,
+      "signature": "lcfirst(self) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-lcfirst",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.isAscii",
+      "kind": "method",
+      "line": 1042,
+      "signature": "isAscii(self) -> bool",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-isascii",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.isJson",
+      "kind": "method",
+      "line": 1058,
+      "signature": "isJson(self) -> bool",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-isjson",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.isUrl",
+      "kind": "method",
+      "line": 1074,
+      "signature": "isUrl(self, protocols: list[str] | None=None) -> bool",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-isurl",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.isUuid",
+      "kind": "method",
+      "line": 1105,
+      "signature": "isUuid(self, version: int | str | None=None) -> bool",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-isuuid",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.isUlid",
+      "kind": "method",
+      "line": 1141,
+      "signature": "isUlid(self) -> bool",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-isulid",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.chopStart",
+      "kind": "method",
+      "line": 1153,
+      "signature": "chopStart(self, needle: str | list[str]) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-chopstart",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.chopEnd",
+      "kind": "method",
+      "line": 1185,
+      "signature": "chopEnd(self, needle: str | list[str]) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-chopend",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.deduplicate",
+      "kind": "method",
+      "line": 1212,
+      "signature": "deduplicate(self, character: str=' ') -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-deduplicate",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.mask",
+      "kind": "method",
+      "line": 1233,
+      "signature": "mask(self, character: str, index: int, length: int | None=None) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-mask",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.limit",
+      "kind": "method",
+      "line": 1289,
+      "signature": "limit(self, limit: int=100, end: str='...', *, preserve_words: bool=False) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-limit",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.padBoth",
+      "kind": "method",
+      "line": 1343,
+      "signature": "padBoth(self, length: int, pad: str=' ') -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-padboth",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.padLeft",
+      "kind": "method",
+      "line": 1384,
+      "signature": "padLeft(self, length: int, pad: str=' ') -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-padleft",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.padRight",
+      "kind": "method",
+      "line": 1420,
+      "signature": "padRight(self, length: int, pad: str=' ') -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-padright",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.trim",
+      "kind": "method",
+      "line": 1456,
+      "signature": "trim(self, characters: str | None=None) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-trim",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.ltrim",
+      "kind": "method",
+      "line": 1477,
+      "signature": "ltrim(self, characters: str | None=None) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-ltrim",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.rtrim",
+      "kind": "method",
+      "line": 1498,
+      "signature": "rtrim(self, characters: str | None=None) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-rtrim",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.charAt",
+      "kind": "method",
+      "line": 1519,
+      "signature": "charAt(self, index: int) -> str | bool",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-charat",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.position",
+      "kind": "method",
+      "line": 1542,
+      "signature": "position(self, needle: str, offset: int=0, encoding: str | None=None) -> int | bool",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-position",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.match",
+      "kind": "method",
+      "line": 1580,
+      "signature": "match(self, pattern: str) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-match",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.matchAll",
+      "kind": "method",
+      "line": 1604,
+      "signature": "matchAll(self, pattern: str) -> list[str]",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-matchall",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.isMatch",
+      "kind": "method",
+      "line": 1626,
+      "signature": "isMatch(self, pattern: str | list[str]) -> bool",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-ismatch",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.test",
+      "kind": "method",
+      "line": 1661,
+      "signature": "test(self, pattern: str) -> bool",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-test",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.numbers",
+      "kind": "method",
+      "line": 1678,
+      "signature": "numbers(self) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-numbers",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.excerpt",
+      "kind": "method",
+      "line": 1695,
+      "signature": "excerpt(self, phrase: str='', options: dict | None=None) -> str | None",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-excerpt",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.basename",
+      "kind": "method",
+      "line": 1758,
+      "signature": "basename(self, suffix: str='') -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-basename",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.dirname",
+      "kind": "method",
+      "line": 1776,
+      "signature": "dirname(self, levels: int=1) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-dirname",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.between",
+      "kind": "method",
+      "line": 1796,
+      "signature": "between(self, from_str: str, to_str: str) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-between",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.betweenFirst",
+      "kind": "method",
+      "line": 1834,
+      "signature": "betweenFirst(self, from_str: str, to_str: str) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-betweenfirst",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.finish",
+      "kind": "method",
+      "line": 1875,
+      "signature": "finish(self, cap: str) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-finish",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.start",
+      "kind": "method",
+      "line": 1904,
+      "signature": "start(self, prefix: str) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-start",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.explode",
+      "kind": "method",
+      "line": 1933,
+      "signature": "explode(self, delimiter: str, limit: int=-1) -> list[str]",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-explode",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.split",
+      "kind": "method",
+      "line": 1964,
+      "signature": "split(self, pattern: str | int, limit: int=-1, flags: int=0) -> list[str]",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-split",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.ucsplit",
+      "kind": "method",
+      "line": 2012,
+      "signature": "ucsplit(self) -> list[str]",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-ucsplit",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.squish",
+      "kind": "method",
+      "line": 2031,
+      "signature": "squish(self) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-squish",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.words",
+      "kind": "method",
+      "line": 2046,
+      "signature": "words(self, words: int=100, end: str='...') -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-words",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.wordCount",
+      "kind": "method",
+      "line": 2080,
+      "signature": "wordCount(self, characters: str | None=None) -> int",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-wordcount",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.wordWrap",
+      "kind": "method",
+      "line": 2116,
+      "signature": "wordWrap(self, characters: int=75, break_str: str='\\n', *, cut_long_words: bool=False) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-wordwrap",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.wrap",
+      "kind": "method",
+      "line": 2161,
+      "signature": "wrap(self, before: str, after: str | None=None) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-wrap",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.unwrap",
+      "kind": "method",
+      "line": 2194,
+      "signature": "unwrap(self, before: str, after: str | None=None) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-unwrap",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.replaceArray",
+      "kind": "method",
+      "line": 2234,
+      "signature": "replaceArray(self, search: str, replace: list[str]) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-replacearray",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.replaceFirst",
+      "kind": "method",
+      "line": 2277,
+      "signature": "replaceFirst(self, search: str, replace: str) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-replacefirst",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.replaceLast",
+      "kind": "method",
+      "line": 2301,
+      "signature": "replaceLast(self, search: str, replace: str) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-replacelast",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.replaceStart",
+      "kind": "method",
+      "line": 2335,
+      "signature": "replaceStart(self, search: str, replace: str) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-replacestart",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.replaceEnd",
+      "kind": "method",
+      "line": 2366,
+      "signature": "replaceEnd(self, search: str, replace: str) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-replaceend",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.replaceMatches",
+      "kind": "method",
+      "line": 2398,
+      "signature": "replaceMatches(self, pattern: str | list[str], replace: str | Callable, limit: int=-1) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-replacematches",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.remove",
+      "kind": "method",
+      "line": 2457,
+      "signature": "remove(self, search: str | list[str], *, case_sensitive: bool=True) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-remove",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.plural",
+      "kind": "method",
+      "line": 2504,
+      "signature": "plural(self, count: int | list | Any=2, *, prepend_count: bool=False) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-plural",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.pluralStudly",
+      "kind": "method",
+      "line": 2571,
+      "signature": "pluralStudly(self, count: int | list | Any=2) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-pluralstudly",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.pluralPascal",
+      "kind": "method",
+      "line": 2598,
+      "signature": "pluralPascal(self, count: int | list | Any=2) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-pluralpascal",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.singular",
+      "kind": "method",
+      "line": 2637,
+      "signature": "singular(self) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-singular",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.parseCallback",
+      "kind": "method",
+      "line": 2667,
+      "signature": "parseCallback(self, default: str | None=None) -> list[str | None]",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-parsecallback",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.when",
+      "kind": "method",
+      "line": 2695,
+      "signature": "when(self, condition: bool | Callable, callback: Callable, default: Callable | None=None) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-when",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.whenContains",
+      "kind": "method",
+      "line": 2749,
+      "signature": "whenContains(self, needles: str | list[str], callback: Callable, default: Callable | None=None) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-whencontains",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.whenContainsAll",
+      "kind": "method",
+      "line": 2775,
+      "signature": "whenContainsAll(self, needles: list[str], callback: Callable, default: Callable | None=None) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-whencontainsall",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.whenEmpty",
+      "kind": "method",
+      "line": 2802,
+      "signature": "whenEmpty(self, callback: Callable, default: Callable | None=None) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-whenempty",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.whenNotEmpty",
+      "kind": "method",
+      "line": 2825,
+      "signature": "whenNotEmpty(self, callback: Callable, default: Callable | None=None) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-whennotempty",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.whenEndsWith",
+      "kind": "method",
+      "line": 2848,
+      "signature": "whenEndsWith(self, needles: str | list[str], callback: Callable, default: Callable | None=None) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-whenendswith",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.whenDoesntEndWith",
+      "kind": "method",
+      "line": 2874,
+      "signature": "whenDoesntEndWith(self, needles: str | list[str], callback: Callable, default: Callable | None=None) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-whendoesntendwith",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.whenExactly",
+      "kind": "method",
+      "line": 2901,
+      "signature": "whenExactly(self, value: str, callback: Callable, default: Callable | None=None) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-whenexactly",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.whenNotExactly",
+      "kind": "method",
+      "line": 2927,
+      "signature": "whenNotExactly(self, value: str, callback: Callable, default: Callable | None=None) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-whennotexactly",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.whenStartsWith",
+      "kind": "method",
+      "line": 2953,
+      "signature": "whenStartsWith(self, needles: str | list[str], callback: Callable, default: Callable | None=None) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-whenstartswith",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.whenDoesntStartWith",
+      "kind": "method",
+      "line": 2990,
+      "signature": "whenDoesntStartWith(self, needles: str | list[str], callback: Callable, default: Callable | None=None) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-whendoesntstartwith",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.whenTest",
+      "kind": "method",
+      "line": 3027,
+      "signature": "whenTest(self, pattern: str, callback: Callable, default: Callable | None=None) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-whentest",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.convertCase",
+      "kind": "method",
+      "line": 3053,
+      "signature": "convertCase(self, mode: int | None=None) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-convertcase",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.transliterate",
+      "kind": "method",
+      "line": 3096,
+      "signature": "transliterate(self, unknown: str='?', *, strict: bool=False) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-transliterate",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.hash",
+      "kind": "method",
+      "line": 3145,
+      "signature": "hash(self, algorithm: str) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-hash",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.pipe",
+      "kind": "method",
+      "line": 3174,
+      "signature": "pipe(self, callback: Callable) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-pipe",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.take",
+      "kind": "method",
+      "line": 3206,
+      "signature": "take(self, limit: int) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-take",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.swap",
+      "kind": "method",
+      "line": 3232,
+      "signature": "swap(self, map_dict: dict[str, str]) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-swap",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.substrCount",
+      "kind": "method",
+      "line": 3270,
+      "signature": "substrCount(self, needle: str, offset: int=0, length: int | None=None) -> int",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-substrcount",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.substrReplace",
+      "kind": "method",
+      "line": 3324,
+      "signature": "substrReplace(self, replace: str | list[str], offset: int | list[int]=0, length: int | list[int] | None=None) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-substrreplace",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.scan",
+      "kind": "method",
+      "line": 3484,
+      "signature": "scan(self, format_str: str) -> list[str]",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-scan",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.prepend",
+      "kind": "method",
+      "line": 3520,
+      "signature": "prepend(self, *values: str) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-prepend",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.substr",
+      "kind": "method",
+      "line": 3548,
+      "signature": "substr(self, start: int, length: int | None=None) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-substr",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.doesntContain",
+      "kind": "method",
+      "line": 3586,
+      "signature": "doesntContain(self, needles: str | list[str], *, ignore_case: bool=False) -> bool",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-doesntcontain",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.doesntStartWith",
+      "kind": "method",
+      "line": 3637,
+      "signature": "doesntStartWith(self, needles: str | list[str]) -> bool",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-doesntstartwith",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.doesntEndWith",
+      "kind": "method",
+      "line": 3674,
+      "signature": "doesntEndWith(self, needles: str | list[str]) -> bool",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-doesntendwith",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.startsWith",
+      "kind": "method",
+      "line": 3711,
+      "signature": "startsWith(self, needles: str | list[str]) -> bool",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-startswith",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.jsonSerialize",
+      "kind": "method",
+      "line": 3744,
+      "signature": "jsonSerialize(self) -> str",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-jsonserialize",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.offsetExists",
+      "kind": "method",
+      "line": 3758,
+      "signature": "offsetExists(self, offset: int) -> bool",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-offsetexists",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.offsetGet",
+      "kind": "method",
+      "line": 3781,
+      "signature": "offsetGet(self, offset: int) -> str",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-offsetget",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.isPattern",
+      "kind": "method",
+      "line": 3810,
+      "signature": "isPattern(self, pattern: str | list[str], *, ignore_case: bool=False) -> bool",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-ispattern",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.containsAll",
+      "kind": "method",
+      "line": 3879,
+      "signature": "containsAll(self, needles: list[str], *, ignore_case: bool=False) -> bool",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-containsall",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.whenIs",
+      "kind": "method",
+      "line": 3933,
+      "signature": "whenIs(self, pattern: str | list[str], callback: Callable, default: Callable | None=None) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-whenis",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.whenIsAscii",
+      "kind": "method",
+      "line": 3959,
+      "signature": "whenIsAscii(self, callback: Callable, default: Callable | None=None) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-whenisascii",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.whenIsUuid",
+      "kind": "method",
+      "line": 3982,
+      "signature": "whenIsUuid(self, callback: Callable, default: Callable | None=None) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-whenisuuid",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.whenIsUlid",
+      "kind": "method",
+      "line": 4005,
+      "signature": "whenIsUlid(self, callback: Callable, default: Callable | None=None) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-whenisulid",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.toDate",
+      "kind": "method",
+      "line": 4028,
+      "signature": "toDate(self, format_str: str | None='%Y-%m-%d') -> datetime | None",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-todate",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.encrypt",
+      "kind": "method",
+      "line": 4056,
+      "signature": "encrypt(self) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-encrypt",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.decrypt",
+      "kind": "method",
+      "line": 4072,
+      "signature": "decrypt(self) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-decrypt",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.toHtmlString",
+      "kind": "method",
+      "line": 4088,
+      "signature": "toHtmlString(self) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-tohtmlstring",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/stringable.py",
+      "symbol": "Stringable.tap",
+      "kind": "method",
+      "line": 4102,
+      "signature": "tap(self, callback: Callable[[Stringable], Any]) -> Stringable",
+      "pageId": "helper-stringable",
+      "reference": "/advanced/data-utilities/stringable#stringable-method-tap",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/dot_dict.py",
+      "symbol": "DotDict",
+      "kind": "class",
+      "line": 6,
+      "signature": "class DotDict(dict)",
+      "pageId": "helper-dot-dict",
+      "reference": "/advanced/data-utilities/dot-dict"
+    },
+    {
+      "source": "orionis/support/types/dot_dict.py",
+      "symbol": "DotDict.__getattr__",
+      "kind": "special-method",
+      "line": 10,
+      "signature": "__getattr__(self, key: str) -> object | None",
+      "pageId": "helper-dot-dict",
+      "reference": "/advanced/data-utilities/dot-dict#dotdict-method-getattr",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/dot_dict.py",
+      "symbol": "DotDict.__setattr__",
+      "kind": "special-method",
+      "line": 38,
+      "signature": "__setattr__(self, key: str, value: object) -> None",
+      "pageId": "helper-dot-dict",
+      "reference": "/advanced/data-utilities/dot-dict#dotdict-method-setattr",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/dot_dict.py",
+      "symbol": "DotDict.__delattr__",
+      "kind": "special-method",
+      "line": 63,
+      "signature": "__delattr__(self, key: str) -> None",
+      "pageId": "helper-dot-dict",
+      "reference": "/advanced/data-utilities/dot-dict#dotdict-method-delattr",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/dot_dict.py",
+      "symbol": "DotDict.get",
+      "kind": "method",
+      "line": 94,
+      "signature": "get(self, key: str, default: object | None=None) -> object | None",
+      "pageId": "helper-dot-dict",
+      "reference": "/advanced/data-utilities/dot-dict#dotdict-method-get",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/dot_dict.py",
+      "symbol": "DotDict.export",
+      "kind": "method",
+      "line": 117,
+      "signature": "export(self) -> dict[str, Any]",
+      "pageId": "helper-dot-dict",
+      "reference": "/advanced/data-utilities/dot-dict#dotdict-method-export",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/dot_dict.py",
+      "symbol": "DotDict.copy",
+      "kind": "method",
+      "line": 137,
+      "signature": "copy(self) -> DotDict",
+      "pageId": "helper-dot-dict",
+      "reference": "/advanced/data-utilities/dot-dict#dotdict-method-copy",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/std.py",
+      "symbol": "StdClass",
+      "kind": "class",
+      "line": 5,
+      "signature": "class StdClass(IStdClass)",
+      "pageId": "helper-std-class",
+      "reference": "/advanced/data-utilities/std-class"
+    },
+    {
+      "source": "orionis/support/types/std.py",
+      "symbol": "StdClass.__init_subclass__",
+      "kind": "special-method",
+      "line": 10,
+      "signature": "__init_subclass__(cls, **kwargs: object) -> None",
+      "pageId": "helper-std-class",
+      "reference": "/advanced/data-utilities/std-class#stdclass-method-init-subclass",
+      "decorators": [
+        "classmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/std.py",
+      "symbol": "StdClass.__hash__",
+      "kind": "special-method",
+      "line": 29,
+      "signature": "__hash__(self) -> int",
+      "pageId": "helper-std-class",
+      "reference": "/advanced/data-utilities/std-class#stdclass-method-hash",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/std.py",
+      "symbol": "StdClass.__init__",
+      "kind": "constructor",
+      "line": 44,
+      "signature": "__init__(self, **kwargs: object) -> None",
+      "pageId": "helper-std-class",
+      "reference": "/advanced/data-utilities/std-class#stdclass-method-init",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/std.py",
+      "symbol": "StdClass.__repr__",
+      "kind": "special-method",
+      "line": 62,
+      "signature": "__repr__(self) -> str",
+      "pageId": "helper-std-class",
+      "reference": "/advanced/data-utilities/std-class#stdclass-method-repr",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/std.py",
+      "symbol": "StdClass.__str__",
+      "kind": "special-method",
+      "line": 74,
+      "signature": "__str__(self) -> str",
+      "pageId": "helper-std-class",
+      "reference": "/advanced/data-utilities/std-class#stdclass-method-str",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/std.py",
+      "symbol": "StdClass.__eq__",
+      "kind": "special-method",
+      "line": 86,
+      "signature": "__eq__(self, other: object) -> bool",
+      "pageId": "helper-std-class",
+      "reference": "/advanced/data-utilities/std-class#stdclass-method-eq",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/std.py",
+      "symbol": "StdClass.toDict",
+      "kind": "method",
+      "line": 105,
+      "signature": "toDict(self) -> dict",
+      "pageId": "helper-std-class",
+      "reference": "/advanced/data-utilities/std-class#stdclass-method-todict",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/std.py",
+      "symbol": "StdClass.update",
+      "kind": "method",
+      "line": 117,
+      "signature": "update(self, **kwargs: object) -> None",
+      "pageId": "helper-std-class",
+      "reference": "/advanced/data-utilities/std-class#stdclass-method-update",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/std.py",
+      "symbol": "StdClass.remove",
+      "kind": "method",
+      "line": 152,
+      "signature": "remove(self, *attributes: str) -> None",
+      "pageId": "helper-std-class",
+      "reference": "/advanced/data-utilities/std-class#stdclass-method-remove",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/std.py",
+      "symbol": "StdClass.fromDict",
+      "kind": "method",
+      "line": 181,
+      "signature": "fromDict(cls, dictionary: dict) -> StdClass",
+      "pageId": "helper-std-class",
+      "reference": "/advanced/data-utilities/std-class#stdclass-method-fromdict",
+      "decorators": [
+        "classmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/std.py",
+      "symbol": "StdClass.RESERVED",
+      "kind": "class-attribute",
+      "line": 7,
+      "signature": "RESERVED: frozenset",
+      "pageId": "helper-std-class",
+      "reference": "/advanced/data-utilities/std-class#stdclass-property-reserved"
+    },
+    {
+      "source": "orionis/support/types/sentinel.py",
+      "symbol": "_MISSING_TYPE",
+      "kind": "implementation-class",
+      "line": 1,
+      "signature": "class _MISSING_TYPE",
+      "pageId": "helper-sentinel",
+      "reference": "/advanced/data-utilities/sentinel"
+    },
+    {
+      "source": "orionis/support/types/sentinel.py",
+      "symbol": "_MISSING_TYPE.__repr__",
+      "kind": "special-method",
+      "line": 5,
+      "signature": "__repr__(self) -> str",
+      "pageId": "helper-sentinel",
+      "reference": "/advanced/data-utilities/sentinel#sentinel-method-repr",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/sentinel.py",
+      "symbol": "_MISSING_TYPE.__bool__",
+      "kind": "special-method",
+      "line": 16,
+      "signature": "__bool__(self) -> bool",
+      "pageId": "helper-sentinel",
+      "reference": "/advanced/data-utilities/sentinel#sentinel-method-bool",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/types/sentinel.py",
+      "symbol": "MISSING",
+      "kind": "exported-marker",
+      "line": 28,
+      "signature": "MISSING = _MISSING_TYPE()",
+      "pageId": "helper-sentinel",
+      "reference": "/advanced/data-utilities/sentinel#sentinel-protocol-identity"
+    },
+    {
+      "source": "orionis/support/system/workers.py",
+      "symbol": "Workers",
+      "kind": "class",
+      "line": 27,
+      "signature": "class Workers(IWorkers)",
+      "pageId": "helper-workers",
+      "reference": "/advanced/data-utilities/workers"
+    },
+    {
+      "source": "orionis/support/system/workers.py",
+      "symbol": "Workers.setRamPerWorker",
+      "kind": "method",
+      "line": 35,
+      "signature": "setRamPerWorker(cls, ram_per_worker: float) -> None",
+      "pageId": "helper-workers",
+      "reference": "/advanced/data-utilities/workers#workers-method-setramperworker",
+      "decorators": [
+        "classmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/system/workers.py",
+      "symbol": "Workers.calculate",
+      "kind": "method",
+      "line": 69,
+      "signature": "calculate(cls) -> int",
+      "pageId": "helper-workers",
+      "reference": "/advanced/data-utilities/workers#workers-method-calculate",
+      "decorators": [
+        "classmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/structures/freezer.py",
+      "symbol": "FreezeThaw",
+      "kind": "class",
+      "line": 10,
+      "signature": "class FreezeThaw",
+      "pageId": "helper-freeze-thaw",
+      "reference": "/advanced/data-utilities/freeze-thaw"
+    },
+    {
+      "source": "orionis/support/structures/freezer.py",
+      "symbol": "FreezeThaw.thaw",
+      "kind": "method",
+      "line": 33,
+      "signature": "thaw(obj: object) -> object",
+      "pageId": "helper-freeze-thaw",
+      "reference": "/advanced/data-utilities/freeze-thaw#freezethaw-method-thaw",
+      "decorators": [
+        "staticmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/structures/freezer.py",
+      "symbol": "FreezeThaw.freeze",
+      "kind": "method",
+      "line": 100,
+      "signature": "freeze(obj: object) -> object",
+      "pageId": "helper-freeze-thaw",
+      "reference": "/advanced/data-utilities/freeze-thaw#freezethaw-method-freeze",
+      "decorators": [
+        "staticmethod"
+      ],
+      "async": false
+    },
+    {
+      "source": "orionis/support/performance/counter.py",
+      "symbol": "PerformanceCounter",
+      "kind": "class",
+      "line": 14,
+      "signature": "class PerformanceCounter(IPerformanceCounter)",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter"
+    },
+    {
+      "source": "orionis/support/performance/counter.py",
+      "symbol": "PerformanceCounter.__init__",
+      "kind": "constructor",
+      "line": 21,
+      "signature": "__init__(self) -> None",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-init",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/performance/counter.py",
+      "symbol": "PerformanceCounter.start",
+      "kind": "method",
+      "line": 37,
+      "signature": "start(self) -> PerformanceCounter",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-start",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/performance/counter.py",
+      "symbol": "PerformanceCounter.astart",
+      "kind": "method",
+      "line": 54,
+      "signature": "async astart(self) -> PerformanceCounter",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-astart",
+      "decorators": [],
+      "async": true
+    },
+    {
+      "source": "orionis/support/performance/counter.py",
+      "symbol": "PerformanceCounter.stop",
+      "kind": "method",
+      "line": 71,
+      "signature": "stop(self) -> PerformanceCounter",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-stop",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/performance/counter.py",
+      "symbol": "PerformanceCounter.astop",
+      "kind": "method",
+      "line": 100,
+      "signature": "async astop(self) -> PerformanceCounter",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-astop",
+      "decorators": [],
+      "async": true
+    },
+    {
+      "source": "orionis/support/performance/counter.py",
+      "symbol": "PerformanceCounter.elapsedTime",
+      "kind": "method",
+      "line": 127,
+      "signature": "elapsedTime(self) -> float",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-elapsedtime",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/performance/counter.py",
+      "symbol": "PerformanceCounter.aelapsedTime",
+      "kind": "method",
+      "line": 147,
+      "signature": "async aelapsedTime(self) -> float",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-aelapsedtime",
+      "decorators": [],
+      "async": true
+    },
+    {
+      "source": "orionis/support/performance/counter.py",
+      "symbol": "PerformanceCounter.getMicroseconds",
+      "kind": "method",
+      "line": 167,
+      "signature": "getMicroseconds(self) -> float",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-getmicroseconds",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/performance/counter.py",
+      "symbol": "PerformanceCounter.agetMicroseconds",
+      "kind": "method",
+      "line": 184,
+      "signature": "async agetMicroseconds(self) -> float",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-agetmicroseconds",
+      "decorators": [],
+      "async": true
+    },
+    {
+      "source": "orionis/support/performance/counter.py",
+      "symbol": "PerformanceCounter.getMilliseconds",
+      "kind": "method",
+      "line": 199,
+      "signature": "getMilliseconds(self) -> float",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-getmilliseconds",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/performance/counter.py",
+      "symbol": "PerformanceCounter.agetMilliseconds",
+      "kind": "method",
+      "line": 216,
+      "signature": "async agetMilliseconds(self) -> float",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-agetmilliseconds",
+      "decorators": [],
+      "async": true
+    },
+    {
+      "source": "orionis/support/performance/counter.py",
+      "symbol": "PerformanceCounter.getSeconds",
+      "kind": "method",
+      "line": 231,
+      "signature": "getSeconds(self) -> float",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-getseconds",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/performance/counter.py",
+      "symbol": "PerformanceCounter.agetSeconds",
+      "kind": "method",
+      "line": 246,
+      "signature": "async agetSeconds(self) -> float",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-agetseconds",
+      "decorators": [],
+      "async": true
+    },
+    {
+      "source": "orionis/support/performance/counter.py",
+      "symbol": "PerformanceCounter.getMinutes",
+      "kind": "method",
+      "line": 261,
+      "signature": "getMinutes(self) -> float",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-getminutes",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/performance/counter.py",
+      "symbol": "PerformanceCounter.agetMinutes",
+      "kind": "method",
+      "line": 276,
+      "signature": "async agetMinutes(self) -> float",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-agetminutes",
+      "decorators": [],
+      "async": true
+    },
+    {
+      "source": "orionis/support/performance/counter.py",
+      "symbol": "PerformanceCounter.restart",
+      "kind": "method",
+      "line": 291,
+      "signature": "restart(self) -> PerformanceCounter",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-restart",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/performance/counter.py",
+      "symbol": "PerformanceCounter.arestart",
+      "kind": "method",
+      "line": 309,
+      "signature": "async arestart(self) -> PerformanceCounter",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-arestart",
+      "decorators": [],
+      "async": true
+    },
+    {
+      "source": "orionis/support/performance/counter.py",
+      "symbol": "PerformanceCounter.__enter__",
+      "kind": "special-method",
+      "line": 327,
+      "signature": "__enter__(self) -> Self",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-enter",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/performance/counter.py",
+      "symbol": "PerformanceCounter.__exit__",
+      "kind": "special-method",
+      "line": 339,
+      "signature": "__exit__(self, exc_type: type[BaseException] | None, exc_val: BaseException | None, exc_tb: TracebackType | None) -> None",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-exit",
+      "decorators": [],
+      "async": false
+    },
+    {
+      "source": "orionis/support/performance/counter.py",
+      "symbol": "PerformanceCounter.__aenter__",
+      "kind": "special-method",
+      "line": 365,
+      "signature": "async __aenter__(self) -> Self",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-aenter",
+      "decorators": [],
+      "async": true
+    },
+    {
+      "source": "orionis/support/performance/counter.py",
+      "symbol": "PerformanceCounter.__aexit__",
+      "kind": "special-method",
+      "line": 377,
+      "signature": "async __aexit__(self, exc_type: type[BaseException] | None, exc_val: BaseException | None, exc_tb: TracebackType | None) -> None",
+      "pageId": "helper-performance-counter",
+      "reference": "/advanced/data-utilities/performance-counter#performancecounter-method-aexit",
+      "decorators": [],
+      "async": true
+    },
+    {
+      "source": "orionis/metadata/framework.py",
+      "symbol": "AUTHOR",
+      "kind": "metadata-constant",
+      "line": 2,
+      "signature": "AUTHOR = 'Raul Mauricio Uñate Castro'",
+      "pageId": "metadata-overview",
+      "reference": "/advanced/framework-metadata#metadata-constant-author",
+      "value": "Raul Mauricio Uñate Castro",
+      "valueType": "str"
+    },
+    {
+      "source": "orionis/metadata/framework.py",
+      "symbol": "AUTHOR_EMAIL",
+      "kind": "metadata-constant",
+      "line": 5,
+      "signature": "AUTHOR_EMAIL = 'raulmauriciounate@gmail.com'",
+      "pageId": "metadata-overview",
+      "reference": "/advanced/framework-metadata#metadata-constant-author-email",
+      "value": "raulmauriciounate@gmail.com",
+      "valueType": "str"
+    },
+    {
+      "source": "orionis/metadata/framework.py",
+      "symbol": "API",
+      "kind": "metadata-constant",
+      "line": 8,
+      "signature": "API = 'https://pypi.org/pypi/orionis/json'",
+      "pageId": "metadata-overview",
+      "reference": "/advanced/framework-metadata#metadata-constant-api",
+      "value": "https://pypi.org/pypi/orionis/json",
+      "valueType": "str"
+    },
+    {
+      "source": "orionis/metadata/framework.py",
+      "symbol": "DESCRIPTION",
+      "kind": "metadata-constant",
+      "line": 11,
+      "signature": "DESCRIPTION = 'Orionis Framework — Async-first full-stack framework for modern Python applications.'",
+      "pageId": "metadata-overview",
+      "reference": "/advanced/framework-metadata#metadata-constant-description",
+      "value": "Orionis Framework — Async-first full-stack framework for modern Python applications.",
+      "valueType": "str"
+    },
+    {
+      "source": "orionis/metadata/framework.py",
+      "symbol": "DOCS",
+      "kind": "metadata-constant",
+      "line": 17,
+      "signature": "DOCS = 'https://orionis-framework.com/'",
+      "pageId": "metadata-overview",
+      "reference": "/advanced/framework-metadata#metadata-constant-docs",
+      "value": "https://orionis-framework.com/",
+      "valueType": "str"
+    },
+    {
+      "source": "orionis/metadata/framework.py",
+      "symbol": "FRAMEWORK",
+      "kind": "metadata-constant",
+      "line": 20,
+      "signature": "FRAMEWORK = 'https://github.com/orionis-framework/framework'",
+      "pageId": "metadata-overview",
+      "reference": "/advanced/framework-metadata#metadata-constant-framework",
+      "value": "https://github.com/orionis-framework/framework",
+      "valueType": "str"
+    },
+    {
+      "source": "orionis/metadata/framework.py",
+      "symbol": "NAME",
+      "kind": "metadata-constant",
+      "line": 23,
+      "signature": "NAME = 'orionis'",
+      "pageId": "metadata-overview",
+      "reference": "/advanced/framework-metadata#metadata-constant-name",
+      "value": "orionis",
+      "valueType": "str"
+    },
+    {
+      "source": "orionis/metadata/framework.py",
+      "symbol": "PYTHON_REQUIRES",
+      "kind": "metadata-constant",
+      "line": 26,
+      "signature": "PYTHON_REQUIRES = (3, 14)",
+      "pageId": "metadata-overview",
+      "reference": "/advanced/framework-metadata#metadata-constant-python-requires",
+      "value": [
+        3,
+        14
+      ],
+      "valueType": "tuple"
+    },
+    {
+      "source": "orionis/metadata/framework.py",
+      "symbol": "SKELETON",
+      "kind": "metadata-constant",
+      "line": 29,
+      "signature": "SKELETON = 'https://github.com/orionis-framework/skeleton'",
+      "pageId": "metadata-overview",
+      "reference": "/advanced/framework-metadata#metadata-constant-skeleton",
+      "value": "https://github.com/orionis-framework/skeleton",
+      "valueType": "str"
+    },
+    {
+      "source": "orionis/metadata/framework.py",
+      "symbol": "VERSION",
+      "kind": "metadata-constant",
+      "line": 32,
+      "signature": "VERSION = '1.0.7'",
+      "pageId": "metadata-overview",
+      "reference": "/advanced/framework-metadata#metadata-constant-version",
+      "value": "1.0.7",
+      "valueType": "str"
+    }
+  ]
+}

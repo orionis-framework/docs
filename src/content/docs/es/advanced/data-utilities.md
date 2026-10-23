@@ -17,6 +17,24 @@ El paquete tiene deliberadamente dos niveles de API. `orionis.support.facades` y
 - El runtime de Orionis y sus dependencias declaradas. Este módulo usa directamente `pendulum`, `dotty-dict` y `psutil`.
 - Una aplicación Orionis inicializada antes de invocar fachadas respaldadas por servicios. `DateTime` es una clase autónoma y no requiere el contenedor para las operaciones de fecha normales.
 
+## Referencias de Helpers y Metadata
+
+Cada helper tiene una guía propia con importaciones, parámetros, retornos, ejemplos y formas de acceso:
+
+| Utilidad | Uso principal |
+| --- | --- |
+| [Collection](/es/advanced/data-utilities/collection) | Transformar, filtrar, agrupar y serializar datos en memoria. |
+| [DotDict](/es/advanced/data-utilities/dot-dict) | Acceder por atributos a diccionarios anidados. |
+| [Sentinel](/es/advanced/data-utilities/sentinel) | Diferenciar un dato omitido mediante `MISSING`. |
+| [StdClass](/es/advanced/data-utilities/std-class) | Agrupar atributos dinámicos y exportarlos a un diccionario. |
+| [Stringable](/es/advanced/data-utilities/stringable) | Transformar y analizar cadenas inmutables. |
+| [Workers](/es/advanced/data-utilities/workers) | Estimar concurrencia según CPU y presupuesto de memoria. |
+| [FreezeThaw](/es/advanced/data-utilities/freeze-thaw) | Convertir contenedores entre formas congeladas y mutables. |
+| [PerformanceCounter](/es/advanced/data-utilities/performance-counter) | Medir intervalos síncronos y asíncronos. |
+| [Metadata](/es/advanced/framework-metadata) | Consultar la identidad y versión del framework instalado. |
+
+Los tipos que reciben datos se construyen explícitamente; los métodos de clase, métodos estáticos y constantes no requieren contenedor. Cada referencia explica cuándo la inyección es aplicable. Estas utilidades no hidratan por sí solas los datos de una petición.
+
 ## Recorrido del módulo
 
 - [Transformar colecciones y cadenas](/es/advanced/data-utilities/collections-and-strings)

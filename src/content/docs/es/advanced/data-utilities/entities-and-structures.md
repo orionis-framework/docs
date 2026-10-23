@@ -5,6 +5,8 @@ editUrl: true
 lastUpdated: false
 ---
 
+Consulta las referencias de [DotDict](/es/advanced/data-utilities/dot-dict), [StdClass](/es/advanced/data-utilities/std-class), [Sentinel](/es/advanced/data-utilities/sentinel) y [FreezeThaw](/es/advanced/data-utilities/freeze-thaw) para conocer todos sus métodos y límites. Esta página conserva los ejemplos de integración con entidades.
+
 Usa una dataclass para representar un resultado de aplicación con campos conocidos; `BaseEntity` añade serialización recursiva y metadatos. Usa `DotDict` o `StdClass` cuando las claves se conocen durante la ejecución. Estas utilidades no validan datos externos como un Schema. Los ejemplos son independientes entre sí.
 
 ## Flujos de trabajo comunes

@@ -3001,12 +3001,16 @@
       "id": "test-overview",
       "kind": "doc",
       "title": {
-        "es": "Pruebas de aplicaciones",
-        "en": "Application testing"
+        "es": "Pruebas",
+        "en": "Testing"
       },
       "slug": {
         "es": "/es/testing",
         "en": "/en/testing"
+      },
+      "label": {
+        "es": "Introducción",
+        "en": "Introduction"
       }
     },
     {
@@ -3051,6 +3055,10 @@
       "slug": {
         "es": "/es/testing/writing-and-running-tests",
         "en": "/en/testing/writing-and-running-tests"
+      },
+      "label": {
+        "es": "Crear y ejecutar casos",
+        "en": "Create and run cases"
       }
     },
     {
@@ -3169,12 +3177,12 @@
       "id": "metadata-overview",
       "kind": "doc",
       "title": {
-        "es": "Metadatos y compatibilidad de Orionis",
-        "en": "Orionis metadata and compatibility"
+        "es": "Metadata",
+        "en": "Metadata"
       },
       "label": {
-        "en": "Metadata and compatibility",
-        "es": "Metadatos y compatibilidad"
+        "es": "Metadata",
+        "en": "Metadata"
       },
       "slug": {
         "es": "/es/advanced/framework-metadata",
@@ -3347,6 +3355,166 @@
       "slug": {
         "es": "/es/getting-started/deployment/docker",
         "en": "/en/getting-started/deployment/docker"
+      }
+    },
+    {
+      "id": "test-cases-and-decorators",
+      "kind": "doc",
+      "title": {
+        "es": "TestCase, ciclo de vida y decoradores",
+        "en": "TestCase, lifecycle and decorators"
+      },
+      "label": {
+        "es": "TestCase y decoradores",
+        "en": "TestCase and decorators"
+      },
+      "slug": {
+        "es": "/es/testing/cases-and-decorators",
+        "en": "/en/testing/cases-and-decorators"
+      }
+    },
+    {
+      "id": "test-dependency-injection",
+      "kind": "doc",
+      "title": {
+        "es": "Inyección de dependencias y aislamiento",
+        "en": "Dependency injection and isolation"
+      },
+      "label": {
+        "es": "Dependencias y aislamiento",
+        "en": "Dependencies and isolation"
+      },
+      "slug": {
+        "es": "/es/testing/dependency-injection",
+        "en": "/en/testing/dependency-injection"
+      }
+    },
+    {
+      "id": "helper-collection",
+      "kind": "doc",
+      "title": {
+        "es": "Collection",
+        "en": "Collection"
+      },
+      "label": {
+        "es": "Collection",
+        "en": "Collection"
+      },
+      "slug": {
+        "es": "/es/advanced/data-utilities/collection",
+        "en": "/en/advanced/data-utilities/collection"
+      }
+    },
+    {
+      "id": "helper-dot-dict",
+      "kind": "doc",
+      "title": {
+        "es": "DotDict",
+        "en": "DotDict"
+      },
+      "label": {
+        "es": "DotDict",
+        "en": "DotDict"
+      },
+      "slug": {
+        "es": "/es/advanced/data-utilities/dot-dict",
+        "en": "/en/advanced/data-utilities/dot-dict"
+      }
+    },
+    {
+      "id": "helper-sentinel",
+      "kind": "doc",
+      "title": {
+        "es": "Sentinel",
+        "en": "Sentinel"
+      },
+      "label": {
+        "es": "Sentinel",
+        "en": "Sentinel"
+      },
+      "slug": {
+        "es": "/es/advanced/data-utilities/sentinel",
+        "en": "/en/advanced/data-utilities/sentinel"
+      }
+    },
+    {
+      "id": "helper-std-class",
+      "kind": "doc",
+      "title": {
+        "es": "StdClass",
+        "en": "StdClass"
+      },
+      "label": {
+        "es": "StdClass",
+        "en": "StdClass"
+      },
+      "slug": {
+        "es": "/es/advanced/data-utilities/std-class",
+        "en": "/en/advanced/data-utilities/std-class"
+      }
+    },
+    {
+      "id": "helper-stringable",
+      "kind": "doc",
+      "title": {
+        "es": "Stringable",
+        "en": "Stringable"
+      },
+      "label": {
+        "es": "Stringable",
+        "en": "Stringable"
+      },
+      "slug": {
+        "es": "/es/advanced/data-utilities/stringable",
+        "en": "/en/advanced/data-utilities/stringable"
+      }
+    },
+    {
+      "id": "helper-workers",
+      "kind": "doc",
+      "title": {
+        "es": "Workers",
+        "en": "Workers"
+      },
+      "label": {
+        "es": "Workers",
+        "en": "Workers"
+      },
+      "slug": {
+        "es": "/es/advanced/data-utilities/workers",
+        "en": "/en/advanced/data-utilities/workers"
+      }
+    },
+    {
+      "id": "helper-freeze-thaw",
+      "kind": "doc",
+      "title": {
+        "es": "FreezeThaw",
+        "en": "FreezeThaw"
+      },
+      "label": {
+        "es": "FreezeThaw",
+        "en": "FreezeThaw"
+      },
+      "slug": {
+        "es": "/es/advanced/data-utilities/freeze-thaw",
+        "en": "/en/advanced/data-utilities/freeze-thaw"
+      }
+    },
+    {
+      "id": "helper-performance-counter",
+      "kind": "doc",
+      "title": {
+        "es": "PerformanceCounter",
+        "en": "PerformanceCounter"
+      },
+      "label": {
+        "es": "PerformanceCounter",
+        "en": "PerformanceCounter"
+      },
+      "slug": {
+        "es": "/es/advanced/data-utilities/performance-counter",
+        "en": "/en/advanced/data-utilities/performance-counter"
       }
     }
   ]

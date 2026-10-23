@@ -5,6 +5,8 @@ editUrl: true
 lastUpdated: false
 ---
 
+The complete references are [Collection](/en/advanced/data-utilities/collection) and [Stringable](/en/advanced/data-utilities/stringable). This page combines them in a workflow.
+
 ## Quick start
 
 ```python

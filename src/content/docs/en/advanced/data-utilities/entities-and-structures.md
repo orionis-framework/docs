@@ -5,6 +5,8 @@ editUrl: true
 lastUpdated: false
 ---
 
+See the [DotDict](/en/advanced/data-utilities/dot-dict), [StdClass](/en/advanced/data-utilities/std-class), [Sentinel](/en/advanced/data-utilities/sentinel) and [FreezeThaw](/en/advanced/data-utilities/freeze-thaw) references for all methods and limitations. This page retains entity integration examples.
+
 Use a dataclass for an application result with known fields; `BaseEntity` adds recursive serialization and metadata. Use `DotDict` or `StdClass` when keys are determined at runtime. These utilities do not validate untrusted input like a Schema. The examples are independent of one another.
 
 ## Common workflows
