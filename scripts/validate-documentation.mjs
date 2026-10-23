@@ -16,6 +16,7 @@ import './validate-exceptions-coverage.mjs';
 import './validate-deployment-coverage.mjs';
 import './validate-testing-coverage.mjs';
 import './validate-utilities-coverage.mjs';
+import './validate-introspection-coverage.mjs';
 
 const catalog = documentationCatalog;
 const pages = validateCatalog(catalog);

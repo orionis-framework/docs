@@ -3065,12 +3065,12 @@
       "id": "introspection-overview",
       "kind": "doc",
       "title": {
-        "es": "Introspección y metaprogramación",
-        "en": "Introspection and metaprogramming"
+        "es": "Introspección",
+        "en": "Introspection"
       },
       "label": {
-        "en": "Introspection",
-        "es": "Introspección"
+        "es": "Introducción",
+        "en": "Introduction"
       },
       "slug": {
         "es": "/es/advanced/introspection",
@@ -3081,12 +3081,12 @@
       "id": "introspection-dependencies-and-discovery",
       "kind": "doc",
       "title": {
-        "es": "Dependencias, descubrimiento y referencia",
-        "en": "Dependencies, discovery, and reference"
+        "es": "Dependencias y firmas",
+        "en": "Dependencies and signatures"
       },
       "label": {
-        "en": "Dependencies and discovery",
-        "es": "Dependencias y descubrimiento"
+        "es": "Dependencias y firmas",
+        "en": "Dependencies and signatures"
       },
       "slug": {
         "es": "/es/advanced/introspection/dependencies-and-discovery",
@@ -3097,12 +3097,12 @@
       "id": "introspection-reflection",
       "kind": "doc",
       "title": {
-        "es": "Inspeccionar clases, funciones e instancias",
-        "en": "Inspecting classes, functions, and instances"
+        "es": "Reflection: clasificación y selección",
+        "en": "Reflection: classification and selection"
       },
       "label": {
-        "en": "Classes, functions and instances",
-        "es": "Clases, funciones e instancias"
+        "es": "Reflection",
+        "en": "Reflection"
       },
       "slug": {
         "es": "/es/advanced/introspection/reflection",
@@ -3515,6 +3515,102 @@
       "slug": {
         "es": "/es/advanced/data-utilities/performance-counter",
         "en": "/en/advanced/data-utilities/performance-counter"
+      }
+    },
+    {
+      "id": "introspection-callables",
+      "kind": "doc",
+      "title": {
+        "es": "ReflectionCallable",
+        "en": "ReflectionCallable"
+      },
+      "label": {
+        "es": "Funciones y métodos",
+        "en": "Functions and methods"
+      },
+      "slug": {
+        "es": "/es/advanced/introspection/callables",
+        "en": "/en/advanced/introspection/callables"
+      }
+    },
+    {
+      "id": "introspection-abstract-classes",
+      "kind": "doc",
+      "title": {
+        "es": "ReflectionAbstract",
+        "en": "ReflectionAbstract"
+      },
+      "label": {
+        "es": "Clases abstractas",
+        "en": "Abstract classes"
+      },
+      "slug": {
+        "es": "/es/advanced/introspection/abstract-classes",
+        "en": "/en/advanced/introspection/abstract-classes"
+      }
+    },
+    {
+      "id": "introspection-concrete-classes",
+      "kind": "doc",
+      "title": {
+        "es": "ReflectionConcrete",
+        "en": "ReflectionConcrete"
+      },
+      "label": {
+        "es": "Clases concretas",
+        "en": "Concrete classes"
+      },
+      "slug": {
+        "es": "/es/advanced/introspection/concrete-classes",
+        "en": "/en/advanced/introspection/concrete-classes"
+      }
+    },
+    {
+      "id": "introspection-instances",
+      "kind": "doc",
+      "title": {
+        "es": "ReflectionInstance",
+        "en": "ReflectionInstance"
+      },
+      "label": {
+        "es": "Instancias",
+        "en": "Instances"
+      },
+      "slug": {
+        "es": "/es/advanced/introspection/instances",
+        "en": "/en/advanced/introspection/instances"
+      }
+    },
+    {
+      "id": "introspection-modules",
+      "kind": "doc",
+      "title": {
+        "es": "ReflectionModule",
+        "en": "ReflectionModule"
+      },
+      "label": {
+        "es": "Módulos",
+        "en": "Modules"
+      },
+      "slug": {
+        "es": "/es/advanced/introspection/modules",
+        "en": "/en/advanced/introspection/modules"
+      }
+    },
+    {
+      "id": "introspection-module-discovery",
+      "kind": "doc",
+      "title": {
+        "es": "ModuleInspector",
+        "en": "ModuleInspector"
+      },
+      "label": {
+        "es": "Descubrimiento de módulos",
+        "en": "Module discovery"
+      },
+      "slug": {
+        "es": "/es/advanced/introspection/module-discovery",
+        "en": "/en/advanced/introspection/module-discovery"
       }
     }
   ]

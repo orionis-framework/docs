@@ -1430,13 +1430,19 @@
         "helper-freeze-thaw",
         "helper-performance-counter",
         "metadata-overview",
+        "introspection-overview",
+        "introspection-reflection",
+        "introspection-callables",
+        "introspection-abstract-classes",
+        "introspection-concrete-classes",
+        "introspection-instances",
+        "introspection-dependencies-and-discovery",
+        "introspection-modules",
+        "introspection-module-discovery",
         "support-overview",
         "support-collections-and-strings",
         "support-entities-and-structures",
-        "support-facades-and-runtime-utilities",
-        "introspection-overview",
-        "introspection-reflection",
-        "introspection-dependencies-and-discovery"
+        "support-facades-and-runtime-utilities"
       ],
       "groups": [
         {
@@ -1467,19 +1473,34 @@
           ]
         },
         {
+          "id": "utilities-introspection",
+          "title": {
+            "es": "Introspección",
+            "en": "Introspection"
+          },
+          "pageIds": [
+            "introspection-overview",
+            "introspection-reflection",
+            "introspection-callables",
+            "introspection-abstract-classes",
+            "introspection-concrete-classes",
+            "introspection-instances",
+            "introspection-dependencies-and-discovery",
+            "introspection-modules",
+            "introspection-module-discovery"
+          ]
+        },
+        {
           "id": "utilities-reference",
           "title": {
-            "es": "Extensión e introspección",
-            "en": "Extensions and introspection"
+            "es": "Extensión y referencias",
+            "en": "Extensions and references"
           },
           "pageIds": [
             "support-overview",
             "support-collections-and-strings",
             "support-entities-and-structures",
-            "support-facades-and-runtime-utilities",
-            "introspection-overview",
-            "introspection-reflection",
-            "introspection-dependencies-and-discovery"
+            "support-facades-and-runtime-utilities"
           ]
         }
       ]

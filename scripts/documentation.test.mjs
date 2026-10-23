@@ -190,12 +190,12 @@ test('regrouping navigation preserves page IDs, page records, and both locale ro
 test('utilities provide dedicated helper and metadata groups while retaining existing references', () => {
   const section = navigationSections.find((entry) => entry.id === 'utilities');
   assert.deepEqual(section.title, { es: 'Utilidades y metadatos', en: 'Utilities and metadata' });
-  assert.deepEqual(section.groups.map((group) => group.id), ['utilities-helpers', 'utilities-metadata', 'utilities-reference']);
+  assert.deepEqual(section.groups.map((group) => group.id), ['utilities-helpers', 'utilities-metadata', 'utilities-introspection', 'utilities-reference']);
   const helpers = ['collection', 'dot-dict', 'sentinel', 'std-class', 'stringable', 'workers', 'freeze-thaw', 'performance-counter'];
   assert.deepEqual(section.groups[0].pageIds, helpers.map((name) => `helper-${name}`));
   assert.deepEqual(section.groups[0].pages.map((page) => page.title.en), ['Collection', 'DotDict', 'Sentinel', 'StdClass', 'Stringable', 'Workers', 'FreezeThaw', 'PerformanceCounter']);
   assert.deepEqual(section.groups[1].pageIds, ['metadata-overview']);
-  assert.deepEqual(section.groups[2].pageIds, ['support-overview', 'support-collections-and-strings', 'support-entities-and-structures', 'support-facades-and-runtime-utilities', 'introspection-overview', 'introspection-reflection', 'introspection-dependencies-and-discovery']);
+  assert.deepEqual(section.groups[3].pageIds, ['support-overview', 'support-collections-and-strings', 'support-entities-and-structures', 'support-facades-and-runtime-utilities']);
   for (const locale of documentationCatalog.locales) {
     for (const page of section.pages) assert.equal(getPageBySlug(page.slug[locale]).id, page.id);
     assert.equal(section.groups[1].pages[0].title[locale], 'Metadata');
@@ -209,6 +209,23 @@ test('the menu makes realtime, MCP, and application services distinct visible ca
   for (const id of ['mcp-overview', 'mcp-transports-and-configuration', 'test-mcp-testing']) assert.equal(sectionFor(id).id, 'mcp');
   for (const [pageId, sectionId] of [['storage-overview', 'storage'], ['cache-overview', 'cache'], ['mail-overview', 'mail'], ['queues-overview', 'queues'], ['auth-overview', 'authentication'], ['view-overview', 'views']]) assert.equal(sectionFor(pageId).id, sectionId);
   for (const section of navigationSections) for (const locale of documentationCatalog.locales) assert.ok(section.title[locale]);
+});
+
+test('introspection has a complete nine-guide subgroup without losing its previous routes', () => {
+  const section = navigationSections.find((item) => item.id === 'utilities');
+  const group = section.groups.find((item) => item.id === 'utilities-introspection');
+  assert.deepEqual(group.title, { es: 'Introspección', en: 'Introspection' });
+  const suffixes = ['overview', 'reflection', 'callables', 'abstract-classes', 'concrete-classes', 'instances', 'dependencies-and-discovery', 'modules', 'module-discovery'];
+  assert.deepEqual(group.pageIds, suffixes.map((name) => `introspection-${name}`));
+  const references = section.groups.find((item) => item.id === 'utilities-reference');
+  assert.ok(references.pageIds.every((id) => !id.startsWith('introspection-')));
+  for (const locale of documentationCatalog.locales) {
+    for (const suffix of ['overview', 'reflection', 'dependencies-and-discovery']) {
+      const page = getPageBySlug(`/${locale}/advanced/introspection${suffix === 'overview' ? '' : `/${suffix}`}`);
+      assert.equal(page.id, `introspection-${suffix}`);
+    }
+    for (const page of group.pages) assert.equal(getPageBySlug(page.slug[locale]).id, page.id);
+  }
 });
 test('retained contribution pages switch languages through their stable IDs', () => {
   const page = getPageBySlug('/es/contribute/contributors');
