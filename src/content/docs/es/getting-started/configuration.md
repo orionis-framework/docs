@@ -7,18 +7,9 @@ lastUpdated: false
 
 ## Configurar un proyecto generado
 
-Edita los valores de cada entorno en el `.env` del proyecto y conserva su `APP_KEY` existente. Por ejemplo:
+Define los valores de cada instalación siguiendo la guía independiente de [Entorno](/es/architecture/environment). Allí se documentan `.env`, la lectura exclusiva desde `config/`, el tipado y la persistencia JSON del bootstrap.
 
-```dotenv
-APP_NAME="Mi aplicación"
-APP_ENV=development
-APP_DEBUG=bool:true
-APP_TIMEZONE=UTC
-```
-
-El archivo generado `config/app.py` y los demás módulos de `config/` definen configuración tipada. Los campos que usan `Env.get()` leen `.env` al construir su dataclass; un valor fijado en la configuración de la aplicación reemplaza su valor nativo. Reinicia los procesos de la aplicación después de cambiar ajustes de arranque. Si está habilitada la caché, sigue también el [flujo de invalidación](/es/getting-started/paths-and-caching).
-
-Lee los ajustes mediante `app.config("app.name")` después de la creación o a través de `IApplication` inyectada en un manejador. Concentra las lecturas del entorno en los archivos de configuración para que el código de aplicación use los mismos ajustes validados.
+Durante la ejecución, lee los ajustes resueltos mediante `app.config("app.name")` o una `IApplication` inyectada. Esta página explica cómo se reúne, valida y consulta esa configuración.
 
 ## Configuración
 

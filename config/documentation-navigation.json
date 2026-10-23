@@ -1126,6 +1126,45 @@
       ]
     },
     {
+      "id": "environment",
+      "band": "operate",
+      "icon": "environment",
+      "title": {
+        "es": "Entorno",
+        "en": "Environment"
+      },
+      "pageIds": [
+        "environment-overview",
+        "environment-typed-configuration",
+        "environment-compiled-configuration",
+        "environment-operations-and-reference"
+      ],
+      "groups": [
+        {
+          "id": "environment-configuration",
+          "title": {
+            "es": "Variables y configuración",
+            "en": "Variables and configuration"
+          },
+          "pageIds": [
+            "environment-overview",
+            "environment-typed-configuration"
+          ]
+        },
+        {
+          "id": "environment-bootstrap",
+          "title": {
+            "es": "Bootstrap y referencia",
+            "en": "Bootstrap and reference"
+          },
+          "pageIds": [
+            "environment-compiled-configuration",
+            "environment-operations-and-reference"
+          ]
+        }
+      ]
+    },
+    {
       "id": "application",
       "band": "operate",
       "icon": "architecture",
@@ -1135,9 +1174,6 @@
       },
       "pageIds": [
         "foundation-configuration",
-        "environment-overview",
-        "environment-typed-configuration",
-        "environment-operations-and-reference",
         "foundation-application-lifecycle",
         "foundation-paths-and-caching",
         "container-overview",

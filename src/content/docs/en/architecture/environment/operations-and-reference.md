@@ -1,74 +1,217 @@
 ---
-title: "Persistence, reloads, and Env reference"
-description: "Use this reference when you need to update or reload environment values programmatically. The usual application workflow is to edit .env, read values from config/, and restart…"
+title: "Env reference and configuration operations"
+description: "Env API, file and process values, reloads, validators and key generation while preparing configuration."
 editUrl: true
 lastUpdated: false
 ---
 
-Use this reference when you need to update or reload environment values programmatically. The usual application workflow is to edit `.env`, read values from `config/`, and restart the application. `Env.set()` persists by default, so an HTTP handler or command using it changes the project's file as well as the current process; use `only_os=True` for a deliberately process-local override.
+Use the environment component **only in configuration files**. This reference explains its operations for preparing those values; do not call `Env`, `env()` or `DotEnv` from controllers, middleware, commands, jobs or services at runtime. During application execution, consume the resolved configuration through `IApplication.config()`, as shown in [Bootstrap and JSON files](/en/architecture/environment/compiled-configuration#runtime-configuration).
 
-## Public API
+For ordinary settings, edit `.env` and read it from a dataclass in `config/`: [Variables and types](/en/architecture/environment/typed-configuration). You do not need to write or reload the file through Python on every startup.
 
-### `Env.get(key, default=None)` and `env(key, default=None)`
+<a id="env-api"></a>
+## Imports and contract
 
-Validate the uppercase key and return its parsed process value, or the exact default when absent. `env()` is a thin one-call delegate to `Env.get`.
+```python
+from orionis.environment import Env, env
+```
 
-### `Env.set(key, value, type_hint=None, *, only_os=False)`
+These are the two exports of the root package. `Env` implements `IEnv` through class methods and delegates to the same `DotEnv` singleton; you do not need `Env()` or a container binding. All its operations are synchronous and do not use `await`. `IEnv`, available in `orionis.environment.contracts.env`, declares the same five methods; it does not provide another source of values.
 
-Serializes the value, optionally with an explicit typed prefix. By default it updates `.env`, the file cache, and `os.environ`; `only_os=True` updates only the current process. Success returns `True`.
+<a id="env-get"></a>
+<a id="env-helper"></a>
+## Read: Env.get() and env()
 
-### `Env.unset(key, *, only_os=False)`
+```text
+Env.get(key: str, default: object | None = None) -> object
+env(key: str, default: object | None = None) -> object
+```
 
-Removes the entry from file/cache and process, or from the process only. Missing valid keys are treated as successfully absent and return `True`; `python-dotenv` may emit an informational message for a missing file entry.
+`key` is the exact variable name. Both validate the name, read `os.environ` and convert the text according to the [typing rules](/en/architecture/environment/typed-configuration). The helper delegates directly to `Env.get()` and accepts the same two arguments; it has no third conversion argument.
 
-### `Env.all()` and `Env.reload()`
+You can use either form in the fields of your configuration file:
 
-`all()` returns a new dictionary containing parsed file-backed cache values. `reload()` loads the file again with override enabled and rebuilds that cache. A reload failure is wrapped by `DotEnv` as `RuntimeError` and propagates.
+```python
+# config/reports.py
+from dataclasses import dataclass, field
+from orionis.environment import Env, env
 
-### Advanced components
 
-`EnvironmentCaster`, `EnvironmentValueType`, `DotEnv`, and `SecureKeyGenerator` live in their respective subpackages. They are useful for framework integration and tests, but only `Env` and `env` are exported by `orionis.environment`.
+@dataclass(frozen=True, kw_only=True)
+class Reports:
+    limit: int = field(default_factory=lambda: Env.get("REPORT_LIMIT", 100))
+    region: str = field(default_factory=lambda: env("REPORT_REGION", "eu"))
+```
 
-## Integration with Orionis
+With `REPORT_LIMIT=int:50`, `limit` receives the integer `50`. The default is returned exactly as supplied **only when the key does not exist in the process**; it does not convert an incompatible value, replace an already stored `None` or empty string, or validate the field annotation by itself. An invalid name raises `TypeError` or `ValueError`; a recognized prefix with invalid content can raise conversion errors instead of returning the default.
 
-Framework configuration dataclasses call `Env.get` in their default factories, so environment parsing happens before providers consume normalized config. Application key validation also uses `SecureKeyGenerator` and persists a generated `APP_KEY` through `Env.set` when absent.
+<a id="env-set"></a>
+## Write: Env.set()
 
-Console, HTTP, database, cache, queue, session, mail, logging, view, MCP, and testing configuration all depend on this module. It has no service provider because its singleton facade is usable during early bootstrap.
+The declared signature is:
 
-## Errors and edge cases
+```text
+Env.set(
+    key: str,
+    value: str | float | bool | list | dict | tuple | set,
+    type_hint: str | EnvironmentValueType | None = None,
+    *,
+    only_os: bool = False,
+) -> bool
+```
 
-- Keys must be uppercase and may contain only uppercase letters, digits, and underscores; invalid keys raise `TypeError` or `ValueError`.
-- Unknown explicit type hints passed to `Env.set` raise `RuntimeError`; incompatible values raise `TypeError` or `ValueError`.
-- Empty stored strings parse as `None`, which differs from explicit `str:` behavior.
-- `base64:` uses strict validation; malformed payloads fail instead of returning undecoded text.
-- `only_os=True` does not update the file cache, so `get()` can see the value while `all()` does not.
-- Values returned by `all()` are newly collected, but nested mutable values are newly parsed rather than shared cache objects.
-- The module stores secrets as plain `.env` text; Base64 is encoding, not encryption.
-
-## Performance and concurrency
-
-All `DotEnv` operations use one class-level `threading.Lock`, protecting process/file/cache consistency but serializing reads and writes across threads. Async callers should avoid frequent persistent writes on an event-loop hot path because file access is synchronous.
-
-File entries are cached for `all()`, typed primitive parsing has a fast path, key validation uses an LRU of 512 names, and type-hint normalization uses an LRU of 64 entries. `get()` still reads `os.environ` so process-only updates remain visible immediately.
-
-## Compatibility
-
-Orionis declares Python 3.14+ and `python-dotenv` 1.2.3+. Persisted path strings use POSIX separators across platforms; collection syntax is Python-literal based rather than JSON.
-
-## Module structure
-
-| Path | Responsibility |
+| Parameter | Effect |
 |---|---|
-| `facade.py`, `functions.py` | Public `Env` class methods and `env()` helper. |
-| `core/dot_env.py` | File lifecycle, process synchronization, cache, parsing, and locking. |
-| `dynamic/caster.py` | Typed serialization and deserialization. |
-| `enums/value_type.py` | Supported `EnvironmentValueType` values. |
-| `validators/` | Variable-name and type-hint validation with bounded caches. |
-| `key/key_generator.py` | Random Laravel-compatible AES application keys. |
-| `contracts/` | Abstract environment and caster interfaces. |
+| `key` | Required. Name validated with the same format as `get()`. |
+| `value` | Required. Value serialized before storage. |
+| `type_hint` | Optional, `None`. A type name or an `EnvironmentValueType` member selects explicit serialization with a prefix. |
+| `only_os` | Keyword-only, `False`. With `True`, updates only `os.environ`; it does not write the file or the `all()` snapshot. |
 
-## Reference and next steps
+Without `type_hint`, strings are trimmed with `strip()`, booleans are written as `true`/`false`, numbers as text and collections through `repr()`. Although the annotation does not list `int` or `None`, the actual serializer accepts integers and converts `None` to `null` when no hint is supplied. Other objects fall back to `str()`; do not assume that reading them will preserve their type.
 
-[dot_env.py](https://github.com/orionis-framework/framework/blob/470229f78a5db61263ce887bcdd16bc98f9141db/orionis/environment/core/dot_env.py) · [key_name.py](https://github.com/orionis-framework/framework/blob/470229f78a5db61263ce887bcdd16bc98f9141db/orionis/environment/validators/key_name.py) · [key_generator.py](https://github.com/orionis-framework/framework/blob/470229f78a5db61263ce887bcdd16bc98f9141db/orionis/environment/key/key_generator.py)
+With a hint, `ValidateTypes` accepts `str`, `int`, `float`, `bool`, `list`, `dict`, `tuple` and `set` values. For example, `"INT"` is normalized to `"int"`; spaces in the name are not removed. That validator rejects `None`, `Path` or `bytes` when a hint is supplied, even though the lower-level converter has other capabilities. For `path` or `base64`, use compatible text. The [ten types and the converter](/en/architecture/environment/typed-configuration) describe their restrictions.
 
-[Return to the module index](/en/architecture/environment).
+This helper illustrates an explicit write while preparing configuration; **defining it does not execute it**. Do not call it from business code or add it as an unconditional write on every startup:
+
+```python
+# config/reports.py: preparation helper, separate from the previous dataclass.
+from orionis.environment import Env
+from orionis.environment.enums import EnvironmentValueType
+
+
+def persist_report_limit(value: int) -> bool:
+    return Env.set("REPORT_LIMIT", value, EnvironmentValueType.INT)
+```
+
+Calling it with `50` during that preparation stores a value equivalent to `REPORT_LIMIT='int:50'`, updates the file snapshot and updates the process environment. With `only_os=True`, `Env.get()` would see the new value, but `Env.all()` would retain the previous one.
+
+It returns `True` if the flow completes; this is not a transaction between the file, snapshot and process. An unknown hint raises `RuntimeError`, an incompatible hint or value type can raise `TypeError`, and failed conversion can raise `ValueError`. Access and write failures propagate. It provides neither locking between processes nor rollback of partial changes.
+
+<a id="env-unset"></a>
+## Remove: Env.unset()
+
+```text
+Env.unset(key: str, *, only_os: bool = False) -> bool
+```
+
+Removes the entry from `.env`, the snapshot and `os.environ`. With `only_os=True`, it only removes the process entry: a later `all()` call can still show the file entry, and reloading can restore it to the process. A valid absent key also returns `True`; this does not indicate whether an entry previously existed. Invalid names raise `TypeError` or `ValueError`, and file errors propagate.
+
+An explicit cleanup helper within configuration can be:
+
+```python
+from orionis.environment import Env
+
+
+def remove_obsolete_report_option() -> bool:
+    return Env.unset("REPORT_LEGACY_OPTION")
+```
+
+The function acts only when deliberately called during configuration preparation; it is not a cleanup mechanism for each request.
+
+<a id="env-all"></a>
+## Inspect the file: Env.all()
+
+```text
+Env.all() -> dict[str, Any]
+```
+
+Returns a new dictionary containing entries from the **file snapshot** and their converted values. It does not enumerate all of `os.environ`, read the disk again or include a variable created only with `only_os=True`. Collections are parsed again, so they do not reference the internal snapshot.
+
+To check for keys while preparing configuration without printing their values:
+
+```python
+from orionis.environment import Env
+
+
+def has_report_configuration() -> bool:
+    names = Env.all().keys()
+    return "REPORT_LIMIT" in names and "REPORT_REGION" in names
+```
+
+An invalid file value can make conversion of the whole mapping fail. `all()` can also contain keys with `None` when they appear without an assignment in the file. Do not dump its result into logs: it includes credential values present in `.env`.
+
+<a id="env-reload"></a>
+## Reload: Env.reload()
+
+```text
+Env.reload() -> bool
+```
+
+Loads the same file again with precedence over process values and rebuilds the snapshot; it retains the instance and selected path. A successful operation returns `True`. If reloading fails, `DotEnv.reload()` wraps the error in `RuntimeError`, which the facade allows to propagate. The facade returns `False` only if obtaining or constructing the singleton fails with `OSError` or `ValueError` before its reload is called.
+
+```python
+from orionis.environment import Env
+
+
+def refresh_configuration_source() -> bool:
+    return Env.reload()
+```
+
+This helper belongs exclusively to configuration preparation. Reloading **does not rebuild** previously instantiated dataclasses, services or compiled configuration files. It also does not remove process keys that you manually deleted from the file: they can disappear from `all()` and remain visible through `get()`. To apply changes to the application, follow [the invalidation and restart workflow](/en/architecture/environment/compiled-configuration#refresh-compiled-configuration).
+
+<a id="dotenv-service"></a>
+## DotEnv and file selection
+
+```text
+DotEnv(path: str | None = None) -> None
+```
+
+The implementation lives in `orionis.environment.core.dot_env`. The first access creates one instance per process. Without a path it uses `.env` in the working directory; an explicit path is expanded and resolved. If the file is absent, it attempts to create it; it does not automatically create its parent directories.
+
+It loads the file with `override=True` and prepares its snapshot. Later calls reuse the instance: passing another path does not select a second file. `Env` and `env()` share that selection. The facade does not expose an argument for choosing different files per lookup; keep the process in the project root while preparing its configuration.
+
+`DotEnv` provides the same five methods: `get`, `set`, `unset`, `all` and `reload`; their parameters and effects match those described above. Its `all()` is annotated as `dict`, and its `reload()` propagates `RuntimeError` without the facade's additional handling. A `threading.Lock` serializes these operations within the process; it is not a distributed lock. The component provides no HTTP API, async API, per-request injection API or reloadable runtime configuration system.
+
+<a id="environment-validators"></a>
+## Key and hint validators
+
+Both callables are exported from `orionis.environment.validators`:
+
+```text
+ValidateKeyName(key: str) -> str
+ValidateTypes(
+    *,
+    value: str | float | bool | list | dict | tuple | set,
+    type_hint: str | EnvironmentValueType | None = None,
+) -> str
+```
+
+`ValidateKeyName` is a function alias: it returns the name unchanged if it matches `[A-Z][A-Z0-9_]*`. It does not convert it to uppercase or remove spaces. It rejects types other than `str` and invalid formats.
+
+`ValidateTypes` is a callable instance. It checks accepted Python types and returns the normalized hint, or the inferred type name when omitted. **It does not perform conversion or check whether a string is a valid integer**. A hint such as `"unknown"` raises `RuntimeError`; an unsupported value or hint type raises `TypeError`.
+
+```python
+# Auxiliary checks while preparing config/.
+from orionis.environment.validators import ValidateKeyName, ValidateTypes
+
+assert ValidateKeyName("REPORT_LIMIT") == "REPORT_LIMIT"
+assert ValidateTypes(value="50", type_hint="INT") == "int"
+assert ValidateTypes(value=["eu", "us"]) == "list"
+```
+
+To convert content, use [EnvironmentCaster](/en/architecture/environment/typed-configuration#caster-construction); for ordinary reads, use `Env.get()` or `env()`.
+
+<a id="environment-key-generator"></a>
+## APP_KEY generation
+
+```text
+SecureKeyGenerator.generate(cipher: str | Cipher = Cipher.AES_256_CBC) -> str
+```
+
+`SecureKeyGenerator`, in `orionis.environment.key.key_generator`, generates random bytes with `os.urandom` and returns text with the `base64:` prefix. `KEY_SIZES` maps the four options to their size:
+
+| Cipher or exact text | Bytes generated |
+|---|---|
+| `Cipher.AES_128_CBC` / `"AES-128-CBC"` | 16 |
+| `Cipher.AES_256_CBC` / `"AES-256-CBC"` | 32 |
+| `Cipher.AES_128_GCM` / `"AES-128-GCM"` | 16 |
+| `Cipher.AES_256_GCM` / `"AES-256-GCM"` | 32 |
+
+An unknown algorithm string raises `ValueError`; its case is not normalized. Generating a key does not persist it by itself. The native `App` configuration entity uses this generator when the key is absent and writes `APP_KEY` during validation.
+
+Do not generate a new key whenever your configuration is constructed: retain the existing key so previously encrypted data can still be decrypted. For an explicit operation, use the [key:generate command](/en/console/built-in-application#command-key-generate) and see [Hashing and encryption](/en/security/encryption).
+
+<a id="environment-coverage"></a>
+## Verified reference
+
+The [component inventory](/downloads/environment-api-inventory.json) maps its public API, contracts, types and validators to the four Environment guides. Private functions, lazy export loading and inherited or generated methods are not presented as additional features.

@@ -7,18 +7,9 @@ lastUpdated: false
 
 ## Configure a generated project
 
-Edit deployment-specific values in the project's `.env`, retaining its existing `APP_KEY`. For example:
+Define installation-specific values using the independent [Environment](/en/architecture/environment) guide. It covers `.env`, reading values exclusively from `config/`, typed values and bootstrap JSON persistence.
 
-```dotenv
-APP_NAME="My application"
-APP_ENV=development
-APP_DEBUG=bool:true
-APP_TIMEZONE=UTC
-```
-
-The generated `config/app.py` and other modules under `config/` define typed configuration. Fields that use `Env.get()` read `.env` when their dataclass is constructed; a field hard-coded in the application config overrides its native default. Restart running application processes after changing startup settings. When bootstrap caching is enabled, also follow the [cache invalidation workflow](/en/getting-started/paths-and-caching).
-
-Read application settings through `app.config("app.name")` after creation, or an injected `IApplication` in a handler. Use environment lookups in configuration files so application code consumes the same validated settings.
+During application execution, read resolved settings through `app.config("app.name")` or an injected `IApplication`. This page explains how that configuration is merged, validated and accessed.
 
 ## Configuration
 

@@ -6,7 +6,7 @@ import { root, validateCatalog, within, stripFrontmatter, markdownLinks, heading
 import { createSidebar, flattenSidebar, documentationCatalog, documentationNavigation, navigationSections, resolveNavigation, sitePages, documentationPages, getPageBySlug, getTranslations } from '../src/utils/documentation-menu.mjs';
 
 const groupedBuildSections = ['getting-started', 'http', 'realtime', 'mcp', 'views', 'localization', 'authentication', 'sessions', 'cryptography', 'validation'];
-const groupedSections = new Set([...groupedBuildSections, 'database', 'orm', 'faker', 'storage', 'cache', 'mail', 'queues', 'console']);
+const groupedSections = new Set([...groupedBuildSections, 'database', 'orm', 'faker', 'storage', 'cache', 'mail', 'queues', 'console', 'environment']);
 const flatSections = ['application', 'deployment', 'testing', 'utilities', 'contribute'];
 const buildPageIds = {
   'getting-started': ['foundation-overview', 'foundation-installation', 'foundation-getting-started', 'foundation-architecture-and-lifecycle'],

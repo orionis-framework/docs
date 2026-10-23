@@ -37,37 +37,7 @@ The default result is `<project>/resources/views`. You can also use `app.path("r
 
 ### Configure compiled bootstrap state
 
-```python
-import base64
-from pathlib import Path
-from tempfile import TemporaryDirectory
-from orionis import Application
-from orionis.environment import Env
-
-
-class CachedApplication(Application):
-    pass
-
-
-key = "base64:" + base64.b64encode(b"c" * 32).decode()
-Env.set("APP_KEY", key, only_os=True)
-try:
-    with TemporaryDirectory() as directory:
-        root = Path(directory)
-        (root / "config").mkdir()
-        (root / ".env").touch()
-        app = CachedApplication(root)
-        app.compile("bootstrap/cache", ["config", ".env"])
-        app.withConfigApp(key=key)
-        app.create()
-        assert app.compiled
-        assert app.compiledPath == (root / "bootstrap/cache").resolve()
-        assert (root / "config").resolve() in app.compiledInvalidationPathsDirs
-        assert (root / ".env").resolve() in app.compiledInvalidationPathsFiles
-        print("compiled cache configured")
-finally:
-    Env.unset("APP_KEY", only_os=True)
-```
+Bootstrap persistence, its JSON files and `.env` invalidation are covered in [Environment: bootstrap and compiled configuration](/en/architecture/environment/compiled-configuration). Configure it in `bootstrap/app.py` on the same application instance before `app.create()`; directory paths can be part of that snapshot.
 
 ## Refresh bootstrap caches after a change
 

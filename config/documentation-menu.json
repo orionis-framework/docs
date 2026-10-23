@@ -137,12 +137,12 @@
       "id": "environment-overview",
       "kind": "doc",
       "title": {
-        "es": "Entorno y configuración de proceso",
-        "en": "Environment and process configuration"
+        "es": "Entorno",
+        "en": "Environment"
       },
       "label": {
-        "en": "Environment",
-        "es": "Entorno"
+        "es": "Introducción",
+        "en": "Introduction"
       },
       "slug": {
         "es": "/es/architecture/environment",
@@ -150,15 +150,31 @@
       }
     },
     {
+      "id": "environment-compiled-configuration",
+      "kind": "doc",
+      "title": {
+        "es": "Bootstrap y configuración compilada",
+        "en": "Bootstrap and compiled configuration"
+      },
+      "label": {
+        "es": "Bootstrap y archivos JSON",
+        "en": "Bootstrap and JSON files"
+      },
+      "slug": {
+        "es": "/es/architecture/environment/compiled-configuration",
+        "en": "/en/architecture/environment/compiled-configuration"
+      }
+    },
+    {
       "id": "environment-operations-and-reference",
       "kind": "doc",
       "title": {
-        "es": "Persistencia, recarga y referencia de Env",
-        "en": "Persistence, reloads, and Env reference"
+        "es": "Referencia de Env y operaciones de configuración",
+        "en": "Env reference and configuration operations"
       },
       "label": {
-        "en": "Persistence and reloads",
-        "es": "Persistencia y recarga"
+        "es": "Referencia de Env",
+        "en": "Env reference"
       },
       "slug": {
         "es": "/es/architecture/environment/operations-and-reference",
@@ -169,12 +185,12 @@
       "id": "environment-typed-configuration",
       "kind": "doc",
       "title": {
-        "es": "Leer y escribir configuración de entorno",
-        "en": "Reading and writing environment configuration"
+        "es": "Variables y configuración tipada",
+        "en": "Variables and typed configuration"
       },
       "label": {
-        "en": "Typed environment values",
-        "es": "Configuración tipada"
+        "es": "Variables y tipos",
+        "en": "Variables and types"
       },
       "slug": {
         "es": "/es/architecture/environment/typed-configuration",
