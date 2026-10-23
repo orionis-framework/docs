@@ -1173,15 +1173,81 @@
         "es": "Aplicación y contenedor"
       },
       "pageIds": [
-        "foundation-configuration",
+        "foundation-application-overview",
         "foundation-application-lifecycle",
+        "foundation-server-entrypoints",
+        "foundation-application-api",
+        "foundation-bootstrap-options",
+        "foundation-configuration",
         "foundation-paths-and-caching",
         "container-overview",
         "container-bindings-and-invocation",
-        "container-providers-and-facades",
         "container-scopes-and-concurrency",
+        "container-providers-and-facades",
+        "container-facades",
         "aio-overview",
         "aio-async-execution"
+      ],
+      "groups": [
+        {
+          "id": "application-lifecycle",
+          "title": {
+            "es": "Aplicación y ejecución",
+            "en": "Application and execution"
+          },
+          "pageIds": [
+            "foundation-application-overview",
+            "foundation-application-lifecycle",
+            "foundation-server-entrypoints",
+            "foundation-application-api"
+          ]
+        },
+        {
+          "id": "application-bootstrap",
+          "title": {
+            "es": "Bootstrap y configuración",
+            "en": "Bootstrap and configuration"
+          },
+          "pageIds": [
+            "foundation-bootstrap-options",
+            "foundation-configuration",
+            "foundation-paths-and-caching"
+          ]
+        },
+        {
+          "id": "application-container",
+          "title": {
+            "es": "Resolución y scopes",
+            "en": "Resolution and scopes"
+          },
+          "pageIds": [
+            "container-overview",
+            "container-bindings-and-invocation",
+            "container-scopes-and-concurrency"
+          ]
+        },
+        {
+          "id": "application-services",
+          "title": {
+            "es": "Proveedores y fachadas",
+            "en": "Providers and facades"
+          },
+          "pageIds": [
+            "container-providers-and-facades",
+            "container-facades"
+          ]
+        },
+        {
+          "id": "application-async",
+          "title": {
+            "es": "Ejecución asíncrona",
+            "en": "Asynchronous execution"
+          },
+          "pageIds": [
+            "aio-overview",
+            "aio-async-execution"
+          ]
+        }
       ]
     },
     {

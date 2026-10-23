@@ -229,12 +229,12 @@
       "id": "container-providers-and-facades",
       "kind": "doc",
       "title": {
-        "es": "Service Providers, facades y extensión",
-        "en": "Service Providers, facades, and extension"
+        "es": "Proveedores de servicios",
+        "en": "Service providers"
       },
       "label": {
-        "en": "Providers and facades",
-        "es": "Proveedores y facades"
+        "es": "Proveedores de servicios",
+        "en": "Service providers"
       },
       "slug": {
         "es": "/es/architecture/service-container/providers-and-facades",
@@ -3171,6 +3171,86 @@
       "slug": {
         "en": "/en/contribute/contributors",
         "es": "/es/contribute/contributors"
+      }
+    },
+    {
+      "id": "foundation-application-overview",
+      "kind": "doc",
+      "title": {
+        "es": "Aplicación y contenedor",
+        "en": "Application and container"
+      },
+      "label": {
+        "es": "Introducción",
+        "en": "Introduction"
+      },
+      "slug": {
+        "es": "/es/getting-started/application-overview",
+        "en": "/en/getting-started/application-overview"
+      }
+    },
+    {
+      "id": "foundation-server-entrypoints",
+      "kind": "doc",
+      "title": {
+        "es": "Puntos de entrada ASGI y RSGI",
+        "en": "ASGI and RSGI entry points"
+      },
+      "label": {
+        "es": "ASGI y RSGI",
+        "en": "ASGI and RSGI"
+      },
+      "slug": {
+        "es": "/es/getting-started/server-entrypoints",
+        "en": "/en/getting-started/server-entrypoints"
+      }
+    },
+    {
+      "id": "foundation-application-api",
+      "kind": "doc",
+      "title": {
+        "es": "IApplication: servicios y referencia",
+        "en": "IApplication: services and reference"
+      },
+      "label": {
+        "es": "IApplication y API",
+        "en": "IApplication and API"
+      },
+      "slug": {
+        "es": "/es/getting-started/application-api",
+        "en": "/en/getting-started/application-api"
+      }
+    },
+    {
+      "id": "foundation-bootstrap-options",
+      "kind": "doc",
+      "title": {
+        "es": "Configurar bootstrap/app.py",
+        "en": "Configure bootstrap/app.py"
+      },
+      "label": {
+        "es": "Opciones de bootstrap",
+        "en": "Bootstrap options"
+      },
+      "slug": {
+        "es": "/es/getting-started/bootstrap-options",
+        "en": "/en/getting-started/bootstrap-options"
+      }
+    },
+    {
+      "id": "container-facades",
+      "kind": "doc",
+      "title": {
+        "es": "Fachadas síncronas y asíncronas",
+        "en": "Synchronous and asynchronous facades"
+      },
+      "label": {
+        "es": "Fachadas sync y async",
+        "en": "Sync and async facades"
+      },
+      "slug": {
+        "es": "/es/architecture/service-container/facades",
+        "en": "/en/architecture/service-container/facades"
       }
     }
   ]

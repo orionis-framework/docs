@@ -1,32 +1,115 @@
 ---
 title: "Service container"
-description: "Use dependency injection to share application services across HTTP handlers, commands, and jobs. Register an interface-to-implementation binding in app/providers/, then…"
+description: "Contracts, constructor and method injection, lifetimes, and service resolution through the existing Orionis application."
 editUrl: true
 lastUpdated: false
 ---
 
-Use dependency injection to share application services across HTTP handlers, commands, and jobs. Register an interface-to-implementation binding in `app/providers/`, then type-hint that interface in the consumer. The existing `Application` owns the container; normal application code does not create a separate `Container`.
+The container builds application objects and connects their dependencies. A controller can request a service through a type annotation; a provider registers the implementation of that contract and how long its instances should be reused.
 
-Begin with [Registering and invoking services](/en/architecture/service-container/bindings-and-invocation), then follow the complete [application provider example](/en/architecture/service-container/providers-and-facades). Choose `transient` for a new instance per resolution, `singleton` for reusable process state, and `scoped` for request or command state. A singleton is not shared between worker processes.
+`Application` extends `Container`, and `IApplication` extends `IContainer`. Receiving `app: IApplication` gives you both application features and the bindings registered by its providers. Ordinary application code uses this existing instance.
 
-## Overview
+## From contract to consumer
 
-The container maps contracts or aliases to implementations and creates object graphs from type annotations. It supports prebuilt instances, transient services, process-level singletons, and context-local scoped services. `build` constructs a class, `invoke` injects a function, and `call` injects a named instance method.
+Save this example as `app/services/greetings.py`:
 
-Application code usually interacts through `Application`, which extends the container, while application providers register your services and optional `Facade` entry points. Deferred providers postpone importing/registering services until a declared contract is requested. HTTP and console kernels create scopes so request/command-local dependencies cannot leak into one another.
+```python
+from abc import ABC, abstractmethod
 
-## Requirements
 
-- Python 3.14 or newer.
-- No optional dependency or external service.
-- Runtime type annotations on injectable constructor/function parameters.
-- An active `beginScope()` context before resolving a `scoped` binding.
-- Forward references must be import-resolvable in the callable's module context.
+class IGreeter(ABC):
 
-## Module learning path
+    @abstractmethod
+    def greet(self, name: str) -> str:
+        raise NotImplementedError
 
-- [Registering and invoking services](/en/architecture/service-container/bindings-and-invocation)
-- [Service Providers, facades, and extension](/en/architecture/service-container/providers-and-facades)
-- [Scopes, isolation, and concurrency](/en/architecture/service-container/scopes-and-concurrency)
 
-Continue with: [foundation](/en/getting-started) · [schemas](/en/validation).
+class Greeter(IGreeter):
+
+    def greet(self, name: str) -> str:
+        return f"Hello, {name}!"
+
+
+class WelcomeService:
+
+    def __init__(self, greeter: IGreeter) -> None:
+        self._greeter = greeter
+
+    def message(self, name: str) -> str:
+        return self._greeter.greet(name)
+```
+
+Register the implementation in `app/providers/greeting_provider.py`:
+
+```python
+from app.services.greetings import Greeter, IGreeter
+from orionis.container.providers import ServiceProvider
+
+
+class GreetingProvider(ServiceProvider):
+
+    def register(self) -> None:
+        self.app.singleton(IGreeter, Greeter)
+```
+
+Configure or discover this provider as described in the [provider guide](/en/architecture/service-container/providers-and-facades). The following action receives its service through the container:
+
+```python
+from app.services.greetings import WelcomeService
+from orionis.http import JSONResponse
+
+
+class GreetingController:
+
+    async def show(
+        self,
+        name: str,
+        welcome: WelcomeService,
+    ) -> JSONResponse:
+        return JSONResponse({"message": welcome.message(name)})
+```
+
+A [route](/en/http/routing) supplies `name` and selects `GreetingController.show`. The framework builds `WelcomeService`, resolves its `IGreeter` contract, and reuses the singleton `Greeter`. The concrete `WelcomeService` class can be built without its own binding.
+
+```mermaid
+flowchart TD
+    A[The framework invokes an action] --> B[Preserve explicit arguments]
+    B --> C[Inspect missing parameters]
+    C --> D[WelcomeService: unbound concrete class]
+    D --> E[Build its dependencies]
+    E --> F[IGreeter: singleton binding to Greeter]
+    F --> G[Reuse or build Greeter]
+    G --> H[Build WelcomeService and execute the action]
+```
+
+Injection happens when the container builds or invokes the component. Calling `GreetingController().show(...)` directly in Python requires you to supply its arguments.
+
+## Choose a lifetime
+
+| Registration | Creation and reuse | Typical use |
+|---|---|---|
+| `transient(contract, class)` | A new instance for each `make()`. | Services without shared identity. |
+| `singleton(contract, class)` | One instance per container, created on first resolution. | Services reusable throughout the process lifetime. |
+| `scoped(contract, class)` | One instance per active scope. | Request or command state. |
+| `instance(contract, object)` | Publishes an existing object in the active scope; globally when outside one. | Adapters or resources you have already initialized. |
+
+A singleton is shared inside the process that owns the container. Other workers, servers, or Fargate tasks have their own instances. The application's JSON cache stores bootstrap metadata, not container objects.
+
+## Resolve and invoke
+
+| Operation | Purpose |
+|---|---|
+| `await app.make(contract_or_alias)` | Resolve a registration using its lifetime; an unbound concrete class can be built automatically. |
+| `await app.build(Class)` | Create a new instance of that class and inject its constructor. |
+| `await app.invoke(function, ...)` | Inject and execute a synchronous or asynchronous function. |
+| `await app.call(object, "method", ...)` | Inject and execute a method on an existing object. |
+
+`build()` constructs the supplied type even if that type has a singleton registration. Use `make()` to retrieve the shared instance.
+
+## Read the guide
+
+- [Register and invoke services](/en/architecture/service-container/bindings-and-invocation): the complete `IContainer` API, arguments, classes, and functions.
+- [Providers and facades](/en/architecture/service-container/providers-and-facades): publishing services and accessing them through facades.
+- [Scopes, isolation and concurrency](/en/architecture/service-container/scopes-and-concurrency): HTTP and CLI scopes, child tasks, and resource cleanup.
+
+See [Application and container](/en/getting-started/application-overview) for bootstrap and the `IApplication` lifecycle, and [Schemas and validation](/en/validation) for typed payloads.
