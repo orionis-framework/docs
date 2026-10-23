@@ -2227,6 +2227,10 @@
       "slug": {
         "es": "/es/asynchronous/queues",
         "en": "/en/asynchronous/queues"
+      },
+      "label": {
+        "es": "Introducción",
+        "en": "Introduction"
       }
     },
     {
@@ -2269,12 +2273,92 @@
         "en": "Workers, retries, and failures"
       },
       "label": {
-        "en": "Workers, retries and failures",
-        "es": "Workers, reintentos y fallos"
+        "es": "Workers y procesamiento",
+        "en": "Workers and processing"
       },
       "slug": {
         "es": "/es/asynchronous/queues/workers-and-failures",
         "en": "/en/asynchronous/queues/workers-and-failures"
+      }
+    },
+    {
+      "id": "queues-configuration",
+      "kind": "doc",
+      "title": {
+        "es": "Configuración de colas",
+        "en": "Queue configuration"
+      },
+      "slug": {
+        "es": "/es/asynchronous/queues/configuration",
+        "en": "/en/asynchronous/queues/configuration"
+      },
+      "label": {
+        "es": "Configuración",
+        "en": "Configuration"
+      }
+    },
+    {
+      "id": "queues-execution-modes",
+      "kind": "doc",
+      "title": {
+        "es": "Formas de ejecución de jobs",
+        "en": "Job execution modes"
+      },
+      "slug": {
+        "es": "/es/asynchronous/queues/execution-modes",
+        "en": "/en/asynchronous/queues/execution-modes"
+      },
+      "label": {
+        "es": "Formas de ejecución",
+        "en": "Execution modes"
+      }
+    },
+    {
+      "id": "queues-failures-and-retries",
+      "kind": "doc",
+      "title": {
+        "es": "Reintentos, excepciones y jobs fallidos",
+        "en": "Retries, exceptions and failed jobs"
+      },
+      "slug": {
+        "es": "/es/asynchronous/queues/failures-and-retries",
+        "en": "/en/asynchronous/queues/failures-and-retries"
+      },
+      "label": {
+        "es": "Reintentos y fallos",
+        "en": "Retries and failures"
+      }
+    },
+    {
+      "id": "queues-manager-and-injection",
+      "kind": "doc",
+      "title": {
+        "es": "Fachada e inyección de Queue",
+        "en": "Queue facade and injection"
+      },
+      "slug": {
+        "es": "/es/asynchronous/queues/manager-and-injection",
+        "en": "/en/asynchronous/queues/manager-and-injection"
+      },
+      "label": {
+        "es": "Fachada e inyección",
+        "en": "Facade and injection"
+      }
+    },
+    {
+      "id": "queues-api-reference",
+      "kind": "doc",
+      "title": {
+        "es": "Referencia técnica de colas",
+        "en": "Queue technical reference"
+      },
+      "slug": {
+        "es": "/es/asynchronous/queues/api-reference",
+        "en": "/en/asynchronous/queues/api-reference"
+      },
+      "label": {
+        "es": "Referencia técnica",
+        "en": "Technical reference"
       }
     },
     {

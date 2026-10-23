@@ -1,86 +1,140 @@
 ---
 title: "Colas y jobs"
-description: "Usa una cola cuando tu aplicación deba registrar trabajo ahora y ejecutarlo mediante un proceso consumidor separado, por ejemplo para preparar un reporte. Un job transporta…"
+description: "Crea tu primer job, elige almacenamiento persistente y ejecuta workers con Orionis."
 editUrl: true
 lastUpdated: false
 ---
 
-Usa una cola cuando tu aplicación deba registrar trabajo ahora y ejecutarlo mediante un proceso consumidor separado, por ejemplo para preparar un reporte. Un job transporta datos serializables; su `handle()` async se ejecuta con los servicios de la aplicación disponibles.
+Un **job** representa una tarea con datos serializables y un método async `handle()`. La **cola** conserva los mensajes pendientes y permite que un worker los reserve y ejecute. Úsalos para preparar archivos, procesar registros o integrar servicios sin mantener abierta la petición que solicitó el trabajo.
 
-## Completar la primera tarea en cola
+Orionis ofrece tres drivers: `sync`, `database` y `redis`. El predeterminado, `sync`, ejecuta dentro del mismo `await` del productor. Database y Redis permiten separar el envío de la ejecución. La fachada `Queue` y la inyección de `IQueueManager` acceden al mismo servicio.
 
-### 1. Elegir almacenamiento persistente
+```mermaid
+flowchart TD
+    accTitle: Arquitectura de colas de Orionis
+    A[Controlador, comando u otro componente async] --> B[Queue o IQueueManager]
+    B --> C[PendingDispatch: enviar al hacer await]
+    C --> D[Serializador y envelope]
+    D --> E{Driver}
+    E --> S[sync: intento inmediato]
+    E --> P[Database o Redis: guardar mensaje]
+    P --> W[Worker: reservar con token y vencimiento]
+    S --> H[Scope e inyección en handle]
+    W --> H
+    H --> R{Resultado}
+    R --> O[Éxito: borrar reserva]
+    R --> T[Reintento: liberar con demora]
+    R --> F[Fallo definitivo: registrar en SQL y borrar reserva]
+```
 
-El driver `sync`, predeterminado, ejecuta durante `await Queue.dispatch(...)`. Para usar un consumidor separado, configura el `.env` de tu aplicación antes del arranque:
+## 1. Seleccionar persistencia
+
+Para procesar en otra terminal, configura `.env` antes del arranque de la aplicación:
 
 ```dotenv
 QUEUE_CONNECTION=database
 DB_CONNECTION=sqlite
 ```
 
-Revisa la ubicación de SQLite y sus permisos en `config/database.py`. El driver crea `jobs` y `failed_jobs` cuando se necesitan, por lo que requiere permisos para crear tablas. Redis es una alternativa, pero su repositorio de fallos también necesita SQL. Consulta la [configuración de drivers](/es/asynchronous/queues/drivers-and-configuration).
+Comprueba la ubicación y permisos de SQLite en `config/database.py`. El driver crea la tabla de mensajes cuando la necesita; el repositorio SQL de fallos crea la suya al utilizarlo. Ambas ubicaciones requieren permisos para crear tablas. Puedes elegir otra conexión SQL o usar Redis para los mensajes; los fallos definitivos siguen utilizando SQL. Consulta [drivers](/es/asynchronous/queues/drivers-and-configuration) y [configuración](/es/asynchronous/queues/configuration).
 
-### 2. Añadir un job importable
+Las bibliotecas de colas, SQLite y Redis están incluidas en las dependencias normales del framework. Un servidor Redis accesible solo es necesario cuando seleccionas ese driver. No necesitas instalar un extra de colas mediante `packages`.
 
-Guarda esta clase en `app/jobs/write_report.py`. Manténla a nivel de módulo para que el productor y el consumidor puedan descubrir la misma clase:
+## 2. Generar y completar un job
+
+Desde la raíz del proyecto, utiliza una de estas alternativas:
+
+```shell
+orionis make:job process_record
+```
+
+```shell
+python -B reactor make:job process_record
+```
+
+Completa `app/jobs/process_record_job.py` con este ejemplo. Recibe un ID y genera un pequeño archivo mediante el servicio Storage:
 
 ```python
-from uuid import UUID
 from orionis.queues import BaseJob
 from orionis.storage.contracts.manager import IStorageManager
 
 
-class WriteReport(BaseJob):
-    __slots__ = ("report_id", "text")
-    report_id: str
-    text: str
+class ProcessRecordJob(BaseJob):
+    __slots__ = ("record_id",)
+    record_id: int
     tries = 3
     timeout = 30.0
+    backoff = (1.0, 5.0)
 
-    def __init__(self, report_id: str, text: str) -> None:
-        self.report_id = str(UUID(report_id))
-        self.text = text
+    def __init__(self, record_id: int) -> None:
+        self.record_id = record_id
 
     async def handle(self, storage: IStorageManager) -> None:
         await storage.disk("local").put(
-            f"reports/{self.report_id}.txt", self.text, visibility="private",
+            f"records/{self.record_id}.txt",
+            f"Processed record {self.record_id}\n",
+            visibility="private",
         )
 ```
 
-El consumidor inyecta `IStorageManager` en `handle()`. El job escribe en el disco `local` configurado, que debe ser escribible. Repetirlo con el mismo `report_id` reemplaza el mismo archivo con el mismo contenido; el ejemplo evita deliberadamente crear otro reporte al reintentar. Guarda documentos grandes en storage en lugar de superar el límite de 1 MiB de la carga de la cola.
+Mantén la clase a nivel de módulo, importable por productor y consumidor. El job conserva únicamente `record_id`; el contenedor proporciona Storage en `handle()`. La reconstrucción del job no ejecuta `__init__` ni inyecta servicios en él.
 
-### 3. Enviar desde la aplicación
+Repetir este ejemplo reemplaza el mismo archivo con el mismo contenido. Este diseño permite repetir un intento sin crear otro archivo por accidente. Para operaciones de negocio con otros efectos, define su propia estrategia de idempotencia. La guía de [jobs](/es/asynchronous/queues/jobs-and-dispatch) explica la plantilla, los tipos permitidos y las políticas.
 
-Usa esta función en un controlador o comando async después del arranque:
+## 3. Enviar desde un controlador
+
+Guarda esta clase en `app/http/controllers/record_controller.py`:
 
 ```python
-from uuid import uuid4
-from app.jobs.write_report import WriteReport
+from app.jobs.process_record_job import ProcessRecordJob
+from orionis.http import JSONResponse
 from orionis.support.facades import Queue
 
 
-async def request_report() -> dict[str, str]:
-    report_id = str(uuid4())
-    job_id = await Queue.dispatch(WriteReport(report_id, "Report ready"))
-    return {"job_id": job_id, "report_id": report_id}
+class RecordController:
+    async def store(self, record_id: int) -> JSONResponse:
+        job_id = await Queue.dispatch(ProcessRecordJob(record_id))
+        return JSONResponse({"job_id": job_id}, status_code=202)
 ```
 
-Llama `await request_report()` desde ese flujo de aplicación. El resultado contiene la identidad del job y la del reporte. Un envío correcto indica que se presentó el mensaje; el reporte todavía puede estar pendiente. `await` es obligatorio: construir y descartar un `PendingDispatch` no envía nada.
+Registra la acción en `routes/api.py`:
 
-### 4. Arrancar el consumidor
+```python
+from app.http.controllers.record_controller import RecordController
+from orionis.support.facades import Route
 
-En otra terminal situada en la misma raíz de aplicación, con el mismo código y configuración:
+Route.post("/records/{record_id:int}/process", [RecordController, "store"])
+```
+
+`await` es obligatorio: crear y descartar `PendingDispatch` no envía nada. Con Database, el ID confirma el envío; el archivo todavía puede estar pendiente. Con `sync`, la acción espera la ejecución completa. Si deseas seleccionar canal o demorar el trabajo, utiliza [las opciones del envío](/es/asynchronous/queues/jobs-and-dispatch#pending-construction).
+
+## 4. Ejecutar el consumidor
+
+En otra terminal, con el mismo código y configuración, utiliza una alternativa:
 
 ```shell
-uv run python -B reactor queue:work database --queue default
+orionis queue:work database --queue default
 ```
 
-El proceso consume el job y escribe `storage/app/private/reports/<report_id>.txt` con la configuración local predeterminada. Déjalo activo para los siguientes mensajes y detenlo con la señal habitual de interrupción. En producción, configura supervisión de procesos y revisa los [fallos](/es/asynchronous/queues/workers-and-failures).
+```shell
+python -B reactor queue:work database --queue default
+```
 
-## Continuar con las guías completas
+Cuando se invoque la ruta, el worker ejecutará el job y Storage escribirá `records/<record_id>.txt` en el disco `local`, con visibilidad privada. Deja el proceso activo para recibir nuevos mensajes. Consulta [workers y señales](/es/asynchronous/queues/workers-and-failures) para detenerlo, limitar el procesamiento o configurar concurrencia.
 
-1. [Escribir y enviar jobs](/es/asynchronous/queues/jobs-and-dispatch): dependencias tipadas, datos permitidos, destinos y ejecución diferida.
-2. [Elegir y configurar un backend](/es/asynchronous/queues/drivers-and-configuration): almacenamiento, separación por entorno, transacciones SQL y requisitos Redis.
-3. [Workers, reintentos y fallos](/es/asynchronous/queues/workers-and-failures): reservas, tiempos límite, recuperación y decisiones de reintento.
+Un worker reserva mensajes por un plazo; una interrupción puede permitir su recuperación por otro consumidor. La persistencia no garantiza que un efecto externo ocurra exactamente una vez. Los [reintentos y fallos](/es/asynchronous/queues/failures-and-retries) explican qué sucede con excepciones, timeouts y reservas vencidas.
 
-La persistencia del mensaje no garantiza que un efecto externo ocurra exactamente una vez. Diseña cada operación de negocio para poder repetirse. Python 3.14+ y las dependencias Python de colas forman parte de la instalación normal; el servidor Redis solo se necesita al elegir ese driver.
+## Recorrido de la documentación
+
+| Necesidad | Guía |
+| --- | --- |
+| Comparar almacenamiento y requisitos | [Drivers y persistencia](/es/asynchronous/queues/drivers-and-configuration) |
+| Configurar conexiones, canales y políticas | [Configuración de colas](/es/asynchronous/queues/configuration) |
+| Crear clases y preparar payloads | [Escribir y enviar jobs](/es/asynchronous/queues/jobs-and-dispatch) |
+| Elegir ejecución inmediata o consumidores | [Formas de ejecución](/es/asynchronous/queues/execution-modes) |
+| Ejecutar procesos y administrar reservas | [Workers](/es/asynchronous/queues/workers-and-failures) |
+| Recuperar errores y reencolar fallos | [Reintentos y excepciones](/es/asynchronous/queues/failures-and-retries) |
+| Usar todos los métodos del administrador y DI | [Fachada e inyección](/es/asynchronous/queues/manager-and-injection) |
+| Consultar contratos, drivers y utilidades | [Referencia técnica](/es/asynchronous/queues/api-reference) |
+
+Las [tareas tras responder](/es/asynchronous/background-tasks) y la [programación de tareas](/es/console/task-scheduling) tienen ciclos de ejecución diferentes; pueden enviar jobs, pero no sustituyen a un consumidor de colas persistentes.

@@ -964,12 +964,67 @@
       },
       "pageIds": [
         "queues-overview",
-        "queues-jobs-and-dispatch",
         "queues-drivers-and-configuration",
+        "queues-configuration",
+        "queues-jobs-and-dispatch",
+        "queues-execution-modes",
         "queues-workers-and-failures",
+        "queues-failures-and-retries",
+        "queues-manager-and-injection",
+        "queues-api-reference",
         "background-overview",
         "background-response-tasks",
         "console-task-scheduling"
+      ],
+      "groups": [
+        {
+          "id": "queues-setup",
+          "title": {
+            "es": "Fundamentos y persistencia",
+            "en": "Foundations and persistence"
+          },
+          "pageIds": [
+            "queues-overview",
+            "queues-drivers-and-configuration",
+            "queues-configuration"
+          ]
+        },
+        {
+          "id": "queues-processing",
+          "title": {
+            "es": "Jobs y procesamiento",
+            "en": "Jobs and processing"
+          },
+          "pageIds": [
+            "queues-jobs-and-dispatch",
+            "queues-execution-modes",
+            "queues-workers-and-failures",
+            "queues-failures-and-retries"
+          ]
+        },
+        {
+          "id": "queues-reference",
+          "title": {
+            "es": "Servicios y referencia",
+            "en": "Services and reference"
+          },
+          "pageIds": [
+            "queues-manager-and-injection",
+            "queues-api-reference"
+          ]
+        },
+        {
+          "id": "queues-related",
+          "title": {
+            "es": "Respuesta y programación",
+            "en": "Responses and scheduling"
+          },
+          "pageIds": [
+            "background-overview",
+            "background-response-tasks",
+            "console-task-scheduling"
+          ]
+        }
       ]
     },
     {

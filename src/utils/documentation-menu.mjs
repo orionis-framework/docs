@@ -10,7 +10,7 @@ export const documentationNavigation = navigation;
 const groupedSections = new Set([
   'getting-started', 'http', 'realtime', 'mcp', 'views', 'localization',
   'authentication', 'sessions', 'cryptography', 'validation',
-  'database', 'orm', 'faker', 'storage', 'cache', 'mail',
+  'database', 'orm', 'faker', 'storage', 'cache', 'mail', 'queues',
 ]);
 const navigationId = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 

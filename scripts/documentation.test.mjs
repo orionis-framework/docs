@@ -6,8 +6,8 @@ import { root, validateCatalog, within, stripFrontmatter, markdownLinks, heading
 import { createSidebar, flattenSidebar, documentationCatalog, documentationNavigation, navigationSections, resolveNavigation, sitePages, documentationPages, getPageBySlug, getTranslations } from '../src/utils/documentation-menu.mjs';
 
 const groupedBuildSections = ['getting-started', 'http', 'realtime', 'mcp', 'views', 'localization', 'authentication', 'sessions', 'cryptography', 'validation'];
-const groupedSections = new Set([...groupedBuildSections, 'database', 'orm', 'faker', 'storage', 'cache', 'mail']);
-const flatSections = ['queues', 'console', 'application', 'deployment', 'testing', 'utilities', 'contribute'];
+const groupedSections = new Set([...groupedBuildSections, 'database', 'orm', 'faker', 'storage', 'cache', 'mail', 'queues']);
+const flatSections = ['console', 'application', 'deployment', 'testing', 'utilities', 'contribute'];
 const buildPageIds = {
   'getting-started': ['foundation-overview', 'foundation-installation', 'foundation-getting-started', 'foundation-architecture-and-lifecycle'],
   http: ['http-overview', 'http-routing', 'http-middleware-and-security', 'http-request-lifecycle', 'http-requests-and-validation', 'http-forms-and-uploads', 'http-responses', 'http-exceptions'],
@@ -98,7 +98,7 @@ test('capability navigation rejects unknown, duplicate, or omitted pages and inv
   const cases = [
     [(copy) => { copy.sections[0].pageIds[0] = 'missing-page'; }, /Unknown navigation page/],
     [(copy) => { copy.sections[1].pageIds.push(copy.sections[0].pageIds[0]); }, /Duplicate navigation page/],
-    [(copy) => { copy.sections.find((section) => section.id === 'queues').pageIds.shift(); }, /Pages without navigation/],
+    [(copy) => { copy.sections.find((section) => section.id === 'console').pageIds.shift(); }, /Pages without navigation/],
     [(copy) => { copy.sections[0].band = 'missing-band'; }, /Invalid navigation band\/order/],
     [(copy) => { copy.bands.push(structuredClone(copy.bands[0])); }, /Duplicate navigation band/],
     [(copy) => { copy.sections[0].band = copy.bands[1].id; }, /Invalid navigation band\/order/],
@@ -147,7 +147,7 @@ test('navigation rejects malformed, duplicated, missing, reordered, and unsuppor
   const database = (copy) => copy.sections.find((section) => section.id === 'database');
   const groupError = /navigation subgroup|navigation groups/i;
   const cases = [
-    [(copy) => { const section = copy.sections.find((entry) => entry.id === 'queues'); section.groups = [{ id: 'unsupported', title: { en: 'Unsupported', es: 'No permitido' }, pageIds: [...section.pageIds] }]; }, groupError],
+    [(copy) => { const section = copy.sections.find((entry) => entry.id === 'console'); section.groups = [{ id: 'unsupported', title: { en: 'Unsupported', es: 'No permitido' }, pageIds: [...section.pageIds] }]; }, groupError],
     [(copy) => { database(copy).groups = []; }, groupError],
     [(copy) => { delete database(copy).groups; }, groupError],
     [(copy) => { database(copy).groups[0].id = ''; }, groupError],
@@ -177,7 +177,7 @@ test('navigation rejects malformed, duplicated, missing, reordered, and unsuppor
 });
 test('regrouping navigation preserves page IDs, page records, and both locale routes', () => {
   const copy = structuredClone(documentationNavigation);
-  const index = copy.sections.findIndex((section) => section.id === 'queues');
+  const index = copy.sections.findIndex((section) => section.id === 'console');
   copy.sections[index].pageIds.reverse();
   const resolved = resolveNavigation(copy);
   assert.deepEqual(resolved[index].pages.map((page) => page.id), copy.sections[index].pageIds);
