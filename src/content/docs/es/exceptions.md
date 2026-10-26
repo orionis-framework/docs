@@ -257,8 +257,6 @@ La [página de excepciones HTTP](/es/http/exceptions) explica qué contiene el d
 
 ## Continuar con la implementación
 
-El [inventario verificable de Exceptions](/downloads/exceptions-api-inventory.json) relaciona las declaraciones de `failure`, el handler del proyecto y su registro en la aplicación con sus guías. Las integraciones de cada transporte se revisan por separado; no se presentan como una captura universal del proceso.
-
 1. [Reportar y gestionar excepciones](/es/exceptions/handling-exceptions): clase de aplicación, errores de dominio, logging, CLI e inyección de servicios.
 2. [Contextos y transportes](/es/exceptions/contexts-and-transports): captura y respuesta real en HTTP, CLI, WebSocket, Realtime, MCP, colas y tareas.
 3. [Políticas de errores y referencia](/es/exceptions/policies-and-reference): contratos completos, Throwable, ignorados, contextos, concurrencia y verificación.

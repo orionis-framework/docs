@@ -191,7 +191,4 @@ Estos módulos describen defaults del bootstrap; normalmente no necesitas llamar
 
 Los mapas de solo lectura protegen su nivel externo; no infieras inmutabilidad profunda de todas sus estructuras. Una instantánea de disco conserva metadatos compatibles, no servicios vivos.
 
-<a id="application-api-coverage"></a>
-## Cobertura verificable
-
-El [inventario de Aplicación y Contenedor](/downloads/application-container-api-inventory.json) relaciona la API propia con sus guías. Las entidades de configuración de cada subsistema se citan desde [configuración](/es/application/configuration), manteniendo sus opciones junto al componente que las utiliza.
+Las entidades de configuración de cada subsistema se citan desde [configuración](/es/application/configuration), manteniendo sus opciones junto al componente que las utiliza.

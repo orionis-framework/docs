@@ -1,6 +1,6 @@
 ---
 title: "Referencia técnica de colas"
-description: "Contratos, métodos de drivers, utilidades públicas y cobertura verificable del sistema de colas."
+description: "Contratos, métodos de drivers, utilidades públicas y excepciones del sistema de colas."
 editUrl: true
 lastUpdated: false
 ---
@@ -282,11 +282,3 @@ def getFacadeAccessor(cls) -> type[IQueueManager]: ...
 ```
 
 `Queue.getFacadeAccessor()` devuelve `IQueueManager`. Es el enlace entre la fachada y el contenedor; para enviar utiliza los métodos del servicio. Importa `Queue` desde `orionis.support.facades`.
-
-<a id="coverage"></a>
-
-## Inventario verificable
-
-El [inventario de API de colas](/downloads/queues-api-inventory.json) relaciona cada declaración pública propia de `orionis/queues`, sus entidades de configuración y su fachada con un destino de esta documentación. Incluye contratos, constructores, protocolos, campos, utilidades y overrides de los drivers; no cuenta métodos heredados de terceros ni métodos generados automáticamente como funcionalidades adicionales.
-
-La validación del sitio comprueba que cada destino exista en español e inglés. El script `scripts/audit-queues-source.py` compara firmas y hashes con el checkout real del framework para detectar cambios que requieren revisar la guía.

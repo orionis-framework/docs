@@ -225,7 +225,3 @@ This class method returns `ICacheManager`. It links the facade to the container,
 `CacheException` extends `Exception`; `CacheStoreException` extends it for unknown stores, missing configuration or a custom backend without atomic replacement. External errors are not universally converted to these types: file permissions, timeouts, Redis/Memcached connection failures, JSON errors, numeric conversion errors and `QueryException` may retain their original types.
 
 The manager does not fall back automatically to memory if a server fails. Explicitly define how your application responds when it cannot read, compute or store an entry; do not indiscriminately catch resolver errors as if they were ordinary cache misses.
-
-## Verifiable inventory
-
-The [downloadable inventory](/downloads/cache-api-inventory.json) maps every own public declaration to its signature, file, line, checksum and documentation destination. Includes contracts, implementations, configuration fields, constructors, context protocols and all four batch aliases. Excludes private implementation, dataclass-generated methods and inherited aiocache API; relevant dependency differences are explained in the driver, value and lock guides.

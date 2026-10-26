@@ -1,17 +1,15 @@
 ---
 title: "Referencia técnica de Storage"
-description: "Contratos, constructores, helpers, excepciones e inventario verificable de Storage."
+description: "Contratos, constructores, helpers y excepciones de Storage."
 editUrl: true
 lastUpdated: false
 ---
 
 Esta referencia complementa los ejemplos de las guías; la aplicación utiliza normalmente la fachada `Storage` o `IStorageManager`, no el driver directamente.
 
-## Superficie pública e inventario
+## Superficie pública
 
-El [inventario descargable](/downloads/storage-api-inventory.json) registra las declaraciones propias públicas del módulo, sus contratos, implementaciones de drivers, configuración y fachada. Incluye firmas extraídas del AST, archivo, línea, hash de fuente y destino documental sin prefijo de idioma. Los contratos y overrides se cuentan separadamente: no representan funcionalidades distintas.
-
-Se incluyen constructores y protocolos de contexto asíncrono. Se excluyen implementación privada, resolución interna de exports y métodos heredados de otros módulos; los métodos generados por dataclasses se explican mediante sus campos, sin contarlos como declaraciones fuente. Los aliases de compatibilidad se enumeran al final de esta referencia. El inventario no afirma haber probado todas las combinaciones contra servicios cloud externos.
+La API de Storage incluye contratos, implementaciones de drivers, configuración y fachada, además de constructores y protocolos de contexto asíncrono. Los aliases de compatibilidad se enumeran al final de esta referencia.
 
 | API | Referencia práctica |
 | --- | --- |

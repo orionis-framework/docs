@@ -1,6 +1,6 @@
 ---
 title: "Mail technical reference"
-description: "Contracts, MIME composition, types, helpers, provider, exceptions and a verified Mail API inventory."
+description: "Mail contracts, MIME composition, types, helpers, provider and exceptions."
 editUrl: true
 lastUpdated: false
 ---
@@ -214,7 +214,3 @@ This class method returns the contract through which the facade resolves its man
 | `MailTransportException` | Delivery/publication failure; does not guarantee the server received no data. |
 
 These classes provide no retry method or public rollback attribute. Context and the original cause may accompany an exception. A partial SMTP result carries its own data in `MailResult`; it does not simply represent “nothing sent.” See [results and errors](/en/mail/sending-and-results).
-
-## Coverage and maintenance
-
-The [downloadable inventory](/downloads/mail-api-inventory.json) maps own public declarations to their signatures, file, line, checksum and ES/EN section. Includes overloads, type aliases, fields, contracts and implementations; dataclass-generated methods are explained through their fields. Excludes private implementation and inherited API from components outside this module. Operations inherited by `MailManager` from `PendingMail` are documented once in the sending guide.

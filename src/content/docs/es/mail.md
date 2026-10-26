@@ -80,6 +80,6 @@ El `MailProvider` nativo registra el manager y el composer como singletons y fij
 - [Adjuntos desde Storage](/es/mail/attachments): rutas, discos, nombres visibles, MIME y lectura de archivos.
 - [Envío y resultados](/es/mail/sending-and-results): API completa de las cadenas, callbacks y resultados.
 - [Fachada e inyección](/es/mail/manager-and-injection): controladores, servicios y dependencias de una clase de correo.
-- [Referencia técnica](/es/mail/api-reference): compositor, contratos, helpers, excepciones e inventario.
+- [Referencia técnica](/es/mail/api-reference): compositor, contratos, helpers y excepciones.
 
 Si el trabajo debe sobrevivir al reinicio del proceso, envía un [job persistente](/es/queues) que reconstruya y envíe el mensaje. El correo y la confirmación de una transacción de base de datos son efectos separados.

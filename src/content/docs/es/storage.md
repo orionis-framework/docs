@@ -63,7 +63,7 @@ El resultado es una ruta lógica dentro de `reports`, no una URL HTTP. Guarda es
 4. [Configuración completa](/es/storage/configuration): campos, variables de entorno, validación y valores predeterminados de `config/filesystems.py`.
 5. [Temporales y contextos](/es/storage/temporary-files-and-contexts): cierre, publicación y limpieza de recursos según el driver.
 6. [Fachada e inyección](/es/storage/manager-and-injection): uso desde constructores y métodos y API completa de `IStorageManager`.
-7. [Referencia técnica](/es/storage/api-reference): contratos, constructores, helpers, excepciones e inventario de API.
+7. [Referencia técnica](/es/storage/api-reference): contratos, constructores, helpers y excepciones.
 
 ## Primer recorrido HTTP
 

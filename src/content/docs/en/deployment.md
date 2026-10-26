@@ -118,5 +118,3 @@ Check the private backend, then the public domain. `/up`, if you retain the defa
 For a planned interruption, `python -B reactor down` writes the maintenance marker for processes sharing its storage; it does not interrupt operations already in progress. Stop processes, publish and verify; `python -B reactor up` restores availability. Investigate startup failures in the supervisor and [Logs](/en/logging).
 
 Continue with [Windows Server](/en/deployment/windows-server), [Linux](/en/deployment/linux) or [Docker](/en/deployment/docker), and review [the proxy contract](/en/deployment/reverse-proxies).
-
-The [deployment traceability inventory](/downloads/deployment-source-inventory.json) maps documented integration points to reviewed configuration, implementation and test files.

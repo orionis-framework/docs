@@ -1378,22 +1378,6 @@
       }
     },
     {
-      "id": "database-api-coverage",
-      "kind": "doc",
-      "title": {
-        "es": "Inventario y cobertura de Database y ORM",
-        "en": "Database and ORM inventory and coverage"
-      },
-      "slug": {
-        "es": "/es/database/api-coverage",
-        "en": "/en/database/api-coverage"
-      },
-      "label": {
-        "es": "Inventario y cobertura",
-        "en": "Inventory and coverage"
-      }
-    },
-    {
       "id": "orm-overview",
       "kind": "doc",
       "title": {

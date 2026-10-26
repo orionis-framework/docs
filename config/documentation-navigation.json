@@ -578,8 +578,7 @@
         "database-commands",
         "database-dialects-and-production",
         "database-runtime-api",
-        "database-query-plans",
-        "database-api-coverage"
+        "database-query-plans"
       ],
       "groups": [
         {
@@ -645,8 +644,7 @@
           "pageIds": [
             "database-dialects-and-production",
             "database-runtime-api",
-            "database-query-plans",
-            "database-api-coverage"
+            "database-query-plans"
           ]
         }
       ]

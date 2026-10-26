@@ -51,4 +51,4 @@ You can also run `orionis test` or `uv run python -B reactor test`. You do not n
 
 The command does not automatically choose another database or change `APP_ENV` to `testing`. Prepare configuration and test resources before bootstrap. Inheriting from `TestCase` does not enable rollback, file cleanup or an independent container scope per case; arrange cleanup with the documented mechanisms.
 
-The [source and API reference inventory](/downloads/testing-api-inventory.json) distinguishes Orionis declarations from inherited `unittest` tools. Start by [creating your first test](/en/testing/writing-and-running-tests).
+Start by [creating your first test](/en/testing/writing-and-running-tests).

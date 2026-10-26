@@ -191,7 +191,4 @@ These modules describe bootstrap defaults; normally you do not need to call or m
 
 Read-only maps protect their outer level; do not infer deep immutability of every nested structure. A disk snapshot retains compatible metadata, not live services.
 
-<a id="application-api-coverage"></a>
-## Verifiable coverage
-
-The [Application and Container inventory](/downloads/application-container-api-inventory.json) maps the components' own API to its guides. Configuration entities for each subsystem are linked from [configuration](/en/application/configuration), keeping their options with the component using them.
+Configuration entities for each subsystem are linked from [configuration](/en/application/configuration), keeping their options with the component using them.

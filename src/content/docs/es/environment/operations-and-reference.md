@@ -210,8 +210,3 @@ SecureKeyGenerator.generate(cipher: str | Cipher = Cipher.AES_256_CBC) -> str
 Una cadena de algoritmo desconocida produce `ValueError`; no se normalizan sus mayúsculas. Generar una clave no la persiste por sí solo. La entidad nativa de configuración `App` utiliza este generador si falta la clave y escribe `APP_KEY` durante su validación.
 
 No generes una clave nueva cada vez que se construya tu configuración: conserva la existente para poder descifrar los datos previos. Para la operación explícita utiliza el [comando key:generate](/es/console/built-in-application#command-key-generate) y consulta [Hashing y cifrado](/es/cryptography/encryption).
-
-<a id="environment-coverage"></a>
-## Referencia contrastada
-
-El [inventario del componente](/downloads/environment-api-inventory.json) relaciona su API pública, contratos, tipos y validadores con las cuatro guías de Entorno. Las funciones privadas, la carga diferida de exportaciones y los métodos heredados o generados no se presentan como funcionalidades adicionales.

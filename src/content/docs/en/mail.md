@@ -80,6 +80,6 @@ The native `MailProvider` registers the manager and composer as singletons and p
 - [Storage attachments](/en/mail/attachments): paths, disks, filenames, MIME and file loading.
 - [Sending and results](/en/mail/sending-and-results): complete chain API, callbacks and outcomes.
 - [Facade and injection](/en/mail/manager-and-injection): controllers, services and mailable constructor dependencies.
-- [Technical reference](/en/mail/api-reference): composer, contracts, helpers, exceptions and inventory.
+- [Technical reference](/en/mail/api-reference): composer, contracts, helpers and exceptions.
 
 For work that must survive process restarts, use a [persistent job](/en/queues) that reconstructs and sends the message. Sending mail and confirming a database transaction are separate effects.

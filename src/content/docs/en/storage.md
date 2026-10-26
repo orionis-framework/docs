@@ -63,7 +63,7 @@ The result is a logical path such as `reports/550e8400-e29b-41d4-a716-4466554400
 4. [Complete configuration](/en/storage/configuration): fields, environment variables, validation, and defaults in `config/filesystems.py`.
 5. [Temporary files and contexts](/en/storage/temporary-files-and-contexts): closing, publication, and cleanup for each driver.
 6. [Facade and injection](/en/storage/manager-and-injection): constructor and method usage and the complete `IStorageManager` API.
-7. [Technical reference](/en/storage/api-reference): contracts, constructors, helpers, exceptions, and the API inventory.
+7. [Technical reference](/en/storage/api-reference): contracts, constructors, helpers and exceptions.
 
 ## First HTTP workflow
 

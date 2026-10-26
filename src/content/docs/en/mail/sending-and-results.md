@@ -753,4 +753,4 @@ PreparedMail(
 
 All five fields are required and keyword-only. `sender` is the transport mailbox; `recipients` is the deduplicated To/Cc/Bcc union. `mime` contains complete MIME bytes without a Bcc header. `smtp_utf8` indicates international mailbox requirements; a Unicode display name alone does not require SMTPUTF8. Transports receive no templates, logical attachment paths, or mutable `EmailMessage`.
 
-Use the [API reference](/en/mail/api-reference) for the component inventory and [content and views](/en/mail/content-and-views) to continue with body declarations.
+Use the [API reference](/en/mail/api-reference) for contracts and helpers and [content and views](/en/mail/content-and-views) to continue with body declarations.

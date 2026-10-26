@@ -1,5 +1,4 @@
 import catalog from '../../config/documentation-menu.json' with { type: 'json' };
-import legacyRedirects from '../../config/legacy-redirects.json' with { type: 'json' };
 import navigation from '../../config/documentation-navigation.json' with { type: 'json' };
 
 export const documentationCatalog = catalog;
@@ -60,23 +59,6 @@ export function validateRouteOrganization(catalogConfig = catalog, navigationCon
     } else distinctNames(section.pageIds.map((id) => pages.get(id)), locales, `pages/${section.id}`, pageNames);
   }
   return catalogConfig.pages;
-}
-
-// Every old address must lead directly to a final page, including custom Astro pages.
-export function validateLegacyRedirects(redirectConfig = legacyRedirects, catalogConfig = catalog) {
-  if (!redirectConfig || typeof redirectConfig !== 'object' || Array.isArray(redirectConfig)) throw new Error('Invalid legacy redirect configuration.');
-  const slugs = new Set(catalogConfig.pages.flatMap((page) => Object.values(page.slug)));
-  const relativePath = /^[a-z0-9][a-z0-9_-]*(?:\/[a-z0-9][a-z0-9_-]*)*$/;
-  for (const [oldPath, newPath] of Object.entries(redirectConfig)) {
-    if (!relativePath.test(oldPath) || typeof newPath !== 'string' || !relativePath.test(newPath)) throw new Error(`Invalid legacy redirect path: ${oldPath} -> ${newPath}`);
-    if (Object.hasOwn(redirectConfig, newPath)) throw new Error(`Legacy redirect chain or cycle: ${oldPath} -> ${newPath}`);
-    for (const locale of catalogConfig.locales) {
-      const source = `/${locale}/${oldPath}`, destination = `/${locale}/${newPath}`;
-      if (slugs.has(source)) throw new Error(`Legacy redirect shadows canonical page: ${source}`);
-      if (!slugs.has(destination)) throw new Error(`Invalid legacy redirect target: ${destination}`);
-    }
-  }
-  return redirectConfig;
 }
 
 // Flatten configured sidebar groups without changing their leaf order.
@@ -180,13 +162,4 @@ export function createSidebar() {
     label: resource.title.en, translations: resource.title, link: resource.url,
     attrs: { class: 'api-reference-link', target: '_blank', rel: 'noopener noreferrer' },
   }))];
-}
-
-export function createRedirects() {
-  const redirects = { '/': '/en/getting-started', '/en/': '/en/getting-started', '/es/': '/es/getting-started' };
-  for (const locale of catalog.locales) for (const [oldPath, newPath] of Object.entries(validateLegacyRedirects())) {
-    const source = `/${locale}/${oldPath}`, destination = `/${locale}/${newPath}`;
-    redirects[source] = destination;
-  }
-  return redirects;
 }

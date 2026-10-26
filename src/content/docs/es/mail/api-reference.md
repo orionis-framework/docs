@@ -1,6 +1,6 @@
 ---
 title: "Referencia técnica de correo"
-description: "Contratos, composición MIME, tipos, helpers, provider, excepciones e inventario de la API de Mail."
+description: "Contratos, composición MIME, tipos, helpers, provider y excepciones de la API de Mail."
 editUrl: true
 lastUpdated: false
 ---
@@ -214,7 +214,3 @@ Este método de clase retorna el contrato con el que la fachada resuelve el mana
 | `MailTransportException` | Fallo de entrega/publicación; no garantiza que el servidor no haya recibido datos. |
 
 Estas clases no incorporan un método de retry ni un atributo público de rollback. El contexto y la causa original pueden acompañar la excepción. Un resultado SMTP parcial tiene datos propios en `MailResult`; no se representa simplemente como «ningún envío». Consulta [resultados y errores](/es/mail/sending-and-results).
-
-## Cobertura y mantenimiento
-
-El [inventario descargable](/downloads/mail-api-inventory.json) relaciona las declaraciones públicas propias con sus firmas, archivo, línea, checksum y sección ES/EN. Incluye sobrecargas, aliases de tipos, campos, contratos e implementaciones; los métodos generados por dataclasses se explican por sus campos. Excluye implementación privada y API heredada de componentes externos al módulo. Las operaciones heredadas de `PendingMail` por `MailManager` se documentan una sola vez en la guía de envío.

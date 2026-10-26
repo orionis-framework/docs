@@ -225,7 +225,3 @@ Este método de clase retorna `ICacheManager`. Es el punto de enlace de la facha
 `CacheException` hereda de `Exception`; `CacheStoreException` hereda de ella y señala almacenes desconocidos, configuración ausente o un backend personalizado sin reemplazo atómico. No existe una conversión universal de errores externos a estas clases: permisos de archivo, timeouts, conexión Redis/Memcached, errores de JSON, conversión numérica y `QueryException` pueden propagarse con su tipo original.
 
 El manager no implementa un fallback automático a memoria si un servidor falla. Define explícitamente cómo debe responder tu aplicación si no puede leer, calcular o guardar una entrada; no captures indiscriminadamente errores del resolver como si fueran simples ausencias de caché.
-
-## Inventario verificable
-
-El [inventario descargable](/downloads/cache-api-inventory.json) relaciona cada declaración pública propia con su firma, archivo, línea, checksum y destino documental. Incluye contratos, implementaciones, campos de configuración, constructores, protocolos de contexto y los cuatro aliases de lotes. Excluye implementación privada, métodos generados por dataclasses y API heredada de aiocache; las diferencias relevantes de esa dependencia se explican en las guías de drivers, valores y locks.

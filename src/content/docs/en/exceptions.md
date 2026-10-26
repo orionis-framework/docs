@@ -257,7 +257,7 @@ The [HTTP exception page](/en/http/exceptions) explains the diagnostic contents,
 
 ## Continuing with implementation
 
-The [verifiable Exceptions inventory](/downloads/exceptions-api-inventory.json) maps declarations in `failure`, the project's handler, and application registration to these guides. Each transport's integration is reviewed separately; these mechanisms are not presented as universal process interception.
+Each transport has its own exception integration; these mechanisms do not intercept every process failure.
 
 1. [Reporting and handling exceptions](/en/exceptions/handling-exceptions): application class, domain errors, logging, CLI, and service injection.
 2. [Contexts and transports](/en/exceptions/contexts-and-transports): actual capture and responses in HTTP, CLI, WebSocket, Realtime, MCP, queues, and tasks.

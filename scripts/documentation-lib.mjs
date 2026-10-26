@@ -1,7 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createHash } from 'node:crypto';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkGfm from 'remark-gfm';
@@ -10,9 +9,6 @@ import { toString } from 'mdast-util-to-string';
 
 export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const parser = unified().use(remarkParse).use(remarkGfm);
-// Text checksums stay stable across Windows and Linux line endings.
-export const sha256 = (text) => createHash('sha256').update(typeof text === 'string' ? text.replaceAll('\r\n', '\n') : text).digest('hex');
-export const slash = (value) => value.replaceAll('\\', '/');
 export function walk(node, visit) {
   visit(node);
   for (const child of node.children || []) walk(child, visit);

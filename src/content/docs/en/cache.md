@@ -66,4 +66,4 @@ The manager selects one of five native stores and retains its repository. The fa
 - [Locks and concurrency](/en/cache/locks): contexts, waiting and each backend's guarantees.
 - [Source-derived artifacts](/en/cache/source-artifacts): source invalidation and enriched serialization.
 - [Facade and injection](/en/cache/manager-and-injection): controllers, services and providers.
-- [Technical reference](/en/cache/api-reference): contracts, backends, factories, errors and verifiable inventory.
+- [Technical reference](/en/cache/api-reference): contracts, backends, factories and errors.

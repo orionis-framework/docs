@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import remarkMermaid from '../src/plugins/remark-mermaid.mjs';
 import path from 'node:path';
 import { root, validateCatalog, within, stripFrontmatter, markdownLinks, headingIds, parser } from './documentation-lib.mjs';
-import { createSidebar, createRedirects, flattenSidebar, documentationCatalog, documentationNavigation, navigationSections, resolveNavigation, validateRouteOrganization, validateLegacyRedirects, sitePages, documentationPages, getPageBySlug, getTranslations } from '../src/utils/documentation-menu.mjs';
+import { createSidebar, flattenSidebar, documentationCatalog, documentationNavigation, navigationSections, resolveNavigation, validateRouteOrganization, sitePages, documentationPages, getPageBySlug, getTranslations } from '../src/utils/documentation-menu.mjs';
 
 const groupedBuildSections = ['getting-started', 'http', 'realtime', 'mcp', 'views', 'localization', 'authentication', 'sessions', 'cryptography', 'validation'];
 const groupedSections = new Set([...groupedBuildSections, 'database', 'orm', 'faker', 'storage', 'cache', 'mail', 'queues', 'console', 'environment', 'application', 'logging', 'exceptions', 'deployment', 'testing', 'utilities']);
@@ -241,47 +241,6 @@ test('localized menu names are trimmed and sibling names are distinct', () => {
     const catalog = structuredClone(documentationCatalog), nav = structuredClone(documentationNavigation);
     mutate(catalog, nav);
     assert.throws(() => validateRouteOrganization(catalog, nav), expectedError);
-  }
-});
-
-test('legacy redirects lead directly to canonical pages without chains, cycles, or shadows', () => {
-  const valid = { 'legacy-start': 'getting-started', 'legacy-contributors': 'contribute/contributors' };
-  assert.deepEqual(validateLegacyRedirects(valid), valid);
-  const cases = [
-    [{ 'legacy-start': 'missing-page' }, /Invalid legacy redirect target/],
-    [{ 'legacy-start': 'legacy-other', 'legacy-other': 'http' }, /Legacy redirect chain or cycle/],
-    [{ 'legacy-start': 'legacy-other', 'legacy-other': 'legacy-start' }, /Legacy redirect chain or cycle/],
-    [{ 'legacy-start': 'legacy-start' }, /Legacy redirect chain or cycle/],
-    [{ http: 'getting-started' }, /Legacy redirect shadows canonical page/],
-    [{ 'contribute/contributors': 'getting-started' }, /Legacy redirect shadows canonical page/],
-    [{ '../outside': 'getting-started' }, /Invalid legacy redirect path/],
-    [{ 'legacy-start': 'https://example.com' }, /Invalid legacy redirect path/],
-  ];
-  for (const [redirects, expectedError] of cases) assert.throws(() => validateLegacyRedirects(redirects), expectedError);
-  const redirects = createRedirects(), sources = new Set(Object.keys(redirects));
-  for (const [source, destination] of Object.entries(redirects)) {
-    assert.ok(!getPageBySlug(source), source);
-    assert.ok(getPageBySlug(destination), destination);
-    assert.ok(!sources.has(destination), `${source} -> ${destination}`);
-  }
-});
-
-test('published addresses remain available after canonical menu reorganization', () => {
-  const redirects = createRedirects();
-  const examples = {
-    'http/request-lifecycle': 'http/controllers',
-    'http/forms-and-uploads': 'http/requests',
-    'http/websockets': 'realtime/websocket',
-    'testing/mcp-testing': 'mcp/testing',
-    'database/orm': 'orm',
-    'database/orm/faker': 'faker',
-    'architecture/service-container': 'application/container',
-    'asynchronous/event-loops': 'application/async',
-    'database/orm/events-and-scopes': 'orm/events',
-    'advanced/introspection': 'utilities/introspection',
-  };
-  for (const locale of documentationCatalog.locales) for (const [oldPath, newPath] of Object.entries(examples)) {
-    assert.equal(redirects[`/${locale}/${oldPath}`], `/${locale}/${newPath}`);
   }
 });
 

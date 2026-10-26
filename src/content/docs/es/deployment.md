@@ -118,5 +118,3 @@ Verifica el backend privado y después el dominio público. `/up`, si conservas 
 Para una interrupción programada, `python -B reactor down` escribe el marcador de mantenimiento para los procesos que comparten su almacenamiento; no interrumpe operaciones ya iniciadas. Detén los procesos, publica y verifica; `python -B reactor up` restaura disponibilidad. Investiga fallos de arranque en el supervisor y [Logs](/es/logging).
 
 Continúa con [Windows Server](/es/deployment/windows-server), [Linux](/es/deployment/linux) o [Docker](/es/deployment/docker), y revisa [el contrato del proxy](/es/deployment/reverse-proxies).
-
-La [trazabilidad del despliegue](/downloads/deployment-source-inventory.json) relaciona los puntos de integración documentados con los archivos de configuración, implementación y pruebas revisados.

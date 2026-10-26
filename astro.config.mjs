@@ -2,21 +2,25 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import sitemap from '@astrojs/sitemap';
-import { createSidebar, createRedirects } from './src/utils/documentation-menu.mjs';
+import { createSidebar } from './src/utils/documentation-menu.mjs';
 import remarkMermaid from './src/plugins/remark-mermaid.mjs';
 import rehypeResponsiveTables from './src/plugins/rehype-responsive-tables.mjs';
 
-const redirects = createRedirects();
+const entryRedirects = {
+  '/': '/en/getting-started',
+  '/en': '/en/getting-started',
+  '/es': '/es/getting-started',
+};
 export default defineConfig({
   site: 'https://docs.orionis-framework.com',
   trailingSlash: 'never',
-  redirects,
+  redirects: entryRedirects,
   markdown: {
     remarkPlugins: [remarkMermaid],
     rehypePlugins: [rehypeResponsiveTables],
   },
   integrations: [
-    sitemap({ filter: (url) => !Object.hasOwn(redirects, new URL(url).pathname) }),
+    sitemap({ filter: (url) => !Object.hasOwn(entryRedirects, new URL(url).pathname.replace(/\/+$/, '') || '/') }),
     starlight({
       title: 'Orionis Framework',
       description: 'Documentation for Orionis: installation, application development, services, and API reference.',

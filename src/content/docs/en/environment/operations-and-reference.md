@@ -210,8 +210,3 @@ SecureKeyGenerator.generate(cipher: str | Cipher = Cipher.AES_256_CBC) -> str
 An unknown algorithm string raises `ValueError`; its case is not normalized. Generating a key does not persist it by itself. The native `App` configuration entity uses this generator when the key is absent and writes `APP_KEY` during validation.
 
 Do not generate a new key whenever your configuration is constructed: retain the existing key so previously encrypted data can still be decrypted. For an explicit operation, use the [key:generate command](/en/console/built-in-application#command-key-generate) and see [Hashing and encryption](/en/cryptography/encryption).
-
-<a id="environment-coverage"></a>
-## Verified reference
-
-The [component inventory](/downloads/environment-api-inventory.json) maps its public API, contracts, types and validators to the four Environment guides. Private functions, lazy export loading and inherited or generated methods are not presented as additional features.

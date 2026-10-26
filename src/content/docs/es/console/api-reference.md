@@ -188,11 +188,3 @@ Estas funciones de infraestructura coordinan el arranque y restauran su contexto
 | `stdio.protocol_stdout() -> BinaryIO \| None` | Devuelve el writer binario original dentro de ese contexto, o `None`. |
 
 El feedback se omite con redirección/pipes, CI, terminales no aptos y MCP. Los contextos de protocolo no convierten otros comandos en servidores MCP. Consulta [los comandos de transporte](/es/console/built-in-workers) y [Servidores MCP](/es/mcp) para esa integración.
-
-<a id="coverage"></a>
-
-## Cobertura contrastada con la fuente
-
-El [inventario de Console](/downloads/console-api-inventory.json) relaciona las declaraciones públicas incluidas en esta guía, sus firmas y campos con referencias en ambos idiomas. Registra por separado las exclusiones editoriales acordadas para que no se confundan con funcionalidades documentadas. Conserva un catálogo separado de las 67 firmas CLI con sus argumentos reales. Los detalles internos de implementación de cada comando nativo no se cuentan como una API adicional de aplicación.
-
-El auditor `scripts/audit-console-source.py` contrasta el inventario contra el checkout del framework. La validación del sitio comprueba destinos, anclas y cobertura del catálogo sin requerir dicho checkout en CI. Los métodos privados, exports, API heredada de dependencias y métodos generados automáticamente quedan fuera del conteo de declaraciones propias.

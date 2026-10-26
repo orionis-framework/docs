@@ -1,17 +1,13 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { parse } from 'parse5';
-import { root, within, validateCatalog, contentPath, filesUnder, sha256, stripFrontmatter, markdownLinks, headingIds, parser, walk } from './documentation-lib.mjs';
-import { validateRouteOrganization, validateLegacyRedirects, createSidebar, flattenSidebar, createRedirects, getTranslations, supplementalPages, documentationPages, sitePages, documentationCatalog, documentationNavigation, navigationSections } from '../src/utils/documentation-menu.mjs';
-
-import './validate-api-coverage.mjs';
+import { root, within, validateCatalog, contentPath, filesUnder, stripFrontmatter, markdownLinks, headingIds, parser, walk } from './documentation-lib.mjs';
+import { validateRouteOrganization, createSidebar, flattenSidebar, getTranslations, supplementalPages, documentationPages, sitePages, documentationCatalog, documentationNavigation, navigationSections } from '../src/utils/documentation-menu.mjs';
 
 const catalog = documentationCatalog;
 const pages = validateCatalog(catalog);
 validateRouteOrganization();
-validateLegacyRedirects();
 const site = 'https://docs.orionis-framework.com';
-const fontAssets = JSON.parse(await fs.readFile(path.join(root, 'config/font-assets.json'), 'utf8'));
 const errors = [], routeMap = new Map();
 const normalize = (pathname) => decodeURI(pathname).replace(/\/+$/, '') || '/';
 function check(condition, message) { if (!condition) errors.push(message); }
@@ -26,21 +22,6 @@ for (const agent of ['*', 'OAI-SearchBot', 'GPTBot', 'ChatGPT-User']) {
   check(groups.length === 1 && groups[0] === `User-agent: ${agent}\nAllow: /`, `Expected one unrestricted robots.txt group for ${agent}.`);
 }
 check(robotsGroups.includes(`Sitemap: ${site}/sitemap-index.xml`), 'robots.txt must advertise the canonical sitemap index.');
-
-async function validateFontAssets(directory) {
-  for (const asset of [...fontAssets.files, fontAssets.license]) {
-    const file = within(directory, asset.path.slice(1));
-    try {
-      const bytes = await fs.readFile(file);
-      check(sha256(bytes) === asset.sha256, `Local font/license differs from official asset: ${file}`);
-      if (asset.path.endsWith('.woff2')) {
-        check(bytes.subarray(0, 4).toString('ascii') === 'wOF2' && bytes.length === asset.bytes, `Invalid local WOFF2 font: ${file}`);
-      }
-    } catch (error) { errors.push(`Missing local font/license: ${file} (${error.message})`); }
-  }
-}
-check(fontAssets.family === 'JetBrains Mono' && fontAssets.files.length === 6, 'Expected local JetBrains Mono regular, semibold, and bold fonts with italics.');
-await validateFontAssets(path.join(root, 'public'));
 
 const expected = new Set();
 for (const page of pages) for (const locale of catalog.locales) {
@@ -110,10 +91,9 @@ check(pageSections.get('mcp-overview')?.id === 'mcp' && pageSections.get('test-m
 check(pageSections.get('realtime-overview')?.id === 'realtime' && pageSections.get('realtime-protocol-and-streaming')?.id === 'realtime', 'Realtime and its protocol must have their own category.');
 for (const page of sitePages) check(getTranslations(page.id).length === catalog.locales.length, `Missing translations: ${page.id}`);
 
-let internalLinks = 0, implementationLinks = 0;
+let internalLinks = 0;
 for (const [slug, data] of routeMap) for (const node of markdownLinks(data.body)) {
   const href = node.url;
-  if (/^https:\/\/github\.com\/orionis-framework\/framework\/blob\//.test(href)) implementationLinks++;
   if (/^(?:[a-z][a-z\d+.-]*:|\/\/)/i.test(href)) continue;
   check(href.startsWith('/') || href.startsWith('#'), `Unresolved relative link: ${slug} -> ${href}`);
   const url = new URL(href, `https://docs.orionis-framework.com${slug}`), target = normalize(url.pathname);
@@ -126,20 +106,14 @@ for (const [slug, data] of routeMap) for (const node of markdownLinks(data.body)
   }
 }
 
-const redirects = createRedirects();
-check(Object.values(redirects).every((slug) => routeMap.has(slug)), 'Redirect without canonical page.');
-check(Object.keys(redirects).every((slug) => !routeMap.has(slug)), 'Redirect shadows a canonical page.');
-
 if (process.argv.includes('--built')) {
   const output = path.join(root, 'dist');
   const builtRobots = (await fs.readFile(path.join(output, 'robots.txt'), 'utf8')).replaceAll('\r\n', '\n');
   check(builtRobots === robots, 'Published robots.txt must preserve the crawler permissions and sitemap.');
-  await validateFontAssets(output);
   const fontCSS = (await Promise.all((await filesUnder(output)).filter((file) => file.endsWith('.css')).map((file) => fs.readFile(file, 'utf8')))).join('\n');
   check(/--sl-font-mono\s*:[^;}]*JetBrains Mono/.test(fontCSS), 'Inline code must use JetBrains Mono.');
   check(/--ec-codeFontFml\s*:[^;}]*JetBrains Mono/.test(fontCSS) && /font-family\s*:\s*var\(--ec-codeFontFml\)/.test(fontCSS), 'Rendered code blocks must use JetBrains Mono.');
   const fontFaces = fontCSS.match(/@font-face\s*\{[^}]+\}/g) || [];
-  for (const font of fontAssets.files) check(fontFaces.some((face) => face.includes('JetBrains Mono') && face.includes(font.path)), `Missing bundled JetBrains Mono font face: ${font.path}`);
   check(fontFaces.every((face) => !/url\(\s*['"]?(?:https?:)?\/\//.test(face)), 'Font faces must load locally, without a CDN.');
   check(!/@import\s+(?:url\(\s*)?['"]?(?:https?:)?\/\//.test(fontCSS), 'Stylesheets must not import remote font declarations.');
   check(!fontCSS.includes('Fira Code'), 'Old Fira Code declarations must not override the requested code font.');
@@ -291,10 +265,10 @@ if (process.argv.includes('--built')) {
       catch { errors.push(`Broken rendered link: ${slug} -> ${href}`); }
     }
   }
-  for (const [from, to] of Object.entries(redirects)) {
+  for (const [entry, locale] of [['/', catalog.defaultLocale], ...catalog.locales.map((locale) => [`/${locale}`, locale])]) {
     try {
-      const html = await htmlAt(from);
-      check(html.includes(to), `Incorrect redirect output: ${from}`);
+      const html = await htmlAt(entry);
+      check(html.includes(`content="0;url=${pages[0].slug[locale]}"`), `Language entry must lead to its introduction: ${entry}`);
     } catch (error) { errors.push(error.message); }
   }
   const sitemapFiles = (await filesUnder(output)).filter((file) => /sitemap-\d+\.xml$/.test(file));
@@ -308,17 +282,17 @@ if (process.argv.includes('--built')) {
   const sitemapRoutes = sitemapPageURLs.map((url) => normalize(url.pathname));
   const sitemapSet = new Set(sitemapRoutes);
   check(sitemapRoutes.length === sitemapSet.size && sitemapSet.size === routeMap.size && [...routeMap.keys()].every((slug) => sitemapSet.has(slug)), `Sitemap must contain exactly ${routeMap.size} unique canonical documents, found ${sitemapRoutes.length}`);
-  const allowed = new Set([...routeMap.keys(), ...Object.keys(redirects).map(normalize), '/404']);
+  const allowed = new Set([...routeMap.keys(), '/', ...catalog.locales.map((locale) => `/${locale}`), '/404']);
   for (const file of (await filesUnder(output)).filter((file) => file.endsWith('.html'))) {
     const slug = normalize('/' + path.relative(output, file).replaceAll('\\', '/').replace(/(?:\/index)?\.html$/, '').replace(/^index$/, ''));
     check(allowed.has(slug), `Unexpected published HTML page: ${slug}`);
   }
   check((await filesUnder(path.join(output, 'pagefind'))).length > 0, 'Search index was not generated.');
-  console.log(`Verified ${htmlPages.size} rendered pages, crawler permissions, indexable static content, local links/fragments, translations, redirects, sitemap, and search output.`);
+  console.log(`Verified ${htmlPages.size} rendered pages, crawler permissions, indexable static content, local links/fragments, translations, language entries, sitemap, and search output.`);
 }
 if (errors.length) {
   console.error(errors.join('\n'));
   process.exitCode = 1;
 } else {
-  console.log(`Documentation valid: ${navigationSections.length} capability categories in ${documentationNavigation.bands.length} navigation bands, ${documentationPages.length} manual pages per locale, ${supplementalPages.length} contribution resources per locale, ${internalLinks} internal links, ${implementationLinks} implementation permalinks.`);
+  console.log(`Documentation valid: ${navigationSections.length} capability categories in ${documentationNavigation.bands.length} navigation bands, ${documentationPages.length} manual pages per locale, ${supplementalPages.length} contribution resources per locale, ${internalLinks} internal links.`);
 }

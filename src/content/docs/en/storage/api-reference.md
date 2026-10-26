@@ -1,17 +1,15 @@
 ---
 title: "Storage technical reference"
-description: "Contracts, constructors, helpers, exceptions, and a verifiable Storage inventory."
+description: "Storage contracts, constructors, helpers and exceptions."
 editUrl: true
 lastUpdated: false
 ---
 
 This reference complements the guide examples; application code normally uses the `Storage` facade or `IStorageManager` rather than a driver directly.
 
-## Public surface and inventory
+## Public API
 
-The [downloadable inventory](/downloads/storage-api-inventory.json) records own public declarations in the module, its contracts, driver implementations, configuration, and facade. It includes AST-derived signatures, source files, lines, source hashes, and documentation destinations without a locale prefix. Contracts and overrides are counted separately: they are not distinct features.
-
-Constructors and asynchronous context protocols are included. Private implementation, internal export resolution, and methods inherited from other modules are excluded; dataclass-generated methods are explained through their fields without counting them as source declarations. Compatibility aliases are listed at the end of this reference. The inventory does not claim every combination was tested against external cloud services.
+This reference covers contracts, driver implementations, configuration, the facade, constructors and asynchronous context protocols. Compatibility aliases are listed at the end.
 
 | API | Practical reference |
 | --- | --- |

@@ -68,4 +68,4 @@ El manager selecciona uno de los cinco almacenes nativos y conserva su repositor
 - [Bloqueos y concurrencia](/es/cache/locks): contextos, espera y garantías de cada backend.
 - [Artefactos de código fuente](/es/cache/source-artifacts): invalidación por fuentes y serialización enriquecida.
 - [Fachada e inyección](/es/cache/manager-and-injection): uso en controladores, servicios y providers.
-- [Referencia técnica](/es/cache/api-reference): contratos, backends, factorías, errores e inventario verificable.
+- [Referencia técnica](/es/cache/api-reference): contratos, backends, factorías y errores.

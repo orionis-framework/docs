@@ -1,6 +1,6 @@
 ---
 title: "Queue technical reference"
-description: "Contracts, driver methods, public helpers, and verifiable queue system coverage."
+description: "Contracts, driver methods and public helpers for queue processing."
 editUrl: true
 lastUpdated: false
 ---
@@ -282,11 +282,3 @@ def getFacadeAccessor(cls) -> type[IQueueManager]: ...
 ```
 
 `Queue.getFacadeAccessor()` returns `IQueueManager`. This links the facade to the container; use service methods to submit work. Import `Queue` from `orionis.support.facades`.
-
-<a id="coverage"></a>
-
-## Verifiable inventory
-
-The [queue API inventory](/downloads/queues-api-inventory.json) maps each public declaration owned by `orionis/queues`, its configuration entities, and its facade to a documentation destination. Includes contracts, constructors, protocols, fields, helpers, and driver overrides; inherited third-party methods and automatically generated methods are not counted as additional features.
-
-Site validation checks that every destination exists in Spanish and English. The `scripts/audit-queues-source.py` script compares signatures and hashes against the actual framework checkout to detect changes that require reviewing the guide.
