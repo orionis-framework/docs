@@ -49,6 +49,14 @@ const entries = sidebar.map((entry) => {
   <p class="sidebar-caption">{spanish ? 'Desarrolla con Orionis' : 'Build with Orionis'}</p>
 </div>
 
+<a class="api-reference-link" href={spanish ? 'https://inspector.orionis-framework.com/es/' : 'https://inspector.orionis-framework.com/'}
+  target="_blank" rel="noopener noreferrer"
+  title={spanish ? 'Inspecciona y valida tus servidores MCP en el navegador' : 'Inspect and validate your MCP servers in the browser'}>
+  <span class="resource-icon"><NavigationIcon name="mcp" /></span>
+  <span class="resource-label">MCP Inspector</span>
+  <Icon name="external" class="resource-external" size="0.875rem" />
+</a>
+
 <div class="sidebar-filter" hidden>
   <label for="navigation-filter">{spanish ? 'Filtrar menú' : 'Filter menu'}</label>
   <div class="sidebar-filter-field">

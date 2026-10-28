@@ -9,6 +9,10 @@ lastUpdated: false
 
 Declaras las clases, las reúnes en un `Server` y registras sus transportes. Orionis se encarga del protocolo; no necesitas escribir un parser JSON-RPC, un controlador HTTP para cada herramienta ni un bucle STDIO.
 
+:::tip[Inspecciona tu servidor desde el navegador]
+Abre [Orionis MCP Inspector](https://inspector.orionis-framework.com/es/) para descubrir herramientas, recursos y prompts, validar schemas, inspeccionar peticiones JSON-RPC y exportar informes de diagnóstico. Se conecta directamente a servidores HTTP con MCP `2026-07-28` stateless; tu endpoint debe permitir el origen del inspector mediante CORS. Consulta el flujo de [pruebas en el navegador](/es/mcp/testing#inspeccionar-un-servidor-http-desde-el-navegador).
+:::
+
 ## Qué componente necesitas
 
 | Componente | Responsabilidad | Ejemplo |
