@@ -13,7 +13,7 @@ Esta referencia complementa las guías de uso. Para enviar trabajo utiliza la [f
 
 | Contrato | Implementación y referencia |
 | --- | --- |
-| `IQueueManager` | `QueueManager`: [todos sus métodos](/es/queues/manager-and-injection#manager-construction). |
+| `IQueueManager` | `QueueManager`: [todos sus métodos](/es/queues/manager-and-injection#manager-construction), incluido [`migrate()`](/es/queues/manager-and-injection#manager-migrate) para preparar el almacenamiento SQL. |
 | `IJob` | `BaseJob`: [`handle()`](/es/queues/jobs-and-dispatch#job-handle). |
 | `IJobSerializer` | `JobSerializer`: [registro, estado y envelopes](/es/queues/jobs-and-dispatch#serializer). |
 | `IQueueDriver` | `SyncQueueDriver`, `DatabaseQueueDriver`, `RedisQueueDriver`: API de esta página. |

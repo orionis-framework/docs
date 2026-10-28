@@ -33,6 +33,7 @@ Foundation also defines frozen configuration entities for every major subsystem,
 
 ## Module learning path
 
+- [Release notes: changes from 1.0.8 to 1.0.12](/en/getting-started/release-notes)
 - [Application architecture and lifecycle](/en/getting-started/architecture-and-lifecycle)
 - [Application lifecycle and resource ownership](/en/application/lifecycle)
 - [Typed configuration and runtime values](/en/application/configuration)

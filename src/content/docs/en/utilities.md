@@ -31,6 +31,7 @@ Each helper has its own guide covering imports, parameters, returns, examples an
 | [Workers](/en/utilities/helpers/workers) | Estimate concurrency from CPU and a memory budget. |
 | [FreezeThaw](/en/utilities/helpers/freeze-thaw) | Convert containers between frozen and mutable forms. |
 | [PerformanceCounter](/en/utilities/helpers/performance-counter) | Measure synchronous and asynchronous intervals. |
+| [Debug](/en/utilities/helpers/debug) | Inspect values in the console or stop a request with an HTML dump. |
 | [Metadata](/en/utilities/metadata) | Read the installed framework's identity and version. |
 
 Construct data-bearing types explicitly; class methods, static methods and constants do not require the container. Each reference explains where injection applies. These utilities do not hydrate request data by themselves.
@@ -52,5 +53,6 @@ Continue with: [container](/en/application/container) · [schemas](/en/validatio
 | Serialize a result with known fields | A dataclass extending `BaseEntity`. |
 | Work with dates and time zones | `DateTime` from `orionis.support.facades`; no container is needed for ordinary operations. |
 | Call a configured framework service | Its facade after bootstrap, or its service contract through dependency injection. |
+| Inspect values during development | `Debug.dump()` to continue or `Debug.dd()` to stop execution according to the context. |
 
 These are Python utilities you can import into your application; they do not create SQL tables or validate a request automatically. Use [schemas](/en/validation) for external input and [container bindings](/en/application/container) for service dependencies.

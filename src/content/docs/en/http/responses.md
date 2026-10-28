@@ -446,6 +446,10 @@ Header lookups are case-insensitive. Use text names and values compatible with t
 
 Specialized classes preserve the supplied Content-Type. `RedirectResponse` sets its own Location. Adapters also set `Server: Orionis ASGI` or `Orionis RSGI` during delivery.
 
+Since 1.0.11, built-in classes initialize standard headers with fewer redundant calls and keep mutable headers independent for each response. Each class retains its documented precedence: for example, redirects and files set their own metadata. Subclasses still execute their header hooks during construction; JSON serialization and stream consumption retain their behavior.
+
+The [1.0.11 performance notes](/en/getting-started/release-notes#v1-0-11) distinguish response construction, the Python path per request, and transfer. Locally measured time reductions do not imply the same increase in RPS.
+
 ## Cookies
 
 `setCookie()` adds a `Set-Cookie` header and returns `None`. `withCookie()` accepts the same arguments and returns the response itself for chaining.

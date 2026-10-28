@@ -446,6 +446,10 @@ Las búsquedas de cabeceras no distinguen mayúsculas. Utiliza nombres y valores
 
 Las clases especializadas conservan el Content-Type suministrado. `RedirectResponse` establece su propio Location. Los adaptadores también establecen `Server: Orionis ASGI` o `Orionis RSGI` durante la entrega.
 
+Desde 1.0.11, las clases incorporadas inicializan las cabeceras estándar con menos llamadas redundantes y mantienen cabeceras mutables independientes por respuesta. Se conserva la precedencia descrita para cada clase: por ejemplo, redirecciones y archivos establecen sus propios metadatos. Las subclases siguen ejecutando sus hooks de cabeceras durante la construcción; la serialización JSON y el consumo de streams conservan su comportamiento.
+
+Las [notas de rendimiento de 1.0.11](/es/getting-started/release-notes#v1-0-11) distinguen construcción de respuestas, recorrido Python por petición y transferencia. Las reducciones locales medidas no equivalen al mismo incremento en RPS.
+
 ## Cookies
 
 `setCookie()` agrega un `Set-Cookie` y devuelve `None`. `withCookie()` recibe los mismos argumentos y devuelve la propia respuesta para encadenar.

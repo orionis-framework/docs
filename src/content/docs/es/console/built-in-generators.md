@@ -99,11 +99,11 @@ Genera una definición de tabla reutilizable.
 
 | Argumento u opción | Tipo y presencia | Valor efectivo al omitir | Propósito |
 |---|---|---|---|
-| `name` | str, obligatorio | — | Nombre del archivo/clase; admite subdirectorios cuando se usa el generador. |
+| `name` | str, obligatorio | — | Nombre del módulo; admite subdirectorios. |
 
-Usa `database_schema.stub` y el sufijo `Schema`. La definición debe ser utilizada por una migración o por la API de esquemas; crear el archivo no crea una tabla.
+Usa `database_schema.stub` y añade el sufijo `Schema` al nombre del archivo. Desde 1.0.10 genera un módulo con `TABLE: Final[TableDefinition | None] = None`, sin clase contenedora. Sustituye `None` por la definición completa e importa `TABLE` desde una migración o desde la API de esquemas; crear el archivo no crea una tabla. Consulta [el stub y su uso](/es/database/schema#schema-generator).
 
-**Destino predeterminado:** `database/schemas`. Sufijo de clase/archivo: `Schema`.
+**Destino predeterminado:** `database/schemas`. Sufijo del archivo: `Schema`; constante exportada: `TABLE`.
 
 ```shell
 orionis make:database-schema products

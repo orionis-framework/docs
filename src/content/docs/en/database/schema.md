@@ -110,14 +110,14 @@ async createFromDefinition(definition: TableDefinition) -> bool
 Accept a reusable `TableDefinition` and return bool after awaiting. Uses the explicit connection, migration contextual connection, or default connection, in that order. Type/DDL failures propagate as `QueryException` or from the compiler.
 
 ```python
-from database.schemas.projects_v1_schema import ProjectsV1Schema
+from database.schemas.projects_v1_schema import TABLE as PROJECTS_V1
 from orionis.database import Migration
 from orionis.support.facades import Schema
 
 
 class CreateProjects(Migration):
     async def up(self) -> None:
-        await Schema.createFromDefinition(ProjectsV1Schema.table_definition)
+        await Schema.createFromDefinition(PROJECTS_V1)
 
     async def down(self) -> None:
         await Schema.drop("projects")
@@ -164,7 +164,7 @@ async def remove_projects() -> bool:
 
 ## Shared versioned definitions
 
-Generate the holder with either command below. name is required; `Schema` is appended when absent. catalog/projects_v1 creates database/schemas/catalog/projects_v1_schema.py and ProjectsV1Schema. No table contents are generated automatically.
+Generate the module with either command below. `name` is required; the `Schema` suffix is appended to the normalized filename when absent. `catalog/projects_v1` creates `database/schemas/catalog/projects_v1_schema.py`. Since 1.0.10, the stub declares a module constant named `TABLE` instead of a holder class:
 
 ```shell
 orionis make:database-schema projects_v1
@@ -172,22 +172,31 @@ python -B reactor make:database-schema projects_v1
 ```
 
 ```python
+from typing import Final
+from orionis.orm.schema import TableDefinition
+
+TABLE: Final[TableDefinition | None] = None
+```
+
+Replace `None` with the complete definition before using it:
+
+```python
+from typing import Final
 from orionis.database.schema.column import Column
 from orionis.orm.schema import TableDefinition
 
 
-class ProjectsV1Schema:
-    table_definition = TableDefinition(
-        name="projects",
-        columns={
-            "id": Column.id(),
-            "name": Column.string("name", 120),
-        },
-        primary_key="id",
-    )
+TABLE: Final[TableDefinition] = TableDefinition(
+    name="projects",
+    columns={
+        "id": Column.id(),
+        "name": Column.string("name", 120),
+    },
+    primary_key="id",
+)
 ```
 
-Save the example in database/schemas/projects_v1_schema.py. `TableDefinition` contains the logical name, columns, and constraints. A model metaclass accepts table_definition = ProjectsV1Schema.table_definition. Freeze V1: introduce V2 and another migration to evolve the schema instead of changing an applied migration. Nested directories are created automatically; an existing file raises `FileExistsError` and there is no --force. Names, relative paths, suffixes, and rejections follow the [migration generator](/en/database/migrations#generating-a-migration).
+Save the example in `database/schemas/projects_v1_schema.py`. `TableDefinition` contains the logical name, columns, and constraints. Import `TABLE` with a descriptive alias such as `PROJECTS_V1`, and pass it to `Schema.createFromDefinition()` in the migration above. A model can also assign `table_definition = PROJECTS_V1`. `Final` expresses the intent not to reassign the constant; it neither executes DDL nor makes its contents immutable. Freeze V1: introduce V2 and another migration to evolve the schema instead of changing an applied migration. Nested directories are created automatically; an existing file raises `FileExistsError` and there is no `--force`. Names, relative paths, suffixes, and rejections follow the [migration generator](/en/database/migrations#generating-a-migration).
 
 <a id="blueprint-api"></a>
 

@@ -91,6 +91,23 @@ orionis queue:forget 866a127d-3185-4e5c-b21c-65eef9cd78a8
 python -B reactor queue:forget 866a127d-3185-4e5c-b21c-65eef9cd78a8
 ```
 
+<a id="command-queue-migrate"></a>
+
+## queue:migrate
+
+Creates missing tables for every queue connection using the `database` driver and the central SQL failure repository.
+
+Takes no arguments or command-specific options; only automatic help.
+
+Available since 1.0.10. Uses the application's queue configuration and respects configured SQL connections, table names, and prefixes. Includes non-default Database queue connections and prepares failure storage even when jobs use `sync` or `redis`. Creates columns and indexes while preserving existing data; it does not compare or update incompatible older structures. It neither opens Redis clients nor starts workers. Lazy creation on first use remains available.
+
+The SQL user needs creation permissions, and the backend must enforce unique constraints. It accepts neither `--database`, a positional connection, nor `--force`. Success prints `Queue tables migrated successfully.` and returns `0`; a caught `DatabaseException` or `QueueError` returns `1`. See [table preparation](/en/queues/drivers-and-configuration#command-migrate) and [`Queue.migrate()`](/en/queues/manager-and-injection#manager-migrate).
+
+```shell
+orionis queue:migrate
+python reactor queue:migrate
+```
+
 <a id="command-queue-retry"></a>
 
 ## queue:retry

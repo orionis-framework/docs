@@ -31,6 +31,7 @@ Cada helper tiene una guía propia con importaciones, parámetros, retornos, eje
 | [Workers](/es/utilities/helpers/workers) | Estimar concurrencia según CPU y presupuesto de memoria. |
 | [FreezeThaw](/es/utilities/helpers/freeze-thaw) | Convertir contenedores entre formas congeladas y mutables. |
 | [PerformanceCounter](/es/utilities/helpers/performance-counter) | Medir intervalos síncronos y asíncronos. |
+| [Debug](/es/utilities/helpers/debug) | Inspeccionar valores en consola o detener una petición con un volcado HTML. |
 | [Metadata](/es/utilities/metadata) | Consultar la identidad y versión del framework instalado. |
 
 Los tipos que reciben datos se construyen explícitamente; los métodos de clase, métodos estáticos y constantes no requieren contenedor. Cada referencia explica cuándo la inyección es aplicable. Estas utilidades no hidratan por sí solas los datos de una petición.
@@ -52,5 +53,6 @@ Continúa por: [container](/es/application/container) · [schemas](/es/validatio
 | Serializar un resultado con campos conocidos | Una dataclass que herede de `BaseEntity`. |
 | Trabajar con fechas y zonas horarias | `DateTime`, desde `orionis.support.facades`; las operaciones habituales no requieren contenedor. |
 | Invocar un servicio configurado del framework | Su fachada después del arranque, o su contrato mediante inyección de dependencias. |
+| Inspeccionar valores durante el desarrollo | `Debug.dump()` para continuar o `Debug.dd()` para detener la ejecución según el contexto. |
 
 Son utilidades Python que puedes importar en tu aplicación; no crean tablas SQL ni validan una petición automáticamente. Usa [schemas](/es/validation) para la entrada externa y el [contenedor](/es/application/container) para las dependencias de servicios.

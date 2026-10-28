@@ -612,6 +612,8 @@ The infrastructure constructs these objects from the transport; you do not need 
 
 `HTTPBodyLimits` also includes `max_concurrent_requests`, configured through `HTTP_MAX_CONCURRENT_REQUESTS`, with an initial value of `128` per kernel. It limits active requests, including response delivery, rather than payload size.
 
+Since 1.0.11, admission uses a shared counter for ASGI and RSGI without thread locks. Each application and HTTP kernel belongs to one worker event loop: do not share them across threads or loops. A request retains its slot through delivery and resource cleanup; the slot is also released when the request fails or is cancelled.
+
 When this concurrency is exhausted, the kernel rejects new requests with `503` and `Retry-After: 1`. It also validates `Content-Length`: invalid values, duplicates, or combinations with `Transfer-Encoding` produce `400` before reading; a declared length exceeding the total produces `413`. The reader also counts actual bytes even when that header is missing.
 
 All byte budgets must be positive. `max_files=0` and `max_fields=0` reject that kind of part; they do not mean unlimited. Part and field limits still apply when you increase the total.

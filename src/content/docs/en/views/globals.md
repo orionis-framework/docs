@@ -343,7 +343,7 @@ The second result is `report:7`. `decrypt` requires a valid payload and the corr
 
 ### dump(*values)
 
-Produces diagnostic HTML through `VarDumper` and returns `Markup`; no `|safe` is needed. The implementation also prints the dump to the process console. Use it temporarily with data appropriate to expose on that page and in its logs.
+Produces diagnostic HTML through `VarDumper` and returns `Markup`; no `|safe` is needed. It does not print to the console or stop execution. Use it temporarily with data appropriate to expose on that page. To inspect values from Python in the console or stop the request, see [`Debug.dump()` and `Debug.dd()`](/en/utilities/helpers/debug).
 
 ```html
 {{ dump({"report_id": 7, "status": "ready"}, ["api", "web"]) }}

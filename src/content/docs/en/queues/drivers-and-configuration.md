@@ -68,11 +68,31 @@ Omitting `QUEUE_DB_CONNECTION` selects the default SQL connection. Configure Dat
 
 ### Table creation and compatibility
 
-The table is created lazily, on the first operation requiring its schema (`push`, `reserve`, `size`, or `clear`). The SQL connection prefix is applied to its logical name when configured. No queue migration needs to be generated to obtain the included schema; the SQL user needs permission to create it.
+The table is created lazily, on the first operation requiring its schema (`push`, `reserve`, `size`, or `clear`). You can also prepare it with [`queue:migrate`](#command-migrate). The SQL connection prefix is applied to its logical name when configured. No queue migration file needs to be generated to obtain the included schema; the SQL user needs permission to create it.
 
 If another process creates the table concurrently, the driver checks that all expected columns are queryable. This does not migrate or update an incompatible existing table. When creation happens inside a transaction, the driver does not consider schema readiness definitive while still inside that transaction.
 
 The connection must enforce unique constraints: `DatabaseQueueDriver` rejects a connection whose `supportsUniqueConstraints()` returns `False`, such as Redshift. Included schema and query plans have compilation tests for SQLite, MySQL, PostgreSQL, Oracle, and SQL Server; that does not replace setup and requirements for your chosen engine.
+
+<a id="command-migrate"></a>
+
+### Prepare tables: queue:migrate
+
+Since 1.0.10, run either alternative from the project root:
+
+```shell
+orionis queue:migrate
+python reactor queue:migrate
+```
+
+The command takes no arguments or command-specific options; it supports `-h` / `--help`. It reads the application's queue configuration and creates missing tables with their columns and indexes:
+
+- The jobs table for **every** connection using the `database` driver, even when it is not the default queue connection.
+- The central `queue.failed` repository table, even if jobs only use `sync` or `redis`.
+
+It respects each definition's SQL connection, logical table name, and configured prefix. It neither opens Redis clients nor starts workers. Existing tables and records are preserved; repeated calls do not clear jobs or failures. It does not compare or update incompatible older structures or run the application migrations handled by `migrate`. It accepts neither `--database` nor a positional connection: its scope is all configured SQL queue definitions.
+
+The SQL user needs permission to create missing tables, and the backend must enforce unique constraints. Success prints `Queue tables migrated successfully.` and returns `0`. A caught `DatabaseException` or `QueueError` is displayed and returns `1`. The equivalent API is [`await Queue.migrate()`](/en/queues/manager-and-injection#manager-migrate).
 
 <a id="schema-jobs"></a>
 

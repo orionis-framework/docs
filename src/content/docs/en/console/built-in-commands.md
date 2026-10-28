@@ -1,11 +1,11 @@
 ---
 title: "Built-in commands"
-description: "Complete catalog of Orionis's 67 native commands, grouped by task and linked to argument/option references."
+description: "Complete catalog of Orionis's 68 native commands, grouped by task and linked to argument/option references."
 editUrl: true
 lastUpdated: false
 ---
 
-Reactor's native registry includes **67 commands**. These references cover their arguments, options, defaults, effects and execution examples. Applications can add signatures through classes and [console routes](/en/console/command-routing).
+Reactor's native registry includes **68 commands**. These references cover their arguments, options, defaults, effects and execution examples. Applications can add signatures through classes and [console routes](/en/console/command-routing).
 
 Run commands from the project root. The direct command and local file share the same registry and execution lifecycle:
 
@@ -26,7 +26,7 @@ python -B reactor make:console-command --help
 | [Code generators](/en/console/built-in-generators) | 24 | Create all 24 available component types from stubs. |
 | [Application and maintenance commands](/en/console/built-in-application) | 16 | Server, tests, inspection, clearing, keys and packages. |
 | [Database commands](/en/console/built-in-database) | 11 | Inspection, migrations, rollback, seeding and wiping. |
-| [Worker and scheduler commands](/en/console/built-in-workers) | 9 | Queue workers, failure operations, scheduler and MCP. |
+| [Worker and scheduler commands](/en/console/built-in-workers) | 10 | Queue table preparation, workers, failure operations, scheduler and MCP. |
 | [Project bootstrap and recovery](/en/console/built-in-bootstrap) | 7 | Enable contexts and restore missing configuration. |
 
 ## Signature index
@@ -93,6 +93,7 @@ Each link opens the complete options and examples for that command.
 | [`queue:clear`](/en/console/built-in-workers#command-queue-clear) | Clear a queue, including delayed or reserved jobs. |
 | [`queue:failed`](/en/console/built-in-workers#command-queue-failed) | List terminally failed jobs. |
 | [`queue:forget`](/en/console/built-in-workers#command-queue-forget) | Remove a failure record. |
+| [`queue:migrate`](/en/console/built-in-workers#command-queue-migrate) | Create missing SQL queue and failure tables while preserving data. |
 | [`queue:retry`](/en/console/built-in-workers#command-queue-retry) | Requeue one identified failed job. |
 | [`queue:work`](/en/console/built-in-workers#command-queue-work) | Consume persisted jobs from a queue connection. |
 | [`route:list`](/en/console/built-in-application#command-route-list) | Inspect registered HTTP routes. |

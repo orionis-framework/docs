@@ -201,6 +201,26 @@ async def inspect_failures() -> tuple[tuple[str, str], ...]:
 
 The failure record ID differs from the job ID. The [failure repository](/en/queues/failures-and-retries#failed-repository) documents query and deletion methods, their errors, and traceback data.
 
+<a id="manager-migrate"></a>
+
+## Prepare SQL storage: migrate()
+
+```python
+async def migrate(self) -> None: ...
+```
+
+Creates missing tables for every queue connection using the `database` driver and the `queue.failed` repository, with their columns and indexes. It uses configured SQL connections, table names, and prefixes even when the default queue connection is `sync` or `redis`. Existing tables and data are preserved; incompatible older structures are not updated.
+
+```python
+from orionis.support.facades import Queue
+
+
+async def prepare_queue_storage() -> None:
+    await Queue.migrate()
+```
+
+The application must be booted. The method accepts no connection selection and returns `None`, without a count. It neither creates drivers, opens Redis clients, nor starts consumers. It requires enforced unique constraints and propagates Database or storage errors. The [`queue:migrate` command](/en/queues/drivers-and-configuration#command-migrate) runs the same preparation before workers start. Lazy creation on first use remains available.
+
 <a id="manager-retryfailed"></a>
 
 ## Requeue a failure: retryFailed()

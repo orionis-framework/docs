@@ -9,7 +9,7 @@ const groupedBuildSections = ['getting-started', 'http', 'realtime', 'mcp', 'vie
 const groupedSections = new Set([...groupedBuildSections, 'database', 'orm', 'faker', 'storage', 'cache', 'mail', 'queues', 'console', 'environment', 'application', 'logging', 'exceptions', 'deployment', 'testing', 'utilities']);
 const flatSections = ['contribute'];
 const buildPageIds = {
-  'getting-started': ['foundation-overview', 'foundation-installation', 'foundation-getting-started', 'foundation-architecture-and-lifecycle'],
+  'getting-started': ['foundation-overview', 'foundation-installation', 'foundation-getting-started', 'foundation-architecture-and-lifecycle', 'foundation-release-notes'],
   http: ['http-overview', 'http-routing', 'http-middleware-and-security', 'http-request-lifecycle', 'http-requests-and-validation', 'http-forms-and-uploads', 'http-responses', 'http-exceptions'],
   realtime: ['realtime-overview', 'realtime-routing-and-lifecycle', 'realtime-hubs-and-methods', 'realtime-javascript-client', 'realtime-chat', 'realtime-protocol-and-streaming', 'realtime-groups-and-deployment', 'http-websockets', 'http-streaming-and-sse'],
   mcp: ['mcp-overview', 'mcp-servers-and-tools', 'mcp-tools', 'mcp-resources-and-prompts', 'mcp-prompts', 'mcp-responses-and-content', 'mcp-http-and-clients', 'mcp-transports-and-configuration', 'mcp-advanced-workflows', 'test-mcp-testing'],
@@ -248,9 +248,9 @@ test('utilities provide dedicated helper and metadata groups while retaining exi
   const section = navigationSections.find((entry) => entry.id === 'utilities');
   assert.deepEqual(section.title, { es: 'Utilidades', en: 'Utilities' });
   assert.deepEqual(section.groups.map((group) => group.id), ['utilities-helpers', 'utilities-metadata', 'utilities-introspection', 'utilities-reference']);
-  const helpers = ['collection', 'dot-dict', 'sentinel', 'std-class', 'stringable', 'workers', 'freeze-thaw', 'performance-counter'];
+  const helpers = ['collection', 'dot-dict', 'sentinel', 'std-class', 'stringable', 'workers', 'freeze-thaw', 'performance-counter', 'debug'];
   assert.deepEqual(section.groups[0].pageIds, helpers.map((name) => `helper-${name}`));
-  assert.deepEqual(section.groups[0].pages.map((page) => page.title.en), ['Collection', 'DotDict', 'Sentinel', 'StdClass', 'Stringable', 'Workers', 'FreezeThaw', 'PerformanceCounter']);
+  assert.deepEqual(section.groups[0].pages.map((page) => page.title.en), ['Collection', 'DotDict', 'Sentinel', 'StdClass', 'Stringable', 'Workers', 'FreezeThaw', 'PerformanceCounter', 'Debug']);
   assert.deepEqual(section.groups[1].pageIds, ['metadata-overview']);
   assert.deepEqual(section.groups[3].pageIds, ['support-overview', 'support-collections-and-strings', 'support-entities-and-structures', 'support-facades-and-runtime-utilities']);
   for (const locale of documentationCatalog.locales) {
@@ -260,7 +260,7 @@ test('utilities provide dedicated helper and metadata groups while retaining exi
 });
 test('the menu makes realtime, MCP, and application services distinct visible capabilities', () => {
   assert.deepEqual(navigationSections.slice(0, 4).map((section) => section.id), ['getting-started', 'http', 'realtime', 'mcp']);
-  assert.deepEqual(navigationSections[0].pageIds, ['foundation-overview', 'foundation-installation', 'foundation-getting-started', 'foundation-architecture-and-lifecycle']);
+  assert.deepEqual(navigationSections[0].pageIds, ['foundation-overview', 'foundation-installation', 'foundation-getting-started', 'foundation-architecture-and-lifecycle', 'foundation-release-notes']);
   const sectionFor = (pageId) => navigationSections.find((section) => section.pageIds.includes(pageId));
   for (const id of ['realtime-overview', 'realtime-protocol-and-streaming', 'http-websockets', 'http-streaming-and-sse']) assert.equal(sectionFor(id).id, 'realtime');
   for (const id of ['mcp-overview', 'mcp-transports-and-configuration', 'test-mcp-testing']) assert.equal(sectionFor(id).id, 'mcp');

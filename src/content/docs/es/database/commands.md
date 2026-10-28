@@ -212,7 +212,7 @@ Genera una definición de esquema reutilizable para una tabla. Es un archivo Pyt
 
 | Argumento u opción propia | Tipo | Predeterminado | Efecto |
 | --- | --- | --- | --- |
-| `name` | `str` | Obligatorio | Nombre de archivo y clase; añade el sufijo Schema si falta. |
+| `name` | `str` | Obligatorio | Nombre del módulo; añade el sufijo Schema al archivo si falta. |
 
 También acepta `--help`/`-h`.
 
@@ -221,9 +221,16 @@ orionis make:database-schema products
 python -B reactor make:database-schema products
 ```
 
-Con las rutas predeterminadas genera `database/schemas/products_schema.py` y `ProductsSchema`, utilizando el template real de schema. También admite subdirectorios, como `catalog/products`.
+Con las rutas predeterminadas genera `database/schemas/products_schema.py`. También admite subdirectorios, como `catalog/products`. Desde 1.0.10, el stub contiene una constante de módulo, sin clase contenedora:
 
-Completa `ProductsSchema.table_definition` y aplícala desde una migración con `await Schema.createFromDefinition(ProductsSchema.table_definition)`. No crea el modelo ORM ni aplica el esquema automáticamente. Sólo admite `name` y ayuda. Consulta [Crear esquemas y tablas](/es/database/schema).
+```python
+from typing import Final
+from orionis.orm.schema import TableDefinition
+
+TABLE: Final[TableDefinition | None] = None
+```
+
+Reemplaza `None` por una `TableDefinition`, importa `TABLE` en la migración y aplícala con `await Schema.createFromDefinition(TABLE)`. No crea el modelo ORM ni aplica el esquema automáticamente. Sólo admite `name` y ayuda. Consulta [Crear esquemas y tablas](/es/database/schema).
 
 <a id="make-database-seeder"></a>
 

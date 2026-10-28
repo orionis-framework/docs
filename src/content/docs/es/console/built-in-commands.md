@@ -1,11 +1,11 @@
 ---
 title: "Comandos incluidos"
-description: "Catálogo completo de los 67 comandos nativos de Orionis, organizado por tarea y vinculado a cada referencia de argumentos y opciones."
+description: "Catálogo completo de los 68 comandos nativos de Orionis, organizado por tarea y vinculado a cada referencia de argumentos y opciones."
 editUrl: true
 lastUpdated: false
 ---
 
-El registro nativo de Reactor incluye **67 comandos**. Las referencias de esta sección cubren sus argumentos, opciones, valores predeterminados, efectos y ejemplos de ejecución. La aplicación puede incorporar firmas adicionales mediante clases y [rutas de consola](/es/console/command-routing).
+El registro nativo de Reactor incluye **68 comandos**. Las referencias de esta sección cubren sus argumentos, opciones, valores predeterminados, efectos y ejemplos de ejecución. La aplicación puede incorporar firmas adicionales mediante clases y [rutas de consola](/es/console/command-routing).
 
 Ejecuta los comandos desde la raíz del proyecto. El comando directo y el archivo local comparten el mismo registro y ciclo de ejecución:
 
@@ -26,7 +26,7 @@ python -B reactor make:console-command --help
 | [Generadores de código](/es/console/built-in-generators) | 24 | Crear los 24 componentes disponibles mediante stubs. |
 | [Comandos de aplicación y mantenimiento](/es/console/built-in-application) | 16 | Servidor, pruebas, inspección, limpieza, claves y paquetes. |
 | [Comandos de bases de datos](/es/console/built-in-database) | 11 | Inspección, migraciones, reversión, seeders y borrado. |
-| [Comandos de workers y scheduler](/es/console/built-in-workers) | 9 | Workers de colas, operaciones sobre fallos, scheduler y MCP. |
+| [Comandos de workers y scheduler](/es/console/built-in-workers) | 10 | Preparación de tablas de colas, workers, operaciones sobre fallos, scheduler y MCP. |
 | [Bootstrap y recuperación del proyecto](/es/console/built-in-bootstrap) | 7 | Habilitar contextos y recuperar configuración faltante. |
 
 ## Índice de firmas
@@ -93,6 +93,7 @@ Cada enlace lleva a las opciones y ejemplos completos de ese comando.
 | [`queue:clear`](/es/console/built-in-workers#command-queue-clear) | Vacía una cola, incluidos jobs retrasados o reservados. |
 | [`queue:failed`](/es/console/built-in-workers#command-queue-failed) | Lista los jobs con fallo terminal. |
 | [`queue:forget`](/es/console/built-in-workers#command-queue-forget) | Elimina un registro de fallo. |
+| [`queue:migrate`](/es/console/built-in-workers#command-queue-migrate) | Crea las tablas SQL de colas y fallos que faltan, conservando los datos. |
 | [`queue:retry`](/es/console/built-in-workers#command-queue-retry) | Reenvía un job fallido identificado. |
 | [`queue:work`](/es/console/built-in-workers#command-queue-work) | Consume jobs persistidos en una conexión de colas. |
 | [`route:list`](/es/console/built-in-application#command-route-list) | Inspecciona las rutas HTTP registradas. |

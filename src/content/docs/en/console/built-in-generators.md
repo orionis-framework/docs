@@ -99,11 +99,11 @@ Generate a reusable table definition.
 
 | Argument or option | Type and presence | Effective value when omitted | Purpose |
 |---|---|---|---|
-| `name` | str, required | — | File/class name; generators support nested directories. |
+| `name` | str, required | — | Module name; supports nested directories. |
 
-Use `database_schema.stub` and the `Schema` suffix. A migration or schema API must use the definition; file generation does not create a table.
+Uses `database_schema.stub` and appends the `Schema` suffix to the filename. Since 1.0.10 it generates a module with `TABLE: Final[TableDefinition | None] = None`, without a holder class. Replace `None` with the complete definition and import `TABLE` in a migration or schema API call; file generation does not create a table. See [the stub and its usage](/en/database/schema#schema-generator).
 
-**Default destination:** `database/schemas`. Class/file suffix: `Schema`.
+**Default destination:** `database/schemas`. Filename suffix: `Schema`; exported constant: `TABLE`.
 
 ```shell
 orionis make:database-schema products

@@ -13,7 +13,7 @@ This reference complements the usage guides. Submit work through [the facade or 
 
 | Contract | Implementation and reference |
 | --- | --- |
-| `IQueueManager` | `QueueManager`: [all its methods](/en/queues/manager-and-injection#manager-construction). |
+| `IQueueManager` | `QueueManager`: [all its methods](/en/queues/manager-and-injection#manager-construction), including [`migrate()`](/en/queues/manager-and-injection#manager-migrate) to prepare SQL storage. |
 | `IJob` | `BaseJob`: [`handle()`](/en/queues/jobs-and-dispatch#job-handle). |
 | `IJobSerializer` | `JobSerializer`: [registration, state, and envelopes](/en/queues/jobs-and-dispatch#serializer). |
 | `IQueueDriver` | `SyncQueueDriver`, `DatabaseQueueDriver`, `RedisQueueDriver`: the API on this page. |

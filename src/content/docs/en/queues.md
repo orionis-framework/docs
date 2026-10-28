@@ -40,6 +40,15 @@ Check SQLite's location and permissions in `config/database.py`. The driver crea
 
 Queue, SQLite, and Redis libraries are included in the framework's normal dependencies. A reachable Redis server is required only when selecting that driver. You do not need to install a queue extra through `packages`.
 
+Since 1.0.10, you can prepare the tables before submitting jobs or starting workers. From the project root, use either alternative:
+
+```shell
+orionis queue:migrate
+python reactor queue:migrate
+```
+
+The command creates missing tables for every queue connection using the `database` driver and the SQL failure store, respecting configured names and connections. Existing data is preserved. See [table preparation](/en/queues/drivers-and-configuration#command-migrate) for its scope and exit codes.
+
 ## 2. Generate and complete a job
 
 From the project root, use either alternative:

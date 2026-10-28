@@ -7,6 +7,8 @@ lastUpdated: false
 
 Loop centralizes loop creation, callable dispatch, and synchronous bridges. Start by deciding whether your code already runs inside an event loop: that determines which operation to use.
 
+Since Orionis 1.0.8, loop management uses the `asyncio` registration and `asyncio.Runner` for a predictable lifecycle on Python 3.14. When updating older code, `createTask()` is now synchronous, `runSync()` rejects calls from an active loop, and `KeyboardInterrupt` propagates to the caller.
+
 ## Requirements
 
 - Python 3.14 or newer, as declared by the project.
@@ -46,16 +48,16 @@ print(result)  # JOB-7
 | Script or CLI with no active loop | `Loop.run(main())` | Runs the coroutine and returns its result. |
 | Already inside an `async` function | `await main()` | Keeps the current loop and its resources. |
 | Unknown sync or async callback | `await Loop.execute(callback, ...)` | Dispatches and awaits the result. |
-| Concurrent work on the same loop | `task = await Loop.createTask(work())` followed by `await task` | Creates an `asyncio.Task`; the first `await` only obtains the task. |
-| Synchronous contract requiring an async result | `Loop.runSync(work())` | Blocks the caller until the operation completes. |
+| Concurrent work on the same loop | `task = Loop.createTask(work())` followed by `await task` | Creates an `asyncio.Task` immediately; await the task for its result. |
+| Synchronous contract with no active loop requiring an async result | `Loop.runSync(work())` | Runs the coroutine in the calling thread and waits for its result. |
 
-Inside an async controller, use `await` directly. When a loop is active, `runSync()` uses another thread but waits with `.result()`: it blocks the calling thread and, when called on the server loop, other requests on that loop. Do not move connections, locks, or tasks bound to the original loop across this bridge. It also cannot complete a coroutine that needs the blocked loop to make progress.
+Inside an async controller, use `await` directly. Both `run()` and `runSync()` raise `RuntimeError` if a loop is already running in the calling thread. They do not create another thread to handle this situation. A rejected coroutine remains unconsumed: its caller must await or close it.
 
-`execute()` accepts a function, not an already-created coroutine object. Sync callables run in the executor; if one returns an awaitable, that result is awaited back on the loop. `run_in_executor` does not promise automatic propagation of the caller's `ContextVar` values; pass required data explicitly.
+`execute()` accepts a function, not an already-created coroutine object. Sync callables run through `asyncio.to_thread`, which propagates the caller's `ContextVar` values to the worker. If one returns an awaitable, including a generator-based coroutine, that result is awaited back on the original loop.
 
 ### Resource ownership
 
-`getEventLoop()` reuses the running loop or a per-thread cached loop. `eventLoopContext()` cancels and awaits pending tasks only when its loop is not running; it does not close the loop or replace the server lifecycle. `Loop.run()` manages its own entry-point runner. Retain every task and await or cancel its result; task creation does not provide persistence, retries, or a supervisor.
+`getEventLoop()` reuses the running loop or the open loop registered with `asyncio` in that thread. If it creates a loop, the caller owns its cleanup. `eventLoopContext()` borrows an already registered loop without cancelling tasks or closing it; when no open loop exists, it creates and manages its own loop through `asyncio.Runner`. `Loop.run()` also manages an owned loop and restores the previous registration on exit. Retain every task and await or cancel its result; task creation does not provide persistence, retries, or a supervisor.
 
 Use [queues](/en/queues) when work must survive a restart; an asyncio task is not persisted. For work attached to an HTTP response, see [background tasks](/en/queues/background-tasks/response-tasks).
 
@@ -63,19 +65,21 @@ Use [queues](/en/queues) when work must survive a restart; an asyncio task is no
 
 ### Entry-point loop versus the current loop
 
-`Loop.run(coro)` is for a synchronous entry point where no event loop is running in the calling thread. Inside async code, use `await` normally. `Loop.getEventLoop()` returns the active loop when called inside async code; outside it, the method creates or reuses an open loop cached for the current thread.
+`Loop.run(coro)` is for a synchronous entry point where no event loop is running in the calling thread. Inside async code, use `await` normally. `Loop.getEventLoop()` returns the active loop when called inside async code; outside it, the method reuses the open loop registered with `asyncio` or creates and registers a new one. It keeps no cache separate from the `asyncio` registration.
 
 ### Callable bridge
 
-`Loop.execute(func, *args, **kwargs)` accepts both kinds of callable. A coroutine function is called and awaited on the current loop. A synchronous callable is sent to that loop's default executor. If the synchronous callable returns an awaitable, the returned object is subsequently awaited on the current loop.
+`Loop.execute(func, *args, **kwargs)` accepts both kinds of callable. A coroutine function is called and awaited on the current loop. A synchronous callable is sent through `asyncio.to_thread` to that loop's default executor, preserving the caller's context. If it returns an awaitable, the returned object is subsequently awaited on the current loop.
 
 ### Synchronous coroutine bridge
 
-`Loop.runSync(coro)` deliberately blocks until the coroutine finishes. Without an active loop it delegates to `Loop.run`. With an active loop in the calling thread, it submits `Loop.run(coro)` to one shared, single-worker `ThreadPoolExecutor`, where the coroutine receives a separate loop.
+`Loop.runSync(coro)` delegates to `Loop.run` in the same thread and waits for the coroutine to finish. It requires that no loop is running in the calling thread; from async code, use `await`. This method no longer uses a shared executor.
 
 ### Loop ownership and cleanup
 
-`Loop.eventLoopContext()` borrows the loop returned by `getEventLoop`; it does not close it. On exit, when that loop is not running, it cancels and drains all pending tasks for the loop. When called from an already running loop, cleanup is skipped so the context does not cancel the task driving its caller.
+`Loop.eventLoopContext()` borrows any open loop already registered, including one obtained earlier through `getEventLoop()`. On exit, it does not cancel its tasks or close it. Nested contexts borrow the outer context's loop.
+
+When no open loop is registered on entry, the context creates its own loop. On exit, `asyncio.Runner` cancels and drains pending tasks, finalizes asynchronous generators, shuts down the default executor, and closes the loop. Do not close that loop manually or leave it running on exit.
 
 ## Common workflows
 
@@ -89,11 +93,11 @@ Pass the synchronous function and its arguments to `await Loop.execute(...)`. Th
 
 ### Schedule concurrent work
 
-Inside a running loop, call `await Loop.createTask(coro, name=...)` for each coroutine. Save the returned tasks and later await them individually or with `asyncio.gather`.
+Inside a running loop, call `Loop.createTask(coro, name=...)` for each coroutine, without awaiting its creation. Save the returned tasks and later await them individually or with `asyncio.gather`.
 
 ### Adapt an async operation to a synchronous contract
 
-Use `Loop.runSync(coro)` only at a synchronous boundary that cannot become async. If the caller is already on an event-loop thread, the bridge uses its dedicated worker so it does not try to run a second loop in that same thread. The call still blocks the caller until completion.
+Use `Loop.runSync(coro)` at a synchronous boundary whose thread has no running loop. The method preserves the caller's thread and context. If you control an async call chain, use `await` directly.
 
 ## Examples
 
@@ -141,7 +145,7 @@ async def fetch_total() -> int:
 
 
 async def main() -> tuple[str, int]:
-    task = await Loop.createTask(fetch_total(), name="fetch-total")
+    task = Loop.createTask(fetch_total(), name="fetch-total")
     return task.get_name(), await task
 
 
@@ -166,7 +170,7 @@ async def lookup(code: str) -> str:
 print(Loop.runSync(lookup("orionis")))  # ORIONIS
 ```
 
-The synchronous caller waits until `lookup` finishes. In an async controller, command, or job, use `await lookup(...)` directly. Calling `runSync` on the server loop still blocks that loop even though the coroutine executes on another thread.
+The synchronous caller waits until `lookup` finishes. In an async controller, command, or job, use `await lookup(...)` directly; calling `runSync` from that loop raises `RuntimeError`.
 
 
 ### Handle invalid entry-point usage
@@ -196,7 +200,7 @@ This module consumes no Orionis configuration keys or environment variables. Fac
 ## Integration with Orionis
 
 - `orionis.mail` uses `Loop.execute` to keep synchronous rendering, file storage, and SMTP work off the active event-loop thread.
-- `orionis.schemas.rules.unique` uses `Loop.runSync` because its public validation hook is synchronous while its existence check uses asynchronous database operations.
+- The `Unique` rule awaits its database query directly on the current loop, preserving its connection and transaction; it does not use `runSync`.
 - The repository's `reactor` executable starts `app.handleCommand(sys.argv)` with `Loop.run`.
 - `Loop` has no provider and is not resolved through the service container; importing it is sufficient.
 
@@ -205,22 +209,22 @@ These are direct consumers, not bootstrap side effects. Importing `orionis.aio` 
 ## Errors and edge cases
 
 - `run` raises `TypeError("A coroutine object is required")` for a coroutine function, plain value, or other object that is not a native coroutine object.
-- `run` raises `RuntimeError` when the calling thread already has a running loop. The supplied coroutine remains unconsumed and is still owned by the caller.
-- `execute` raises `TypeError("The provided object is not callable")` before scheduling a non-callable. Without a running loop, its call to `asyncio.get_running_loop()` raises `RuntimeError`.
+- `run` and `runSync` raise `RuntimeError` when the calling thread already has a running loop. The supplied coroutine remains unconsumed and the caller must await or close it.
+- `execute` raises `TypeError("The provided object is not callable")` before scheduling a non-callable. It is async: await its result from async code or run its coroutine with `Loop.run` at a synchronous entry point.
 - Exceptions from invoked callables and coroutines propagate; the module does not wrap them.
-- `run` converts `KeyboardInterrupt` raised during coroutine execution into the integer `0`.
-- `eventLoopContext` may cancel any pending task associated with its idle loop, not only tasks created inside the context. It intentionally does not close that loop.
-- A closed thread-local loop is discarded and replaced on the next `getEventLoop` call.
+- `run` and `runSync` propagate `KeyboardInterrupt` to the caller.
+- `eventLoopContext` only cleans up and closes owned loops. Closing one manually or leaving it running on exit raises `RuntimeError`. Borrowed loops and their tasks remain their owner's responsibility.
+- A registered loop that is already closed is discarded and replaced on the next `getEventLoop` call.
 
 ## Performance and concurrency
 
 Loop-factory resolution and `uvloop` detection are process-wide caches guarded by a `threading.Lock` during first use. Repeated resolution uses an unlocked fast path.
 
-Idle loops are cached in `threading.local`, so each thread receives its own loop and repeated calls in that thread reuse it until closed. A currently running loop always takes precedence over the cached value.
+The `asyncio` registration determines the thread's loop. `getEventLoop()` respects changes made with `asyncio.set_event_loop()` and reuses the registered open loop; a currently running loop takes precedence.
 
-`execute` uses the current loop's default executor for synchronous work; its capacity and lifecycle therefore belong to that event loop. `runSync` uses a separate process-wide `ThreadPoolExecutor(max_workers=1)` created lazily under a lock. Consequently, concurrent `runSync` calls that require the worker are serialized. The executor is retained rather than shut down after each call.
+`execute` uses the current loop's default executor through `asyncio.to_thread`; its capacity and lifecycle belong to that event loop. `runSync` runs in the calling thread and has no global pool serializing calls made from different threads.
 
-`runSync` avoids nested-loop errors by running the coroutine in another thread, but it is a blocking call and can pause the caller's event-loop thread. `createTask` only schedules work; concurrency depends on the coroutine yielding control.
+`runSync` rejects nested loops. `createTask` only schedules work; concurrency depends on the coroutine yielding control.
 
 ## Public API
 
@@ -240,7 +244,7 @@ All public methods are static or class methods and operate on shared class state
 Loop.getEventLoop() -> asyncio.AbstractEventLoop
 ```
 
-Returns the loop currently running in the calling thread. If none is running, it reuses that thread's cached open loop or creates a new one, installs it with `asyncio.set_event_loop`, and caches it in thread-local storage. A closed cached loop is replaced. Loops are never shared between thread-local caches.
+Returns the loop currently running in the calling thread. If none is running, it reuses the open loop registered with `asyncio` or creates a new one and installs it with `asyncio.set_event_loop`. The caller must close a loop created by this method. For automatic cleanup, enter `eventLoopContext()` directly without registering an open loop first.
 
 #### `run(coro)`
 
@@ -248,9 +252,9 @@ Returns the loop currently running in the calling thread. If none is running, it
 Loop.run(coro: Coroutine[Any, Any, T]) -> T
 ```
 
-Runs a native coroutine object to completion and returns its value. Factory selection is `uvloop.new_event_loop` when available outside Windows, then `asyncio.ProactorEventLoop` on Windows when exposed, then the standard `asyncio` factory. If an explicit factory is available, the implementation uses `asyncio.Runner`; otherwise it uses `asyncio.run`.
+Runs a native coroutine object to completion and returns its value. Factory selection is `uvloop.new_event_loop` when available outside Windows, then `asyncio.ProactorEventLoop` on Windows when exposed, then `asyncio.new_event_loop`. It always uses `asyncio.Runner` with a factory that registers the loop before running the coroutine. On exit it cleans up and closes the owned loop, then restores the previous loop if it remains open.
 
-The method accepts a coroutine object, not a coroutine function or a general awaitable. It returns `0` after `KeyboardInterrupt`, propagates other coroutine exceptions, and rejects use from a thread that already has a running loop.
+The method accepts a coroutine object, not a coroutine function or a general awaitable. It propagates exceptions, including `KeyboardInterrupt`, and rejects use from a thread that already has a running loop.
 
 #### `execute(func, /, *args, **kwargs)`
 
@@ -258,9 +262,9 @@ The method accepts a coroutine object, not a coroutine function or a general awa
 await Loop.execute(func, *args, **kwargs) -> Any
 ```
 
-Invokes a coroutine function directly and awaits it. It offloads any other callable to the current loop's default executor using `run_in_executor(None, ...)`. Arguments and return values pass through unchanged; an awaitable returned by the offloaded callable is awaited before the result is returned. Original exceptions cross the await boundary unchanged.
+Invokes a coroutine function directly and awaits it. It offloads any other callable to the current loop's default executor using `asyncio.to_thread`, propagating the caller's `ContextVar` values. Arguments and return values pass through unchanged; an awaitable recognized by `inspect.isawaitable` is awaited on the original loop before returning the result. Original exceptions cross the await boundary unchanged.
 
-This method must be called inside a running event loop. It does not use the private single-worker executor reserved for `runSync`.
+Await this method from a running event loop. It creates no private executor.
 
 #### `eventLoopContext()`
 
@@ -272,7 +276,7 @@ with Loop.eventLoopContext() as loop:
     assert loop is Loop.getEventLoop()
 ```
 
-Yields `getEventLoop()`'s result. On exit from a non-running loop, every pending task on that loop is cancelled and gathered with `return_exceptions=True`. Cleanup suppresses `RuntimeError` and `asyncio.CancelledError`, including the case where code inside the block closed the loop. The context leaves the loop open and reusable when it can do so.
+If an open loop is already registered, it yields that borrowed loop without modifying it on exit. Otherwise it creates an owned loop through `asyncio.Runner`: on exit it cancels and drains tasks, finalizes asynchronous generators, shuts down the default executor, closes the loop, and clears its registration. Nested contexts borrow the outer loop. Manually closing an owned loop or leaving it running on exit raises `RuntimeError`.
 
 #### `isLoopRunning()`
 
@@ -280,15 +284,15 @@ Yields `getEventLoop()`'s result. On exit from a non-running loop, every pending
 Loop.isLoopRunning() -> bool
 ```
 
-Reports whether an event loop is actively running in the calling thread. A cached but idle loop does not make this return `True`.
+Reports whether an event loop is actively running in the calling thread. A registered but idle loop does not make this return `True`.
 
 #### `createTask(coro, *, name=None)`
 
 ```text
-await Loop.createTask(coro, name=None) -> asyncio.Task[T]
+Loop.createTask(coro, name=None) -> asyncio.Task[T]
 ```
 
-Creates the task on the current running loop and returns it without awaiting the task's completion. Although the method itself is async, callers must retain or await the returned task to observe completion and exceptions. The optional name is forwarded to `loop.create_task`.
+Creates the task on the current running loop and returns it immediately. The method is synchronous: retain the task and use `await task` to observe its result and exceptions. The optional name is forwarded to `asyncio.create_task`. Without a running loop it raises `RuntimeError`.
 
 #### `runSync(coro)`
 
@@ -296,9 +300,9 @@ Creates the task on the current running loop and returns it without awaiting the
 Loop.runSync(coro: Coroutine[Any, Any, T]) -> T
 ```
 
-Synchronously waits for a coroutine and returns its result. In a thread without a running loop, this is a direct call to `run`. In a thread with a running loop, execution moves to the module's lazily created, shared single-worker executor. Exceptions raised by the coroutine are re-raised in the calling thread.
+Delegates directly to `run` and waits for the coroutine in the calling thread. It preserves that thread's context and shares `run`'s requirements, cleanup, and exceptions. If the thread already has a running loop, it raises `RuntimeError` and leaves the coroutine unconsumed.
 
-Because `runSync` blocks the calling thread, it should be reserved for genuinely synchronous APIs. Async callers that control their call chain should use `await` instead.
+Reserve `runSync` for synchronous APIs running without an active loop. Async callers must use `await`.
 
 ## Implementation reference for extensions
 

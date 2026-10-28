@@ -91,6 +91,23 @@ orionis queue:forget 866a127d-3185-4e5c-b21c-65eef9cd78a8
 python -B reactor queue:forget 866a127d-3185-4e5c-b21c-65eef9cd78a8
 ```
 
+<a id="command-queue-migrate"></a>
+
+## queue:migrate
+
+Crea las tablas faltantes de todas las conexiones de colas con driver `database` y el repositorio SQL central de fallos.
+
+No recibe argumentos ni opciones específicas; solo la ayuda automática.
+
+Disponible desde 1.0.10. Usa la configuración de colas de la aplicación y respeta las conexiones SQL, nombres de tablas y prefijos configurados. Incluye las conexiones Database que no son la predeterminada y prepara el almacenamiento de fallos incluso si los jobs usan `sync` o `redis`. Crea columnas e índices y conserva los datos existentes; no compara ni actualiza una estructura antigua incompatible. No abre clientes Redis ni inicia workers. La creación perezosa en el primer uso sigue disponible.
+
+El usuario SQL necesita permisos de creación y el motor debe imponer restricciones únicas. No admite `--database`, una conexión posicional ni `--force`. Una ejecución correcta imprime `Queue tables migrated successfully.` y devuelve `0`; un `DatabaseException` o `QueueError` capturado devuelve `1`. Consulta [preparación de tablas](/es/queues/drivers-and-configuration#command-migrate) y [`Queue.migrate()`](/es/queues/manager-and-injection#manager-migrate).
+
+```shell
+orionis queue:migrate
+python reactor queue:migrate
+```
+
 <a id="command-queue-retry"></a>
 
 ## queue:retry

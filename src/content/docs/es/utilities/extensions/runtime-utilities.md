@@ -42,6 +42,7 @@ Importa las fachadas desde `orionis.support.facades`:
 | `Crypt` | Cifrado y descifrado. |
 | `DateTime` | Utilidades autónomas de fecha, zona horaria, duración e intervalo. |
 | `DB` | Constructor de consultas de base de datos. |
+| [`Debug`](/es/utilities/helpers/debug) | Inspección de valores con `dump()` y `dd()`; disponible desde 1.0.12. |
 | `Hash` | Hash de contraseñas y valores. |
 | `Lang` | Traducción. |
 | `Log` | Registro de eventos de texto con filtros de severidad. |

@@ -201,6 +201,26 @@ async def inspect_failures() -> tuple[tuple[str, str], ...]:
 
 El ID del registro fallido y el del job son diferentes. El [repositorio de fallos](/es/queues/failures-and-retries#failed-repository) documenta los métodos de consulta y eliminación, sus errores y los datos del traceback.
 
+<a id="manager-migrate"></a>
+
+## Preparar el almacenamiento SQL: migrate()
+
+```python
+async def migrate(self) -> None: ...
+```
+
+Crea las tablas faltantes de todas las conexiones de colas con driver `database` y del repositorio `queue.failed`, con sus columnas e índices. Usa las conexiones SQL, nombres de tablas y prefijos configurados, incluso cuando la conexión de colas predeterminada sea `sync` o `redis`. Conserva las tablas y los datos existentes; no actualiza una estructura antigua incompatible.
+
+```python
+from orionis.support.facades import Queue
+
+
+async def prepare_queue_storage() -> None:
+    await Queue.migrate()
+```
+
+La aplicación debe estar inicializada. No recibe selección de conexión ni devuelve un conteo; termina con `None`. No crea drivers ni abre clientes Redis ni inicia consumidores. Exige restricciones únicas y propaga los errores de Database o almacenamiento. El comando [`queue:migrate`](/es/queues/drivers-and-configuration#command-migrate) permite ejecutar esta misma preparación antes de iniciar los workers. La creación perezosa en el primer uso sigue disponible.
+
 <a id="manager-retryfailed"></a>
 
 ## Reencolar un fallo: retryFailed()

@@ -40,6 +40,15 @@ Comprueba la ubicación y permisos de SQLite en `config/database.py`. El driver 
 
 Las bibliotecas de colas, SQLite y Redis están incluidas en las dependencias normales del framework. Un servidor Redis accesible solo es necesario cuando seleccionas ese driver. No necesitas instalar un extra de colas mediante `packages`.
 
+Desde 1.0.10 puedes preparar las tablas antes de enviar jobs o iniciar workers. Desde la raíz del proyecto, ejecuta una de estas alternativas:
+
+```shell
+orionis queue:migrate
+python reactor queue:migrate
+```
+
+El comando crea las tablas faltantes de todas las conexiones de colas con driver `database` y el almacenamiento SQL de fallos, respetando los nombres y conexiones configurados. Conserva los datos existentes. Consulta [preparación de tablas](/es/queues/drivers-and-configuration#command-migrate) para su alcance y códigos de salida.
+
 ## 2. Generar y completar un job
 
 Desde la raíz del proyecto, utiliza una de estas alternativas:

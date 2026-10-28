@@ -42,6 +42,7 @@ Import facades from `orionis.support.facades`:
 | `Crypt` | Encryption and decryption. |
 | `DateTime` | Standalone date, time-zone, duration, and interval helpers. |
 | `DB` | Database query builder. |
+| [`Debug`](/en/utilities/helpers/debug) | Value inspection through `dump()` and `dd()`; available since 1.0.12. |
 | `Hash` | Password and value hashing. |
 | `Lang` | Translation. |
 | `Log` | Text event logging with severity filtering. |

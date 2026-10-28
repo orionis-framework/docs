@@ -100,7 +100,7 @@ get_core_commands_mapping() -> tuple[type, ...]
 CORE_COMMANDS: tuple
 ```
 
-In `orionis.console.core.commands`, the function returns the framework's 67 registered classes and `CORE_COMMANDS` retains the result for the loader. These are not command instances executed during catalog import. The [complete catalog](/en/console/built-in-commands) documents every signature, argument and option; finding another class in a source file does not make it a registered CLI command.
+In `orionis.console.core.commands`, the function returns the framework's 68 registered classes and `CORE_COMMANDS` retains the result for the loader. These are not command instances executed during catalog import. The [complete catalog](/en/console/built-in-commands) documents every signature, argument and option; finding another class in a source file does not make it a registered CLI command.
 
 <a id="stub-construction"></a>
 

@@ -68,11 +68,31 @@ Si omites `QUEUE_DB_CONNECTION`, se utiliza la conexión SQL predeterminada. Con
 
 ### Creación de la tabla y compatibilidad
 
-La tabla se crea de forma perezosa, en la primera operación que necesita el esquema (`push`, `reserve`, `size` o `clear`). Su nombre lógico recibe el prefijo de la conexión SQL, cuando está configurado. No necesitas generar una migración de colas para obtener el esquema incluido; el usuario SQL necesita permisos para crearlo.
+La tabla se crea de forma perezosa, en la primera operación que necesita el esquema (`push`, `reserve`, `size` o `clear`). También puedes prepararla con [`queue:migrate`](#command-migrate). Su nombre lógico recibe el prefijo de la conexión SQL, cuando está configurado. No necesitas generar un archivo de migración de colas para obtener el esquema incluido; el usuario SQL necesita permisos para crearlo.
 
 Si otro proceso crea la tabla a la vez, el driver comprueba que sus columnas sean consultables. Esta comprobación no migra ni actualiza una tabla antigua incompatible. Si la creación ocurre dentro de una transacción, el driver no considera definitivo el esquema hasta que deje de estar en esa transacción.
 
 La conexión debe imponer restricciones únicas: `DatabaseQueueDriver` rechaza una conexión cuyo `supportsUniqueConstraints()` devuelve `False`, como Redshift. Los planes y los esquemas incluidos tienen pruebas de compilación para SQLite, MySQL, PostgreSQL, Oracle y SQL Server; esto no sustituye la configuración y los requisitos del motor elegido.
+
+<a id="command-migrate"></a>
+
+### Preparar las tablas: queue:migrate
+
+Desde 1.0.10, ejecuta desde la raíz del proyecto una de estas alternativas:
+
+```shell
+orionis queue:migrate
+python reactor queue:migrate
+```
+
+No recibe argumentos ni opciones propias; admite `-h` / `--help`. Lee la configuración de colas de la aplicación y crea las tablas faltantes con sus columnas e índices:
+
+- La tabla de jobs de **cada** conexión cuyo driver sea `database`, aunque no sea la conexión predeterminada.
+- La tabla del repositorio central `queue.failed`, incluso si los jobs utilizan únicamente `sync` o `redis`.
+
+Respeta la conexión SQL, el nombre lógico de tabla y el prefijo configurados para cada definición. No abre clientes Redis ni inicia workers. Las tablas existentes y sus registros se conservan; repetirlo no vacía jobs ni fallos. No compara ni actualiza estructuras antiguas incompatibles, ni ejecuta las migraciones de aplicación de `migrate`. No acepta `--database` ni una conexión posicional: su alcance son todas las definiciones SQL de colas configuradas.
+
+El usuario SQL necesita permisos para crear las tablas faltantes y el motor debe imponer restricciones únicas. Una ejecución correcta imprime `Queue tables migrated successfully.` y devuelve `0`. Un `DatabaseException` o `QueueError` capturado se muestra como error y devuelve `1`. La API equivalente es [`await Queue.migrate()`](/es/queues/manager-and-injection#manager-migrate).
 
 <a id="schema-jobs"></a>
 

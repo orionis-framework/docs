@@ -212,7 +212,7 @@ Generates a reusable table schema definition. It is a Python file usable by migr
 
 | Argument or specific option | Type | Default | Effect |
 | --- | --- | --- | --- |
-| `name` | `str` | Required | File and class name; appends Schema when absent. |
+| `name` | `str` | Required | Module name; appends Schema to the filename when absent. |
 
 Also accepts `--help`/`-h`.
 
@@ -221,9 +221,16 @@ orionis make:database-schema products
 python -B reactor make:database-schema products
 ```
 
-With default paths it generates `database/schemas/products_schema.py` and `ProductsSchema`, using the actual schema template. Subdirectories such as `catalog/products` are also supported.
+With default paths it generates `database/schemas/products_schema.py`. Subdirectories such as `catalog/products` are also supported. Since 1.0.10, the stub contains a module constant without a holder class:
 
-Complete `ProductsSchema.table_definition` and apply it from a migration with `await Schema.createFromDefinition(ProductsSchema.table_definition)`. It neither generates an ORM model nor automatically applies the schema. Only `name` and help are supported. See [Creating schemas and tables](/en/database/schema).
+```python
+from typing import Final
+from orionis.orm.schema import TableDefinition
+
+TABLE: Final[TableDefinition | None] = None
+```
+
+Replace `None` with a `TableDefinition`, import `TABLE` in the migration, and apply it with `await Schema.createFromDefinition(TABLE)`. It neither generates an ORM model nor automatically applies the schema. Only `name` and help are supported. See [Creating schemas and tables](/en/database/schema).
 
 <a id="make-database-seeder"></a>
 

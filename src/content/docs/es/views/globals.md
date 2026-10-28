@@ -343,7 +343,7 @@ El segundo resultado es `report:7`. `decrypt` necesita un payload válido y la c
 
 ### dump(*values)
 
-Genera una representación HTML de diagnóstico con `VarDumper` y la devuelve como `Markup`; no necesita `|safe`. La implementación también imprime el volcado en la consola del proceso. Utilízalo de manera temporal con datos que puedas exponer en esa página y sus logs.
+Genera una representación HTML de diagnóstico con `VarDumper` y la devuelve como `Markup`; no necesita `|safe`. No imprime en consola ni detiene la ejecución. Utilízalo de manera temporal con datos que puedas exponer en esa página. Para inspeccionar desde Python en consola o detener la petición, consulta [`Debug.dump()` y `Debug.dd()`](/es/utilities/helpers/debug).
 
 ```html
 {{ dump({"report_id": 7, "status": "ready"}, ["api", "web"]) }}

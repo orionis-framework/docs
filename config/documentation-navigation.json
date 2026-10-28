@@ -49,7 +49,8 @@
         "foundation-overview",
         "foundation-installation",
         "foundation-getting-started",
-        "foundation-architecture-and-lifecycle"
+        "foundation-architecture-and-lifecycle",
+        "foundation-release-notes"
       ],
       "groups": [
         {
@@ -71,7 +72,8 @@
           },
           "pageIds": [
             "foundation-getting-started",
-            "foundation-architecture-and-lifecycle"
+            "foundation-architecture-and-lifecycle",
+            "foundation-release-notes"
           ]
         }
       ]
@@ -1423,6 +1425,7 @@
         "helper-workers",
         "helper-freeze-thaw",
         "helper-performance-counter",
+        "helper-debug",
         "metadata-overview",
         "introspection-overview",
         "introspection-reflection",
@@ -1453,7 +1456,8 @@
             "helper-stringable",
             "helper-workers",
             "helper-freeze-thaw",
-            "helper-performance-counter"
+            "helper-performance-counter",
+            "helper-debug"
           ]
         },
         {
