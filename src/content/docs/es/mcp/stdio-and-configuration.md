@@ -133,10 +133,28 @@ Los streams abiertos conservan una plaza de admisión hasta terminar. Los límit
 
 | Campo | Variable de entorno | Predeterminado |
 | --- | --- | --- |
-| `allowed_origins` | `CORS_ALLOW_ORIGINS` | Lista vacía. |
+| `allowed_origins` | `CORS_ALLOW_ORIGINS` | En el archivo editable `config/mcp.py` desde 1.0.16: `["https://inspector.orionis-framework.com"]`. Núcleo `McpConfig`: `[]`. |
 
-Una petición **sin `Origin`** está permitida. Si la cabecera está presente, su valor debe coincidir exactamente con un origen HTTP(S) configurado, como `https://agent.example.com`. No se aceptan comodines, rutas ni una excepción implícita para el mismo origen. Una lista vacía rechaza cualquier `Origin` presente.
+Desde **1.0.16**, `allowed_origins` es una `list[str]`, copiada de forma independiente para cada instancia de configuración. Se siguen aceptando tuplas de entrada, que se convierten en listas. El inspector es un valor predeterminado únicamente de la configuración editable `BootstrapMcp`; crear `McpConfig` directamente no añade ese origen.
 
-Esta opción valida el origen para MCP; si conectas desde un navegador, configura también el CORS del [flujo HTTP](/es/http/routing). Un agente que se ejecuta como proceso remoto no es necesariamente un navegador ni tiene por qué enviar `Origin`.
+Para adoptar este valor en el `config/mcp.py` de una aplicación existente, importa `field` desde `dataclasses` y `Env` desde `orionis.environment`, y actualiza el campo dentro de `BootstrapMcp`, conservando sus demás opciones:
+
+```python
+    allowed_origins: list[str] = field(
+        default_factory=lambda: Env.get(
+            "CORS_ALLOW_ORIGINS", ["https://inspector.orionis-framework.com"],
+        ),
+    )
+```
+
+Actualizar el paquete no reemplaza tu configuración editable. Si defines `CORS_ALLOW_ORIGINS`, su valor sustituye este predeterminado en lugar de ampliarlo, incluso cuando es `[]`. Para permitir el inspector y otro cliente web, incluye ambos explícitamente:
+
+```dotenv
+CORS_ALLOW_ORIGINS=["https://inspector.orionis-framework.com","https://agent.example.com"]
+```
+
+Esta comprobación permite una petición **sin `Origin`**. Si la cabecera está presente, su valor debe coincidir exactamente con un origen HTTP(S) configurado; de lo contrario, MCP responde `403`. Cada entrada contiene solo esquema, host y puerto opcional, sin ruta ni barra final. Las páginas en inglés y español del inspector comparten el origen `https://inspector.orionis-framework.com`; no añadas `/` ni `/es/`. No se aceptan comodines ni una excepción implícita para el mismo origen. Una lista vacía explícita rechaza cualquier `Origin` presente.
+
+Esta opción valida el origen para MCP; las conexiones desde el navegador también necesitan [CORS HTTP](/es/http/middleware#cors-http) para las cabeceras de respuesta y el preflight. Aunque ambos leen `CORS_ALLOW_ORIGINS`, MCP rechaza `["*"]` al validar la configuración. Usa orígenes explícitos en la variable compartida o configura HTTP y MCP por separado en sus archivos editables. Un agente que se ejecuta como proceso remoto no es necesariamente un navegador ni tiene por qué enviar `Origin`. Reinicia la aplicación después de cambiar los orígenes: los transportes existentes conservan la lista capturada al arrancar.
 
 Los presupuestos enteros deben ser positivos; `subscription_keepalive` debe ser finito y mayor que cero, y `default_page_size` no puede superar `max_page_size`. La configuración incorrecta se rechaza al crear la entidad, antes de servir las peticiones.

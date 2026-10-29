@@ -298,7 +298,7 @@ class BootstrapHTTP(HTTP):
 
 Conserva los demás campos de tu configuración existente. CORS forma parte de las capas internas del kernel; no necesitas registrarlo mediante `app.withMiddleware()`. Si utilizas cookies con credenciales entre orígenes, configura orígenes explícitos y `allow_credentials=True`: el framework rechaza combinar credenciales con `allow_origins=["*"]`.
 
-Estos valores predeterminados pertenecen a HTTP. Las comprobaciones de origen de [WebSocket](/es/realtime/websocket) y [MCP](/es/mcp/stdio-and-configuration) conservan sus propias políticas. Para cambiar la dirección en la que escucha el servidor, utiliza [`serve --host`](/es/console/built-in-application#command-serve).
+Estos valores predeterminados pertenecen a HTTP. Las comprobaciones de origen de [WebSocket](/es/realtime/websocket) y [MCP](/es/mcp/stdio-and-configuration#orígenes-http-permitidos) conservan sus propias políticas. En 1.0.16, la configuración editable MCP propone el origen del inspector si `CORS_ALLOW_ORIGINS` no está definida, mientras el núcleo `McpConfig` conserva `[]`. Definir la variable compartida como `["*"]` reemplaza ese valor de MCP y provoca un error al validar su configuración. En aplicaciones con MCP, declara orígenes explícitos en la variable compartida o configura cada protocolo por separado en su archivo editable. Para cambiar la dirección en la que escucha el servidor, utiliza [`serve --host`](/es/console/built-in-application#command-serve).
 
 ## Asignar middleware a una ruta
 

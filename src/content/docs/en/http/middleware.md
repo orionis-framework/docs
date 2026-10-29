@@ -298,7 +298,7 @@ class BootstrapHTTP(HTTP):
 
 Keep the other fields in your existing configuration. CORS is an internal kernel layer; it does not require registration through `app.withMiddleware()`. For cross-origin cookies with credentials, configure explicit origins and `allow_credentials=True`: the framework rejects credentials combined with `allow_origins=["*"]`.
 
-These defaults belong to HTTP. [WebSocket](/en/realtime/websocket) and [MCP](/en/mcp/stdio-and-configuration) keep their own origin policies. Use [`serve --host`](/en/console/built-in-application#command-serve) to change the server's bind address.
+These defaults belong to HTTP. [WebSocket](/en/realtime/websocket) and [MCP](/en/mcp/stdio-and-configuration#allowed-http-origins) keep their own origin policies. In 1.0.16, editable MCP configuration defaults to the inspector's origin when `CORS_ALLOW_ORIGINS` is unset, while core `McpConfig` defaults to `[]`. Setting the shared variable to `["*"]` replaces that MCP default and fails MCP configuration validation. For applications using MCP, provide explicit origins in the shared variable or configure each protocol separately in its editable configuration. Use [`serve --host`](/en/console/built-in-application#command-serve) to change the server's bind address.
 
 ## Assigning middleware to a route
 

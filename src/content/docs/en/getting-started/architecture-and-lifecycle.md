@@ -352,7 +352,9 @@ Groups body and multipart limits, WebSockets, proxies, hosts, CORS, CSRF and rat
 
 ### `mcp.py`: MCP protocol limits
 
-`MCP_DEFAULT_PAGE_SIZE=50` and `MCP_MAX_PAGE_SIZE=100` control pagination. `MCP_MAX_REQUEST_SIZE` falls back to `HTTP_MAX_BODY_SIZE`, then to 1 MiB; concurrency falls back to `HTTP_MAX_CONCURRENT_REQUESTS`, then to 32. These are environment variables, rather than effective `http.py` values. The configuration also limits subscriptions, tool search and responses. `CORS_ALLOW_ORIGINS` supplies trusted origins: an empty allowlist rejects MCP HTTP requests carrying `Origin`. Servers are registered through AI routes. See [MCP](/en/mcp).
+`MCP_DEFAULT_PAGE_SIZE=50` and `MCP_MAX_PAGE_SIZE=100` control pagination. `MCP_MAX_REQUEST_SIZE` falls back to `HTTP_MAX_BODY_SIZE`, then to 1 MiB; concurrency falls back to `HTTP_MAX_CONCURRENT_REQUESTS`, then to 32. These are environment variables, rather than effective `http.py` values. The configuration also limits subscriptions, tool search and responses. Servers are registered through AI routes.
+
+Since **1.0.16**, `allowed_origins` uses independent `list[str]` values. When `CORS_ALLOW_ORIGINS` is unset, editable `config/mcp.py` defaults to `["https://inspector.orionis-framework.com"]`; core `McpConfig` retains `[]`. A defined environment value replaces the editable default, including `[]`, which rejects every present `Origin`. Requests without that header pass the origin check. MCP requires exact HTTP(S) origins without wildcards, paths, or trailing slashes. See [MCP configuration](/en/mcp/stdio-and-configuration#allowed-http-origins) to update an existing application and distinguish this policy from HTTP CORS.
 
 ### `queue.py`: job execution
 

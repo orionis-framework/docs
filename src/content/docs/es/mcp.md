@@ -10,7 +10,7 @@ lastUpdated: false
 Declaras las clases, las reúnes en un `Server` y registras sus transportes. Orionis se encarga del protocolo; no necesitas escribir un parser JSON-RPC, un controlador HTTP para cada herramienta ni un bucle STDIO.
 
 :::tip[Inspecciona tu servidor desde el navegador]
-Abre [Orionis MCP Inspector](https://inspector.orionis-framework.com/es/) para descubrir herramientas, recursos y prompts, validar schemas, inspeccionar peticiones JSON-RPC y exportar informes de diagnóstico. Se conecta directamente a servidores HTTP con MCP `2026-07-28` stateless; tu endpoint debe permitir el origen del inspector mediante CORS. Consulta el flujo de [pruebas en el navegador](/es/mcp/testing#inspeccionar-un-servidor-http-desde-el-navegador).
+Abre [Orionis MCP Inspector](https://inspector.orionis-framework.com/es/) para descubrir herramientas, recursos y prompts, validar schemas, inspeccionar peticiones JSON-RPC y exportar informes de diagnóstico. Se conecta directamente a servidores HTTP con MCP `2026-07-28` stateless. Desde 1.0.16, el archivo editable `config/mcp.py` permite por defecto `https://inspector.orionis-framework.com` cuando `CORS_ALLOW_ORIGINS` no está definida. Tu endpoint también debe permitir las peticiones del navegador mediante CORS HTTP. Consulta las [pruebas en el navegador](/es/mcp/testing#inspeccionar-un-servidor-http-desde-el-navegador) para configurar ambas comprobaciones, también en aplicaciones existentes.
 :::
 
 ## Qué componente necesitas

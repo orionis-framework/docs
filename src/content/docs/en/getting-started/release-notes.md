@@ -1,11 +1,39 @@
 ---
 title: "Release notes"
-description: "Orionis 1.0.8 through 1.0.15: HTTP CORS, schema validation, serve --host, performance, queues, and the Debug facade."
+description: "Orionis 1.0.8 through 1.0.16: MCP origins and Inspector defaults, HTTP CORS, schema validation, performance, queues, and the Debug facade."
 editUrl: true
 lastUpdated: false
 ---
 
-These notes cover **versions 1.0.8 through 1.0.15** and link to the updated usage guides. Run Reactor examples from the application root using its Python environment.
+These notes cover **versions 1.0.8 through 1.0.16** and link to the updated usage guides. Run Reactor examples from the application root using its Python environment.
+
+<a id="v1-0-16"></a>
+
+## 1.0.16: MCP origin lists and Inspector configuration
+
+MCP `allowed_origins` now uses `list[str]`, consistent with HTTP configuration. Lists and tuples remain accepted as input; each configuration instance stores an independent list.
+
+The editable `BootstrapMcp` configuration in `config/mcp.py` supplies `["https://inspector.orionis-framework.com"]` when `CORS_ALLOW_ORIGINS` is unset. Core `McpConfig` defaults to `[]` when that variable is unset and does not embed the Inspector URL. An explicit `CORS_ALLOW_ORIGINS` list replaces the editable default, including an empty list.
+
+For an existing application, update the `allowed_origins` field in its `config/mcp.py` to adopt this default; updating the installed framework alone does not rewrite your configuration. The field uses `field` from `dataclasses` and `Env` from `orionis.environment`:
+
+```python
+allowed_origins: list[str] = field(
+    default_factory=lambda: Env.get(
+        "CORS_ALLOW_ORIGINS", ["https://inspector.orionis-framework.com"],
+    ),
+)
+```
+
+Alternatively, configure the allowed origins explicitly through the environment:
+
+```dotenv
+CORS_ALLOW_ORIGINS=["https://inspector.orionis-framework.com"]
+```
+
+MCP accepts requests without `Origin`. A present `Origin` must exactly match a configured HTTP(S) origin; otherwise, the transport returns `403`. Entries contain only the scheme, host, and optional port, without a path or trailing slash. Wildcards and implicit same-origin access remain unsupported; `[]` rejects every present `Origin`.
+
+The environment variable is shared with HTTP CORS, but MCP keeps its stricter validation. In particular, the `["*"]` HTTP CORS setting shown for [1.0.15](#v1-0-15) is invalid for MCP. Use explicit origins when sharing this variable, and configure HTTP CORS to allow the browser's methods, headers, and preflight requests. See [MCP configuration](/en/mcp/stdio-and-configuration#allowed-http-origins) and [browser testing](/en/mcp/testing#inspect-an-http-server-in-the-browser).
 
 <a id="v1-0-15"></a>
 

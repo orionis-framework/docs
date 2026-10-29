@@ -52,10 +52,19 @@ Expect one passing test and exit code 0. `assertOk()` rejects JSON-RPC errors an
 Use [Orionis MCP Inspector](https://inspector.orionis-framework.com/) to check a deployed HTTP endpoint alongside your in-process tests. The inspector runs entirely in your browser and sends requests directly to the endpoint you choose, without an intermediary proxy. It supports stateless MCP `2026-07-28`; it does not launch STDIO processes.
 
 1. Publish your server using the [HTTP transport](/en/mcp/http-and-clients).
-2. Configure CORS on that server to allow `https://inspector.orionis-framework.com`, `POST`, and the headers required by your requests, including MCP headers and authentication when used. The browser handles the `OPTIONS` preflight; the server must answer it without requiring the POST's credentials.
-3. Open the inspector, enter your endpoint, configure authentication if needed, and connect to discover the server's capabilities.
-4. Run **Run All Safe Tests** to collect protocol and schema diagnostics, coverage, and observed request latency. This action does not automatically call tools. Execute a tool manually only after reviewing its arguments and possible effects.
-5. Inspect request and response details, then export a JSON, HTML, or PDF report generated locally in the browser.
+2. Check that MCP's `allowed_origins` includes `https://inspector.orionis-framework.com`. The editable `config/mcp.py` in 1.0.16 supplies this default only when `CORS_ALLOW_ORIGINS` is unset. In an existing application, update that local configuration or set the environment variable as shown below; upgrading the package does not rewrite your editable file.
+3. Configure [HTTP CORS](/en/http/middleware#http-cors) to allow the same origin, `POST`, and the headers required by your requests, including MCP headers and authentication when used. The browser handles the `OPTIONS` preflight; the server must answer it without requiring the POST's credentials.
+4. Open the inspector, enter your endpoint, configure authentication if needed, and connect to discover the server's capabilities.
+5. Run **Run All Safe Tests** to collect protocol and schema diagnostics, coverage, and observed request latency. This action does not automatically call tools. Execute a tool manually only after reviewing its arguments and possible effects.
+6. Inspect request and response details, then export a JSON, HTML, or PDF report generated locally in the browser.
+
+To select the inspector explicitly through the shared environment variable:
+
+```dotenv
+CORS_ALLOW_ORIGINS=["https://inspector.orionis-framework.com"]
+```
+
+This replaces the default list; include any other trusted browser origins you need. Use only the origin, without a trailing slash or `/es/` path, regardless of the inspector's language. HTTP CORS accepts `"*"`, but MCP rejects that wildcard as invalid configuration. An explicit `[]` rejects every MCP request carrying `Origin`; requests without that header remain allowed by the origin check. See [MCP configuration](/en/mcp/stdio-and-configuration) for defaults and validation.
 
 A browser network error can indicate CORS, DNS, TLS, or another connectivity problem; it does not establish that the MCP server is invalid. A successful cURL request also does not verify CORS. Review the coverage and production readiness status: **Not Verified** means there is insufficient evidence, even if some checks passed. Browser latency includes the network and client, not only server processing.
 

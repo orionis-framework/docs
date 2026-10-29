@@ -39,6 +39,12 @@ Todas las operaciones se envían mediante **POST al mismo endpoint**. Para lista
 
 Las herramientas cuyo schema declare `x-mcp-header` requieren además reflejar esos argumentos en sus cabeceras declaradas. El transporte comprueba los valores antes de ejecutar el handler. No envíes una cabecera de sesión MCP: cada petición se procesa de forma independiente.
 
+### Orígenes del navegador
+
+MCP comprueba que una cabecera `Origin` presente coincida exactamente con una entrada de `allowed_origins` y devuelve HTTP `403` si no coincide. Los orígenes deben contener solo esquema HTTP(S), host y puerto opcional, sin ruta ni barra final. No se admiten comodines ni excepciones implícitas para el mismo origen. Una lista vacía rechaza todo `Origin` presente; una petición sin esa cabecera supera la comprobación de origen.
+
+Desde 1.0.16, el archivo editable `config/mcp.py` aporta `["https://inspector.orionis-framework.com"]` cuando `CORS_ALLOW_ORIGINS` no está definida; el núcleo `McpConfig` conserva `[]` como valor de respaldo. Un valor de entorno definido reemplaza el predeterminado editable, incluido un `[]` explícito. Los clientes de navegador también necesitan las cabeceras de respuesta CORS HTTP adecuadas y un preflight `OPTIONS` correcto: superar la comprobación de origen MCP no configura esos requisitos. Consulta las [pruebas en el navegador](/es/mcp/testing#inspeccionar-un-servidor-http-desde-el-navegador) y la [configuración MCP](/es/mcp/stdio-and-configuration).
+
 ### Primera consulta con curl
 
 Guarda este cuerpo UTF-8 en `discover.json`:
@@ -290,7 +296,7 @@ Usa un token válido emitido por tu aplicación. La autenticación del endpoint 
 | HTTP `405` | Utiliza POST al endpoint registrado; GET y DELETE no ejecutan operaciones MCP. |
 | HTTP `406` | Incluye ambos tipos explícitos en `Accept` y no les asignes `q=0`. |
 | HTTP `415` | Envía un único `Content-Type: application/json` y un cuerpo JSON. |
-| HTTP `403` por origen | Un `Origin` presente debe coincidir exactamente con `allowed_origins`. Uno ausente se admite; la lista vacía no autoriza automáticamente el mismo origen. |
+| HTTP `403` por origen | Un `Origin` presente debe coincidir exactamente con `allowed_origins`. Comprueba si `CORS_ALLOW_ORIGINS` reemplazó el valor predeterminado del inspector. Uno ausente supera la comprobación; `[]` rechaza todo origen presente. |
 | Error `-32020` | Falta una cabecera reflejada, está repetida o difiere del cuerpo. Revisa versión, método y nombre/URI. |
 | Error `-32022` | Revisión no soportada: consulta `error.data.supported`. |
 | Error `-32601` | Método inexistente, como `initialize` o `ping`. |

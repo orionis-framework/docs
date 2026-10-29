@@ -352,7 +352,9 @@ Agrupa límites de cuerpos y multipart, WebSocket, proxies, hosts, CORS, CSRF y 
 
 ### `mcp.py`: límites del protocolo MCP
 
-`MCP_DEFAULT_PAGE_SIZE=50` y `MCP_MAX_PAGE_SIZE=100` controlan paginación. `MCP_MAX_REQUEST_SIZE` recurre a `HTTP_MAX_BODY_SIZE` y después a 1 MiB; la concurrencia recurre a `HTTP_MAX_CONCURRENT_REQUESTS` y después a 32. Son variables de entorno, no los valores efectivos de `http.py`. También limita suscripciones, búsqueda de herramientas y respuestas. `CORS_ALLOW_ORIGINS` aporta los orígenes admitidos: una lista vacía rechaza una petición MCP HTTP que presente `Origin`. Los servidores se registran en las rutas AI. Consulta [MCP](/es/mcp).
+`MCP_DEFAULT_PAGE_SIZE=50` y `MCP_MAX_PAGE_SIZE=100` controlan paginación. `MCP_MAX_REQUEST_SIZE` recurre a `HTTP_MAX_BODY_SIZE` y después a 1 MiB; la concurrencia recurre a `HTTP_MAX_CONCURRENT_REQUESTS` y después a 32. Son variables de entorno, no los valores efectivos de `http.py`. También limita suscripciones, búsqueda de herramientas y respuestas. Los servidores se registran en las rutas AI.
+
+Desde **1.0.16**, `allowed_origins` utiliza valores `list[str]` independientes. Si `CORS_ALLOW_ORIGINS` no está definida, el archivo editable `config/mcp.py` propone `["https://inspector.orionis-framework.com"]`; el núcleo `McpConfig` conserva `[]`. Un valor de entorno definido reemplaza el predeterminado editable, incluido `[]`, que rechaza cualquier `Origin` presente. Las peticiones sin esa cabecera superan la comprobación de origen. MCP exige orígenes HTTP(S) exactos, sin comodines, rutas ni barra final. Consulta [configuración MCP](/es/mcp/stdio-and-configuration#orígenes-http-permitidos) para actualizar una aplicación existente y distinguir esta política de CORS HTTP.
 
 ### `queue.py`: ejecución de trabajos
 

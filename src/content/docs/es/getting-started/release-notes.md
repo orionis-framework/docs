@@ -1,11 +1,39 @@
 ---
 title: "Notas de versión"
-description: "Cambios de Orionis 1.0.8 a 1.0.15: CORS HTTP, validación de schemas, serve --host, rendimiento, colas y fachada Debug."
+description: "Cambios de Orionis 1.0.8 a 1.0.16: orígenes MCP y configuración del Inspector, CORS HTTP, validación de schemas, rendimiento, colas y fachada Debug."
 editUrl: true
 lastUpdated: false
 ---
 
-Estas notas reúnen los cambios de las versiones **1.0.8 a 1.0.15** y enlazan las guías de uso actualizadas. Los ejemplos de Reactor se ejecutan desde la raíz de la aplicación con su entorno de Python.
+Estas notas reúnen los cambios de las versiones **1.0.8 a 1.0.16** y enlazan las guías de uso actualizadas. Los ejemplos de Reactor se ejecutan desde la raíz de la aplicación con su entorno de Python.
+
+<a id="v1-0-16"></a>
+
+## 1.0.16: listas de orígenes MCP y configuración del Inspector
+
+`allowed_origins` de MCP utiliza ahora `list[str]`, como la configuración HTTP. Se siguen aceptando listas y tuplas como entrada; cada instancia de configuración conserva una lista independiente.
+
+La configuración editable `BootstrapMcp` de `config/mcp.py` utiliza `["https://inspector.orionis-framework.com"]` cuando `CORS_ALLOW_ORIGINS` no está definida. La entidad `McpConfig` del núcleo utiliza `[]` si esa variable está ausente y no incluye la URL del Inspector. Una lista explícita en `CORS_ALLOW_ORIGINS` reemplaza el valor editable, incluso si está vacía.
+
+En una aplicación existente, actualiza el campo `allowed_origins` de su `config/mcp.py` para adoptar este valor; actualizar únicamente el framework instalado no reescribe tu configuración. El campo utiliza `field` de `dataclasses` y `Env` de `orionis.environment`:
+
+```python
+allowed_origins: list[str] = field(
+    default_factory=lambda: Env.get(
+        "CORS_ALLOW_ORIGINS", ["https://inspector.orionis-framework.com"],
+    ),
+)
+```
+
+También puedes declarar los orígenes permitidos explícitamente mediante el entorno:
+
+```dotenv
+CORS_ALLOW_ORIGINS=["https://inspector.orionis-framework.com"]
+```
+
+MCP acepta peticiones sin `Origin`. Si la cabecera aparece, debe coincidir exactamente con un origen HTTP(S) configurado; de lo contrario, el transporte devuelve `403`. Cada entrada contiene únicamente esquema, host y puerto opcional, sin ruta ni barra final. Se mantiene el rechazo de comodines y no existe una excepción implícita de mismo origen; `[]` rechaza toda cabecera `Origin` presente.
+
+La variable de entorno se comparte con CORS HTTP, pero MCP conserva su validación más estricta. En particular, el valor `["*"]` de CORS HTTP mostrado para [1.0.15](#v1-0-15) no es válido en MCP. Utiliza orígenes explícitos cuando compartas esta variable y configura CORS HTTP para admitir los métodos, cabeceras y peticiones preflight del navegador. Consulta la [configuración MCP](/es/mcp/stdio-and-configuration#orígenes-http-permitidos) y las [pruebas en el navegador](/es/mcp/testing#inspeccionar-un-servidor-http-desde-el-navegador).
 
 <a id="v1-0-15"></a>
 
