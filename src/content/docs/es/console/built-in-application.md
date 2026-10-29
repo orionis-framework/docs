@@ -223,20 +223,23 @@ Inicia el servidor HTTP Granian de la aplicación.
 | Argumento u opción | Tipo y presencia | Valor efectivo al omitir | Propósito |
 |---|---|---|---|
 | `--interface` / `-i` | str, opcional | `rsgi` | Interfaz HTTP del servidor. Valores: `rsgi`, `asgi`. |
+| `--host` | str, opcional | `127.0.0.1` en desarrollo; `0.0.0.0` en producción | Dirección de escucha; disponible desde 1.0.13. |
 | `--port` / `-p` | int, opcional | `8000` | Puerto TCP; entero. |
 | `--log` | Bandera, opcional | `False` | Activar el logging del servidor a nivel info. |
 | `--export` | Bandera, opcional | `False` | Imprimir el comando Granian resuelto sin iniciarlo. |
 
 `--interface` / `-i` acepta `rsgi` o `asgi`, con `rsgi` como elección efectiva predeterminada. `--port` / `-p` es entero; en ejecución normal el puerto predeterminado es `8000`. `--log` activa nivel `info`; sin esa bandera se usa `error` en producción y se desactiva el log del servidor en desarrollo. `--export` imprime el comando Granian resuelto y termina sin iniciar el servidor.
 
-En el modo normal se escucha en `127.0.0.1` fuera de producción y `0.0.0.0` en producción; el CLI no expone `--host`. Windows usa un worker y loop `auto`; otros sistemas usan el número de CPU y `uvloop`. El reload se activa fuera de producción cuando hay directorios observables válidos; las rutas con espacios se excluyen de ese conjunto. El montaje estático procede del disco `public` de `filesystems`.
+`--host` permite elegir la dirección de escucha. Al omitirlo, el modo normal escucha en `127.0.0.1` fuera de producción y `0.0.0.0` en producción. Windows usa un worker y loop `auto`; otros sistemas usan el número de CPU y `uvloop`. El reload se activa fuera de producción cuando hay directorios observables válidos; las rutas con espacios se excluyen de ese conjunto. El montaje estático procede del disco `public` de `filesystems`.
 
 En Windows con depurador activo se utiliza el servidor embebido: en esa variante host y puerto omitidos se leen de `app.host` y `app.port` antes de los defaults. Estos valores no sustituyen el comportamiento de la ejecución normal.
 
 ```shell
-orionis serve --interface asgi --port 8001
-python -B reactor serve --interface asgi --port 8001
+orionis serve --interface asgi --host 127.0.0.1 --port 8001
+python -B reactor serve --interface asgi --host 127.0.0.1 --port 8001
 ```
+
+Para escuchar en todas las interfaces de red, usa `--host 0.0.0.0`; accede desde el cliente mediante la IP o el dominio del servidor. La dirección de escucha y la política de [CORS HTTP](/es/http/middleware#cors-http) son opciones independientes.
 
 <a id="command-test"></a>
 

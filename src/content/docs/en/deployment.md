@@ -73,11 +73,11 @@ Run these checks with the service identity and working directory. `serve --expor
 python -B reactor serve --interface asgi --port 8000 --log
 ```
 
-You can also use `orionis serve --interface asgi --port 8000 --log`. Reactor accepts `--interface` (`rsgi` by default or `asgi`), `--port` (8000), `--log` and `--export`; it **does not expose `--host`, `--workers` or `--reload`**.
+You can also use `orionis serve --interface asgi --port 8000 --log`. Reactor accepts `--interface` (`rsgi` by default or `asgi`), `--host` (since 1.0.13), `--port` (8000), `--log` and `--export`. Add `--host 127.0.0.1` to bind to the local proxy. Set `--workers` and `--reload` when invoking Granian directly.
 
 | Decision | `serve` | Services in these guides |
 | --- | --- | --- |
-| Address | Loopback in development; `0.0.0.0` in production | Loopback on Windows/Linux; private network in Docker |
+| Address | `--host`; when omitted, loopback in development and `0.0.0.0` in production | Loopback on Windows/Linux; private network in Docker |
 | Workers | One on Windows; CPU count on Unix | Explicitly one |
 | Reload | Only outside production | Explicitly disabled |
 | Public files | Reads the `public` disk | Equivalent mount configured in Granian |

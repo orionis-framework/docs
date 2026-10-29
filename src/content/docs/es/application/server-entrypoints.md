@@ -68,9 +68,9 @@ orionis serve --interface rsgi
 python -B reactor serve --interface rsgi
 ```
 
-`--interface` tiene el alias `-i`; solo admite `asgi` o `rsgi`. `--port` tiene el alias `-p`. Las otras opciones específicas son `--log` y `--export`. Consulta sus efectos y las diferencias de plataforma en la [referencia completa de `serve`](/es/console/built-in-application#command-serve).
+`--interface` tiene el alias `-i`; solo admite `asgi` o `rsgi`. `--port` tiene el alias `-p`. Desde 1.0.13, `--host` permite seleccionar la dirección de escucha. Las otras opciones específicas son `--log` y `--export`. Consulta sus efectos y las diferencias de plataforma en la [referencia completa de `serve`](/es/console/built-in-application#command-serve).
 
-`serve` prepara el servidor Granian y pasa `app.entryPoint` como target. En el lanzamiento normal utiliza un puerto predeterminado de `8000`, enlaza `127.0.0.1` en desarrollo y `0.0.0.0` en producción. El modo de depuración integrado de Windows consulta `app.host` y `app.port`, además del argumento de puerto. Abre siempre la dirección que indique la consola.
+`serve` prepara el servidor Granian y pasa `app.entryPoint` como target. En el lanzamiento normal, al omitir `--host` y `--port`, utiliza el puerto `8000`, enlaza `127.0.0.1` en desarrollo y `0.0.0.0` en producción. Los argumentos explícitos sustituyen esos valores. El modo de depuración integrado de Windows consulta `app.host` y `app.port` cuando se omiten sus argumentos. Abre siempre la dirección que indique la consola.
 
 La ejecución normal usa un proceso administrado en Windows y sustituye el proceso en sistemas Unix. Bajo un depurador en Windows se utiliza el servidor integrado. En ese caso, el lanzamiento RSGI espera explícitamente startup y shutdown desde el loop activo, sin llamar dentro de él a los hooks síncronos que ejecutan `run_until_complete()`.
 

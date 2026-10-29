@@ -1,11 +1,67 @@
 ---
 title: "Notas de versión"
-description: "Cambios de Orionis 1.0.8 a 1.0.12: Loop en Python 3.14, pruebas, generación de schemas, migración de colas, rendimiento HTTP y fachada Debug."
+description: "Cambios de Orionis 1.0.8 a 1.0.14: validación de schemas, serve --host, CORS HTTP, rendimiento, colas y fachada Debug."
 editUrl: true
 lastUpdated: false
 ---
 
-Estas notas reúnen los cambios de las versiones **1.0.8 a 1.0.12** y enlazan las guías de uso actualizadas. Los ejemplos de Reactor se ejecutan desde la raíz de la aplicación con su entorno de Python.
+Estas notas reúnen los cambios de las versiones **1.0.8 a 1.0.14** y enlazan las guías de uso actualizadas. Los ejemplos de Reactor se ejecutan desde la raíz de la aplicación con su entorno de Python.
+
+<a id="v1-0-14"></a>
+
+## 1.0.14: validación de schemas
+
+Se mejora el sistema de validación de `orionis.schemas`, tanto para datos de entrada como para schemas devueltos por controladores HTTP.
+
+### Errores estructurados y múltiples fallos por campo
+
+Cada elemento de `ValidationException.errors[campo]` contiene ahora `rule` y `message`. Las reglas personalizadas conservan su identificador `__code__`; las restricciones nativas informan códigos como `ge`, `gt`, `multiple_of` o `min_length`.
+
+El validador acumula las restricciones y reglas aplicables a un mismo campo. Por ejemplo, una cantidad negativa e impar puede incumplir simultáneamente `GreaterThanOrEqual(1)` y `MultipleOf(2)`. Con mensajes personalizados mediante `message=`, el resultado puede ser:
+
+```json
+{
+  "message": "Quantity must be positive. (and 1 more error)",
+  "errors": {
+    "quantity": [
+      {"rule": "ge", "message": "Quantity must be positive."},
+      {"rule": "multiple_of", "message": "Quantity must be even."}
+    ]
+  }
+}
+```
+
+El resumen cuenta fallos, no campos. Cuando el tipo es incompatible, se informa ese error y se omiten las reglas que necesitan el valor convertido. Los errores de schemas hijos y colecciones mantienen su ruta, como `items[0].quantity`. Al actualizar consumidores de la API, lee `error["message"]` donde antes recibías una cadena; `error["rule"]` permite identificar la condición. Los formularios WEB conservan sus mensajes de texto en la bolsa flash. Consulta [validación y errores](/es/validation/validation-and-errors).
+
+### Validación automática de la salida HTTP
+
+Si una acción devuelve directamente una instancia de `Schema`, el framework comprueba sus tipos, restricciones y reglas antes de serializarla. También revalida instancias modificadas y schemas anidados. Una salida inválida sigue el manejo de errores del servidor y produce `500` con la configuración predeterminada.
+
+La comprobación depende del valor devuelto: una anotación de retorno no convierte ni valida un diccionario. Las respuestas `dict` y `Response` mantienen su recorrido sin ejecutar el validador de salida. Si devuelves el mismo schema recibido como entrada, sus reglas se ejecutan de nuevo; utiliza un contrato de salida adecuado cuando las reglas consulten servicios externos. Consulta [schemas en controladores HTTP](/es/validation/controllers-and-http).
+
+### Compilación, rendimiento y generación de reglas
+
+Las restricciones nativas se compilan también dentro de colecciones y uniones, como `list[Field[int, GreaterThanOrEqual(1)]]` y `Nullable[Field[int, GreaterThanOrEqual(1)]]`. Se conservan mensajes personalizados y nombres de campo renombrados. La [declaración de schemas](/es/validation/declaring-schemas) incluye ejemplos ejecutables de los siete aliases de tipos.
+
+La conversión válida mantiene las comprobaciones nativas en C mediante `msgspec`, con planes preparados y reutilizados. La recopilación detallada se reserva para entradas inválidas y se evitan recorridos de Python por hijos sin reglas personalizadas. Las reglas asíncronas y sus operaciones de I/O mantienen su propio coste.
+
+El generador `make:http-schema-rule` utiliza el stub actualizado con `async def enforce(...)`, `__code__` y `__message__`. Consulta [reglas personalizadas](/es/validation/application-rules) para implementar el contrato asíncrono.
+
+<a id="v1-0-13"></a>
+
+## 1.0.13: serve --host y CORS HTTP
+
+El comando `serve` incorpora `--host` para elegir explícitamente la dirección de escucha:
+
+```bash
+python reactor serve --host 0.0.0.0 --port 8000
+```
+
+`0.0.0.0` escucha en todas las interfaces IPv4. Si omites `--host`, se mantiene `127.0.0.1` en desarrollo y `0.0.0.0` en producción; el puerto predeterminado es `8000`. Consulta [puntos de entrada del servidor](/es/application/server-entrypoints).
+
+La configuración CORS de **HTTP** cambia el valor predeterminado de `allow_origins` a `["*"]`. Esto permite orígenes de navegador externos y facilita probar endpoints con clientes web como Postman o Hoppscotch, sin instalar un cliente de escritorio, siempre que el navegador pueda alcanzar la API. Una lista vacía también se normaliza a `["*"]`; para restringir el acceso por origen, declara una lista de orígenes explícitos.
+
+El cambio corresponde a los orígenes permitidos: las peticiones con preflight también necesitan métodos y cabeceras autorizados mediante `allow_methods` y `allow_headers`. `allow_credentials` sigue siendo `False`; para habilitar credenciales, configura orígenes explícitos en lugar de `"*"`. Consulta [CORS HTTP](/es/http/middleware). Las políticas de origen de WebSocket y MCP se configuran por separado.
 
 <a id="v1-0-12"></a>
 

@@ -27,7 +27,7 @@ This location follows the HTTP generator convention; it does not prevent importi
 
 | Context | Input and validation | Schema output |
 | --- | --- | --- |
-| HTTP function or controller | Body from `Request.data()`; the container validates and injects the Schema parameter. | The instance serializes as JSON; the return annotation does not validate output. |
+| HTTP function or controller | Body from `Request.data()`; the container validates and injects the Schema parameter. | A directly returned Schema instance is validated and then serialized as JSON. |
 | MCP tool | The `arguments` object is validated against the input declared by `Tool`. | Use `McpResponse.structured(schema)`; the declared output validates structured content. |
 | Realtime `@remote` method | Invocation `args` and `kwargs`; typed conversion and Schema rules. | Serializes inside the protocol result; its return annotation does not validate output. |
 | Plain WebSocket | The handler receives the message and explicitly calls the validator. | `sendJson(schema)` serializes the instance. |
@@ -67,7 +67,7 @@ Route.post("/contacts/function-preview", preview_contact)
 
 Both routes receive the typed contract before their function or action executes. They do not need to call the validator manually. The Schema represents the body: URL parameters, query values, and headers are not merged automatically. You may also receive `Request` when you need those elements.
 
-The returned instance becomes JSON with status `200`. Declaring `-> ContactSchema` does not check the result or convert a dictionary by itself. See [controllers, responses, and HTTP errors](/en/validation/controllers-and-http) for explicit output validation and the differences between API and WEB errors.
+The returned instance is validated before becoming JSON with status `200`, including instances constructed directly or modified after input validation. The check depends on the actual returned value: declaring `-> ContactSchema` does not convert a dictionary by itself. An invalid Schema output is a server error `500`. See [controllers, responses, and HTTP errors](/en/validation/controllers-and-http) for the scope of this validation and the differences between API and WEB errors.
 
 ## MCP: tool input and output
 

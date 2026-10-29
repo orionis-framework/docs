@@ -223,20 +223,23 @@ Start the application's Granian HTTP server.
 | Argument or option | Type and presence | Effective value when omitted | Purpose |
 |---|---|---|---|
 | `--interface` / `-i` | str, optional | `rsgi` | Server HTTP interface. Choices: `rsgi`, `asgi`. |
+| `--host` | str, optional | `127.0.0.1` in development; `0.0.0.0` in production | Bind address; available since 1.0.13. |
 | `--port` / `-p` | int, optional | `8000` | TCP port; integer. |
 | `--log` | Flag, optional | `False` | Enable server logging at info level. |
 | `--export` | Flag, optional | `False` | Print the resolved Granian command without starting it. |
 
 `--interface` / `-i` accepts `rsgi` or `asgi`, with an effective default of `rsgi`. `--port` / `-p` is an integer; normal execution defaults to port `8000`. `--log` enables `info` logging; without it, production uses `error` and development disables server logging. `--export` prints the resolved Granian command and exits without starting the server.
 
-Normal execution binds to `127.0.0.1` outside production and `0.0.0.0` in production; the CLI does not expose `--host`. Windows uses one worker and the `auto` loop; other systems use the CPU count and `uvloop`. Reload is enabled outside production when valid watch directories exist; paths containing spaces are excluded from that set. Static mounting comes from the `public` filesystem disk.
+`--host` selects the bind address. When omitted, normal execution binds to `127.0.0.1` outside production and `0.0.0.0` in production. Windows uses one worker and the `auto` loop; other systems use the CPU count and `uvloop`. Reload is enabled outside production when valid watch directories exist; paths containing spaces are excluded from that set. Static mounting comes from the `public` filesystem disk.
 
 Windows with an active debugger uses the embedded server: in that variant omitted host/port are read from `app.host` / `app.port` before falling back to defaults. These values do not replace the normal execution behavior.
 
 ```shell
-orionis serve --interface asgi --port 8001
-python -B reactor serve --interface asgi --port 8001
+orionis serve --interface asgi --host 127.0.0.1 --port 8001
+python -B reactor serve --interface asgi --host 127.0.0.1 --port 8001
 ```
+
+Use `--host 0.0.0.0` to listen on every network interface; clients connect through the server's IP address or domain. The bind address and [HTTP CORS policy](/en/http/middleware#http-cors) are independent settings.
 
 <a id="command-test"></a>
 

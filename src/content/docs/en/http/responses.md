@@ -49,14 +49,15 @@ For ordinary routes, the kernel examines the actual returned value, rather than 
 | --- | --- |
 | `Response` or a subclass | Preserves its status, headers and body. |
 | `dict` | Converts it to `JSONResponse` with status `200`. |
-| `msgspec.Struct`, including `Schema` | Serializes it through `JSONResponse` with status `200`. |
+| Orionis `Schema` | Validates types, constraints, and rules, then serializes it through `JSONResponse` with status `200`. |
+| Other `msgspec.Struct` | Serializes it through `JSONResponse` with status `200`. |
 | `list`, `str`, `bytes`, `None` or other objects | Unsupported as direct returns: wrap them in an appropriate response. |
 | `PendingView` | The action must await it with `await` and return the rendered `HTMLResponse`. |
 | `ResponseTemplate` | Return `template.make()` to obtain a `Response`. |
 
 For example, `return {"ready": True}` is valid, but use `return response.json([1, 2, 3])` for a list, `return response.text("Ready")` for text, and `return response.noContent()` for an empty body.
 
-Annotating `-> JSONResponse` or `-> ProductSchema` does not convert the returned value or validate its data. `HttpResponse` is a type alias for `Response`, useful for annotating actions that can return different responses; it is not used as a constructor or an argument to `isinstance()`.
+Annotating `-> JSONResponse` or `-> ProductSchema` does not convert the returned value. Automatic output validation activates when an actual `Schema` instance is returned. `HttpResponse` is a type alias for `Response`, useful for annotating actions that can return different responses; it is not used as a constructor or an argument to `isinstance()`.
 
 [Fallback](/en/http/routing) handlers require an explicit `Response`: they do not receive the automatic dictionary or schema conversion available to ordinary routes.
 
@@ -173,9 +174,9 @@ Therefore, `response.json(schema)` works, but `response.json(schema, indent=2)` 
 
 ## Schemas as HTTP responses
 
-An output schema defines the fields of the representation you return. You can return it directly for JSON 200 or wrap it in `response.json()` to control the status and headers.
+An output schema defines the fields of the representation you return. Return it directly for automatic validation and JSON `200`, or wrap it in `response.json()` to control status and headers. An already constructed response does not activate the direct-Schema check.
 
-The following example shows both alternatives and a third that explicitly validates the output data:
+The following example shows both alternatives and a third that explicitly validates data before constructing a response:
 
 ```python
 from orionis.http import JSONResponse, response
@@ -204,9 +205,10 @@ class ProductController(BaseController):
             headers={"Location": "/products/7"},
         )
 
-    async def checked(self) -> ProductOutput:
+    async def checked(self) -> JSONResponse:
         produced_data = {"id": 7, "name": "Notebook"}
-        return await Validator.validate(produced_data, ProductOutput)
+        product = await Validator.validate(produced_data, ProductOutput)
+        return response.json(product)
 
 
 Route.get("/responses/products/{product_id:int}", [ProductController, "show"])
@@ -225,11 +227,12 @@ All three return `{"id":7,"name":"Notebook"}`; `create` uses status `201`. The d
 Distinguish these mechanisms:
 
 - The `ProductOutput(...)` constructor does not run the validation pipeline.
-- Returning the instance allows serialization; the kernel does not check its rules again.
+- Returning the instance directly, as in `show`, validates its types, constraints, and rules before serialization. Invalid output produces a server error `500` with default handling.
+- Returning a `JSONResponse`, as in `create`, does not activate automatic validation.
 - `-> ProductOutput` describes the return, but does not validate or convert a dictionary.
-- `await Validator.validate(datos, ProductOutput)` checks types, constraints and rules asynchronously before returning the instance.
+- `await Validator.validate(data, ProductOutput)` checks types, constraints and rules asynchronously before returning the instance.
 
-Input and output schemas can be different classes. The [controller and schema guide](/en/validation/controllers-and-http) explains body injection and explicit validation; [other integrations](/en/validation/integrations) describe their differences from MCP and Realtime.
+Input and output schemas can be different classes. The [controller and schema guide](/en/validation/controllers-and-http) explains body injection and output validation; [other integrations](/en/validation/integrations) describe their differences from MCP and Realtime.
 
 ## Text, HTML and empty responses
 

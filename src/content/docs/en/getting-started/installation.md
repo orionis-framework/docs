@@ -336,6 +336,14 @@ Stop the server with Ctrl+C. If the port is occupied:
 uv run python -B reactor serve --port 8001
 ```
 
+Since 1.0.13, `--host` also selects the bind address. For example, to accept connections through the machine's network interfaces:
+
+```bash
+uv run python -B reactor serve --host 0.0.0.0 --port 8001
+```
+
+Open the machine's IP address or domain with the selected port. Use `--host 127.0.0.1` to listen only on the local machine. See the [`serve` options](/en/console/built-in-application#command-serve) and [CORS configuration for browser clients](/en/http/middleware#http-cors).
+
 To add your first routes and understand startup, continue with [Creating and starting an application](/en/getting-started/quick-start) and [Application lifecycle](/en/application/lifecycle).
 
 ## Considerations and recovery

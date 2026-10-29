@@ -49,14 +49,15 @@ El kernel de rutas normales examina el valor real devuelto, no su anotación:
 | --- | --- |
 | `Response` o una subclase | Conserva su estado, cabeceras y cuerpo. |
 | `dict` | Lo convierte en `JSONResponse` con estado `200`. |
-| `msgspec.Struct`, incluido `Schema` | Lo serializa mediante `JSONResponse` con estado `200`. |
+| `Schema` de Orionis | Valida tipos, restricciones y reglas; después lo serializa mediante `JSONResponse` con estado `200`. |
+| Otro `msgspec.Struct` | Lo serializa mediante `JSONResponse` con estado `200`. |
 | `list`, `str`, `bytes`, `None` u otros objetos | No son retornos directos admitidos: envuélvelos en una respuesta apropiada. |
 | `PendingView` | La acción debe esperarlo con `await` y devolver el `HTMLResponse` renderizado. |
 | `ResponseTemplate` | Devuelve `template.make()` para obtener un `Response`. |
 
 Por ejemplo, `return {"ready": True}` es válido, pero para una lista utiliza `return response.json([1, 2, 3])`; para texto, `return response.text("Ready")`, y para un cuerpo vacío, `return response.noContent()`.
 
-Anotar `-> JSONResponse` o `-> ProductSchema` no convierte el valor retornado ni valida sus datos. `HttpResponse` es un alias de tipo de `Response` útil para anotar acciones que pueden devolver distintas respuestas; no se utiliza como constructor ni como argumento de `isinstance()`.
+Anotar `-> JSONResponse` o `-> ProductSchema` no convierte el valor retornado. La validación automática de salida se activa al devolver una instancia real de `Schema`. `HttpResponse` es un alias de tipo de `Response` útil para anotar acciones que pueden devolver distintas respuestas; no se utiliza como constructor ni como argumento de `isinstance()`.
 
 Los handlers de [fallback](/es/http/routing) requieren un `Response` explícito: no reciben la conversión automática de diccionarios o schemas de las rutas normales.
 
@@ -173,9 +174,9 @@ Por tanto, `response.json(schema)` funciona, pero `response.json(schema, indent=
 
 ## Schemas como respuesta HTTP
 
-Un schema de salida define los campos de la representación que devuelves. Puedes retornarlo directamente para JSON 200 o envolverlo en `response.json()` para controlar estado y cabeceras.
+Un schema de salida define los campos de la representación que devuelves. Puedes retornarlo directamente para validarlo automáticamente y producir JSON `200`, o envolverlo en `response.json()` para controlar estado y cabeceras. Una respuesta ya construida no activa la comprobación automática de Schema directo.
 
-El siguiente ejemplo muestra ambas alternativas y una tercera que valida expresamente los datos de salida:
+El siguiente ejemplo muestra ambas alternativas y una tercera que valida expresamente los datos antes de construir una respuesta:
 
 ```python
 from orionis.http import JSONResponse, response
@@ -204,9 +205,10 @@ class ProductController(BaseController):
             headers={"Location": "/products/7"},
         )
 
-    async def checked(self) -> ProductOutput:
+    async def checked(self) -> JSONResponse:
         produced_data = {"id": 7, "name": "Notebook"}
-        return await Validator.validate(produced_data, ProductOutput)
+        product = await Validator.validate(produced_data, ProductOutput)
+        return response.json(product)
 
 
 Route.get("/responses/products/{product_id:int}", [ProductController, "show"])
@@ -225,11 +227,12 @@ Los tres devuelven `{"id":7,"name":"Notebook"}`; `create` utiliza estado `201`. 
 Distingue estos mecanismos:
 
 - El constructor `ProductOutput(...)` no ejecuta el pipeline de validación.
-- Devolver la instancia permite serializarla; el kernel no comprueba sus reglas de nuevo.
+- Devolver directamente la instancia, como en `show`, valida sus tipos, restricciones y reglas antes de serializarla. Una salida inválida produce un error de servidor `500` con el manejo predeterminado.
+- Devolver una `JSONResponse`, como en `create`, no activa esa validación automática.
 - `-> ProductOutput` describe el retorno, pero no valida ni convierte un diccionario.
 - `await Validator.validate(datos, ProductOutput)` sí comprueba tipos, restricciones y reglas de forma asíncrona antes de devolver la instancia.
 
-Los schemas de entrada y de salida pueden ser clases distintas. La [guía de controladores y schemas](/es/validation/controllers-and-http) explica la inyección del cuerpo y la validación explícita; las [otras integraciones](/es/validation/integrations) detallan sus diferencias con MCP y Realtime.
+Los schemas de entrada y de salida pueden ser clases distintas. La [guía de controladores y schemas](/es/validation/controllers-and-http) explica la inyección del cuerpo y la validación de salida; las [otras integraciones](/es/validation/integrations) detallan sus diferencias con MCP y Realtime.
 
 ## Texto, HTML y respuestas vacías
 

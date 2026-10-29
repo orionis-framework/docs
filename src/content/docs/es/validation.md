@@ -57,7 +57,7 @@ Envía un `POST /users/preview` con `Content-Type: application/json` y este cuer
 
 El contenedor inyecta `payload` como `UserSchema`; `newsletter` vale `False` al omitirse. La acción devuelve el schema y Orionis lo serializa como JSON con estado `200`. Este ejemplo devuelve una vista previa; no guarda un usuario. Un correo inválido o una edad menor que 18 impiden ejecutar la acción y producen la respuesta de validación de la ruta.
 
-No necesitas llamar al validador en esta acción. La anotación del parámetro activa la resolución del schema; devolver una instancia de schema permite serializarla, pero la anotación de retorno por sí sola no valida ni convierte la salida. Consulta [schemas de entrada y salida en controladores](/es/validation/controllers-and-http) para el comportamiento completo.
+No necesitas llamar al validador en esta acción. La anotación del parámetro activa la validación de entrada; devolver una instancia de `Schema` activa la validación de salida antes de serializarla. Se comprueban sus tipos, restricciones y reglas, incluidos los schemas hijos. La anotación de retorno por sí sola no convierte un diccionario en un schema. Consulta [schemas de entrada y salida en controladores](/es/validation/controllers-and-http) para el comportamiento completo.
 
 ## Cómo funciona
 
@@ -75,7 +75,7 @@ El proceso combina dos capas de validación:
 | `Annotated` / `Field` | Adjunta restricciones, reglas y metadatos a un tipo sin cambiar el tipo del campo. `Field` es un alias de `typing.Annotated`. |
 | Compilador de metadatos | Transforma restricciones y metadatos documentales en `msgspec.Meta`; detecta declaraciones incompatibles. |
 | Ejecutor de reglas | Recorre schemas hijos y colecciones; espera las reglas de cada campo en orden de declaración y acumula sus fallos. |
-| `ValidationException` | Reúne los fallos y expone mensajes agrupados por campo. |
+| `ValidationException` | Reúne los fallos y expone listas de objetos `{rule, message}` agrupadas por campo. |
 
 Los tipos, las restricciones y los metadatos documentales tienen funciones distintas. Por ejemplo, `str` exige una cadena, `MinLength(2)` limita su longitud, `Email()` comprueba su formato y `Description("...")` describe el campo sin validar su contenido.
 
@@ -83,7 +83,23 @@ Los tipos, las restricciones y los metadatos documentales tienen funciones disti
 
 La conversión conserva el comportamiento estricto de `msgspec`: `"36"` no es un `int` válido para `age`. Determinados tipos sí admiten representaciones de texto, como fechas ISO y UUID, según el tipo declarado.
 
-Orionis puede informar varios errores en una operación. Si falla la conversión inicial, vuelve a inspeccionar los campos para recopilar los errores estructurales y ejecutar reglas sobre los valores que se pudieron convertir. Si la conversión es correcta, acumula los fallos de las reglas en lugar de detenerse en la primera. Esto no implica enumerar todas las restricciones incumplidas simultáneamente por un mismo valor.
+Orionis acumula los errores de cada campo: restricciones incumplidas y reglas que devuelven `False`. Si falla la conversión inicial, inspecciona los campos para completar el diagnóstico. Un tipo incompatible o un campo ausente impide evaluar las condiciones que requieren su valor convertido; los demás campos y elementos siguen validándose.
+
+Cada elemento de `errors` incluye `rule` y `message`. Las reglas propias publican su `__code__`; las restricciones utilizan códigos como `ge`, `min_length` o `pattern`. El resumen cuenta fallos individuales, aunque varios pertenezcan al mismo campo:
+
+```json
+{
+  "message": "Quantity must be positive. (and 1 more error)",
+  "errors": {
+    "quantity": [
+      {"rule": "ge", "message": "Quantity must be positive."},
+      {"rule": "multiple_of", "message": "Quantity must be a multiple of 2."}
+    ]
+  }
+}
+```
+
+La ruta rápida conserva la conversión y las restricciones de `msgspec`, implementadas en código nativo. Los metadatos y planes se preparan al declarar la clase; la recopilación detallada se reserva para los datos inválidos. Las reglas Python y su I/O tienen su propio coste. La validación de salida HTTP sólo se activa al devolver directamente una instancia de `Schema`; las otras respuestas no recorren el validador.
 
 Las reglas de los schemas hijos también se ejecutan cuando están dentro de listas, tuplas, conjuntos o valores de diccionarios, incluso si otro campo falla la conversión. Los errores conservan su ubicación, como `contacts[0].email` o `contacts['primary'].email`. Consulta los [ejemplos de colecciones y errores parciales](/es/validation/validation-and-errors#schemas-en-colecciones).
 

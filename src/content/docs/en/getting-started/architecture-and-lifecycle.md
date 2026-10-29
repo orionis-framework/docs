@@ -340,7 +340,7 @@ Selects `AUTH_GUARD=session`, with `token` as an alternative; `AUTH_MODEL=app.mo
 
 ### `http.py`: HTTP server policies
 
-Groups body and multipart limits, WebSockets, proxies, hosts, CORS, CSRF and rate limiting. `HTTP_MAX_BODY_SIZE` allows 16 MiB and `HTTP_MAX_CONCURRENT_REQUESTS` allows 128. `TRUSTED_PROXIES` starts with `127.0.0.1`; CORS lists are empty. Rate limiting is disabled and CSRF enabled by default. `HTTP_MONITOR_DISCONNECTS=False` controls additional monitoring during handler execution; the local file reads this variable, while the core retains a constant `False` default.
+Groups body and multipart limits, WebSockets, proxies, hosts, CORS, CSRF and rate limiting. `HTTP_MAX_BODY_SIZE` allows 16 MiB and `HTTP_MAX_CONCURRENT_REQUESTS` allows 128. `TRUSTED_PROXIES` starts with `127.0.0.1`. Since 1.0.13, HTTP CORS defaults to `allow_origins=["*"]`; allowed-method, allowed-header and exposed-header lists remain empty, and `allow_credentials=False`. See [HTTP CORS](/en/http/middleware#http-cors) to configure requests from browser clients. Rate limiting is disabled and CSRF enabled by default. `HTTP_MONITOR_DISCONNECTS=False` controls additional monitoring during handler execution; the local file reads this variable, while the core retains a constant `False` default.
 
 ### `logging.py`: files and rotation
 

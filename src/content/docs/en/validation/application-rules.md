@@ -19,7 +19,7 @@ Import `Rule` from `orionis.schemas.rule` and subclass it. The executor recogniz
 | `field: str` | Field path, such as `address.code`, `contacts[0].email`, or `contacts['primary'].email`. |
 | `value: object` | Contains the current field's converted value. |
 | `instance: object` | Provides access to other available fields on the same object. |
-| `__code__` | Failure identifier. Defaults to the lowercase class name when omitted. |
+| `__code__` | Identifier published in `errors[field][i]["rule"]` and `ValidationFailure.rule`. Defaults to the lowercase class name when omitted. |
 | `__message__` | Default message for an invalid value. Define a useful description for the error recipient. |
 | `Rule(message=...)` | Overrides the default message for this declaration. Pass the argument by keyword. |
 
@@ -28,6 +28,22 @@ You do not need to override `async validate()`: the inherited implementation cal
 Declare `enforce()` with `async def` even when its calculation contains no `await`. A synchronous `def enforce(...)` override raises `TypeError` when the class is defined. There is no alternate `enforceAsync()` method or automatic adaptation of synchronous rules; subclasses may also inherit an existing asynchronous implementation.
 
 A rule reports an invalid value by returning `False`. Exceptions raised by its logic propagate; they are not automatically converted into validation failures.
+
+### Generate a rule with the CLI
+
+From the project root, use either command:
+
+```bash
+orionis make:http-schema-rule EvenRule
+```
+
+```bash
+python -B reactor make:http-schema-rule EvenRule
+```
+
+The command creates `app/http/schemas/rules/evenrule.py` with a `Rule` subclass, `__code__ = "custom_rule"`, `__message__ = "The value is invalid."`, and `async def enforce(self, field, value, instance) -> bool`. The path follows `app_http_schemas_rules`; the `Rule` suffix is added when missing. Existing files are not overwritten.
+
+Replace the code and message with your condition's values and implement `enforce`: the template raises `NotImplementedError` until that logic is completed. For the next example, name the class `EvenRule` and use `EvenRule()` on the field, or retain the independent example's `Even` class.
 
 ## Complete example: even quantities
 
@@ -83,7 +99,9 @@ Send `POST /batches/preview` with `Content-Type: application/json`:
 {
   "message": "Quantity must be even.",
   "errors": {
-    "quantity": ["Quantity must be even."]
+    "quantity": [
+      {"rule": "even", "message": "Quantity must be even."}
+    ]
   }
 }
 ```
@@ -159,7 +177,7 @@ With `Content-Type: application/json`, `POST /servers/check` accepts `{"host": "
   "message": "Host must resolve through DNS.",
   "errors": {
     "host": [
-      "Host must resolve through DNS."
+      {"rule": "resolvable_host", "message": "Host must resolve through DNS."}
     ]
   }
 }

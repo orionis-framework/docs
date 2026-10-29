@@ -45,9 +45,9 @@ La inyección valida el **cuerpo**: no mezcla automáticamente query string, par
 
 ## Devolver un schema
 
-El ejemplo devuelve una instancia de `ProfileOutput`; el kernel la serializa como JSON con estado `200`. La anotación `-> ProfileOutput` describe el retorno, pero **no valida ni convierte automáticamente la salida**. Si necesitas comprobarla, ejecuta explícitamente `await Validator.validate(..., ProfileOutput)` antes de devolverla.
+El ejemplo devuelve una instancia de `ProfileOutput`; el framework valida sus tipos, restricciones y reglas antes de serializarla como JSON con estado `200`. Esta comprobación depende de la instancia devuelta, incluso sin anotación de retorno. `-> ProfileOutput` por sí solo no convierte un diccionario en un schema. Las respuestas que no son una instancia directa de `Schema` no pasan por esta validación.
 
-Con el manejo predeterminado, los errores de validación producen JSON `422` en rutas API. En WEB, producen JSON `422` para solicitudes que esperan JSON o son AJAX, y una redirección `302` con errores de sesión para la navegación habitual. Consulta los [detalles de entrada, salida y errores HTTP](/es/validation/controllers-and-http).
+Con el manejo predeterminado, los errores de **entrada** producen JSON `422` en rutas API, con listas de objetos `{rule, message}` por campo. En WEB, producen JSON `422` para solicitudes que esperan JSON o son AJAX, y una redirección `302` con errores de sesión para la navegación habitual. Una salida Schema inválida produce un error de servidor `500`. Consulta los [detalles de entrada, salida y errores HTTP](/es/validation/controllers-and-http).
 
 ## Guía completa de Validación
 

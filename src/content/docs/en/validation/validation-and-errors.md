@@ -88,17 +88,21 @@ The controller does not run. Default API handling responds with status `422` and
 {
   "message": "Quantity must be positive. (and 3 more errors)",
   "errors": {
-    "quantity": ["Quantity must be positive."],
-    "reference": [
-      "Use lowercase characters.",
-      "Reference must start with ord-."
+    "quantity": [
+      {"rule": "ge", "message": "Quantity must be positive."}
     ],
-    "contact.email": ["Enter a valid email address."]
+    "reference": [
+      {"rule": "lowercase", "message": "Use lowercase characters."},
+      {"rule": "starts_with", "message": "Reference must start with ord-."}
+    ],
+    "contact.email": [
+      {"rule": "email", "message": "Enter a valid email address."}
+    ]
   }
 }
 ```
 
-The collector preserves the `quantity` error and also executes rules on values that converted successfully. This produces two messages for `reference` and the direct child's `contact.email` failure.
+The collector preserves the `quantity` error and also executes rules on values that converted successfully. This produces two failures for `reference` and the direct child's `contact.email` failure. The `rule` identifier distinguishes the violated condition without interpreting its message.
 
 ## Inspect an exception
 
@@ -108,7 +112,7 @@ Automatic injection leaves HTTP error handling to the framework. Use this API to
 | --- | --- |
 | `error.failures` | Tuple of collected failures. Each failure exposes `field`, `rule`, and `message`. |
 | `error.failure` | First failure; `None` if the exception was constructed without failures. |
-| `error.errors` | Dictionary mapping field names to lists of messages. Preserves several messages for a field. |
+| `error.errors` | Dictionary mapping field names to lists of objects containing `rule` and `message`. Preserves every collected failure for each field. |
 | `error.message` | Summary: the first message and, when more failures exist, their remaining count. |
 | `error.error()` | Serializable dictionary with `message` and `errors` keys. |
 | `failure.toDict()` | Dictionary containing `field`, `rule`, and `message` for one failure. |
@@ -123,7 +127,9 @@ The example's first failure is represented as follows:
 }
 ```
 
-The summary uses the first error's text and an English suffix for additional failures. Use `errors` to present messages by field and `rule` on individual failures to identify the cause. There is no need to parse the summary text.
+The summary uses the first error's text and a suffix for additional failures: `(and 1 more error)` or `(and N more errors)`. It counts failures, not fields. To present errors by field, consume `errors[field]` and read `item["message"]`; `item["rule"]` identifies the condition. There is no need to parse the summary text.
+
+Rules publish their `__code__`, such as `email` or `starts_with`; custom rules that omit it use the lowercase class name. Constraints use codes such as `ge`, `multiple_of`, `min_length`, and `pattern`. Incompatible types use `type`, and missing required fields use `missing`. `failure.toDict()` adds `field` to the same code and message pair.
 
 Field paths include dots for nested objects, such as `contact.email`, collection indices, such as `contacts[0].email`, and actual dictionary keys, such as `contacts['primary'].email`. This notation applies to both conversion failures and rules. Dictionary keys use `repr()` and may appear with single or double quotes; set indices describe iteration order rather than a stable position. An error concerning the complete payload may use an empty key.
 
@@ -131,10 +137,50 @@ Field paths include dots for nested objects, such as `contact.email`, collection
 
 1. The validator attempts to convert the whole payload and apply structural constraints through `msgspec`.
 2. If conversion succeeds, it awaits rules on converted fields and traverses child schemas, including those inside collections. Every rule uses `async def enforce()` and is awaited through `Rule.validate()`.
-3. If conversion fails, it inspects declared fields to collect conversion errors and missing required fields. It descends into collection children to preserve their failures and also awaits rules on successfully converted values.
+3. If conversion fails, it inspects declared fields to collect conversion errors and missing required fields. For each type-compatible value, it checks every constraint and awaits every rule, even when a constraint fails. It also descends into collection children to preserve their failures.
 4. It groups the collected failures into one `ValidationException`.
 
-Rules on a field follow declaration order; a `False` result does not cancel subsequent checks. During nested traversal, children are validated before rules on their containing field. Checks are awaited sequentially rather than launching every field in parallel. Rules do not execute on a value that failed conversion, but valid fields on that child and other elements are still checked. A field's conversion diagnostic may describe only its first failing constraint; error collection does not guarantee a message for every violated condition across all types and containers.
+Rules on a field follow declaration order; a `False` result does not cancel subsequent checks. During nested traversal, children are validated before rules on their containing field. Checks are awaited sequentially rather than launching every field in parallel. An incompatible type or missing field prevents conditions requiring its converted value from running; valid fields on that child and other elements are still checked.
+
+### Multiple constraints on the same field
+
+This independent example combines two native constraints and a Python rule on one field. Save it as `validation_example.py` at the project root and run `python validation_example.py`:
+
+```python
+import asyncio
+
+from orionis.schemas import Schema
+from orionis.schemas.constraints import Lowercase, MinLength, Pattern
+from orionis.schemas.exceptions import ValidationException
+from orionis.schemas.fields import Field
+from orionis.schemas.validator import Schema as Validator
+
+
+class Reference(Schema):
+    value: Field[
+        str,
+        MinLength(6, message="Use at least 6 characters."),
+        Pattern(r"^ord-", message="Start with ord-."),
+        Lowercase(message="Use lowercase characters."),
+    ]
+
+
+async def main() -> None:
+    try:
+        await Validator.validate({"value": "ABC"}, Reference)
+    except ValidationException as error:
+        assert {item["rule"] for item in error.errors["value"]} == {
+            "min_length", "pattern", "lowercase",
+        }
+        print(error.error())
+
+
+asyncio.run(main())
+```
+
+`"ABC"` has the correct type but violates both constraints and the rule: `errors["value"]` contains three objects. Supplying `42` reports a `type` error; string conditions are not applied to that integer.
+
+Valid data retains msgspec's native conversion and the plans prepared when the class is declared. Detailed traversal runs after that conversion fails; it is not repeated for every valid request. Python rules and their I/O waits still have their own cost.
 
 The validator accepts no `bail`, `max_errors`, or first-error policy options: its `async validate()` method takes only `payload` and `schema`.
 
@@ -204,10 +250,18 @@ The action does not run. Default API handling returns status `422` with these er
 {
   "message": "Email must be a string. (and 3 more errors)",
   "errors": {
-    "contacts[0].email": ["Email must be a string."],
-    "contacts[1].email": ["Enter a valid email address."],
-    "contacts[2].nickname": ["Nickname must have at least 3 characters."],
-    "count": ["Count must be an integer."]
+    "contacts[0].email": [
+      {"rule": "type", "message": "Email must be a string."}
+    ],
+    "contacts[1].email": [
+      {"rule": "email", "message": "Enter a valid email address."}
+    ],
+    "contacts[2].nickname": [
+      {"rule": "min_length", "message": "Nickname must have at least 3 characters."}
+    ],
+    "count": [
+      {"rule": "type", "message": "Count must be an integer."}
+    ]
   }
 }
 ```
@@ -226,7 +280,7 @@ Rules comparing fields on a child receive that child as their context. During pa
 
 In `Order`, an incompatible quantity type uses `"Quantity must be an integer."`; the integer `0` uses `"Quantity must be positive."`. `Message` does not replace every message for the field or the error for a missing required field.
 
-The parser associates structural messages with the constraint identified by the diagnostic. Strict integer bounds may normalize: for example, `GreaterThan(0)` is reported as `ge` with bound `1`. To customize that case, declare `GreaterThanOrEqual(1, message="...")`, as in the example.
+Constraint failures preserve the declared code and its custom message. For example, `GreaterThan(0, message="Must be positive.")` reports `gt`, even if msgspec internally expresses the integer bound as `>= 1`.
 
 ## Use results and handle application errors
 

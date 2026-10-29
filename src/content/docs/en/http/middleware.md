@@ -265,6 +265,33 @@ Early kernel responses, automatic `OPTIONS` and unresolved routes with their pos
 
 When changing registrations in an application with compiled configuration, review [cache invalidation and process restart](/en/application/paths-and-caching).
 
+## HTTP CORS
+
+Since Orionis **1.0.13**, HTTP CORS defaults to `allow_origins=["*"]`. An empty list is also normalized to `["*"]`; declare explicit origins to restrict access by origin. This enables responses with `Access-Control-Allow-Origin: *` and makes it easier to test APIs from browser clients such as Postman or Hoppscotch without installing a desktop client. The endpoint must be reachable from the browser.
+
+The wildcard applies to origins. `allow_methods`, `allow_headers` and `expose_headers` still default to `[]`; `allow_credentials` is `False`. When the browser sends an `OPTIONS` preflight, configure the methods and headers that the request needs. For example, to permit `GET` and JSON `POST` requests with an `Authorization` header, add or adjust the `cors` field in your existing `BootstrapHTTP` class in `config/http.py`:
+
+```python
+from dataclasses import dataclass, field
+from orionis.foundation.config.http import HTTP, Cors
+
+
+@dataclass(frozen=True, kw_only=True)
+class BootstrapHTTP(HTTP):
+    cors: Cors | dict = field(
+        default_factory=lambda: Cors(
+            allow_origins=["*"],
+            allow_methods=["GET", "POST", "OPTIONS"],
+            allow_headers=["Content-Type", "Authorization"],
+            allow_credentials=False,
+        ),
+    )
+```
+
+Keep the other fields in your existing configuration. CORS is an internal kernel layer; it does not require registration through `app.withMiddleware()`. For cross-origin cookies with credentials, configure explicit origins and `allow_credentials=True`: the framework rejects credentials combined with `allow_origins=["*"]`.
+
+This default belongs to HTTP. [WebSocket](/en/realtime/websocket) and [MCP](/en/mcp/stdio-and-configuration) keep their own origin policies. Use [`serve --host`](/en/console/built-in-application#command-serve) to change the server's bind address.
+
 ## Assigning middleware to a route
 
 In the file registered as API, usually `routes/api.py`, import the classes and use `.middleware(...)`:

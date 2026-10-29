@@ -88,17 +88,21 @@ El controlador no se ejecuta. El manejo API predeterminado responde con estado `
 {
   "message": "Quantity must be positive. (and 3 more errors)",
   "errors": {
-    "quantity": ["Quantity must be positive."],
-    "reference": [
-      "Use lowercase characters.",
-      "Reference must start with ord-."
+    "quantity": [
+      {"rule": "ge", "message": "Quantity must be positive."}
     ],
-    "contact.email": ["Enter a valid email address."]
+    "reference": [
+      {"rule": "lowercase", "message": "Use lowercase characters."},
+      {"rule": "starts_with", "message": "Reference must start with ord-."}
+    ],
+    "contact.email": [
+      {"rule": "email", "message": "Enter a valid email address."}
+    ]
   }
 }
 ```
 
-El recolector conserva el error de `quantity` y también ejecuta las reglas de los valores que sí se convirtieron. Por eso `reference` contiene dos mensajes y el hijo directo aporta `contact.email`.
+El recolector conserva el error de `quantity` y también ejecuta las reglas de los valores que sí se convirtieron. Por eso `reference` contiene dos fallos y el hijo directo aporta `contact.email`. El identificador `rule` permite distinguir la condición incumplida sin interpretar el mensaje.
 
 ## Consultar una excepción
 
@@ -108,7 +112,7 @@ La inyección automática deja el tratamiento HTTP al framework. La siguiente AP
 | --- | --- |
 | `error.failures` | Tupla de los fallos recopilados. Cada fallo expone `field`, `rule` y `message`. |
 | `error.failure` | Primer fallo; es `None` si la excepción se construyó sin fallos. |
-| `error.errors` | Diccionario de nombres de campo a listas de mensajes. Conserva varios mensajes sobre un campo. |
+| `error.errors` | Diccionario de nombres de campo a listas de objetos con `rule` y `message`. Conserva todos los fallos recopilados de cada campo. |
 | `error.message` | Resumen: primer mensaje y, si hay más fallos, su cantidad restante. |
 | `error.error()` | Diccionario serializable con las claves `message` y `errors`. |
 | `failure.toDict()` | Diccionario con `field`, `rule` y `message` para ese fallo individual. |
@@ -123,7 +127,9 @@ En el ejemplo, el primer fallo se representa así:
 }
 ```
 
-El resumen utiliza el texto del primer error y un sufijo en inglés para los adicionales. Para presentar los errores por campo, consume `errors`; para distinguir su causa, utiliza `rule` en los fallos individuales. No necesitas analizar el texto del resumen.
+El resumen utiliza el texto del primer error y un sufijo en inglés para los adicionales: `(and 1 more error)` o `(and N more errors)`. Cuenta fallos, no campos. Para presentar los errores por campo, consume `errors[field]` y lee `item["message"]`; `item["rule"]` identifica la condición. No necesitas analizar el texto del resumen.
+
+Las reglas publican su `__code__`, como `email` o `starts_with`; si una regla propia lo omite, utiliza el nombre de su clase en minúsculas. Las restricciones usan códigos como `ge`, `multiple_of`, `min_length` y `pattern`. Los tipos incompatibles usan `type` y los campos obligatorios ausentes, `missing`. `failure.toDict()` añade `field` al mismo par de código y mensaje.
 
 Las rutas de campos incluyen puntos para objetos anidados, como `contact.email`, índices de colecciones, como `contacts[0].email`, y claves reales de diccionario, como `contacts['primary'].email`. Esta notación se usa tanto en fallos de conversión como en reglas. Las claves de diccionario se representan mediante `repr()` y pueden usar comillas simples o dobles; los índices de conjuntos describen su orden de iteración, no una posición estable. Un error sobre el payload completo puede utilizar una clave vacía.
 
@@ -131,10 +137,50 @@ Las rutas de campos incluyen puntos para objetos anidados, como `contact.email`,
 
 1. El validador intenta convertir todo el payload y aplicar las restricciones estructurales mediante `msgspec`.
 2. Si esa conversión funciona, espera las reglas de los campos convertidos y recorre los schemas hijos, también dentro de colecciones. Cada regla utiliza `async def enforce()` y se espera mediante `Rule.validate()`.
-3. Si la conversión falla, inspecciona los campos declarados para recopilar los errores de conversión y los obligatorios ausentes. Desciende a los hijos de las colecciones para conservar sus fallos y también espera las reglas de los valores convertidos correctamente.
+3. Si la conversión falla, inspecciona los campos declarados para recopilar los errores de conversión y los obligatorios ausentes. Sobre cada valor compatible con su tipo comprueba todas las restricciones y espera todas sus reglas, aunque alguna restricción falle. Desciende también a los hijos de las colecciones para conservar sus fallos.
 4. Agrupa los fallos encontrados en una sola `ValidationException`.
 
-Las reglas de un campo siguen el orden de su declaración y un resultado `False` no cancela las siguientes. En un recorrido anidado, los hijos se validan antes de las reglas del campo que los contiene. Las comprobaciones se esperan secuencialmente, sin lanzar todos los campos en paralelo. No se ejecutan las reglas del valor que no pudo convertirse, pero eso no impide comprobar los campos válidos de ese hijo ni otros elementos. El diagnóstico de conversión de un campo puede describir sólo la primera restricción que falla; la colección de errores no garantiza un mensaje para cada condición incumplida de todos los tipos y contenedores.
+Las reglas de un campo siguen el orden de su declaración y un resultado `False` no cancela las siguientes. En un recorrido anidado, los hijos se validan antes de las reglas del campo que los contiene. Las comprobaciones se esperan secuencialmente, sin lanzar todos los campos en paralelo. Un tipo incompatible o un campo ausente impide ejecutar las condiciones que requieren su valor convertido, pero eso no impide comprobar los campos válidos de ese hijo ni otros elementos.
+
+### Varias restricciones del mismo campo
+
+Este ejemplo independiente combina dos restricciones nativas y una regla Python en un mismo campo. Guárdalo como `validation_example.py` en la raíz del proyecto y ejecútalo con `python validation_example.py`:
+
+```python
+import asyncio
+
+from orionis.schemas import Schema
+from orionis.schemas.constraints import Lowercase, MinLength, Pattern
+from orionis.schemas.exceptions import ValidationException
+from orionis.schemas.fields import Field
+from orionis.schemas.validator import Schema as Validator
+
+
+class Reference(Schema):
+    value: Field[
+        str,
+        MinLength(6, message="Use at least 6 characters."),
+        Pattern(r"^ord-", message="Start with ord-."),
+        Lowercase(message="Use lowercase characters."),
+    ]
+
+
+async def main() -> None:
+    try:
+        await Validator.validate({"value": "ABC"}, Reference)
+    except ValidationException as error:
+        assert {item["rule"] for item in error.errors["value"]} == {
+            "min_length", "pattern", "lowercase",
+        }
+        print(error.error())
+
+
+asyncio.run(main())
+```
+
+`"ABC"` tiene el tipo correcto, pero incumple las dos restricciones y la regla: `errors["value"]` contiene tres objetos. Si envías `42`, se informa el error `type`; no se aplican las condiciones de cadena a ese entero.
+
+El caso válido conserva la conversión nativa de `msgspec` y los planes preparados al declarar la clase. El recorrido detallado se utiliza al fallar esa conversión; no se repite para cada petición válida. Las reglas Python y sus esperas de I/O siguen teniendo su propio coste.
 
 El validador no recibe opciones `bail`, `max_errors` ni una política para detenerse en el primer error: su método `async validate()` acepta únicamente `payload` y `schema`.
 
@@ -204,10 +250,18 @@ La acción no se ejecuta. El manejo API predeterminado devuelve estado `422` con
 {
   "message": "Email must be a string. (and 3 more errors)",
   "errors": {
-    "contacts[0].email": ["Email must be a string."],
-    "contacts[1].email": ["Enter a valid email address."],
-    "contacts[2].nickname": ["Nickname must have at least 3 characters."],
-    "count": ["Count must be an integer."]
+    "contacts[0].email": [
+      {"rule": "type", "message": "Email must be a string."}
+    ],
+    "contacts[1].email": [
+      {"rule": "email", "message": "Enter a valid email address."}
+    ],
+    "contacts[2].nickname": [
+      {"rule": "min_length", "message": "Nickname must have at least 3 characters."}
+    ],
+    "count": [
+      {"rule": "type", "message": "Count must be an integer."}
+    ]
   }
 }
 ```
@@ -226,7 +280,7 @@ Las reglas que comparan campos de un hijo reciben ese hijo como contexto. En una
 
 En `Order`, una cantidad con tipo incompatible utiliza `"Quantity must be an integer."`; el entero `0` utiliza `"Quantity must be positive."`. `Message` no sustituye todos los mensajes del campo ni el error de un campo obligatorio ausente.
 
-El parser asocia los mensajes estructurales con la restricción indicada por el diagnóstico. Los límites estrictos sobre enteros pueden normalizarse: por ejemplo, `GreaterThan(0)` se informa como `ge` con límite `1`. Para personalizar ese caso, declara `GreaterThanOrEqual(1, message="...")`, como en el ejemplo.
+Los fallos conservan el código y el mensaje de la restricción declarada. Por ejemplo, `GreaterThan(0, message="Quantity must be positive.")` informa `rule: "gt"`, aunque el diagnóstico interno de `msgspec` exprese el límite entero como `>= 1`. No necesitas sustituirla por `GreaterThanOrEqual` para personalizar el mensaje.
 
 ## Usar el resultado y tratar errores de aplicación
 

@@ -73,11 +73,11 @@ Ejecuta las comprobaciones con la identidad y el directorio del servicio. `serve
 python -B reactor serve --interface asgi --port 8000 --log
 ```
 
-También puedes usar `orionis serve --interface asgi --port 8000 --log`. Reactor admite `--interface` (`rsgi` por defecto o `asgi`), `--port` (8000), `--log` y `--export`; **no expone `--host`, `--workers` ni `--reload`**.
+También puedes usar `orionis serve --interface asgi --port 8000 --log`. Reactor admite `--interface` (`rsgi` por defecto o `asgi`), `--host` (desde 1.0.13), `--port` (8000), `--log` y `--export`. Para fijar la escucha al proxy local, añade `--host 127.0.0.1`. Las opciones `--workers` y `--reload` se configuran al invocar Granian directamente.
 
 | Decisión | `serve` | Servicios de estas guías |
 | --- | --- | --- |
-| Dirección | Loopback en desarrollo; `0.0.0.0` en producción | Loopback en Windows/Linux; red privada en Docker |
+| Dirección | `--host`; al omitirlo, loopback en desarrollo y `0.0.0.0` en producción | Loopback en Windows/Linux; red privada en Docker |
 | Workers | Uno en Windows; número de CPU en Unix | Uno explícito |
 | Recarga | Solo fuera de producción | Deshabilitada explícitamente |
 | Archivos públicos | Lee el disco `public` | Montaje equivalente configurado en Granian |

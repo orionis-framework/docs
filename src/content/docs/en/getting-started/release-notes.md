@@ -1,11 +1,67 @@
 ---
 title: "Release notes"
-description: "Orionis 1.0.8 through 1.0.12: Loop on Python 3.14, tests, schema generation, queue migration, HTTP performance, and the Debug facade."
+description: "Orionis 1.0.8 through 1.0.14: schema validation, serve --host, HTTP CORS, performance, queues, and the Debug facade."
 editUrl: true
 lastUpdated: false
 ---
 
-These notes cover **versions 1.0.8 through 1.0.12** and link to the updated usage guides. Run Reactor examples from the application root using its Python environment.
+These notes cover **versions 1.0.8 through 1.0.14** and link to the updated usage guides. Run Reactor examples from the application root using its Python environment.
+
+<a id="v1-0-14"></a>
+
+## 1.0.14: schema validation
+
+This release improves `orionis.schemas` validation for input data and schemas returned by HTTP controllers.
+
+### Structured errors and multiple failures per field
+
+Each entry in `ValidationException.errors[field]` now contains `rule` and `message`. Custom rules retain their `__code__` identifier; native constraints report codes such as `ge`, `gt`, `multiple_of`, or `min_length`.
+
+The validator collects applicable constraints and rules that fail on the same field. For example, a negative odd quantity can violate both `GreaterThanOrEqual(1)` and `MultipleOf(2)`. With custom messages supplied through `message=`, the result can be:
+
+```json
+{
+  "message": "Quantity must be positive. (and 1 more error)",
+  "errors": {
+    "quantity": [
+      {"rule": "ge", "message": "Quantity must be positive."},
+      {"rule": "multiple_of", "message": "Quantity must be even."}
+    ]
+  }
+}
+```
+
+The summary counts failures, not fields. An incompatible type produces a type error and skips rules that require the converted value. Nested schemas and collection errors retain paths such as `items[0].quantity`. When updating API consumers, read `error["message"]` where you previously received a string; `error["rule"]` identifies the failed condition. WEB forms retain text messages in the flash error bag. See [validation and errors](/en/validation/validation-and-errors).
+
+### Automatic HTTP output validation
+
+When an action returns a `Schema` instance directly, the framework checks its types, constraints, and rules before serialization. This also revalidates modified instances and nested schemas. Invalid output follows server error handling and produces `500` with the default configuration.
+
+The check depends on the returned value: a return annotation does not convert or validate a dictionary. `dict` and `Response` results retain their paths without running output validation. Returning the same schema received as input runs its rules again; use an appropriate output contract when rules call external services. See [schemas in HTTP controllers](/en/validation/controllers-and-http).
+
+### Compilation, performance, and rule generation
+
+Native constraints also compile inside collections and unions, such as `list[Field[int, GreaterThanOrEqual(1)]]` and `Nullable[Field[int, GreaterThanOrEqual(1)]]`. Custom messages and renamed fields are preserved. The [schema declaration guide](/en/validation/declaring-schemas) includes executable examples of all seven type aliases.
+
+Successful conversion keeps native checks in C through `msgspec`, using prepared, reusable plans. Detailed collection runs on invalid input, and Python traversal skips children without custom rules. Asynchronous rules and their I/O operations retain their own cost.
+
+The `make:http-schema-rule` generator uses the updated stub with `async def enforce(...)`, `__code__`, and `__message__`. See [custom rules](/en/validation/application-rules) to implement the asynchronous contract.
+
+<a id="v1-0-13"></a>
+
+## 1.0.13: serve --host and HTTP CORS
+
+The `serve` command adds `--host` to select the listening address explicitly:
+
+```bash
+python reactor serve --host 0.0.0.0 --port 8000
+```
+
+`0.0.0.0` listens on all IPv4 interfaces. Omitting `--host` preserves `127.0.0.1` in development and `0.0.0.0` in production; the default port is `8000`. See [server entry points](/en/application/server-entrypoints).
+
+The **HTTP** CORS configuration changes the default `allow_origins` value to `["*"]`. This allows external browser origins and makes it easier to test endpoints with web clients such as Postman or Hoppscotch without installing a desktop client, provided the browser can reach the API. An empty list is also normalized to `["*"]`; configure explicit origins to restrict access by origin.
+
+The change concerns allowed origins: requests requiring preflight also need methods and headers permitted through `allow_methods` and `allow_headers`. `allow_credentials` remains `False`; enabling credentials requires explicit origins instead of `"*"`. See [HTTP CORS](/en/http/middleware). WebSocket and MCP origin policies are configured separately.
 
 <a id="v1-0-12"></a>
 

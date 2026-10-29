@@ -1,6 +1,6 @@
 ---
 title: "Validación en controladores y respuestas"
-description: "Guía completa de inyección de schemas en controladores HTTP, validación asíncrona, errores API y WEB, serialización y validación explícita de la salida."
+description: "Guía completa de inyección de schemas en controladores HTTP, validación asíncrona de entrada y salida y errores API y WEB."
 editUrl: true
 lastUpdated: false
 ---
@@ -149,19 +149,19 @@ Para el cuerpo inválido `{"name": "x", "email": "bad", "age": 17}`, el endpoint
   "message": "Name must have at least 2 characters. (and 2 more errors)",
   "errors": {
     "name": [
-      "Name must have at least 2 characters."
+      {"rule": "min_length", "message": "Name must have at least 2 characters."}
     ],
     "age": [
-      "Age must be at least 18."
+      {"rule": "ge", "message": "Age must be at least 18."}
     ],
     "email": [
-      "Email is invalid."
+      {"rule": "email", "message": "Email is invalid."}
     ]
   }
 }
 ```
 
-`message` resume el primer fallo y los restantes; `errors` agrupa los mensajes por campo. Puede haber varios fallos de una misma operación. La [API de errores](/es/validation/validation-and-errors) explica cómo inspeccionarlos y personalizarlos.
+`message` resume el primer fallo y cuenta los restantes; `errors` agrupa objetos `{rule, message}` por campo. Un campo puede aportar varios fallos de restricciones y reglas. La [API de errores](/es/validation/validation-and-errors) explica cómo inspeccionarlos y personalizarlos.
 
 En una redirección WEB, se usa primero la URL anterior de sesión, después un `Referer` permitido del mismo origen y, como alternativa, la URL actual. El input conservado excluye campos sensibles de primer nivel como `password` y `password_confirmation`. Consulta [sesiones y datos flash](/es/sessions/state-and-flash).
 
@@ -169,35 +169,45 @@ Estas respuestas corresponden a fallos del schema con el manejo predeterminado. 
 
 ## Devolver schemas y validar la salida
 
-El kernel acepta una instancia de `Schema`, porque hereda de `msgspec.Struct`, y la envuelve en una `JSONResponse` con estado `200`. La respuesta realiza la serialización JSON; no necesitas llamar a `toDict()`.
+Cuando la acción devuelve directamente una instancia de `Schema`, el framework valida sus tipos, restricciones y reglas antes de envolverla en una `JSONResponse` con estado `200`. También comprueba los schemas hijos y los elementos de sus colecciones. No necesitas llamar a `toDict()` ni validar manualmente esa salida.
 
 Distingue estos comportamientos:
 
-- Anotar `-> UserPreviewSchema` no convierte un diccionario devuelto en esa clase.
-- Devolver una instancia de `UserPreviewSchema` permite serializar sus campos a JSON.
-- Construir esa instancia directamente no ejecuta validación de tipos, restricciones ni reglas.
-- El kernel no vuelve a validar el valor de salida, aunque el retorno esté anotado.
+- La comprobación se activa por el valor real: una instancia de `Schema` se valida incluso sin anotación de retorno.
+- Anotar `-> UserPreviewSchema` no convierte un diccionario devuelto en esa clase ni valida ese diccionario.
+- Construir una instancia directamente no ejecuta la validación; el framework la realiza al procesarla como salida HTTP.
+- Una instancia modificada después de validar la entrada también se vuelve a comprobar al devolverla.
+- Las respuestas ordinarias (`dict` o una `Response` ya construida) no ejecutan este validador. Tampoco se busca recursivamente un Schema dentro de cualquier contenedor devuelto.
 
-Si los datos de salida también requieren comprobaciones, valídalos explícitamente antes de devolverlos. Esta es una alternativa completa para el mismo controlador:
+Las reglas de salida pertenecen al schema devuelto. Este ejemplo independiente permite observar la validación automática:
 
 ```python
-from app.http.schemas.create_user_schema import CreateUserSchema
-from app.http.schemas.user_preview_schema import UserPreviewSchema
 from orionis.http.base import BaseController
-from orionis.schemas.validator import Schema as Validator
+from orionis.schemas import Schema
+from orionis.schemas.constraints import GreaterThanOrEqual
+from orionis.schemas.fields import Field
+from orionis.support.facades import Route
 
 
-class PreviewUserController(BaseController):
-    async def __call__(self, payload: CreateUserSchema) -> UserPreviewSchema:
-        return await Validator.validate(
-            {"name": payload.name, "email": payload.email, "age": payload.age},
-            UserPreviewSchema,
-        )
+class StockOutput(Schema):
+    quantity: Field[int, GreaterThanOrEqual(0)]
+
+
+class StockController(BaseController):
+    async def __call__(self) -> StockOutput:
+        return StockOutput(quantity=5)
+
+
+Route.get("/stock", StockController)
 ```
 
-`UserPreviewSchema` comprueba aquí sus tipos declarados; si necesitas reglas adicionales para la salida, debes declararlas en ese schema. El alias `Validator` distingue la API de validación de la clase base declarativa `Schema`.
+Coloca el bloque en tu archivo de rutas API o separa las clases e impórtalas antes del registro. `GET /stock` devuelve `{"quantity": 5}`. Si cambias el retorno a `StockOutput(quantity=-1)`, el constructor crea la instancia, pero la validación de salida rechaza su cantidad. Una cadena como `StockOutput(quantity="bad")` también se rechaza por tipo.
 
-Para controlar el estado o las cabeceras, devuelve una respuesta explícita, por ejemplo `response.json(schema, status_code=202)`, importando `response` desde `orionis.http`. Esa construcción tampoco valida el schema. Consulta [respuestas HTTP](/es/http/responses) para configurar la respuesta.
+Una salida inválida es un fallo de la aplicación: con el manejo predeterminado produce **HTTP `500`**, no el `422` de un cuerpo de entrada inválido ni una redirección de formulario. La respuesta al cliente sigue el manejo de errores de servidor y su configuración de depuración; no uses sus detalles como contrato público de errores de entrada.
+
+Si devuelves el schema que recibiste como parámetro, sus reglas se ejecutan tanto para la entrada como para la salida. Tenlo en cuenta si una regla consulta servicios externos. Diseña esas comprobaciones sin efectos secundarios y declara un schema de salida adecuado a los datos que publicas.
+
+Para controlar el estado o las cabeceras, puedes devolver una respuesta explícita, por ejemplo `response.json(schema, status_code=202)`, importando `response` desde `orionis.http`. El resultado ya es una respuesta, por lo que no activa esta comprobación de Schema directo. Si necesitas validar su contenido, ejecuta `await Validator.validate(datos, TuSchema)` antes de construirla. Consulta [respuestas HTTP](/es/http/responses) para configurar la respuesta.
 
 ## Validación manual como alternativa
 

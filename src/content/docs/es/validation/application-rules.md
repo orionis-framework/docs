@@ -19,7 +19,7 @@ Importa `Rule` desde `orionis.schemas.rule` y crea una subclase. El ejecutor rec
 | `field: str` | Ruta del campo, por ejemplo `address.code`, `contacts[0].email` o `contacts['primary'].email`. |
 | `value: object` | Contiene el valor convertido del campo actual. |
 | `instance: object` | Permite consultar otros campos disponibles del mismo objeto. |
-| `__code__` | Identificador del fallo. Si se omite, se usa el nombre de la clase en minúsculas. |
+| `__code__` | Identificador publicado en `errors[field][i]["rule"]` y en `ValidationFailure.rule`. Si se omite, se usa el nombre de la clase en minúsculas. |
 | `__message__` | Mensaje predeterminado para un valor inválido. Define un texto útil para quien recibe el error. |
 | `Rule(message=...)` | Sustituye el mensaje predeterminado para esa declaración. El argumento se pasa por nombre. |
 
@@ -28,6 +28,22 @@ No necesitas sobrescribir `async validate()`: la implementación heredada ejecut
 `enforce()` debe declararse con `async def` incluso si su cálculo no contiene `await`. Una sobrescritura síncrona con `def enforce(...)` provoca un `TypeError` al definir la clase. No existe un método alternativo `enforceAsync()` ni una adaptación automática de reglas síncronas; también puedes heredar una implementación asíncrona de otra regla.
 
 Una regla informa un valor inválido con `False`. Una excepción lanzada desde su lógica se propaga y no se convierte automáticamente en un fallo de validación.
+
+### Generar una regla con el CLI
+
+Desde la raíz del proyecto, utiliza una de estas alternativas:
+
+```bash
+orionis make:http-schema-rule EvenRule
+```
+
+```bash
+python -B reactor make:http-schema-rule EvenRule
+```
+
+El comando crea `app/http/schemas/rules/evenrule.py` con una subclase de `Rule`, `__code__ = "custom_rule"`, `__message__ = "The value is invalid."` y `async def enforce(self, field, value, instance) -> bool`. La ruta corresponde a `app_http_schemas_rules`; el sufijo `Rule` se añade si falta. No sobrescribe un archivo existente.
+
+Sustituye el código y el mensaje por los de tu condición e implementa `enforce`: la plantilla lanza `NotImplementedError` hasta completar esa lógica. Para el ejemplo siguiente, puedes nombrar la clase `EvenRule` y usar `EvenRule()` en el campo, o conservar el ejemplo autónomo con la clase `Even`.
 
 ## Ejemplo completo: cantidades pares
 
@@ -83,7 +99,9 @@ Envía un `POST /batches/preview` con `Content-Type: application/json`:
 {
   "message": "Quantity must be even.",
   "errors": {
-    "quantity": ["Quantity must be even."]
+    "quantity": [
+      {"rule": "even", "message": "Quantity must be even."}
+    ]
   }
 }
 ```
@@ -159,7 +177,7 @@ Con `Content-Type: application/json`, `POST /servers/check` acepta `{"host": "lo
   "message": "Host must resolve through DNS.",
   "errors": {
     "host": [
-      "Host must resolve through DNS."
+      {"rule": "resolvable_host", "message": "Host must resolve through DNS."}
     ]
   }
 }

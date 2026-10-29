@@ -45,9 +45,9 @@ Injection validates the **body**: it does not automatically merge query strings,
 
 ## Returning a schema
 
-The example returns a `ProfileOutput` instance; the kernel serializes it as JSON with status `200`. The `-> ProfileOutput` annotation describes the return value but **does not automatically validate or convert output**. To check output, explicitly run `await Validator.validate(..., ProfileOutput)` before returning it.
+The example returns a `ProfileOutput` instance; the framework validates its types, constraints, and rules before serializing it as JSON with status `200`. This check depends on the returned instance, even without a return annotation. `-> ProfileOutput` alone does not convert a dictionary into a schema. Responses that are not direct `Schema` instances do not enter this validation.
 
-With default handling, validation failures produce JSON `422` in API routes. In WEB, they produce JSON `422` for requests expecting JSON or using AJAX, and a `302` redirect with session errors for ordinary navigation. See [input, output, and HTTP error details](/en/validation/controllers-and-http).
+With default handling, **input** validation failures produce JSON `422` in API routes, with lists of `{rule, message}` objects per field. In WEB, they produce JSON `422` for requests expecting JSON or using AJAX, and a `302` redirect with session errors for ordinary navigation. An invalid Schema output produces a server error `500`. See [input, output, and HTTP error details](/en/validation/controllers-and-http).
 
 ## Complete Validation guide
 

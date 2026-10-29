@@ -374,15 +374,133 @@ class AliasExampleController(BaseController):
 
 Envía `{"event": "signup"}`: la respuesta es `{"source": "web", "payload": {"event": "signup"}}`. Omitir `event` falla; no es necesario enviar `source`.
 
+#### Probar los siete aliases sin un servidor HTTP
+
+Este ejemplo reúne los siete aliases y verifica sus efectos con el mismo validador del framework. Guárdalo como `aliases_example.py` en la raíz de tu aplicación y ejecuta `python aliases_example.py` con el entorno del proyecto activo:
+
+```python
+import asyncio
+
+from orionis.schemas import Schema
+from orionis.schemas.constraints import MinLength
+from orionis.schemas.exceptions import ValidationException
+from orionis.schemas.fields import (
+    Alias, AnyOf, Choice, Constant, Field, Nullable, Static,
+)
+from orionis.schemas.validator import Schema as Validator
+
+
+DEFAULT_PAGE_SIZE: Constant[int] = 20
+DisplayName: Alias = Field[str, MinLength(2)]
+
+
+class Search(Schema):
+    source: Static[str] = "web"
+    name: DisplayName
+    reference: AnyOf[int, str]
+    nickname: Nullable[str]
+    priority: Choice["normal", "high"] = "normal"
+    page_size: int = DEFAULT_PAGE_SIZE
+
+
+async def main() -> None:
+    data = {"name": "Ada", "reference": 42, "nickname": None}
+    result = await Validator.validate(data, Search)
+    assert result.name == "Ada"
+    assert result.reference == 42
+    assert result.nickname is None
+    assert result.priority == "normal"
+    assert result.page_size == 20
+    assert result.source == "web"
+    assert "source" not in result.toDict()
+
+    alternative = await Validator.validate(
+        {**data, "reference": "SKU-42", "priority": "high", "page_size": 50},
+        Search,
+    )
+    assert alternative.reference == "SKU-42"
+    assert alternative.page_size == 50
+
+    invalid = [
+        {**data, "name": "A"},
+        {**data, "priority": "urgent"},
+        {**data, "reference": []},
+        {"name": "Ada", "reference": 42},
+    ]
+    for payload in invalid:
+        try:
+            await Validator.validate(payload, Search)
+        except ValidationException:
+            continue
+        raise AssertionError(f"Expected invalid input: {payload!r}")
+
+    print("All alias examples passed.")
+
+
+asyncio.run(main())
+```
+
+La última entrada inválida omite `nickname`: `Nullable[str]` permite `None`, pero no convierte el campo en opcional para el payload. `Constant` y `Alias` se declaran a nivel de módulo; `Static` declara un atributo de clase. Las condiciones del payload proceden del tipo, `Field` y `Choice`.
+
 ### Restricciones estructurales
 
 Los diez metadatos de restricciones son `GreaterThan`, `GreaterThanOrEqual`, `LessThan`, `LessThanOrEqual`, `MultipleOf`, `Pattern`, `MinLength`, `MaxLength`, `TimezoneAware` y `TimezoneNaive`. Se importan desde `orionis.schemas.constraints` y se comprueban durante la conversión.
 
 `Field[str, MinLength(2), MaxLength(80)]` y `Annotated[str, MinLength(2), MaxLength(80)]` son equivalentes. El primer argumento es siempre el tipo; los siguientes son instancias de restricciones, reglas o metadatos compatibles.
 
-La compilación se aplica al `Field` exterior de cada campo del schema. No coloques restricciones de Orionis dentro de `list[Field[str, MinLength(2)]]`: esos metadatos internos no se compilan. Para validar cada elemento con esas restricciones, usa un schema hijo con campos declarados normalmente y valida su estructura, o valida los elementos explícitamente.
+Las restricciones nativas también se compilan dentro de las anotaciones de colecciones y uniones compatibles. `list[Field[int, GreaterThanOrEqual(1)]]` limita cada entero; `Field[list[int], MinLength(1)]` limita la cantidad de elementos de la lista.
 
 El compilador rechaza restricciones duplicadas o incompatibles, como dos `MinLength`, un mínimo mayor que el máximo, `MultipleOf(0)` o las dos condiciones de zona horaria en el mismo campo. Los tipos también deben admitir las restricciones aplicadas: una combinación incompatible puede impedir la conversión. Corrige esas combinaciones en el schema; no representan datos inválidos enviados por un cliente.
+
+#### Restricciones en elementos y tipos nullable
+
+Para admitir `None` junto a un número restringido, coloca `Nullable` **alrededor** del tipo restringido: `Nullable[Field[int, GreaterThanOrEqual(1)]]`. No uses `Field[Nullable[int], GreaterThanOrEqual(1)]`: la restricción numérica debe pertenecer a la alternativa `int`, no a la unión completa.
+
+Este ejemplo se puede guardar como `nested_constraints_example.py` y ejecutar con `python nested_constraints_example.py` desde el entorno del proyecto:
+
+```python
+import asyncio
+
+from orionis.schemas import Schema
+from orionis.schemas.constraints import GreaterThanOrEqual, MultipleOf
+from orionis.schemas.exceptions import ValidationException
+from orionis.schemas.fields import Field, Nullable
+from orionis.schemas.validator import Schema as Validator
+
+
+class Quantities(Schema):
+    items: list[Field[int, GreaterThanOrEqual(1), MultipleOf(2)]]
+    limit: Nullable[Field[int, GreaterThanOrEqual(1), MultipleOf(2)]]
+
+
+async def main() -> None:
+    result = await Validator.validate({"items": [2, 4], "limit": None}, Quantities)
+    assert result.items == [2, 4]
+    assert result.limit is None
+
+    try:
+        await Validator.validate({"items": [-1, 0], "limit": -1}, Quantities)
+    except ValidationException as error:
+        codes = {
+            field: {detail["rule"] for detail in details}
+            for field, details in error.errors.items()
+        }
+        assert codes == {
+            "items[0]": {"ge", "multiple_of"},
+            "items[1]": {"ge"},
+            "limit": {"ge", "multiple_of"},
+        }
+        print(error.error())
+    else:
+        raise AssertionError("Expected invalid quantities.")
+
+
+asyncio.run(main())
+```
+
+El valor `-1` incumple ambas restricciones y produce dos objetos `{rule, message}` en su campo; `0` sólo incumple el mínimo. `limit` sigue siendo obligatorio, aunque acepta `None`.
+
+Este recorrido interno aplica **restricciones nativas**. Una regla asíncrona de `Rule`, como `Email()`, dentro de `list[Field[str, Email()]]` provoca un `TypeError` al declarar el schema. Para aplicar una regla a cada elemento, declara un schema hijo con `email: Field[str, Email()]` y usa una lista de ese schema. Una regla en el `Field` exterior de una colección recibe la colección completa.
 
 ### Reglas
 

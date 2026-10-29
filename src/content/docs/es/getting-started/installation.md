@@ -336,6 +336,14 @@ Detén el servidor con Ctrl+C. Si el puerto está ocupado:
 uv run python -B reactor serve --port 8001
 ```
 
+Desde 1.0.13 puedes elegir también la dirección de escucha con `--host`. Por ejemplo, para aceptar conexiones por las interfaces de red del equipo:
+
+```bash
+uv run python -B reactor serve --host 0.0.0.0 --port 8001
+```
+
+Abre la IP o el dominio del equipo con el puerto seleccionado. Si necesitas escuchar únicamente en el equipo local, usa `--host 127.0.0.1`. Consulta las [opciones de `serve`](/es/console/built-in-application#command-serve) y la [configuración CORS para clientes web](/es/http/middleware#cors-http).
+
 Para añadir tus primeras rutas y comprender el arranque, continúa con [Crear y arrancar una aplicación](/es/getting-started/quick-start) y [Ciclo de vida](/es/application/lifecycle).
 
 ## Consideraciones y recuperación

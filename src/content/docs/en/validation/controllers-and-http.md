@@ -1,6 +1,6 @@
 ---
 title: "Validation in controllers and responses"
-description: "Complete guide to schema injection in HTTP controllers, asynchronous validation, API and WEB errors, serialization, and explicit output validation."
+description: "Complete guide to schema injection in HTTP controllers, asynchronous input and output validation, and API and WEB errors."
 editUrl: true
 lastUpdated: false
 ---
@@ -149,19 +149,19 @@ For the invalid body `{"name": "x", "email": "bad", "age": 17}`, the API endpoin
   "message": "Name must have at least 2 characters. (and 2 more errors)",
   "errors": {
     "name": [
-      "Name must have at least 2 characters."
+      {"rule": "min_length", "message": "Name must have at least 2 characters."}
     ],
     "age": [
-      "Age must be at least 18."
+      {"rule": "ge", "message": "Age must be at least 18."}
     ],
     "email": [
-      "Email is invalid."
+      {"rule": "email", "message": "Email is invalid."}
     ]
   }
 }
 ```
 
-`message` summarizes the first failure and the remaining count; `errors` groups messages by field. One operation can report multiple failures. The [error API](/en/validation/validation-and-errors) explains how to inspect and customize them.
+`message` summarizes the first failure and counts the remaining failures; `errors` groups `{rule, message}` objects by field. One field can contribute several constraint and rule failures. The [error API](/en/validation/validation-and-errors) explains how to inspect and customize them.
 
 A WEB redirect first uses the previous session URL, then an allowed same-origin `Referer`, and finally the current URL as a fallback. Retained input excludes sensitive top-level fields such as `password` and `password_confirmation`. See [sessions and flash data](/en/sessions/state-and-flash).
 
@@ -169,35 +169,45 @@ These responses describe schema failures with default handling. Body reading, fo
 
 ## Returning schemas and validating output
 
-The kernel accepts a `Schema` instance, since it inherits from `msgspec.Struct`, and wraps it in a `JSONResponse` with status `200`. The response performs JSON serialization; you do not need to call `toDict()`.
+When an action directly returns a `Schema` instance, the framework validates its types, constraints, and rules before wrapping it in a `JSONResponse` with status `200`. It also checks child schemas and collection elements. You do not need to call `toDict()` or manually validate this output.
 
 Distinguish these behaviors:
 
-- Annotating `-> UserPreviewSchema` does not convert a returned dictionary to that class.
-- Returning a `UserPreviewSchema` instance allows its fields to be serialized as JSON.
-- Constructing that instance directly does not validate types, constraints, or rules.
-- The kernel does not revalidate output, even when the return value is annotated.
+- The actual value activates the check: a `Schema` instance is validated even without a return annotation.
+- Annotating `-> UserPreviewSchema` does not convert a returned dictionary to that class or validate the dictionary.
+- Constructing an instance directly does not run validation; the framework validates it when processing it as HTTP output.
+- An instance modified after input validation is checked again when returned.
+- Ordinary responses (`dict` or an already constructed `Response`) do not run this validator. The framework does not recursively search arbitrary returned containers for schemas.
 
-If output data also requires checks, validate it explicitly before returning it. This is a complete alternative for the same controller:
+Output rules belong to the returned schema. This independent example demonstrates automatic validation:
 
 ```python
-from app.http.schemas.create_user_schema import CreateUserSchema
-from app.http.schemas.user_preview_schema import UserPreviewSchema
 from orionis.http.base import BaseController
-from orionis.schemas.validator import Schema as Validator
+from orionis.schemas import Schema
+from orionis.schemas.constraints import GreaterThanOrEqual
+from orionis.schemas.fields import Field
+from orionis.support.facades import Route
 
 
-class PreviewUserController(BaseController):
-    async def __call__(self, payload: CreateUserSchema) -> UserPreviewSchema:
-        return await Validator.validate(
-            {"name": payload.name, "email": payload.email, "age": payload.age},
-            UserPreviewSchema,
-        )
+class StockOutput(Schema):
+    quantity: Field[int, GreaterThanOrEqual(0)]
+
+
+class StockController(BaseController):
+    async def __call__(self) -> StockOutput:
+        return StockOutput(quantity=5)
+
+
+Route.get("/stock", StockController)
 ```
 
-Here, `UserPreviewSchema` checks its declared types; additional output rules must be declared in that schema. The `Validator` alias distinguishes the validation API from the declarative `Schema` base class.
+Place the block in your API route file, or separate the classes and import them before registration. `GET /stock` returns `{"quantity": 5}`. If you change the return value to `StockOutput(quantity=-1)`, construction succeeds but output validation rejects the quantity. A string such as `StockOutput(quantity="bad")` is also rejected by its type.
 
-To control status or headers, return an explicit response, such as `response.json(schema, status_code=202)`, importing `response` from `orionis.http`. That construction does not validate the schema either. See [HTTP responses](/en/http/responses) for response configuration.
+Invalid output is an application failure: default handling produces **HTTP `500`**, rather than the `422` used for invalid input or a form redirect. The client response follows server error handling and its debug configuration; do not treat its details as the public input-error contract.
+
+If you return the same schema received as a parameter, its rules run for both input and output. Account for this when a rule queries external services. Keep these checks free of side effects and declare an output schema appropriate for the data you publish.
+
+To control status or headers, return an explicit response, such as `response.json(schema, status_code=202)`, importing `response` from `orionis.http`. The result is already a response, so it does not activate the direct-Schema check. If its content needs validation, run `await Validator.validate(data, YourSchema)` before constructing it. See [HTTP responses](/en/http/responses) for response configuration.
 
 ## Manual validation as an alternative
 

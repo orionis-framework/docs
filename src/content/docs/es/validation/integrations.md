@@ -27,7 +27,7 @@ Esta ubicación sigue la convención del generador HTTP; no impide importar el m
 
 | Contexto | Datos de entrada y validación | Salida de tipo Schema |
 | --- | --- | --- |
-| Función o controlador HTTP | Cuerpo de `Request.data()`; el contenedor valida e inyecta el parámetro Schema. | La instancia se serializa como JSON; la anotación de retorno no valida la salida. |
+| Función o controlador HTTP | Cuerpo de `Request.data()`; el contenedor valida e inyecta el parámetro Schema. | Una instancia Schema devuelta directamente se valida y después se serializa como JSON. |
 | Tool MCP | Objeto `arguments` validado contra el input declarado por `Tool`. | Usa `McpResponse.structured(schema)`; el output declarado valida el contenido estructurado. |
 | Método `@remote` de Realtime | `args` y `kwargs` de la invocación; conversión tipada y reglas del Schema. | Se serializa dentro del resultado del protocolo; no se valida por su anotación de retorno. |
 | WebSocket simple | El handler recibe el mensaje y llama explícitamente al validador. | `sendJson(schema)` serializa la instancia. |
@@ -67,7 +67,7 @@ Route.post("/contacts/function-preview", preview_contact)
 
 Ambas rutas reciben el contrato tipado antes de ejecutar su función o acción. No necesitan llamar al validador manualmente. El Schema representa el cuerpo: no incorpora automáticamente parámetros de URL, query ni encabezados. Puedes recibir también `Request` cuando necesites acceder a esos elementos.
 
-La instancia devuelta se convierte en JSON con estado `200`. Declarar `-> ContactSchema` no comprueba el resultado ni convierte por sí solo un diccionario. Consulta [controladores, respuestas y errores HTTP](/es/validation/controllers-and-http) para la validación explícita de salida y las diferencias entre errores API y WEB.
+La instancia devuelta se valida antes de convertirse en JSON con estado `200`, incluso cuando procede de un constructor directo o se modificó después de validar la entrada. La comprobación depende del valor real devuelto: declarar `-> ContactSchema` no convierte por sí solo un diccionario. Una salida Schema inválida es un error de servidor `500`. Consulta [controladores, respuestas y errores HTTP](/es/validation/controllers-and-http) para los límites de esta validación y las diferencias entre errores API y WEB.
 
 ## MCP: input y output de un tool
 

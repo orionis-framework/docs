@@ -124,7 +124,7 @@ From the root, temporarily start the same process the service will use:
 
 The target is the `app` instance exported by `bootstrap/app.py`. ASGI runs the startup and shutdown lifespan. You can select `--interface rsgi` with the same target; that uses RSGI hooks instead. Do not add `--factory`: the bootstrap exports an instance, not a factory. See [ASGI and RSGI](/en/application/server-entrypoints).
 
-Granian is invoked directly to bind the backend to loopback: `reactor serve` does not expose `--host`, and its normal production launch uses `0.0.0.0`. On Windows that command selects one worker and loop `auto`; this guide preserves those choices. `--no-reload` prevents code reloading while the service runs.
+Granian is invoked directly to fix all service arguments, including loopback, workers and reloading. Since 1.0.13, `reactor serve --host 127.0.0.1` also selects loopback; omitting `--host` keeps the normal production bind address of `0.0.0.0`. On Windows that command selects one worker and loop `auto`; this guide preserves those choices. `--no-reload` prevents code reloading while the service runs.
 
 In another console, check the health route configured by `app.withRouting(health="/up")`:
 

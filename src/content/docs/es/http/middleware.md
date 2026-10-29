@@ -265,6 +265,33 @@ Una respuesta anticipada del kernel, el `OPTIONS` automático o una ruta no resu
 
 Si cambias el registro en una aplicación con configuración compilada, revisa la [invalidación de caché y el reinicio del proceso](/es/application/paths-and-caching).
 
+## CORS HTTP
+
+Desde Orionis **1.0.13**, la configuración CORS HTTP utiliza `allow_origins=["*"]` por defecto. Una lista vacía también se normaliza a `["*"]`; para restringir el acceso por origen, declara los orígenes explícitos. Esto permite responder con `Access-Control-Allow-Origin: *` y facilita probar APIs desde clientes web, como Postman o Hoppscotch, sin instalar un cliente de escritorio. El endpoint debe ser accesible desde el navegador.
+
+El comodín corresponde a los orígenes. `allow_methods`, `allow_headers` y `expose_headers` siguen teniendo `[]` como valor predeterminado; `allow_credentials` es `False`. Cuando el navegador envía un preflight `OPTIONS`, configura los métodos y cabeceras que necesita la petición. Por ejemplo, para permitir `GET` y `POST` JSON con una cabecera `Authorization`, añade o ajusta el campo `cors` de tu clase `BootstrapHTTP` en `config/http.py`:
+
+```python
+from dataclasses import dataclass, field
+from orionis.foundation.config.http import HTTP, Cors
+
+
+@dataclass(frozen=True, kw_only=True)
+class BootstrapHTTP(HTTP):
+    cors: Cors | dict = field(
+        default_factory=lambda: Cors(
+            allow_origins=["*"],
+            allow_methods=["GET", "POST", "OPTIONS"],
+            allow_headers=["Content-Type", "Authorization"],
+            allow_credentials=False,
+        ),
+    )
+```
+
+Conserva los demás campos de tu configuración existente. CORS forma parte de las capas internas del kernel; no necesitas registrarlo mediante `app.withMiddleware()`. Si utilizas cookies con credenciales entre orígenes, configura orígenes explícitos y `allow_credentials=True`: el framework rechaza combinar credenciales con `allow_origins=["*"]`.
+
+El valor predeterminado descrito pertenece a HTTP. Las comprobaciones de origen de [WebSocket](/es/realtime/websocket) y [MCP](/es/mcp/stdio-and-configuration) conservan sus propias políticas. Para cambiar la dirección en la que escucha el servidor, utiliza [`serve --host`](/es/console/built-in-application#command-serve).
+
 ## Asignar middleware a una ruta
 
 En el archivo registrado como API, normalmente `routes/api.py`, importa las clases y utiliza `.middleware(...)`:

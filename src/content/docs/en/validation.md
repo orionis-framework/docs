@@ -57,7 +57,7 @@ Send a `POST /users/preview` with `Content-Type: application/json` and this body
 
 The container injects `payload` as a `UserSchema`; omitted `newsletter` defaults to `False`. The action returns the schema and Orionis serializes it as JSON with status `200`. This example returns a preview; it does not save a user. An invalid email or an age under 18 prevents the action from running and produces the route's validation response.
 
-You do not need to call the validator in this action. The parameter annotation triggers schema resolution; returning a schema instance allows serialization, but a return annotation alone does not validate or convert output. See [input and output schemas in controllers](/en/validation/controllers-and-http) for the complete behavior.
+You do not need to call the validator in this action. The parameter annotation activates input validation; returning a `Schema` instance activates output validation before serialization. Its types, constraints, and rules are checked, including child schemas. A return annotation alone does not convert a dictionary into a schema. See [input and output schemas in controllers](/en/validation/controllers-and-http) for the complete behavior.
 
 ## How it works
 
@@ -75,7 +75,7 @@ The process combines two validation layers:
 | `Annotated` / `Field` | Attaches constraints, rules and metadata to a type without changing the field type. `Field` aliases `typing.Annotated`. |
 | Metadata compiler | Transforms constraints and documentation metadata into `msgspec.Meta`; detects incompatible declarations. |
 | Rule executor | Traverses child schemas and collections, awaits each field's rules in declaration order, and collects their failures. |
-| `ValidationException` | Collects failures and exposes messages grouped by field. |
+| `ValidationException` | Collects failures and exposes lists of `{rule, message}` objects grouped by field. |
 
 Types, constraints and documentation metadata have different purposes. For example, `str` requires a string, `MinLength(2)` limits its length, `Email()` checks its format, and `Description("...")` describes the field without validating its contents.
 
@@ -83,7 +83,23 @@ Types, constraints and documentation metadata have different purposes. For examp
 
 Conversion preserves `msgspec`'s strict behavior: `"36"` is not a valid `int` for `age`. Certain types accept string representations, such as ISO dates and UUIDs, according to the declared type.
 
-Orionis can report several errors in one operation. If initial conversion fails, it inspects the fields again to collect structural errors and run rules on values that converted successfully. If conversion succeeds, it collects rule failures instead of stopping at the first one. This does not mean that every constraint violated by the same value is reported simultaneously.
+Orionis collects each field's errors: failed constraints and rules returning `False`. If initial conversion fails, it inspects the fields to complete the diagnosis. An incompatible type or missing field prevents conditions that require its converted value from running; other fields and elements continue to be validated.
+
+Each `errors` entry includes `rule` and `message`. Custom rules publish their `__code__`; constraints use codes such as `ge`, `min_length`, or `pattern`. The summary counts individual failures, including several on the same field:
+
+```json
+{
+  "message": "Quantity must be positive. (and 1 more error)",
+  "errors": {
+    "quantity": [
+      {"rule": "ge", "message": "Quantity must be positive."},
+      {"rule": "multiple_of", "message": "Quantity must be a multiple of 2."}
+    ]
+  }
+}
+```
+
+The fast path retains msgspec's native conversion and constraint checks. Metadata and plans are prepared when the class is declared; detailed collection is reserved for invalid data. Python rules and their I/O have their own cost. HTTP output validation only activates for a directly returned `Schema` instance; other responses do not run the validator.
 
 Child schemas' rules also run inside lists, tuples, sets, and dictionary values, even when another field fails conversion. Errors retain their location, such as `contacts[0].email` or `contacts['primary'].email`. See the [collection and partial error examples](/en/validation/validation-and-errors#schemas-in-collections).
 

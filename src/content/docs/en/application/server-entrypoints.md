@@ -68,9 +68,9 @@ orionis serve --interface rsgi
 python -B reactor serve --interface rsgi
 ```
 
-`--interface` has the `-i` alias and only accepts `asgi` or `rsgi`. `--port` has the `-p` alias. The other command-specific options are `--log` and `--export`. See their effects and platform differences in the [complete `serve` reference](/en/console/built-in-application#command-serve).
+`--interface` has the `-i` alias and only accepts `asgi` or `rsgi`. `--port` has the `-p` alias. Since 1.0.13, `--host` selects the bind address. The other command-specific options are `--log` and `--export`. See their effects and platform differences in the [complete `serve` reference](/en/console/built-in-application#command-serve).
 
-`serve` prepares the Granian server and passes `app.entryPoint` as its target. Normal launching uses a default port of `8000`, binds `127.0.0.1` in development and `0.0.0.0` in production. Windows embedded debugger mode reads `app.host` and `app.port` in addition to the port argument. Always open the address shown in the console.
+`serve` prepares the Granian server and passes `app.entryPoint` as its target. When `--host` and `--port` are omitted, normal launching uses port `8000`, binds `127.0.0.1` in development and `0.0.0.0` in production. Explicit arguments override these values. Windows embedded debugger mode reads `app.host` and `app.port` when their arguments are omitted. Always open the address shown in the console.
 
 Normal execution uses a managed subprocess on Windows and replaces the process on Unix systems. Under a debugger on Windows, it uses the embedded server. In that case, RSGI launching explicitly awaits startup and shutdown from the active loop without invoking the synchronous hooks that call `run_until_complete()` within it.
 
