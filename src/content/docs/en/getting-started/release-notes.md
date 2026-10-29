@@ -1,11 +1,27 @@
 ---
 title: "Release notes"
-description: "Orionis 1.0.8 through 1.0.14: schema validation, serve --host, HTTP CORS, performance, queues, and the Debug facade."
+description: "Orionis 1.0.8 through 1.0.15: HTTP CORS, schema validation, serve --host, performance, queues, and the Debug facade."
 editUrl: true
 lastUpdated: false
 ---
 
-These notes cover **versions 1.0.8 through 1.0.14** and link to the updated usage guides. Run Reactor examples from the application root using its Python environment.
+These notes cover **versions 1.0.8 through 1.0.15** and link to the updated usage guides. Run Reactor examples from the application root using its Python environment.
+
+<a id="v1-0-15"></a>
+
+## 1.0.15: HTTP CORS for debugging tools
+
+This release completes the allowed-origin change introduced in [1.0.13](#v1-0-13). HTTP CORS now defaults to `["*"]` for origins, methods, and headers:
+
+```dotenv
+CORS_ALLOW_ORIGINS=["*"]
+CORS_ALLOW_METHODS=["*"]
+CORS_ALLOW_HEADERS=["*"]
+```
+
+These values allow requests and their `OPTIONS` preflight checks to use the methods and headers needed to test the API from browser debugging tools such as Postman, EchoAPI, or Hoppscotch, provided the browser can reach the endpoint. You do not need to list each method or header for these tests.
+
+The values correspond to `allow_origins`, `allow_methods`, and `allow_headers` in the HTTP `Cors` configuration. Set explicit lists to restrict them. `allow_credentials` remains `False` and `expose_headers` remains `[]`; enabling credentials requires explicit origins. See [HTTP CORS](/en/http/middleware#http-cors).
 
 <a id="v1-0-14"></a>
 
@@ -61,7 +77,7 @@ python reactor serve --host 0.0.0.0 --port 8000
 
 The **HTTP** CORS configuration changes the default `allow_origins` value to `["*"]`. This allows external browser origins and makes it easier to test endpoints with web clients such as Postman or Hoppscotch without installing a desktop client, provided the browser can reach the API. An empty list is also normalized to `["*"]`; configure explicit origins to restrict access by origin.
 
-The change concerns allowed origins: requests requiring preflight also need methods and headers permitted through `allow_methods` and `allow_headers`. `allow_credentials` remains `False`; enabling credentials requires explicit origins instead of `"*"`. See [HTTP CORS](/en/http/middleware). WebSocket and MCP origin policies are configured separately.
+In 1.0.13, the change concerns allowed origins: requests requiring preflight also need methods and headers permitted through `allow_methods` and `allow_headers`. [Version 1.0.15](#v1-0-15) completes this configuration by also defaulting methods and headers to `["*"]`. `allow_credentials` remains `False`; enabling credentials requires explicit origins instead of `"*"`. See [HTTP CORS](/en/http/middleware). WebSocket and MCP origin policies are configured separately.
 
 <a id="v1-0-12"></a>
 

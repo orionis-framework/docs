@@ -267,9 +267,17 @@ When changing registrations in an application with compiled configuration, revie
 
 ## HTTP CORS
 
-Since Orionis **1.0.13**, HTTP CORS defaults to `allow_origins=["*"]`. An empty list is also normalized to `["*"]`; declare explicit origins to restrict access by origin. This enables responses with `Access-Control-Allow-Origin: *` and makes it easier to test APIs from browser clients such as Postman or Hoppscotch without installing a desktop client. The endpoint must be reachable from the browser.
+Since Orionis **1.0.15**, HTTP CORS uses these defaults:
 
-The wildcard applies to origins. `allow_methods`, `allow_headers` and `expose_headers` still default to `[]`; `allow_credentials` is `False`. When the browser sends an `OPTIONS` preflight, configure the methods and headers that the request needs. For example, to permit `GET` and JSON `POST` requests with an `Authorization` header, add or adjust the `cors` field in your existing `BootstrapHTTP` class in `config/http.py`:
+```dotenv
+CORS_ALLOW_ORIGINS=["*"]
+CORS_ALLOW_METHODS=["*"]
+CORS_ALLOW_HEADERS=["*"]
+```
+
+These correspond to `allow_origins`, `allow_methods` and `allow_headers` in `Cors`. This completes the change started in **1.0.13**, which enabled wildcard origins, by extending it to methods and headers to handle `OPTIONS` preflight requests as well. It makes API testing easier with browser debugging tools such as Postman, EchoAPI or Hoppscotch without installing a desktop client. The endpoint must be reachable from the browser.
+
+Empty lists for these three options are also normalized to `["*"]`. `expose_headers` retains `[]` and `allow_credentials` retains `False`. To restrict methods or headers, declare explicit values. For example, to permit `GET` and JSON `POST` requests with an `Authorization` header, add or adjust the `cors` field in your existing `BootstrapHTTP` class in `config/http.py`:
 
 ```python
 from dataclasses import dataclass, field
@@ -290,7 +298,7 @@ class BootstrapHTTP(HTTP):
 
 Keep the other fields in your existing configuration. CORS is an internal kernel layer; it does not require registration through `app.withMiddleware()`. For cross-origin cookies with credentials, configure explicit origins and `allow_credentials=True`: the framework rejects credentials combined with `allow_origins=["*"]`.
 
-This default belongs to HTTP. [WebSocket](/en/realtime/websocket) and [MCP](/en/mcp/stdio-and-configuration) keep their own origin policies. Use [`serve --host`](/en/console/built-in-application#command-serve) to change the server's bind address.
+These defaults belong to HTTP. [WebSocket](/en/realtime/websocket) and [MCP](/en/mcp/stdio-and-configuration) keep their own origin policies. Use [`serve --host`](/en/console/built-in-application#command-serve) to change the server's bind address.
 
 ## Assigning middleware to a route
 

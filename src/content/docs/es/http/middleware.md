@@ -267,9 +267,17 @@ Si cambias el registro en una aplicación con configuración compilada, revisa l
 
 ## CORS HTTP
 
-Desde Orionis **1.0.13**, la configuración CORS HTTP utiliza `allow_origins=["*"]` por defecto. Una lista vacía también se normaliza a `["*"]`; para restringir el acceso por origen, declara los orígenes explícitos. Esto permite responder con `Access-Control-Allow-Origin: *` y facilita probar APIs desde clientes web, como Postman o Hoppscotch, sin instalar un cliente de escritorio. El endpoint debe ser accesible desde el navegador.
+Desde Orionis **1.0.15**, la configuración CORS HTTP utiliza estos valores por defecto:
 
-El comodín corresponde a los orígenes. `allow_methods`, `allow_headers` y `expose_headers` siguen teniendo `[]` como valor predeterminado; `allow_credentials` es `False`. Cuando el navegador envía un preflight `OPTIONS`, configura los métodos y cabeceras que necesita la petición. Por ejemplo, para permitir `GET` y `POST` JSON con una cabecera `Authorization`, añade o ajusta el campo `cors` de tu clase `BootstrapHTTP` en `config/http.py`:
+```dotenv
+CORS_ALLOW_ORIGINS=["*"]
+CORS_ALLOW_METHODS=["*"]
+CORS_ALLOW_HEADERS=["*"]
+```
+
+Corresponden a `allow_origins`, `allow_methods` y `allow_headers` de `Cors`. El cambio completa lo iniciado en **1.0.13**, que habilitó el comodín para los orígenes, y lo extiende a métodos y cabeceras para atender también los preflight `OPTIONS`. Esto facilita probar APIs desde herramientas de depuración web como Postman, EchoAPI o Hoppscotch, sin instalar un cliente de escritorio. El endpoint debe ser accesible desde el navegador.
+
+Las listas vacías de estas tres opciones también se normalizan a `["*"]`. `expose_headers` conserva `[]` y `allow_credentials` conserva `False`. Si necesitas restringir métodos o cabeceras, declara sus valores explícitos. Por ejemplo, para permitir `GET` y `POST` JSON con una cabecera `Authorization`, añade o ajusta el campo `cors` de tu clase `BootstrapHTTP` en `config/http.py`:
 
 ```python
 from dataclasses import dataclass, field
@@ -290,7 +298,7 @@ class BootstrapHTTP(HTTP):
 
 Conserva los demás campos de tu configuración existente. CORS forma parte de las capas internas del kernel; no necesitas registrarlo mediante `app.withMiddleware()`. Si utilizas cookies con credenciales entre orígenes, configura orígenes explícitos y `allow_credentials=True`: el framework rechaza combinar credenciales con `allow_origins=["*"]`.
 
-El valor predeterminado descrito pertenece a HTTP. Las comprobaciones de origen de [WebSocket](/es/realtime/websocket) y [MCP](/es/mcp/stdio-and-configuration) conservan sus propias políticas. Para cambiar la dirección en la que escucha el servidor, utiliza [`serve --host`](/es/console/built-in-application#command-serve).
+Estos valores predeterminados pertenecen a HTTP. Las comprobaciones de origen de [WebSocket](/es/realtime/websocket) y [MCP](/es/mcp/stdio-and-configuration) conservan sus propias políticas. Para cambiar la dirección en la que escucha el servidor, utiliza [`serve --host`](/es/console/built-in-application#command-serve).
 
 ## Asignar middleware a una ruta
 

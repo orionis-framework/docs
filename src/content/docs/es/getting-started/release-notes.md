@@ -1,11 +1,27 @@
 ---
 title: "Notas de versión"
-description: "Cambios de Orionis 1.0.8 a 1.0.14: validación de schemas, serve --host, CORS HTTP, rendimiento, colas y fachada Debug."
+description: "Cambios de Orionis 1.0.8 a 1.0.15: CORS HTTP, validación de schemas, serve --host, rendimiento, colas y fachada Debug."
 editUrl: true
 lastUpdated: false
 ---
 
-Estas notas reúnen los cambios de las versiones **1.0.8 a 1.0.14** y enlazan las guías de uso actualizadas. Los ejemplos de Reactor se ejecutan desde la raíz de la aplicación con su entorno de Python.
+Estas notas reúnen los cambios de las versiones **1.0.8 a 1.0.15** y enlazan las guías de uso actualizadas. Los ejemplos de Reactor se ejecutan desde la raíz de la aplicación con su entorno de Python.
+
+<a id="v1-0-15"></a>
+
+## 1.0.15: CORS HTTP para herramientas de depuración
+
+Esta versión complementa el cambio de orígenes permitidos iniciado en [1.0.13](#v1-0-13). CORS HTTP utiliza ahora `["*"]` por defecto para orígenes, métodos y cabeceras:
+
+```dotenv
+CORS_ALLOW_ORIGINS=["*"]
+CORS_ALLOW_METHODS=["*"]
+CORS_ALLOW_HEADERS=["*"]
+```
+
+Con estos valores, las peticiones y sus comprobaciones preflight `OPTIONS` admiten los métodos y cabeceras necesarios para probar la API desde herramientas de depuración como Postman, EchoAPI o Hoppscotch en el navegador, siempre que este pueda alcanzar el endpoint. No necesitas declarar cada método o cabecera para esas pruebas.
+
+Los valores corresponden a `allow_origins`, `allow_methods` y `allow_headers` en la configuración `Cors` de HTTP. Para restringirlos, declara listas explícitas. `allow_credentials` sigue siendo `False` y `expose_headers` conserva `[]`; si habilitas credenciales, debes configurar orígenes explícitos. Consulta [CORS HTTP](/es/http/middleware#cors-http).
 
 <a id="v1-0-14"></a>
 
@@ -61,7 +77,7 @@ python reactor serve --host 0.0.0.0 --port 8000
 
 La configuración CORS de **HTTP** cambia el valor predeterminado de `allow_origins` a `["*"]`. Esto permite orígenes de navegador externos y facilita probar endpoints con clientes web como Postman o Hoppscotch, sin instalar un cliente de escritorio, siempre que el navegador pueda alcanzar la API. Una lista vacía también se normaliza a `["*"]`; para restringir el acceso por origen, declara una lista de orígenes explícitos.
 
-El cambio corresponde a los orígenes permitidos: las peticiones con preflight también necesitan métodos y cabeceras autorizados mediante `allow_methods` y `allow_headers`. `allow_credentials` sigue siendo `False`; para habilitar credenciales, configura orígenes explícitos en lugar de `"*"`. Consulta [CORS HTTP](/es/http/middleware). Las políticas de origen de WebSocket y MCP se configuran por separado.
+En 1.0.13, el cambio corresponde a los orígenes permitidos: las peticiones con preflight también necesitan métodos y cabeceras autorizados mediante `allow_methods` y `allow_headers`. [La versión 1.0.15](#v1-0-15) completa esta configuración con `["*"]` por defecto también para métodos y cabeceras. `allow_credentials` sigue siendo `False`; para habilitar credenciales, configura orígenes explícitos en lugar de `"*"`. Consulta [CORS HTTP](/es/http/middleware). Las políticas de origen de WebSocket y MCP se configuran por separado.
 
 <a id="v1-0-12"></a>
 
