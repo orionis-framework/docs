@@ -144,3 +144,23 @@ El entorno utiliza `jinja2.Undefined`: una variable ausente puede imprimirse vac
 Una plantilla ausente produce `ViewTemplateNotFoundException`. Los errores del renderizado pendiente se presentan como `ViewRenderException`, conservando la causa. Revisa el nombre solicitado, los directorios de búsqueda y la excepción original antes de limpiar cachés. Consulta [excepciones HTTP](/es/http/exceptions) para entender su presentación durante una petición.
 
 Para añadir filtros, globals, tests o etiquetas, utiliza un [provider de vistas](/es/views/providers-and-extensions). La configuración anterior controla carga y caché; el provider amplía el entorno compartido antes de atender peticiones.
+
+<a id="view-warmup"></a>
+
+## Preparar plantillas antes de recibir peticiones
+
+En **1.1.0**, la carga, compilación y comprobación de recarga de plantillas de nivel superior se ejecutan en un pool dedicado de **2 workers y 64 llamadas pendientes por proceso**. Con recarga automática desactivada, una plantilla ya cacheada puede leerse directamente. El renderizado y los globals asíncronos permanecen en el event loop del consumidor. La saturación del pool produce `WorkQueueFullError`.
+
+`IViewEngine` expone `async warmup(*templates: str) -> None`; `Jinja2Engine` lo implementa cargando las plantillas conocidas sin renderizarlas ni evaluar globals:
+
+```python
+from orionis.view.contracts.engine import IViewEngine
+
+
+async def prepare_views(engine: IViewEngine) -> None:
+    await engine.warmup("dashboard", "layouts/base", "partials/menu")
+```
+
+Invoca el helper mediante el contenedor de la aplicación arrancada, o proporciona su motor configurado, antes de recibir tráfico. Crea las plantillas en los directorios configurados. El método pertenece al motor, no a la fachada `View`. Los motores personalizados heredan una implementación que no realiza operaciones y pueden definir su propia preparación.
+
+La carga anidada de `include`, `extends` e imports de Jinja sigue siendo síncrona dentro del renderizador. Incluye explícitamente las dependencias conocidas en warmup; cargar un padre no precarga recursivamente todas sus dependencias dinámicas. Warmup respeta el tamaño de caché y la configuración de bytecode existentes y no impide la expulsión de plantillas. Los nombres dinámicos o las comprobaciones de recarga anidada aún pueden realizar I/O síncrono.

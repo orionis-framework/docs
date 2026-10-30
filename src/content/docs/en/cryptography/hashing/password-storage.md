@@ -13,7 +13,7 @@ Orionis includes the `argon2` driver, which generates **Argon2id**, and `bcrypt`
 
 The framework provider registers `IHashManager` as a singleton and prepares the `Hash` facade during startup. You do not need to register the service manually. Inject it into an action, receive it through the constructor, or use the facade from a controller, service, command, seeder, or another component in a booted application.
 
-`make()` and `check()` are **asynchronous**: use them with `await`. Algorithm work runs on a worker thread through `asyncio.to_thread()`, allowing the event loop to continue handling other tasks. `driver()`, `needsRehash()`, `getAlgorithm()`, and `getDefaultDriver()` are synchronous.
+`make()` and `check()` are **asynchronous**: use them with `await`. Algorithm work runs in a dedicated bounded executor shared by Argon2 and bcrypt, allowing the event loop to continue handling other tasks without using its default worker pool. `driver()`, `needsRehash()`, `getAlgorithm()`, and `getDefaultDriver()` are synchronous.
 
 ### Validate and store a password
 
@@ -324,3 +324,29 @@ These instances do not read `config/hashing.py` or require the facade. The servi
 The default `65536` KiB equals 64 MiB of Argon2 memory cost per operation, in addition to process and backend consumption. Running calculations off the event loop enables concurrency; it does not remove CPU, memory, or worker-thread costs. Tune values according to your application's measurements.
 
 See [authentication](/en/authentication) for identity management and [encryption](/en/cryptography/encryption) when you need to recover an original value.
+
+<a id="hashing-worker-budget"></a>
+
+## Bound concurrent password work
+
+From **1.1.0**, Argon2 and bcrypt share **2 active and 14 pending calls per process**. Cryptographic costs are unchanged. Exhausting that budget raises `WorkQueueFullError`; define an admission or retry response appropriate for authentication instead of lowering the hashing cost. Running native work retains its slot until it finishes, even when its caller is cancelled.
+
+Both constructors accept the keyword-only `executor: BoundedExecutor | None = None`. To use a different host budget, share one executor between drivers:
+
+```python
+from orionis.hashing.hashers.argon2_hasher import Argon2Hasher
+from orionis.hashing.hashers.bcrypt_hasher import BcryptHasher
+from orionis.support.concurrency import BoundedExecutor
+
+
+async def create_hashes(password: str) -> tuple[str, str]:
+    pool = BoundedExecutor(2, max_pending=8, name="password-work")
+    try:
+        argon2 = Argon2Hasher(executor=pool)
+        bcrypt = BcryptHasher(executor=pool)
+        return await argon2.make(password), await bcrypt.make(password)
+    finally:
+        await pool.aclose()
+```
+
+For a long-lived service, create the pool once and close it at shutdown; the example scopes ownership to one operation. A custom pool is caller-owned and is not a new hashing configuration field. Size active work for Argon2 memory and native lanes, then account for all server processes. See [executor cancellation and shutdown](/en/utilities/helpers/concurrency).

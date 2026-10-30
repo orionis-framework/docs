@@ -323,3 +323,9 @@ In the automatic action with `payload: Order`, validation happens before enterin
 The [controller and HTTP integration guide](/en/validation/controllers-and-http) explains automatic schema injection, input selection, and HTTP error responses, including API and WEB differences. The dictionary above is the output of `ValidationException.error()`; HTTP presentation depends on that integration.
 
 When logging or returning errors, use the fields and messages the client needs; do not include passwords or the complete payload.
+
+<a id="validation-plan-cache"></a>
+
+## Bounded validation plans
+
+Since **1.1.0**, custom-rule plans use a process-local LRU with capacity for **1,024 schema types**. Eviction releases the cached plan and allows dynamically created types to be collected when no other references remain. Reusing an evicted type rebuilds its plan; validation is never skipped because the cache is full. Recursive child-plan preparation and concurrent compilation are guarded. Validation rules, structured errors and serialization behavior are unchanged.

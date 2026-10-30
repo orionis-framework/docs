@@ -230,9 +230,10 @@ Este ejemplo administrativo modifica el estado compartido del proceso y vuelve a
 
 ```text
 close() -> None
+async aclose() -> None
 ```
 
-Retira y cierra los handlers, vacía la caché y elimina la referencia interna al logger. Contiene `OSError`, `RuntimeError` y `ValueError` durante la limpieza. Se puede invocar de nuevo. `__del__()` también intenta cerrar el wrapper al destruirlo, pero no sustituye una limpieza explícita cuando necesitas liberar archivos en un momento preciso.
+Retira y cierra los handlers, vacía la caché y elimina la referencia interna al logger. La limpieza ordinaria contiene `OSError`, `RuntimeError` y `ValueError`; los fallos de entrega de handlers con cola se recopilan y producen `LoggingDeliveryError` después de limpiar. Se puede invocar de nuevo. `__del__()` también intenta cerrar el wrapper al destruirlo, pero no sustituye una limpieza explícita cuando necesitas liberar archivos en un momento preciso.
 
 `close()` no desregistra el singleton ni desfija `Log`. Un mensaje posterior o `getLogger()` reconstruye el canal predeterminado usando la configuración conservada por el wrapper. Por ello, no lo llames al final de cada petición.
 
@@ -244,8 +245,8 @@ from orionis.foundation.enums.lifespan import Lifespan
 from orionis.logging.contracts.logger import ILogger
 
 
-def close_application_logger(logger: ILogger) -> None:
-    logger.close()
+async def close_application_logger(logger: ILogger) -> None:
+    await logger.aclose()
 
 
 def register_logger_shutdown(app: IApplication) -> None:
@@ -322,3 +323,5 @@ La inicialización del servicio no garantiza que toda escritura posterior tenga 
 **Sin instancia fijada**, `Log.info(...)` y los demás accesos al servicio producen una operación diferida: deben esperarse para ejecutarse. En ese estado, `await Log.info("...")` sí es válido; después de fijar la instancia debes usar la llamada síncrona. No cambies entre estos estados durante peticiones normales. Para código que deba funcionar independientemente del pinning, recibe `ILogger` o utiliza `logger = await Log.resolve()` y llama a `logger.info(...)`.
 
 La resolución previa al estado de aplicación creada lanza `RuntimeError`; los errores de construcción o resolución del contenedor también pueden propagarse. El detalle general de este despacho está en [fachadas síncronas y asíncronas](/es/application/container/facades#facade-dispatch).
+
+Utiliza `await logger.aclose()` al cerrar desde código async. Desde 1.1.0, la aplicación vacía automáticamente el logging configurado con cola después de los callbacks de apagado, incluso si alguno falla. No registres un callback adicional solo para ese comportamiento integrado. Los loggers independientes requieren que su propietario los cierre. Consulta [apagado del logging con cola](/es/logging/rotation-and-lifecycle#logging-async-close).

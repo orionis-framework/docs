@@ -24,6 +24,34 @@ class ArticleListController:
         return JSONResponse(page.toDict())
 ```
 
+<a id="query-chunks"></a>
+
+## Leer resultados de base de datos por lotes
+
+Desde **1.1.0**, los constructores de consultas exponen `chunks(size: int = 1000) -> AsyncIterator[Collection]`. Consúmelo con `async for`; no apliques `await` al iterador. Funciona en consultas de modelos y en `DB.table(...)`:
+
+```python
+from orionis.support.facades import DB
+
+
+async def count_export_rows() -> int:
+    total = 0
+    query = DB.table("articles").orderBy("id")
+    async for batch in query.chunks(500):
+        total += len(batch)
+    return total
+```
+
+Ejecuta el ejemplo en una aplicación arrancada con una tabla `articles`. Para lotes de modelos, utiliza `Article.query().orderBy("id").chunks(500)` con el modelo de la guía de consultas. Cada lote pasa por `get()`, incluidos casts, scopes globales, eventos `retrieved` y carga anticipada de relaciones.
+
+- `size` debe ser un entero positivo, excluidos booleanos; un tamaño inválido produce `ValueError`.
+- Define un orden explícito y determinista, preferiblemente terminado en una clave única. Sin orden, la iteración produce `InvalidQueryException`.
+- Se respetan `limit()` y `offset()` existentes; el iterador clona la consulta y conserva su plan original.
+- Utiliza paginación LIMIT/OFFSET, no un cursor del servidor. Las inserciones o eliminaciones simultáneas pueden desplazar filas; usa una transacción con el aislamiento adecuado cuando necesites una vista consistente.
+- La consulta libera su cursor antes de entregar el lote. Una transacción del consumidor mantiene su conexión. Cierra el iterador con `contextlib.aclosing()` si terminas antes de agotarlo.
+
+Guardar todos los lotes en una lista elimina la ventaja de memoria. Las relaciones pueden consumir memoria adicional al número de filas. `get()` sigue materializando su resultado, mientras que [`Collection.chunk()`](#collection-chunk) solo divide datos ya cargados en memoria.
+
 ## Paginación de consultas
 
 
@@ -800,13 +828,13 @@ assert Collection([1, 2]).transform(lambda n: n + 1).all() == [2, 3]
 ### `unique`
 
 ```text
-def unique(self, key: str | None=None) -> Collection
+def unique(self, key: str | Callable | None=None) -> Collection
 ```
 
-Colección nueva con valores únicos, opcionalmente por clave; conserva primeras coincidencias y admite no hashables. Una colección respaldada por dict con key retorna self sin filtrar.
+Con campo o selector callable, conserva el primer representante, incluidos valores seleccionados no hashables iguales. Sin clave, los elementos hashables usan un set sin garantía de orden. Una colección respaldada por dict con clave truthy retorna la misma instancia. Consulta la [semántica de valores únicos](/es/utilities/helpers/collection#collection-unique-performance).
 
 ```python
-assert Collection([1, 1, 2]).unique().all() == [1, 2]
+assert sorted(Collection([1, 1, 2]).unique().all()) == [1, 2]
 ```
 
 <a id="collection-where"></a>

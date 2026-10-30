@@ -151,7 +151,7 @@ El servicio utiliza locks de hilo para su inicialización, cambio, recarga y cie
 
 Cada proceso mantiene sus propios contadores y descriptores. Si varios procesos usan el mismo template en un directorio compartido, pueden comprimir o eliminar archivos que otro aún utiliza. Para separar sus archivos configura una ruta identificable por instancia en el despliegue, o adopta una infraestructura externa de recolección. La sección [Configuración](/es/logging/configuration) explica cómo construir la ruta desde valores de configuración.
 
-La escritura, la compresión gzip y el borrado son síncronos. Invocar `Log.info()` o un método de `Logger` en un controlador asíncrono no mueve ese trabajo a una cola. La implementación integrada no añade un transport de red ni un worker de logging.
+Con el valor predeterminado `queue_capacity=0`, la escritura, la compresión gzip y el borrado son síncronos. Una [capacidad de cola](/es/logging/configuration#logging-queue-capacity) positiva mueve ese trabajo a un hilo listener con capacidad limitada. No añade un transport de red ni coordinación de rotación entre procesos.
 
 El handler captura `OSError` durante la emisión y lo comunica mediante `handleError(record)`, el mecanismo estándar de logging. No ofrece una confirmación persistida al devolver `None`. Otros errores, como los de un formatter personalizado, no quedan cubiertos por esa captura de `OSError`.
 
@@ -245,3 +245,21 @@ close() -> None
 `emit()` formatea, añade `\n`, asegura el archivo correcto, escribe y actualiza el contador. `close()` cierra el stream bajo lock y delega el cierre base, sin comprimir ni limpiar. Al volver a abrir un archivo existente se recupera su tamaño inicial; las escrituras externas posteriores no actualizan continuamente ese contador.
 
 Los atributos de configuración anteriores son accesibles en el handler, al igual que `stream`, `current_path`, `current_suffix` y `file_size`. Estos últimos representan el estado del archivo activo, no una API para forzar rotaciones. El handler mantiene una caché interna de rutas y no expone un método público de limpieza manual o `rotate()`.
+
+<a id="logging-async-close"></a>
+
+## Vaciar el logging pendiente durante el apagado
+
+`await logger.aclose()` está disponible en `ILogger` y `Logger` desde 1.1.0. Detiene la admisión a la cola, espera los registros aceptados, cierra sus handlers e informa los fallos del destino después de limpiar los recursos. `close()` sigue siendo síncrono; utiliza `aclose()` desde un event loop.
+
+```python
+from orionis.logging.contracts.logger import ILogger
+
+
+async def close_owned_logger(logger: ILogger) -> None:
+    await logger.aclose()
+```
+
+Este helper corresponde al propietario de un logger independiente, no a un handler que comparte el logger de la aplicación. Cuando se configura logging con cola, el apagado HTTP/CLI ejecuta esta limpieza después de los callbacks de ciclo de vida, incluso si alguno falla. La cola no garantiza entrega durable ante terminación abrupta del proceso y la cancelación no puede interrumpir de forma segura una escritura nativa en curso.
+
+En modo con cola, el listener conserva los fallos de emisión de handlers estándar y los expone mediante `LoggingDeliveryError`; encolar correctamente no confirma persistencia. Gestiona la saturación o los errores del destino mediante la política de la aplicación, sin intentar registrar recursivamente el mismo fallo en la cola afectada.

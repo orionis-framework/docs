@@ -29,6 +29,7 @@ Cada helper tiene una guía propia con importaciones, parámetros, retornos, eje
 | [StdClass](/es/utilities/helpers/std-class) | Agrupar atributos dinámicos y exportarlos a un diccionario. |
 | [Stringable](/es/utilities/helpers/stringable) | Transformar y analizar cadenas inmutables. |
 | [Workers](/es/utilities/helpers/workers) | Estimar concurrencia según CPU y presupuesto de memoria. |
+| [Concurrencia limitada](/es/utilities/helpers/concurrency) | Ejecutar trabajo bloqueante con admisión y cancelación explícitas. |
 | [FreezeThaw](/es/utilities/helpers/freeze-thaw) | Convertir contenedores entre formas congeladas y mutables. |
 | [PerformanceCounter](/es/utilities/helpers/performance-counter) | Medir intervalos síncronos y asíncronos. |
 | [Debug](/es/utilities/helpers/debug) | Inspeccionar valores en consola o detener una petición con un volcado HTML. |

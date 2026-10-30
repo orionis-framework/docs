@@ -212,5 +212,6 @@ Este método de clase retorna el contrato con el que la fachada resuelve el mana
 | `MailCompositionException` | Declaraciones, callbacks, direcciones, vistas o MIME inválidos. |
 | `MailAttachmentException` | Subclase de composición para metadatos o lectura de adjuntos. |
 | `MailTransportException` | Fallo de entrega/publicación; no garantiza que el servidor no haya recibido datos. |
+| `MailBatchException` | Fallo de lote SMTP con resultados `completed` e índice `failed_index` desde cero; sin rollback ni reintento automático. |
 
 Estas clases no incorporan un método de retry ni un atributo público de rollback. El contexto y la causa original pueden acompañar la excepción. Un resultado SMTP parcial tiene datos propios en `MailResult`; no se representa simplemente como «ningún envío». Consulta [resultados y errores](/es/mail/sending-and-results).

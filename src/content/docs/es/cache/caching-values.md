@@ -287,6 +287,38 @@ No se agrupan automáticamente los fallos de caché concurrentes. Varias peticio
 
 Una excepción del resolver se propaga antes de la escritura. Una excepción del backend también se propaga. El método espera `set`, pero no revisa su resultado booleano: si el backend devuelve `False` sin generar una excepción, `remember` igualmente devuelve el valor recién calculado.
 
+<a id="repository-rememberonce"></a>
+
+## Compartir fallos concurrentes con rememberOnce
+
+Disponible desde **1.1.0** en `Cache`, `ICacheManager` y los repositorios:
+
+```text
+async rememberOnce(key: str, ttl: float | None, resolver: Callable,
+                   *, wait_timeout: float = 10, lease: float | None = None) -> Any
+```
+
+Recibe un resolver síncrono o asíncrono sin argumentos. Las llamadas simultáneas con la misma instancia de backend, clave con prefijo y event loop comparten un resultado correcto, incluido `None`. Las llamadas posteriores leen el valor almacenado con el TTL y la serialización habituales del backend. `remember()` y `rememberForever()` siguen disponibles sin esta coordinación local.
+
+```python
+from orionis.cache.contracts import ICacheManager
+
+
+async def cached_total(cache: ICacheManager) -> int:
+    async def calculate() -> int:
+        return 42
+
+    return await cache.rememberOnce(
+        "dashboard:total", 60, calculate, wait_timeout=5,
+    )
+```
+
+El ejemplo recibe un manager de caché inyectado en una aplicación arrancada; reemplaza `calculate()` por la consulta de tu aplicación. Si el resolver falla o se cancela, libera la propiedad y otro consumidor puede reintentar. Resolver recursivamente la misma clave produce `RuntimeError` en lugar de esperar por sí mismo.
+
+`wait_timeout` debe ser finito y positivo. Limita cada fase de admisión local y, cuando corresponde, la admisión y limpieza del lease Redis; **no es un límite de duración del resolver ni del I/O habitual de caché**. Agotar ese tiempo de espera produce `TimeoutError`.
+
+`lease=segundos` adquiere opcionalmente el bloqueo del backend y vuelve a comprobar el almacenamiento antes de resolver. Debe ser finito y positivo. Redis comprueba el propietario al liberar; los otros drivers conservan sus garantías de bloqueo. La expiración del lease permite trabajo simultáneo y los bloqueos de negocio de file/memory siguen siendo locales al proceso. Los resolvers con efectos secundarios deben ser idempotentes: esta API no garantiza ejecución exactamente una vez. Consulta el [alcance de los bloqueos](/es/cache/locks).
+
 <a id="repository-rememberforever"></a>
 
 ### `rememberForever`: resolver sin una nueva expiración
@@ -540,7 +572,7 @@ Consulta [locks y regeneración concurrente](/es/cache/locks) antes de utilizarl
 
 ## Proxies del store predeterminado
 
-`CacheManager` delega las trece operaciones asíncronas de valores anteriores, excepto `replace`, en `store()`. Sus argumentos, valores predeterminados, resultados y errores no cambian. Además, expone la fábrica síncrona `lock(key: str, timeout: float | None = None) -> Any`, cuyo resultado concreto es `CacheLock`.
+`CacheManager` delega las catorce operaciones asíncronas de valores anteriores, excepto `replace`, en `store()`. Sus argumentos, valores predeterminados, resultados y errores no cambian. Además, expone la fábrica síncrona `lock(key: str, timeout: float | None = None) -> Any`, cuyo resultado concreto es `CacheLock`.
 
 El [mapa completo de proxies](/es/cache/manager-and-injection#manager-proxies) enumera todas las firmas del manager y enlaza con la operación correspondiente en esta página. Un proxy no añade reintentos, fallback ni una transacción.
 

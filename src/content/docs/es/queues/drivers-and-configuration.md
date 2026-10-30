@@ -220,3 +220,11 @@ Consulta la [referencia de API](/es/queues/api-reference) para las firmas de `IQ
 | `build_failed_jobs_table(table: str) -> TableDefinition` | Definición completa de fallos, con clave e índice. | Llama a `validate_table_name()`. No ejecuta DDL por sí misma. |
 
 Se importan desde `orionis.queues.schema`. Son herramientas de infraestructura; el uso habitual de la fachada no requiere construir tablas ni envelopes manualmente.
+
+<a id="redis-script-cache"></a>
+
+## Recuperación de la caché de scripts Redis
+
+En **1.1.0**, las transiciones de cola intentan primero `EVALSHA` con el digest del script. Si el nodo Redis responsable devuelve `NOSCRIPT`, el driver vuelve a intentar esa transición una vez con `EVAL`, que ejecuta y cachea el mismo script. La siguiente llamada utiliza de nuevo `EVALSHA`; los reinicios de Redis y la expulsión de scripts no requieren un indicador global de carga en la aplicación.
+
+Esta recuperación solo aplica a `NOSCRIPT`, cuando Redis no ejecutó el script ausente. El driver no convierte otros errores de transporte en una repetición incondicional; sigue aplicándose la política de reintentos configurada en el cliente Redis. No cambian las claves, hash tags, tokens de reserva ni comprobaciones de propiedad. El digest identifica código Lua cacheado; no es un mecanismo de seguridad ni autenticación.

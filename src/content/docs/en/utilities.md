@@ -29,6 +29,7 @@ Each helper has its own guide covering imports, parameters, returns, examples an
 | [StdClass](/en/utilities/helpers/std-class) | Group dynamic attributes and export them to a dictionary. |
 | [Stringable](/en/utilities/helpers/stringable) | Transform and inspect immutable strings. |
 | [Workers](/en/utilities/helpers/workers) | Estimate concurrency from CPU and a memory budget. |
+| [Bounded concurrency](/en/utilities/helpers/concurrency) | Run blocking work with explicit admission and cancellation behavior. |
 | [FreezeThaw](/en/utilities/helpers/freeze-thaw) | Convert containers between frozen and mutable forms. |
 | [PerformanceCounter](/en/utilities/helpers/performance-counter) | Measure synchronous and asynchronous intervals. |
 | [Debug](/en/utilities/helpers/debug) | Inspect values in the console or stop a request with an HTML dump. |

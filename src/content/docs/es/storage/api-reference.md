@@ -459,3 +459,5 @@ except MissingStorageDependencyException as error:
 ```
 
 Los módulos conservan aliases de compatibilidad: `normalizePath`, `normalizeFilePath`, `importDriverDependency`, `assertBinaryMode`, `resolveDownloadTarget`, `filterFiles` y `deriveDirectories`. Apuntan a las funciones snake_case correspondientes; los ejemplos nuevos utilizan sus nombres canónicos.
+
+Desde 1.1.0, `IStorageStream.chunks(size=65536, *, buffer_size=1048576)` retorna un iterador asíncrono de bytes. Consulta [iteración con buffer](/es/storage/streaming-and-uploads#stream-chunks) para validación, cierre y límites de lectura nativa.

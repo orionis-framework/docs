@@ -137,3 +137,5 @@ La primera función utiliza `fillable`, mutadores, estado y eventos de una insta
 `withRelations()`/`load()` del builder permiten [evitar N+1](/es/orm/eager-loading). No añadas nombres de relaciones como columnas de `select`: son mecanismos separados. El modelo no incluye automáticamente sus relaciones en `toDict()`.
 
 Los errores de composición producen `InvalidQueryException`; una relación inexistente, `RelationNotFoundException`; un scope explícito no encontrado, `ScopeNotFoundException`; los fallos de SQL se propagan desde Database. Los tipos y reglas de cada operación están enlazados en las referencias anteriores. El [módulo de pruebas](/es/orm/testing) reúne fixtures y verificaciones de consultas, persistencia y relaciones.
+
+Para resultados grandes en 1.1.0, utiliza [`chunks()` de consultas](/es/orm/collections-and-pagination#query-chunks) con un `orderBy()` explícito y determinista. Entrega colecciones limitadas por lote sin cambiar `get()` ni dividir una colección ya materializada.

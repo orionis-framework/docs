@@ -171,6 +171,7 @@ These methods call the default repository. Their parameters, return values and e
 | `async getMany(keys: list[str]) -> dict[str, Any]` | [Read a batch](/en/cache/caching-values#repository-getmany). |
 | `async setMany(values: dict[str, Any], ttl: float \| None = None) -> bool` | [Write a batch](/en/cache/caching-values#repository-setmany). |
 | `async remember(key: str, ttl: float \| None, resolver: Callable) -> Any` | [Calculate on a miss](/en/cache/caching-values#repository-remember). |
+| `async rememberOnce(key, ttl, resolver, *, wait_timeout=10, lease=None) -> Any` | [Share overlapping misses](/en/cache/caching-values#repository-rememberonce). |
 | `async rememberForever(key: str, resolver: Callable) -> Any` | [Calculate without TTL](/en/cache/caching-values#repository-rememberforever). |
 | `async pull(key: str) -> Any` | [Read, then delete](/en/cache/caching-values#repository-pull); not atomic. |
 | `async add(key: str, value: Any, ttl: float \| None = None) -> bool` | [Add if missing](/en/cache/caching-values#repository-add). |

@@ -291,3 +291,11 @@ class TokenMaintenance:
 La limpieza física requiere que tu aplicación invoque ese servicio desde su tarea de mantenimiento; el guard ya rechaza tokens vencidos o revocados sin esperar a esa limpieza.
 
 Al desactivar una cuenta o cambiar sus credenciales fuera del flujo de recuperación, decide explícitamente qué tokens revocar. El guard de tokens comprueba la identidad y la credencial almacenada; no aplica por sí mismo una condición sobre la columna `active`. La [recuperación de contraseña](/es/authentication/account-recovery) sí revoca los tokens del propietario durante su transacción.
+
+<a id="token-lookup-performance"></a>
+
+## Consulta nativa de tokens en 1.1.0
+
+El repositorio nativo de tokens y el provider de identidad basado en modelos pueden recuperar token y propietario mediante un SELECT con JOIN cuando comparten una conexión nativa, usan claves enteras o de texto admitidas y mantienen una consulta de scopes sencilla. El guard conserva la actualización condicional final de `last_used_at` después de resolver la identidad, comprobando de nuevo revocación y expiración. Esa ruta de token/propietario utiliza dos sentencias en lugar de tres; las relaciones anticipadas pueden ejecutar consultas adicionales.
+
+Los metadatos del token se validan antes de los eventos de identidad. Se mantienen filtros globales, hidratación, eventos `retrieved` y relaciones anticipadas; no se cachean decisiones de autenticación. Providers o repositorios personalizados, conexiones separadas, claves UUID y consultas complejas utilizan la ruta existente. No se requiere un ajuste de configuración ni migración de tokens para aprovechar la ruta nativa compatible.

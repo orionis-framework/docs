@@ -291,3 +291,11 @@ class TokenMaintenance:
 Physical cleanup requires your application to invoke this service from its maintenance task. The guard rejects expired or revoked tokens without waiting for cleanup.
 
 When disabling an account or changing its credentials outside the recovery flow, explicitly decide which tokens to revoke. The token guard checks the identity and stored credential; it does not independently impose a condition on the `active` column. [Password recovery](/en/authentication/account-recovery) does revoke the owner's tokens during its transaction.
+
+<a id="token-lookup-performance"></a>
+
+## Native token lookup in 1.1.0
+
+The native token repository and model identity provider can retrieve the token and owner in one joined SELECT when they share a native connection, use supported integer/string owner keys and retain a simple scoped query. The guard still performs its final conditional `last_used_at` update after identity resolution, rechecking revocation and expiration. The eligible token/owner path uses two statements rather than three; eager relations may issue additional queries.
+
+Token metadata is validated before identity events. Global filters, hydration, retrieved events and eager relationships remain in effect; authentication decisions are not cached. Custom providers or repositories, separate connections, UUID keys and complex query shapes fall back to the existing path. No configuration switch or token migration is required to use the eligible native path.

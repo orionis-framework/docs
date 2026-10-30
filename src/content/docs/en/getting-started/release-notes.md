@@ -1,11 +1,44 @@
 ---
 title: "Release notes"
-description: "Orionis 1.0.8 through 1.0.16: MCP origins and Inspector defaults, HTTP CORS, schema validation, performance, queues, and the Debug facade."
+description: "Orionis 1.0.8 through 1.1.0: bounded concurrency, batch APIs, logging queues, cache limits, and upgrade notes."
 editUrl: true
 lastUpdated: false
 ---
 
-These notes cover **versions 1.0.8 through 1.0.16** and link to the updated usage guides. Run Reactor examples from the application root using its Python environment.
+These notes cover **versions 1.0.8 through 1.1.0** and link to the updated usage guides. Run Reactor examples from the application root using its Python environment.
+
+<a id="v1-1-0"></a>
+
+## 1.1.0: bounded execution and batch APIs
+
+Version **1.1.0** adds optional APIs for concurrent cache misses, query batches, SMTP batches, template preparation and blocking application work. It also bounds internal caches and worker admission. Python **3.14+** remains required.
+
+| Area | Change and usage guide |
+| --- | --- |
+| Blocking callbacks | [`@threaded` and `BoundedExecutor`](/en/utilities/helpers/concurrency) preserve DI signatures and context variables while applying explicit worker limits. |
+| Cache | [`rememberOnce()`](/en/cache/caching-values#repository-rememberonce) shares overlapping resolutions; an optional backend lease coordinates additional callers. File batch operations reduce worker transitions. |
+| ORM and SQL builder | [`chunks(size=1000)`](/en/orm/collections-and-pagination#query-chunks) yields collections using a deterministic order without materializing the full result. |
+| SMTP | [`SmtpTransport.sendMany()`](/en/mail/transports-and-extensions#smtp-batches) sends up to 100 prepared messages through one connection and reports partial outcomes. |
+| Logging | [`queue_capacity`](/en/logging/configuration#logging-queue-capacity) enables bounded background delivery; [`aclose()`](/en/logging/rotation-and-lifecycle#logging-async-close) drains running logging resources. The default remains synchronous. |
+| Hashing | [Argon2 and bcrypt](/en/cryptography/hashing/password-storage#hashing-worker-budget) share a dedicated worker budget, with unchanged cryptographic parameters. |
+| Views | [`warmup()`](/en/views/configuration-and-cache#view-warmup) prepares templates; cold top-level loading and reload checks run in a dedicated pool. |
+| Storage | [`stream.chunks()`](/en/storage/streaming-and-uploads#stream-chunks) and buffered native reads retain explicit ownership and bounded consumption. |
+| Retained state | [Translation maps](/en/localization/messages-and-locales#locale-cache-limits) and [schema plans](/en/validation/validation-and-errors#validation-plan-cache) now have bounded caches. |
+
+Other internal changes reduce repeated dependency-injection inspection, model hydration setup, request-header conversion and collection equality work. Native token authentication can combine token and owner retrieval while retaining the final revocation/expiration check. Redis queue transitions use cached script identifiers with `NOSCRIPT` recovery. See [token authentication](/en/authentication/personal-access-tokens#token-lookup-performance), [Redis queues](/en/queues/drivers-and-configuration#redis-script-cache) and [collection uniqueness](/en/utilities/helpers/collection#collection-unique-performance). These changes do not establish a universal throughput improvement for every application.
+
+### Upgrade an existing application
+
+From the application root, select the new runtime version and synchronize the environment:
+
+```bash
+uv add "orionis==1.1.0"
+uv sync
+```
+
+For an environment managed directly with pip, use `python -m pip install --upgrade "orionis==1.1.0"`. This updates the framework package; it does not regenerate application configuration or install a new project skeleton. Review and regenerate any compiled configuration through the existing [configuration workflow](/en/environment/compiled-configuration), then restart application and worker processes.
+
+Existing `remember()`, `get()`, single-message mail delivery and synchronous callbacks retain their APIs. Adopt the new batch and threaded APIs explicitly. Before enabling them, define how the application handles `WorkQueueFullError`, logging `queue.Full`, admission timeouts and partial SMTP delivery. Cancellation can wait for an already running native operation; configure finite I/O timeouts. The [worker budget table](/en/utilities/helpers/concurrency#framework-worker-budgets) lists the limits per process.
 
 <a id="v1-0-16"></a>
 

@@ -411,9 +411,13 @@ assert Collection([1]).zip(Collection(["a"])).all() == [[1, "a"]]
 
 <a id="collection-method-unique"></a>
 
-### `unique(key: str | None = None) -> Collection`
+<a id="collection-unique-performance"></a>
 
-Without a truthy key, returns a **new** collection via `list(set(items))`, with no promised order. If any item is unhashable, it instead preserves the first occurrence using equality. With a key and list backing, preserves the first item for each hashable extracted value, treating missing fields as `None`. **Current limitation:** unhashable extracted values are not recorded in the seen set, so repeated list/dictionary field values can remain duplicated. With a truthy key and dictionary backing, returns `self` unchanged; without a key it deduplicates dictionary keys.
+### `unique(key: str | Callable | None = None) -> Collection`
+
+Without a truthy key, returns a **new** collection through `list(set(items))` for hashable items, with no promised order. Unhashable items retain their first occurrence using equality-compatible deduplication. With a string key or synchronous callable selector, list-backed collections keep the first item for each selected value, including equal lists and dictionaries; missing fields count as `None`. A truthy key on a dictionary-backed collection still returns `self`; omitting the key deduplicates dictionary keys.
+
+In **1.1.0**, built-in nested value trees use structural indexing when suitable. Small unhashable inputs, custom equality and cycles retain an equality-based fallback. A selector returning a hashable business identity avoids repeated comparisons for custom objects, for example `rows.unique(lambda item: item["id"])`. This also fixes the previous behavior that retained duplicates for unhashable selected fields.
 
 ```python
 from orionis.support.types import Collection
@@ -427,7 +431,8 @@ assert Collection().groupBy("team").all() == []
 assert sorted(Collection([2, 1, 2]).unique().all()) == [1, 2]
 assert Collection([[1], [1], [2]]).unique().all() == [[1], [2]]
 assert rows.unique("team").pluck("id").all() == [1, 2]
-assert Collection([{"v": [1]}, {"v": [1]}]).unique("v").count() == 2
+assert rows.unique(lambda item: item["team"]).pluck("id").all() == [1, 2]
+assert Collection([{"v": [1]}, {"v": [1]}]).unique("v").count() == 1
 indexed = Collection({"a": 1, "b": 1})
 assert indexed.unique("anything") is indexed
 assert sorted(indexed.unique().all()) == ["a", "b"]

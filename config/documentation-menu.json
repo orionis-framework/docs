@@ -3306,6 +3306,22 @@
       }
     },
     {
+      "id": "helper-concurrency",
+      "kind": "doc",
+      "title": {
+        "es": "Concurrencia limitada",
+        "en": "Bounded concurrency"
+      },
+      "label": {
+        "en": "Concurrency",
+        "es": "Concurrencia"
+      },
+      "slug": {
+        "es": "/es/utilities/helpers/concurrency",
+        "en": "/en/utilities/helpers/concurrency"
+      }
+    },
+    {
       "id": "helper-freeze-thaw",
       "kind": "doc",
       "title": {

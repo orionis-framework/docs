@@ -212,5 +212,6 @@ This class method returns the contract through which the facade resolves its man
 | `MailCompositionException` | Invalid declarations, callbacks, addresses, views or MIME. |
 | `MailAttachmentException` | Composition subclass for attachment metadata or loading. |
 | `MailTransportException` | Delivery/publication failure; does not guarantee the server received no data. |
+| `MailBatchException` | SMTP batch failure with `completed` results and zero-based `failed_index`; no automatic rollback or retry. |
 
 These classes provide no retry method or public rollback attribute. Context and the original cause may accompany an exception. A partial SMTP result carries its own data in `MailResult`; it does not simply represent “nothing sent.” See [results and errors](/en/mail/sending-and-results).

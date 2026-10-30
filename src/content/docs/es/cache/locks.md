@@ -208,3 +208,5 @@ Si cancelas una tarea que espera un lock file, la espera termina sin liberar el 
 No suprimas `CancelledError` para continuar como si hubieras adquirido. Usa un objeto de contexto por participante y evita adquisiciones anidadas de la misma clave: estos locks no proporcionan reentrada por tarea. No dependen de un destructor que libere automáticamente, ni la salida de un proceso ejecuta necesariamente `__aexit__()`.
 
 Si falla la liberación, su excepción se propaga y puede sustituir al error del bloque. Un lease no deshace trabajo ya realizado, un bloqueo no impide que código externo escriba sin participar y ningún contexto de esta API confirma o revierte transacciones de base de datos. Para las operaciones de caché disponibles consulta la [referencia de API](/es/cache/api-reference).
+
+Para coordinar fallos de caché en 1.1.0, [`rememberOnce(..., lease=...)`](/es/cache/caching-values#repository-rememberonce) añade admisión limitada y limpieza Redis con comprobación del propietario. Su polling Redis no modifica el contrato de `repository.lock()`/RedLock descrito arriba.

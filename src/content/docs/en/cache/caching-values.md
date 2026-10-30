@@ -287,6 +287,38 @@ There is no automatic coalescing of concurrent misses. Several requests can comp
 
 A resolver exception propagates before the write. A backend exception also propagates. The method awaits `set` but does not inspect its boolean result: if the backend reports `False` without raising, `remember` still returns the freshly computed value.
 
+<a id="repository-rememberonce"></a>
+
+## Share concurrent misses with rememberOnce
+
+Available since **1.1.0** on `Cache`, `ICacheManager` and repositories:
+
+```text
+async rememberOnce(key: str, ttl: float | None, resolver: Callable,
+                   *, wait_timeout: float = 10, lease: float | None = None) -> Any
+```
+
+Use a zero-argument synchronous or asynchronous resolver. Overlapping calls sharing the same backend instance, prefixed key and event loop share one successful result, including `None`. Later calls read the stored value with the backend's normal TTL and serialization. Existing `remember()` and `rememberForever()` remain available without this local coordination.
+
+```python
+from orionis.cache.contracts import ICacheManager
+
+
+async def cached_total(cache: ICacheManager) -> int:
+    async def calculate() -> int:
+        return 42
+
+    return await cache.rememberOnce(
+        "dashboard:total", 60, calculate, wait_timeout=5,
+    )
+```
+
+The example accepts an injected cache manager inside a booted application; replace `calculate()` with the application's query. On a resolver error or cancellation, ownership is released and another caller can retry. Recursively resolving the same key raises `RuntimeError` instead of waiting on itself.
+
+`wait_timeout` must be finite and positive. It bounds each local admission phase and, when used, Redis admission and lease cleanup; it is **not a deadline for the resolver or ordinary cache I/O**. Waiting past that budget raises `TimeoutError`.
+
+`lease=seconds` optionally acquires the backend lock and rechecks storage before resolving. The lease must be finite and positive. Redis uses owner-checked release; other drivers retain their own lock guarantees. Lease expiry can permit overlapping work, and file/memory business locks remain process-local. Use idempotent resolvers for side effects: this API does not guarantee exactly-once execution. See [lock scope](/en/cache/locks).
+
 <a id="repository-rememberforever"></a>
 
 ### `rememberForever`: resolve without a new expiry
@@ -540,7 +572,7 @@ See [locks and concurrent regeneration](/en/cache/locks) before using this to co
 
 ## Default-store proxies
 
-`CacheManager` delegates the thirteen asynchronous value operations above, excluding `replace`, to `store()`. Their arguments, defaults, results, and errors are unchanged. It also exposes the synchronous factory `lock(key: str, timeout: float | None = None) -> Any`, whose concrete result is `CacheLock`.
+`CacheManager` delegates the fourteen asynchronous value operations above, excluding `replace`, to `store()`. Their arguments, defaults, results, and errors are unchanged. It also exposes the synchronous factory `lock(key: str, timeout: float | None = None) -> Any`, whose concrete result is `CacheLock`.
 
 The [complete proxy map](/en/cache/manager-and-injection#manager-proxies) lists every manager signature and links to the corresponding operation here. A proxy does not add retries, fallback, or a transaction.
 

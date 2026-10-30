@@ -314,3 +314,5 @@ Reserve `runSync` for synchronous APIs running without an active loop. Async cal
 ---
 
 [Index](/en/application/async) · [background](/en/queues/background-tasks) · [foundation](/en/getting-started)
+
+For explicit admission limits on synchronous work in 1.1.0, use [`BoundedExecutor` or `@threaded`](/en/utilities/helpers/concurrency). They expose overload and wait for running native work during cancellation. `Loop.execute()` retains the default-executor behavior documented here; adding an async wrapper alone does not apply the new bounded budget.

@@ -1,11 +1,44 @@
 ---
 title: "Notas de versión"
-description: "Cambios de Orionis 1.0.8 a 1.0.16: orígenes MCP y configuración del Inspector, CORS HTTP, validación de schemas, rendimiento, colas y fachada Debug."
+description: "Cambios de Orionis 1.0.8 a 1.1.0: concurrencia limitada, APIs por lotes, colas de logging, límites de caché y actualización."
 editUrl: true
 lastUpdated: false
 ---
 
-Estas notas reúnen los cambios de las versiones **1.0.8 a 1.0.16** y enlazan las guías de uso actualizadas. Los ejemplos de Reactor se ejecutan desde la raíz de la aplicación con su entorno de Python.
+Estas notas reúnen los cambios de las versiones **1.0.8 a 1.1.0** y enlazan las guías de uso actualizadas. Los ejemplos de Reactor se ejecutan desde la raíz de la aplicación con su entorno de Python.
+
+<a id="v1-1-0"></a>
+
+## 1.1.0: ejecución limitada y APIs por lotes
+
+La versión **1.1.0** añade APIs opcionales para fallos concurrentes de caché, consultas por lotes, lotes SMTP, preparación de plantillas y trabajo bloqueante de la aplicación. También limita las cachés internas y la admisión a los workers. Se mantiene el requisito de **Python 3.14+**.
+
+| Área | Cambio y guía de uso |
+| --- | --- |
+| Callbacks bloqueantes | [`@threaded` y `BoundedExecutor`](/es/utilities/helpers/concurrency) conservan las firmas para DI y las variables de contexto, con límites explícitos de ejecución. |
+| Caché | [`rememberOnce()`](/es/cache/caching-values#repository-rememberonce) comparte resoluciones simultáneas; un lease opcional del backend coordina otros consumidores. Las operaciones por lotes de File reducen las transiciones a workers. |
+| ORM y constructor SQL | [`chunks(size=1000)`](/es/orm/collections-and-pagination#query-chunks) entrega colecciones con orden determinista sin materializar el resultado completo. |
+| SMTP | [`SmtpTransport.sendMany()`](/es/mail/transports-and-extensions#smtp-batches) envía hasta 100 mensajes preparados mediante una conexión e informa resultados parciales. |
+| Logging | [`queue_capacity`](/es/logging/configuration#logging-queue-capacity) habilita la entrega en segundo plano con capacidad limitada; [`aclose()`](/es/logging/rotation-and-lifecycle#logging-async-close) cierra los recursos de logging pendientes. El valor predeterminado mantiene la escritura síncrona. |
+| Hashing | [Argon2 y bcrypt](/es/cryptography/hashing/password-storage#hashing-worker-budget) comparten un límite dedicado de workers sin cambiar los parámetros criptográficos. |
+| Vistas | [`warmup()`](/es/views/configuration-and-cache#view-warmup) prepara plantillas; la carga inicial de nivel superior y la comprobación de recarga se ejecutan en un pool dedicado. |
+| Storage | [`stream.chunks()`](/es/storage/streaming-and-uploads#stream-chunks) y las lecturas nativas agrupadas mantienen límites de consumo y cierre explícito de recursos. |
+| Estado retenido | Los [mapas de traducción](/es/localization/messages-and-locales#locale-cache-limits) y los [planes de schemas](/es/validation/validation-and-errors#validation-plan-cache) utilizan cachés limitadas. |
+
+Otros cambios internos reducen la inspección repetida de dependencias, la preparación de hidratación de modelos, la conversión de headers y las comparaciones de colecciones. La autenticación nativa puede combinar la consulta del token y su propietario conservando la comprobación final de revocación y expiración. Las transiciones de colas Redis usan identificadores de scripts con recuperación ante `NOSCRIPT`. Consulta [autenticación por tokens](/es/authentication/personal-access-tokens#token-lookup-performance), [colas Redis](/es/queues/drivers-and-configuration#redis-script-cache) y [valores únicos en colecciones](/es/utilities/helpers/collection#collection-unique-performance). Estos cambios no implican una mejora universal de rendimiento para todas las aplicaciones.
+
+### Actualizar una aplicación existente
+
+Desde la raíz de la aplicación, selecciona la nueva versión del runtime y sincroniza el entorno:
+
+```bash
+uv add "orionis==1.1.0"
+uv sync
+```
+
+Para un entorno administrado directamente con pip, usa `python -m pip install --upgrade "orionis==1.1.0"`. Esto actualiza el paquete del framework; no regenera la configuración de la aplicación ni instala un nuevo skeleton. Revisa y regenera la configuración compilada mediante el [flujo de configuración](/es/environment/compiled-configuration), si lo utilizas, y reinicia los procesos de aplicación y workers.
+
+`remember()`, `get()`, el envío individual de correo y los callbacks síncronos conservan sus APIs. Adopta las nuevas APIs por lotes y en hilos de forma explícita. Define cómo responder a `WorkQueueFullError`, `queue.Full` de logging, timeouts de admisión y entregas SMTP parciales. La cancelación puede esperar una operación nativa que ya empezó; configura timeouts finitos de I/O. La [tabla de workers](/es/utilities/helpers/concurrency#framework-worker-budgets) muestra los límites por proceso.
 
 <a id="v1-0-16"></a>
 

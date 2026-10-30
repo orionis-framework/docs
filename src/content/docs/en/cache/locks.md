@@ -208,3 +208,5 @@ Cancelling a task waiting for a file lock stops its wait without releasing the h
 Do not suppress `CancelledError` and continue as though acquisition succeeded. Use one context object per participant and avoid nested acquisition of the same key: these locks provide no task reentrancy. They do not depend on destructor-based release, and process exit does not necessarily execute `__aexit__()`.
 
 Release errors propagate and can replace the block error. A lease does not undo work, a lock does not prevent external code writing without participation, and no context here commits or rolls back database transactions. See the [API reference](/en/cache/api-reference) for cache operations.
+
+For cache-miss coordination in 1.1.0, [`rememberOnce(..., lease=...)`](/en/cache/caching-values#repository-rememberonce) adds separate bounded admission and Redis owner-checked cleanup. Its Redis polling behavior does not change the existing `repository.lock()`/RedLock contract described above.

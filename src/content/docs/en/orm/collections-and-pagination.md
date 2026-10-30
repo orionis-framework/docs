@@ -24,6 +24,34 @@ class ArticleListController:
         return JSONResponse(page.toDict())
 ```
 
+<a id="query-chunks"></a>
+
+## Read database results in batches
+
+Since **1.1.0**, query builders expose `chunks(size: int = 1000) -> AsyncIterator[Collection]`. Consume it with `async for`; do not await the iterator itself. It works on model queries and `DB.table(...)`:
+
+```python
+from orionis.support.facades import DB
+
+
+async def count_export_rows() -> int:
+    total = 0
+    query = DB.table("articles").orderBy("id")
+    async for batch in query.chunks(500):
+        total += len(batch)
+    return total
+```
+
+Run this inside a booted application with an `articles` table. For model batches, use `Article.query().orderBy("id").chunks(500)` with the model from the querying guide. Every batch follows `get()`, including casts, global scopes, retrieved events and eager loading.
+
+- `size` must be a positive integer, excluding booleans; invalid sizes raise `ValueError`.
+- Supply an explicit, deterministic order, preferably ending in a unique key. Without an order, iteration raises `InvalidQueryException`.
+- Existing `limit()` and `offset()` are honored; iteration clones the query and leaves its original plan unchanged.
+- This uses LIMIT/OFFSET pagination, not a server-side cursor. Concurrent inserts or deletes can shift rows; use an appropriate transaction snapshot when consistency is required.
+- The query releases its cursor before yielding. A caller-owned transaction still owns its connection. Close an iterator with `contextlib.aclosing()` if exiting early.
+
+Keeping batches in a list defeats the memory benefit. Relations may add memory beyond the batch's row count. `get()` still materializes its result, while [`Collection.chunk()`](#collection-chunk) only splits data already loaded into memory.
+
 ## Query pagination
 
 
@@ -800,13 +828,13 @@ assert Collection([1, 2]).transform(lambda n: n + 1).all() == [2, 3]
 ### `unique`
 
 ```text
-def unique(self, key: str | None=None) -> Collection
+def unique(self, key: str | Callable | None=None) -> Collection
 ```
 
-New collection of unique values, optionally by key; preserves first occurrences and handles unhashable items. A dict-backed collection with key returns self unfiltered.
+With a field name or callable selector, keep the first representative, including equal unhashable selected values. Without a key, hashable items use a set with no order guarantee. A dict-backed collection with a truthy key returns itself. See [uniqueness semantics](/en/utilities/helpers/collection#collection-unique-performance).
 
 ```python
-assert Collection([1, 1, 2]).unique().all() == [1, 2]
+assert sorted(Collection([1, 1, 2]).unique().all()) == [1, 2]
 ```
 
 <a id="collection-where"></a>

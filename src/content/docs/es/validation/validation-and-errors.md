@@ -323,3 +323,9 @@ En la acción automática con `payload: Order`, la validación ocurre antes de e
 La [guía de integración con controladores y HTTP](/es/validation/controllers-and-http) explica la inyección automática de schemas, la selección de los datos de entrada y las respuestas HTTP de error, incluidas las diferencias entre API y WEB. El diccionario anterior es la salida de `ValidationException.error()`; la presentación HTTP depende de esa integración.
 
 Al registrar o devolver errores, utiliza los campos y mensajes necesarios para el cliente; no incluyas contraseñas ni el payload completo.
+
+<a id="validation-plan-cache"></a>
+
+## Planes de validación limitados
+
+Desde **1.1.0**, los planes de reglas personalizadas utilizan una caché LRU local al proceso con capacidad para **1.024 tipos de schema**. La expulsión libera el plan cacheado y permite recolectar tipos creados dinámicamente cuando no quedan otras referencias. Reutilizar un tipo expulsado reconstruye su plan; llenar la caché nunca omite la validación. La preparación recursiva de planes hijos y la compilación concurrente están protegidas. No cambian las reglas, los errores estructurados ni la serialización.

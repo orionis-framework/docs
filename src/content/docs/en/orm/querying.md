@@ -137,3 +137,5 @@ The first function uses instance `fillable`, mutators, state and events. A liste
 Builder `withRelations()`/`load()` help [avoid N+1](/en/orm/eager-loading). Do not add relationship names as `select` columns: they are separate mechanisms. Models do not automatically include relationships in `toDict()`.
 
 Composition errors raise `InvalidQueryException`; unknown relationships raise `RelationNotFoundException`; explicitly requested missing scopes raise `ScopeNotFoundException`; SQL failures propagate from Database. Types and rules for each operation are linked in the references above. The [testing module](/en/orm/testing) provides fixtures and checks for queries, persistence and relationships.
+
+For large result sets in 1.1.0, use [query `chunks()`](/en/orm/collections-and-pagination#query-chunks) with an explicit deterministic `orderBy()`. It yields bounded collections without changing `get()` or splitting an already materialized collection.

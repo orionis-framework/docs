@@ -13,8 +13,8 @@ Para operaciones de aplicación utiliza la [fachada o ICacheManager](/es/cache/m
 
 | Contrato | Superficie pública |
 | --- | --- |
-| `ICacheManager` | `store()` y los trece proxies asíncronos de valores de la [guía del manager](/es/cache/manager-and-injection#manager-proxies). `store()` anota `ICacheRepository`, mientras que la implementación retorna `CacheRepository`. |
-| `ICacheRepository` | Catorce operaciones asíncronas: los trece proxies de valores y `replace()`. |
+| `ICacheManager` | `store()` y los catorce proxies asíncronos de valores de la [guía del manager](/es/cache/manager-and-injection#manager-proxies). `store()` anota `ICacheRepository`, mientras que la implementación retorna `CacheRepository`. |
+| `ICacheRepository` | Quince operaciones asíncronas: los catorce proxies de valores y `replace()`. |
 | `IFileBasedCache` | `get() -> dict \| None`, `save(data: dict) -> tuple[int, str]` y `clear() -> bool`, todos síncronos. |
 
 `lock()` existe en `CacheManager` y `CacheRepository`, pero no está declarado en estos contratos abstractos. El provider nativo solo registra `ICacheManager`; no proporciona automáticamente un repositorio o artefacto para los otros contratos. Las anotaciones no sustituyen las diferencias reales entre drivers.
@@ -98,7 +98,7 @@ Lee secuencialmente las claves y devuelve una lista en el mismo orden, utilizand
 
 ### multiSet(pairs: list[tuple[str, Any]], ttl: float | None = None) → bool
 
-Invoca `set()` secuencialmente para cada par, con un TTL común, y devuelve `True`. No hay rollback del lote: una excepción puede dejar escrituras anteriores publicadas. `multi_set = multiSet` es el alias que consume el repositorio.
+Escribe cada par secuencialmente con un TTL común y devuelve `True`. File realiza sus escrituras síncronas en una invocación al worker; Database llama a `set()` para cada par. No hay rollback del lote: una excepción puede dejar escrituras anteriores publicadas. `multi_set = multiSet` es el alias que consume el repositorio.
 
 <a id="backend-add"></a>
 
@@ -225,3 +225,7 @@ Este método de clase retorna `ICacheManager`. Es el punto de enlace de la facha
 `CacheException` hereda de `Exception`; `CacheStoreException` hereda de ella y señala almacenes desconocidos, configuración ausente o un backend personalizado sin reemplazo atómico. No existe una conversión universal de errores externos a estas clases: permisos de archivo, timeouts, conexión Redis/Memcached, errores de JSON, conversión numérica y `QueryException` pueden propagarse con su tipo original.
 
 El manager no implementa un fallback automático a memoria si un servidor falla. Define explícitamente cómo debe responder tu aplicación si no puede leer, calcular o guardar una entrada; no captures indiscriminadamente errores del resolver como si fueran simples ausencias de caché.
+
+## Ejecución por lotes de File en 1.1.0
+
+`FileCacheBackend.multiGet()` y `multiSet()` ejecutan el lote completo mediante una invocación al worker. Conservan el orden de las claves, duplicados en lecturas, valores predeterminados, bloqueos por archivo y TTL por clave. Las escrituras siguen siendo secuenciales y sin rollback; la cancelación se detiene entre entradas después de completar la operación nativa en curso. El backend de base de datos conserva su ejecución secuencial. Estos métodos retornan listas o booleanos; `getMany()` del repositorio sigue retornando un diccionario.

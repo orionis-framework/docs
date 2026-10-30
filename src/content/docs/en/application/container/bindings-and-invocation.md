@@ -393,6 +393,8 @@ The utilities in `orionis.container.entities.invocation` can help when integrati
 | `constructor_plan()` | `constructor_plan(target: type, constructor: object) -> InvocationPlan`: analyzes and validates the class and constructor. |
 | `warm_controller_plan()` | `warm_controller_plan(target: type, method_name: str) -> None`: prepares ordinary constructor and action descriptors without creating a controller. |
 
+Since 1.1.0, `InvocationPlan.has_keyword_only` is a computed read-only field, not a constructor parameter. The container uses this cached shape for positional calls while continuing to resolve current transient, singleton and scoped bindings. Callable or constructor replacements select new metadata. Use [`@threaded`](/en/utilities/helpers/concurrency) to opt a blocking synchronous callable into worker execution; signature caching alone does not move work off the event loop.
+
 Plan caches are limited to 1,024 entries per cached function. Custom descriptors remain lazy. These utilities propagate signature or reflection errors and do not execute the action. Use `build()`, `invoke()`, and `call()` to construct or invoke application services.
 
 Continue with [Providers and facades](/en/application/container/providers) and [Scopes, isolation and concurrency](/en/application/container/scopes-and-concurrency).

@@ -177,3 +177,13 @@ Con `locale="es-CO"` y `fallback_locale="en"`, una consulta busca la clave en `e
 Con los ejemplos anteriores y `APP_FALLBACK_LOCALE=en`, `Lang.get("shop.help", locale="es")` devuelve `Contact support`, porque la clave existe únicamente en inglés. Si tampoco existe en inglés, se consulta el handler de claves ausentes, si lo registraste; en caso contrario, se devuelve la propia clave. `Lang.has(..., fallback=False)` permite comprobar si la traducción está presente específicamente en el idioma solicitado.
 
 Seleccionar `locale=` en una consulta no cambia el idioma activo compartido. Utiliza este argumento para peticiones de usuarios distintos, como se explica en [aplicación y vistas](/es/localization/application-and-views).
+
+<a id="locale-cache-limits"></a>
+
+## Límites de caché de idiomas y archivos ausentes
+
+En **1.1.0**, `TranslationRepository(loader, *, max_locales=256, negative_ttl=30)` conserva hasta **256 mapas de idiomas por repositorio**, contando mapas poblados y vacíos. Las lecturas actualizan su uso reciente; al alcanzar la capacidad se expulsa el menos utilizado recientemente. Los resultados vacíos se vuelven a consultar después de **30 segundos** de forma predeterminada, evitando retener indefinidamente un idioma ausente que luego se añade.
+
+`max_locales` debe ser un entero positivo sin booleanos. `negative_ttl` debe ser finito y no negativo; cero vuelve a consultar los resultados vacíos en la siguiente lectura. Son opciones del constructor del repositorio, no nuevas variables `APP_*`. Reemplaza su binding en un provider para utilizar otro límite.
+
+Los mapas poblados no vigilan el filesystem y permanecen en caché hasta su expulsión o invalidación explícita. Siguen disponibles `forget()`, `flush()` y las APIs de recarga del traductor. La carga continúa siendo síncrona; precarga los idiomas necesarios durante el arranque si quieres evitar I/O de archivos en la primera petición. Los mapas cacheados se comparten dentro del repositorio, por lo que los consumidores no deben mutarlos.

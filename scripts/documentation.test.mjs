@@ -248,9 +248,9 @@ test('utilities provide dedicated helper and metadata groups while retaining exi
   const section = navigationSections.find((entry) => entry.id === 'utilities');
   assert.deepEqual(section.title, { es: 'Utilidades', en: 'Utilities' });
   assert.deepEqual(section.groups.map((group) => group.id), ['utilities-helpers', 'utilities-metadata', 'utilities-introspection', 'utilities-reference']);
-  const helpers = ['collection', 'dot-dict', 'sentinel', 'std-class', 'stringable', 'workers', 'freeze-thaw', 'performance-counter', 'debug'];
+  const helpers = ['collection', 'dot-dict', 'sentinel', 'std-class', 'stringable', 'workers', 'concurrency', 'freeze-thaw', 'performance-counter', 'debug'];
   assert.deepEqual(section.groups[0].pageIds, helpers.map((name) => `helper-${name}`));
-  assert.deepEqual(section.groups[0].pages.map((page) => page.title.en), ['Collection', 'DotDict', 'Sentinel', 'StdClass', 'Stringable', 'Workers', 'FreezeThaw', 'PerformanceCounter', 'Debug']);
+  assert.deepEqual(section.groups[0].pages.map((page) => page.title.en), ['Collection', 'DotDict', 'Sentinel', 'StdClass', 'Stringable', 'Workers', 'Bounded concurrency', 'FreezeThaw', 'PerformanceCounter', 'Debug']);
   assert.deepEqual(section.groups[1].pageIds, ['metadata-overview']);
   assert.deepEqual(section.groups[3].pageIds, ['support-overview', 'support-collections-and-strings', 'support-entities-and-structures', 'support-facades-and-runtime-utilities']);
   for (const locale of documentationCatalog.locales) {

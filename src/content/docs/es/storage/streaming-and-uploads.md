@@ -84,7 +84,7 @@ async def first_report_block() -> bytes:
     return b""
 ```
 
-Los iteradores nativos de local, S3 y GCS liberan su handle en `finally`. Azure utiliza el iterador de bloques del SDK; no añade un handle de Storage ni un cierre explícito del downloader. Memory recorre contenido ya residente en el proceso.
+Los iteradores nativos local, S3 y GCS liberan su handle en `finally`. Azure consume el iterador de bloques del SDK y lo cierra cuando expone `close()`; no añade un handle Storage seekable ni garantiza un cierre independiente del downloader. Memory recorre contenido ya conservado por el proceso.
 
 ## Referencia de AsyncStream
 
@@ -101,6 +101,31 @@ AsyncStream(
 ```
 
 Esta es la firma del constructor para adaptadores propios. Los drivers proporcionan ambas funciones; en el uso habitual obtienes el objeto mediante `file.open()`. Construirlo no abre el handle. La primera operación o `__aenter__()` ejecuta `opener` en un hilo y conserva el handle para las operaciones siguientes. `on_close`, si existe, es una función síncrona que también se ejecuta en un hilo.
+
+<a id="stream-chunks"></a>
+
+### Recorrer un handle binario en bloques con buffer
+
+Desde **1.1.0**, `IStorageStream` y `AsyncStream` exponen `chunks(size: int = 65536, *, buffer_size: int = 1048576) -> AsyncIterator[bytes]`. Ambos tamaños deben ser enteros positivos sin booleanos; un valor inválido produce `ValueError`. El método comienza en la posición actual del handle y entrega bloques hasta EOF:
+
+```python
+from orionis.support.facades import Storage
+
+
+async def count_report_bytes() -> int:
+    total = 0
+    file = Storage.disk("local").file("reports/stock.csv")
+    async with file.open("rb") as stream:
+        async for chunk in stream.chunks(65536, buffer_size=1048576):
+            total += len(chunk)
+    return total
+```
+
+El contexto asíncrono exterior administra el handle y lo cierra al salir antes de tiempo o ante errores. No intercales la iteración con `seek()`, `write()` u otras lecturas del mismo handle. Las implementaciones personalizadas de `IStorageStream` heredan un lector compatible; `AsyncStream` también agrupa lecturas nativas dentro del presupuesto de buffer. El bloque final puede ser menor que `size`.
+
+`readStream()` de local, S3 y GCS lee primero un bloque lógico y después agrupa lecturas dentro de **1 MiB**, o al menos un bloque solicitado si es mayor. Azure agrupa hasta **16 bloques del SDK**, deteniéndose al llegar a 1 MiB; un solo bloque del SDK puede superar ese límite. Ningún productor sigue leyendo mientras el consumidor está pausado. La cancelación espera la operación nativa actual antes de cerrar el handle o iterador que permita cierre. Define timeouts finitos de SDK/red y utiliza `aclosing()` al abandonar un iterador de driver antes de agotarlo.
+
+Estos límites de lectura no restringen el tamaño de objetos ya cargados en memoria ni el comportamiento de archivos temporales de `open()` en la nube. Ten en cuenta las [semánticas de cada driver](/es/storage/disks-and-drivers) al elegir entre `open()` y `readStream()`.
 
 <a id="stream-read"></a>
 ### read(size: int = -1) -> bytes

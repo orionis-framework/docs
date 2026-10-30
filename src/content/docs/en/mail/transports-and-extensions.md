@@ -57,6 +57,35 @@ Connection, STARTTLS, authentication, and transaction failures become `MailTrans
 
 There is no automatic retry. An exception or cancellation does not prove server rejection: it may have accepted the message before confirmation was lost. Canceling the caller also does not necessarily stop the worker or cancel an in-progress SMTP transaction. Define retries with partial acceptance and possible duplicates in mind.
 
+<a id="smtp-batches"></a>
+
+## Send prepared SMTP batches
+
+Since **1.1.0**, `SmtpTransport.sendMany(messages, *, mailer, driver)` accepts an iterable of at most **100 `PreparedMail` objects** and returns `tuple[MailResult, ...]`. This is a transport API: `Mail`, `PendingMail` and `IMailTransport` do not gain a `sendMany()` method. Prepare each envelope and MIME through [`MailComposer.prepare()`](/en/mail/api-reference#composer-prepare) before submitting the batch.
+
+```python
+from orionis.mail.entities.prepared import PreparedMail
+from orionis.mail.entities.result import MailResult
+from orionis.mail.entities.smtp_settings import SmtpSettings
+from orionis.mail.transports.smtp import SmtpTransport
+
+
+async def deliver_prepared(
+    settings: SmtpSettings,
+    messages: tuple[PreparedMail, ...],
+) -> tuple[MailResult, ...]:
+    transport = SmtpTransport(settings)
+    return await transport.sendMany(
+        messages, mailer="notifications", driver="smtp",
+    )
+```
+
+Supply validated settings from `SmtpSettings.fromConfig()` with a finite socket timeout and already prepared messages. The transport opens one connection, negotiates TLS and authenticates once, sends envelopes in order, then closes the connection. Connections are not shared across batches or credentials. Empty input returns `()`; more than 100 messages raises `ValueError` before sending. An iterable is consumed only up to the limit plus one item when checking its size.
+
+The dedicated pool allows **4 running and 16 pending batches per process**; saturation raises `WorkQueueFullError`. A recipient-level partial acceptance still produces its normal `MailResult`. If a transaction fails, `MailBatchException.completed` contains earlier confirmed results and `failed_index` identifies the first unsuccessful or uncertain transaction; later messages are not attempted. Import that exception from `orionis.mail.exceptions`.
+
+There is no automatic retry. Cancelling a running batch waits for native execution and cleanup and can allow the accepted batch to finish. Neither cancellation nor an exception proves non-delivery. Reconcile known results before deciding whether retrying could duplicate mail. Ordinary `send()` retains its single-message return type and execution path.
+
 <a id="smtp-settings"></a>
 
 ## SmtpSettings: effective options

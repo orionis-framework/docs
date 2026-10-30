@@ -13,7 +13,7 @@ Orionis incluye los drivers `argon2`, que genera **Argon2id**, y `bcrypt`. La co
 
 El proveedor del framework registra `IHashManager` como singleton y prepara la fachada `Hash` durante el arranque. No necesitas registrar el servicio manualmente. Puedes inyectarlo en una acción, recibirlo en el constructor o utilizar la fachada desde un controlador, servicio, comando, seeder u otro componente con la aplicación iniciada.
 
-`make()` y `check()` son **asíncronos**: se utilizan con `await`. El trabajo del algoritmo se ejecuta en un worker thread mediante `asyncio.to_thread()`, permitiendo que el event loop continúe atendiendo otras tareas. `driver()`, `needsRehash()`, `getAlgorithm()` y `getDefaultDriver()` son síncronos.
+`make()` y `check()` son **asíncronos**: se utilizan con `await`. El trabajo del algoritmo se ejecuta en un ejecutor dedicado y limitado, compartido por Argon2 y bcrypt, permitiendo que el event loop atienda otras tareas sin utilizar su pool de workers predeterminado. `driver()`, `needsRehash()`, `getAlgorithm()` y `getDefaultDriver()` son síncronos.
 
 ### Validar y guardar una contraseña
 
@@ -324,3 +324,29 @@ Estas instancias no leen `config/hashing.py` ni requieren la fachada. Los servic
 Los `65536` KiB predeterminados equivalen a 64 MiB de coste de memoria Argon2 por operación, además del consumo del proceso y del backend. Ejecutar el cálculo fuera del event loop permite concurrencia; no elimina el coste de CPU, memoria ni worker threads. Ajusta los valores según las mediciones de tu aplicación.
 
 Consulta [autenticación](/es/authentication) para la gestión de identidades y [cifrado](/es/cryptography/encryption) cuando necesites recuperar un valor original.
+
+<a id="hashing-worker-budget"></a>
+
+## Limitar el trabajo concurrente de contraseñas
+
+Desde **1.1.0**, Argon2 y bcrypt comparten **2 llamadas activas y 14 pendientes por proceso**. Los costos criptográficos no cambian. Agotar ese límite produce `WorkQueueFullError`; define una política de admisión o reintento apropiada para autenticación en lugar de reducir el costo del hash. El trabajo nativo conserva su plaza hasta terminar, aunque se cancele su consumidor.
+
+Ambos constructores aceptan el argumento nombrado `executor: BoundedExecutor | None = None`. Para utilizar otro límite del host, comparte un ejecutor entre los drivers:
+
+```python
+from orionis.hashing.hashers.argon2_hasher import Argon2Hasher
+from orionis.hashing.hashers.bcrypt_hasher import BcryptHasher
+from orionis.support.concurrency import BoundedExecutor
+
+
+async def create_hashes(password: str) -> tuple[str, str]:
+    pool = BoundedExecutor(2, max_pending=8, name="password-work")
+    try:
+        argon2 = Argon2Hasher(executor=pool)
+        bcrypt = BcryptHasher(executor=pool)
+        return await argon2.make(password), await bcrypt.make(password)
+    finally:
+        await pool.aclose()
+```
+
+En un servicio persistente, crea el pool una vez y ciérralo durante el apagado; el ejemplo limita su propiedad a una operación. El consumidor administra el pool personalizado y este no es un campo nuevo de configuración de hashing. Dimensiona las operaciones activas según la memoria y los hilos nativos de Argon2, considerando todos los procesos del servidor. Consulta [cancelación y cierre del ejecutor](/es/utilities/helpers/concurrency).

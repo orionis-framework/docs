@@ -23,10 +23,25 @@ from orionis.foundation.config.logging import (
 |---|---|---|
 | `Logging.default` | `str`; `LOG_CHANNEL`, o `"stack"`. | Canal seleccionado al inicializar el logger. Solo acepta los seis nombres exactos de la tabla siguiente. |
 | `Logging.channels` | `Channels \| dict`; nueva entidad `Channels()`. | Un diccionario se convierte en `Channels(**valor)` y valida sus entradas. |
+| `Logging.queue_capacity` | `int`; `LOG_QUEUE_CAPACITY`, o `0`. | Registros pendientes por handler; cero conserva la entrega síncrona. |
 | `BootstrapLogging.default` | `str`; mismo valor de entorno. | El archivo del proyecto hace explícita la selección del canal. |
 | `BootstrapLogging.channels` | `Channels \| dict`; fábrica con las seis entidades. | Expone las lecturas de entorno y las condiciones que puedes personalizar en este archivo. |
 
 `default=" DAILY "`, `default="Daily"` y un nombre desconocido producen `ValueError`: el nombre no se recorta ni se normaliza. Un valor de `channels` que no sea `Channels` o `dict` produce `TypeError`.
+
+<a id="logging-queue-capacity"></a>
+
+## Habilitar logging en segundo plano con capacidad limitada
+
+Desde **1.1.0**, `Logging.queue_capacity: int` limita los registros pendientes **por handler**. El valor predeterminado `0` conserva la entrega síncrona. Define un valor positivo en la configuración o mediante `Application(...).withConfigLogging(queue_capacity=1024)` antes de crear la aplicación:
+
+```dotenv
+LOG_QUEUE_CAPACITY=int:1024
+```
+
+La entidad `Logging` del framework y el `BootstrapLogging` editable actual leen esta variable. Las clases existentes que heredan el campo reciben ese comportamiento; si tu aplicación reemplaza el campo o construye diccionarios de configuración, incluye el valor allí. Un número negativo, booleano o valor no entero produce `ValueError`.
+
+La cola mueve la escritura, rotación y compresión a un hilo listener. La saturación produce `queue.Full` en cualquier severidad, incluido `CRITICAL`; no descarta mensajes silenciosamente ni cambia a escritura bloqueante. Los fallos del destino se exponen mediante `LoggingDeliveryError`, de `orionis.logging.handlers.queued`, en una emisión, flush o cierre posterior. Consulta [apagado y propiedad de recursos](/es/logging/rotation-and-lifecycle#logging-async-close).
 
 <a id="logging-channels"></a>
 ## Los seis canales disponibles
@@ -123,6 +138,7 @@ Estas son todas las lecturas de entorno de `config/logging.py`:
 | Variable | Predeterminado | Alcance real |
 |---|---|---|
 | `LOG_CHANNEL` | `stack` | Selecciona `Logging.default` y determina qué entidad recibe `LOG_PATH` y `LOG_RETENTION`. |
+| `LOG_QUEUE_CAPACITY` | `0` | Habilita una cola limitada en segundo plano por handler cuando es positivo. |
 | `LOG_LEVEL` | `INFO` | Nivel inicial de **los seis canales**, incluidos los inactivos. |
 | `LOG_PATH` | Ruta de la tabla de canales. | Sustituye solo la ruta del canal indicado por `LOG_CHANNEL`. |
 | `LOG_RETENTION` | `24`, `7`, `4` o `4`. | Sustituye solo `retention_hours`, `retention_days`, `retention_weeks` o `retention_months` del canal de tiempo seleccionado. No configura `stack` ni `chunked`. |
@@ -171,6 +187,7 @@ from orionis.foundation.config.logging import (
 
 @dataclass(frozen=True, kw_only=True)
 class BootstrapLogging(Logging):
+    queue_capacity: int = 0
     default: str = "daily"
     channels: Channels | dict = field(
         default_factory=lambda: Channels(

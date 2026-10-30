@@ -144,3 +144,23 @@ The environment uses `jinja2.Undefined`: a missing variable may print as empty t
 A missing template raises `ViewTemplateNotFoundException`. Pending-render failures appear as `ViewRenderException`, preserving their cause. Check the requested name, search directories, and original exception before clearing caches. See [HTTP exceptions](/en/http/exceptions) for their presentation during a request.
 
 To add filters, globals, tests, or tags, use a [view provider](/en/views/providers-and-extensions). The configuration above controls loading and caching; the provider extends the shared environment before requests are served.
+
+<a id="view-warmup"></a>
+
+## Prepare templates before serving requests
+
+In **1.1.0**, top-level template loading, compilation and auto-reload checks run in a dedicated pool with **2 workers and 64 pending calls per process**. With auto-reload disabled, an already cached template can be read directly. Rendering and asynchronous template globals stay on the calling event loop. Pool saturation raises `WorkQueueFullError`.
+
+`IViewEngine` exposes `async warmup(*templates: str) -> None`; `Jinja2Engine` implements it by loading known templates without rendering them or evaluating globals:
+
+```python
+from orionis.view.contracts.engine import IViewEngine
+
+
+async def prepare_views(engine: IViewEngine) -> None:
+    await engine.warmup("dashboard", "layouts/base", "partials/menu")
+```
+
+Invoke the helper through the booted application container, or pass its configured engine, before accepting traffic. Create those templates in the configured search paths. The method belongs to the engine, not to the `View` facade. Custom engines inherit a no-op default and may implement their own preparation policy.
+
+Jinja's nested `include`, `extends` and import loading still runs synchronously inside its renderer. Include known dependencies explicitly in warmup; loading a parent does not recursively preload every dynamic dependency. Warmup respects existing cache size and bytecode settings and does not pin templates against eviction. Dynamic names or nested auto-reload checks may still perform synchronous loader I/O.

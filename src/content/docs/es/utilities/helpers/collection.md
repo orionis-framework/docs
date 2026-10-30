@@ -411,9 +411,13 @@ assert Collection([1]).zip(Collection(["a"])).all() == [[1, "a"]]
 
 <a id="collection-method-unique"></a>
 
-### `unique(key: str | None = None) -> Collection`
+<a id="collection-unique-performance"></a>
 
-Sin clave truthy, devuelve una colección **nueva** mediante `list(set(items))`, sin garantizar el orden. Si algún elemento no es hashable, conserva la primera aparición mediante igualdad. Con clave y respaldo de lista, conserva el primer elemento por cada valor extraído hashable; los campos ausentes cuentan como `None`. **Limitación actual:** los valores extraídos no hashables no se registran en el set de valores vistos, por lo que pueden permanecer duplicados los campos de lista/diccionario repetidos. Con clave truthy y respaldo de diccionario, devuelve `self` sin cambios; sin clave, elimina duplicados entre las claves del diccionario.
+### `unique(key: str | Callable | None = None) -> Collection`
+
+Sin clave truthy, devuelve una colección **nueva** mediante `list(set(items))` para elementos hashables, sin prometer orden. Los elementos no hashables conservan su primera aparición mediante deduplicación compatible con igualdad. Con una clave de texto o selector callable síncrono, las colecciones respaldadas por listas conservan el primer elemento de cada valor seleccionado, incluidas listas y diccionarios iguales; los campos ausentes cuentan como `None`. Una clave truthy en una colección respaldada por diccionario sigue retornando `self`; omitirla elimina duplicados entre las claves del diccionario.
+
+En **1.1.0**, las estructuras anidadas de tipos integrados utilizan índices estructurales cuando corresponde. Las entradas no hashables pequeñas, igualdad personalizada y ciclos mantienen una comparación por igualdad. Un selector con una identidad de negocio hashable evita comparaciones repetidas para objetos personalizados, por ejemplo `rows.unique(lambda item: item["id"])`. También se corrige el comportamiento anterior que retenía duplicados cuando el campo seleccionado no era hashable.
 
 ```python
 from orionis.support.types import Collection
@@ -427,7 +431,8 @@ assert Collection().groupBy("team").all() == []
 assert sorted(Collection([2, 1, 2]).unique().all()) == [1, 2]
 assert Collection([[1], [1], [2]]).unique().all() == [[1], [2]]
 assert rows.unique("team").pluck("id").all() == [1, 2]
-assert Collection([{"v": [1]}, {"v": [1]}]).unique("v").count() == 2
+assert rows.unique(lambda item: item["team"]).pluck("id").all() == [1, 2]
+assert Collection([{"v": [1]}, {"v": [1]}]).unique("v").count() == 1
 indexed = Collection({"a": 1, "b": 1})
 assert indexed.unique("anything") is indexed
 assert sorted(indexed.unique().all()) == ["a", "b"]

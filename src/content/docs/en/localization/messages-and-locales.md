@@ -177,3 +177,13 @@ With `locale="es-CO"` and `fallback_locale="en"`, a query searches for the key i
 With the preceding examples and `APP_FALLBACK_LOCALE=en`, `Lang.get("shop.help", locale="es")` returns `Contact support`, because the key exists only in English. If it is also absent from English, the missing-key handler is consulted if registered; otherwise, the key itself is returned. `Lang.has(..., fallback=False)` checks whether the translation exists specifically in the requested locale.
 
 Selecting `locale=` for a query does not change the shared active locale. Use this argument for requests from different users, as described in [application and views](/en/localization/application-and-views).
+
+<a id="locale-cache-limits"></a>
+
+## Locale cache limits and missing files
+
+In **1.1.0**, `TranslationRepository(loader, *, max_locales=256, negative_ttl=30)` retains at most **256 locale maps per repository**, counting both populated and empty maps. Reads refresh recency; reaching capacity evicts the least recently used map. An empty result is retried after **30 seconds** by default, so adding a previously missing locale no longer requires indefinite negative caching.
+
+`max_locales` must be a positive integer excluding booleans. `negative_ttl` must be finite and nonnegative; zero retries empty results on the next read. These are repository constructor options, not new `APP_*` environment settings. Replace the repository binding in a provider to use a custom budget.
+
+Populated maps do not watch the filesystem and remain cached until eviction or explicit invalidation. Existing `forget()`, `flush()` and translator reload APIs remain available. Loading stays synchronous; preload required locales at startup when first-request file I/O is undesirable. Cached maps are shared within the repository, so consumers should not mutate them.

@@ -171,6 +171,7 @@ Estos métodos llaman al repositorio predeterminado. Sus parámetros, retornos y
 | `async getMany(keys: list[str]) -> dict[str, Any]` | [Leer un lote](/es/cache/caching-values#repository-getmany). |
 | `async setMany(values: dict[str, Any], ttl: float \| None = None) -> bool` | [Guardar un lote](/es/cache/caching-values#repository-setmany). |
 | `async remember(key: str, ttl: float \| None, resolver: Callable) -> Any` | [Calcular ante una ausencia](/es/cache/caching-values#repository-remember). |
+| `async rememberOnce(key, ttl, resolver, *, wait_timeout=10, lease=None) -> Any` | [Compartir fallos simultáneos](/es/cache/caching-values#repository-rememberonce). |
 | `async rememberForever(key: str, resolver: Callable) -> Any` | [Calcular sin TTL](/es/cache/caching-values#repository-rememberforever). |
 | `async pull(key: str) -> Any` | [Leer y luego eliminar](/es/cache/caching-values#repository-pull); no es atómico. |
 | `async add(key: str, value: Any, ttl: float \| None = None) -> bool` | [Agregar si falta](/es/cache/caching-values#repository-add). |

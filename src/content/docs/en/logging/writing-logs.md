@@ -230,9 +230,10 @@ This administrative example changes shared process state and returns to `stack`.
 
 ```text
 close() -> None
+async aclose() -> None
 ```
 
-Removes and closes handlers, clears the cache, and resets the internal logger reference. Contains `OSError`, `RuntimeError`, and `ValueError` during cleanup. It may be called repeatedly. `__del__()` also attempts to close a destroyed wrapper, but does not replace explicit cleanup when resources must be released at a particular time.
+Removes and closes handlers, clears the cache, and resets the internal logger reference. Ordinary cleanup contains `OSError`, `RuntimeError` and `ValueError`; queued-handler delivery failures are collected and raised as `LoggingDeliveryError` after cleanup. It may be called repeatedly. `__del__()` also attempts to close a destroyed wrapper, but does not replace explicit cleanup when resources must be released at a particular time.
 
 `close()` does not unregister the singleton or unpin `Log`. A later message or `getLogger()` reconstructs the default channel using the configuration retained by the wrapper. Consequently, do not call it after every request.
 
@@ -244,8 +245,8 @@ from orionis.foundation.enums.lifespan import Lifespan
 from orionis.logging.contracts.logger import ILogger
 
 
-def close_application_logger(logger: ILogger) -> None:
-    logger.close()
+async def close_application_logger(logger: ILogger) -> None:
+    await logger.aclose()
 
 
 def register_logger_shutdown(app: IApplication) -> None:
@@ -322,3 +323,5 @@ Service initialization does not guarantee every subsequent writing operation suc
 **Without a pinned instance**, `Log.info(...)` and other service accesses return a deferred operation: they must be awaited to execute. In that state, `await Log.info("...")` is valid; after pinning, use the synchronous call. Do not switch between these states during normal requests. For code that must work independently of pinning, receive `ILogger` or use `logger = await Log.resolve()` followed by `logger.info(...)`.
 
 Resolution before application creation raises `RuntimeError`; container construction and resolution errors can also propagate. General dispatch behavior is explained in [synchronous and asynchronous facades](/en/application/container/facades#facade-dispatch).
+
+Use `await logger.aclose()` when closing from async code. Since 1.1.0, the application automatically drains configured queued logging after shutdown callbacks, even if a callback fails. Do not register an extra callback solely for that default behavior. Custom standalone loggers still require an owner to close them. See [queued logging shutdown](/en/logging/rotation-and-lifecycle#logging-async-close).

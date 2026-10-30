@@ -1423,6 +1423,7 @@
         "helper-std-class",
         "helper-stringable",
         "helper-workers",
+        "helper-concurrency",
         "helper-freeze-thaw",
         "helper-performance-counter",
         "helper-debug",
@@ -1455,6 +1456,7 @@
             "helper-std-class",
             "helper-stringable",
             "helper-workers",
+            "helper-concurrency",
             "helper-freeze-thaw",
             "helper-performance-counter",
             "helper-debug"

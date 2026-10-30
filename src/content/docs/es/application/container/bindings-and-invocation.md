@@ -393,6 +393,8 @@ Las utilidades de `orionis.container.entities.invocation` son útiles al integra
 | `constructor_plan()` | `constructor_plan(target: type, constructor: object) -> InvocationPlan`: analiza y valida la clase y su constructor. |
 | `warm_controller_plan()` | `warm_controller_plan(target: type, method_name: str) -> None`: prepara los descriptores habituales de constructor y acción sin crear un controlador. |
 
+Desde 1.1.0, `InvocationPlan.has_keyword_only` es un campo calculado de solo lectura, no un parámetro del constructor. El contenedor utiliza esa forma cacheada en llamadas posicionales y sigue resolviendo los bindings actuales transient, singleton y scoped. Reemplazar un callable o constructor selecciona nuevos metadatos. Usa [`@threaded`](/es/utilities/helpers/concurrency) para ejecutar explícitamente un callable síncrono bloqueante en un worker; cachear su firma no mueve por sí mismo el trabajo fuera del event loop.
+
 Los cachés de planes están limitados a 1.024 entradas por función cacheada. Los descriptores personalizados permanecen bajo análisis diferido. Las utilidades propagan errores de firma o reflexión y no ejecutan la acción. Para construir o invocar servicios de aplicación utiliza `build()`, `invoke()` y `call()`.
 
 Continúa con [Proveedores y fachadas](/es/application/container/providers) y [Scopes, aislamiento y concurrencia](/es/application/container/scopes-and-concurrency).

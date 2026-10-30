@@ -314,3 +314,5 @@ Reserva `runSync` para APIs síncronas ejecutadas sin un loop activo. Quienes ll
 ---
 
 [Índice](/es/application/async) · [background](/es/queues/background-tasks) · [foundation](/es/getting-started)
+
+Para limitar explícitamente la admisión de trabajo síncrono en 1.1.0, utiliza [`BoundedExecutor` o `@threaded`](/es/utilities/helpers/concurrency). Exponen la saturación y esperan el trabajo nativo en ejecución durante la cancelación. `Loop.execute()` conserva el ejecutor predeterminado documentado aquí; añadir un wrapper async no aplica por sí solo el nuevo límite.

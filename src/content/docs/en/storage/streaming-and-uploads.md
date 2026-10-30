@@ -84,7 +84,7 @@ async def first_report_block() -> bytes:
     return b""
 ```
 
-Native local, S3, and GCS iterators release their handle in `finally`. Azure uses the SDK chunk iterator; it does not add a Storage handle or explicitly close the downloader. Memory traverses content already held by the process.
+Native local, S3, and GCS iterators release their handle in `finally`. Azure consumes the SDK chunk iterator and closes that iterator when it exposes `close()`; this does not add a seekable Storage handle or guarantee a separate downloader close. Memory traverses content already held by the process.
 
 ## AsyncStream reference
 
@@ -101,6 +101,31 @@ AsyncStream(
 ```
 
 This is the constructor signature for custom adapters. Drivers supply both functions; normally you obtain the object through `file.open()`. Construction does not open a handle. The first operation or `__aenter__()` runs `opener` on a worker thread and retains the handle for subsequent operations. An optional `on_close` is also a synchronous function run on a worker thread.
+
+<a id="stream-chunks"></a>
+
+### Iterate a binary handle in buffered chunks
+
+Since **1.1.0**, `IStorageStream` and `AsyncStream` expose `chunks(size: int = 65536, *, buffer_size: int = 1048576) -> AsyncIterator[bytes]`. Both sizes must be positive integers excluding booleans; invalid values raise `ValueError`. This method starts at the current handle position and yields byte chunks until EOF:
+
+```python
+from orionis.support.facades import Storage
+
+
+async def count_report_bytes() -> int:
+    total = 0
+    file = Storage.disk("local").file("reports/stock.csv")
+    async with file.open("rb") as stream:
+        async for chunk in stream.chunks(65536, buffer_size=1048576):
+            total += len(chunk)
+    return total
+```
+
+The surrounding async context owns the handle and closes it after early exit or failure. Do not interleave iteration with `seek()`, `write()` or other reads on that handle. Custom `IStorageStream` implementations inherit a compatible reader; the native `AsyncStream` also groups native reads within the buffer budget. The final chunk can be smaller than `size`.
+
+Native local, S3 and GCS `readStream()` first read one logical chunk, then group reads within a **1 MiB** budget, or at least one requested chunk if larger. Azure groups up to **16 SDK chunks**, stopping at 1 MiB; a single SDK chunk can exceed that budget. No producer continues reading while the consumer is paused. Cancellation waits for the current native operation before closing the owned handle or closable iterator. Set finite SDK/network timeouts and use `aclosing()` when leaving a driver iterator early.
+
+These read budgets do not limit the size of objects already loaded into memory or the temporary-file behavior of cloud `open()`. Keep the [driver-specific storage semantics](/en/storage/disks-and-drivers) when choosing between `open()` and `readStream()`.
 
 <a id="stream-read"></a>
 ### read(size: int = -1) -> bytes

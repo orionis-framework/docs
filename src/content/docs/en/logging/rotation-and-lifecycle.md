@@ -151,7 +151,7 @@ The service uses thread locks for initialization, switching, reloading, and clos
 
 Each process owns its counters and file descriptors. Processes sharing a template in a shared directory can compress or delete files another process is still using. Separate their files by configuring an instance-specific path at deployment, or adopt an external collection infrastructure. [Configuration](/en/logging/configuration) explains how to construct a path from configuration values.
 
-Writing, gzip compression, and deletion are synchronous. Calling `Log.info()` or a `Logger` method in an asynchronous controller does not move that work into a queue. The integrated implementation does not add a network transport or logging worker.
+With the default `queue_capacity=0`, writing, gzip compression and deletion are synchronous. A positive [queue capacity](/en/logging/configuration#logging-queue-capacity) moves that work to a bounded listener thread. It does not add a network transport or cross-process rotation coordination.
 
 The handler captures `OSError` during emission and reports it through `handleError(record)`, the standard logging mechanism. Returning `None` is not a persisted-write acknowledgment. Other errors, such as those from a custom formatter, are not covered by that `OSError` handler.
 
@@ -245,3 +245,21 @@ close() -> None
 `emit()` formats a record, adds `\n`, ensures the correct file, writes, and updates the byte counter. `close()` closes the stream under a lock and delegates to the base class without compression or cleanup. Reopening an existing file restores its initial size; later external writes do not continuously update that counter.
 
 The configuration attributes above are accessible on the handler, as are `stream`, `current_path`, `current_suffix`, and `file_size`. The latter represent active-file state rather than an API for forcing rotation. The handler maintains an internal path cache and exposes no public manual cleanup or `rotate()` method.
+
+<a id="logging-async-close"></a>
+
+## Drain queued logging on shutdown
+
+`await logger.aclose()` is available on `ILogger` and `Logger` in 1.1.0. It stops queue admission, waits for accepted records, closes owned handlers and reports background failures after cleanup. `close()` remains synchronous; use `aclose()` from an event loop.
+
+```python
+from orionis.logging.contracts.logger import ILogger
+
+
+async def close_owned_logger(logger: ILogger) -> None:
+    await logger.aclose()
+```
+
+This helper is for the owner of a standalone logger, not a request handler sharing the application logger. For configured queued logging, application HTTP/CLI shutdown performs this cleanup after lifecycle callbacks, including when a callback fails. The queue does not guarantee durable delivery after abrupt process termination, and cancellation cannot interrupt an in-progress native file write safely.
+
+In queued mode, standard handler emission failures are retained by the listener and exposed as `LoggingDeliveryError`; a successful enqueue does not acknowledge persistence. Handle overload or sink failures through the application's policy without recursively logging the same failure to the affected queue.

@@ -220,3 +220,11 @@ See the [API reference](/en/queues/api-reference) for signatures of `IQueueDrive
 | `build_failed_jobs_table(table: str) -> TableDefinition` | Complete failure definition with key and index. | Calls `validate_table_name()`. Does not execute DDL itself. |
 
 Import them from `orionis.queues.schema`. They are infrastructure helpers; normal facade usage does not require constructing tables or envelopes manually.
+
+<a id="redis-script-cache"></a>
+
+## Redis script-cache recovery
+
+In **1.1.0**, queue transitions first use `EVALSHA` with the script's digest. If the owning Redis node returns `NOSCRIPT`, the driver retries that transition once with `EVAL`, which executes and caches the same script. The next call returns to `EVALSHA`; Redis restarts and script-cache eviction do not require an application-wide loaded flag.
+
+This recovery applies only to `NOSCRIPT`, where Redis did not execute the missing script. Other transport failures are not converted into an unconditional replay by the driver; the Redis client's configured retry policy still applies. Queue keys, hash tags, reservation tokens and fencing behavior remain unchanged. The digest identifies cached Lua source and is not a security or authentication mechanism.

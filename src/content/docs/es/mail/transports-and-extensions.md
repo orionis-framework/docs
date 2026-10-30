@@ -57,6 +57,35 @@ Los fallos de conexión, STARTTLS, autenticación y transacción se traducen a `
 
 No hay reintento automático. Una excepción o cancelación no demuestra que el servidor haya rechazado el mensaje: puede haberlo aceptado antes de perderse la confirmación. La cancelación del consumidor tampoco detiene necesariamente el worker ni cancela una transacción SMTP en curso. Define una política de reintentos que tenga en cuenta aceptaciones parciales y posibles duplicados.
 
+<a id="smtp-batches"></a>
+
+## Enviar lotes SMTP preparados
+
+Desde **1.1.0**, `SmtpTransport.sendMany(messages, *, mailer, driver)` recibe un iterable de hasta **100 objetos `PreparedMail`** y retorna `tuple[MailResult, ...]`. Es una API del transporte: `Mail`, `PendingMail` e `IMailTransport` no incorporan `sendMany()`. Prepara cada sobre y su MIME mediante [`MailComposer.prepare()`](/es/mail/api-reference#composer-prepare) antes de enviar el lote.
+
+```python
+from orionis.mail.entities.prepared import PreparedMail
+from orionis.mail.entities.result import MailResult
+from orionis.mail.entities.smtp_settings import SmtpSettings
+from orionis.mail.transports.smtp import SmtpTransport
+
+
+async def deliver_prepared(
+    settings: SmtpSettings,
+    messages: tuple[PreparedMail, ...],
+) -> tuple[MailResult, ...]:
+    transport = SmtpTransport(settings)
+    return await transport.sendMany(
+        messages, mailer="notifications", driver="smtp",
+    )
+```
+
+Proporciona opciones validadas mediante `SmtpSettings.fromConfig()`, con timeout de socket finito, y mensajes ya preparados. El transporte abre una conexión, negocia TLS y autentica una vez, envía los sobres en orden y cierra la conexión. No comparte conexiones entre lotes ni credenciales. Un iterable vacío retorna `()`; superar 100 mensajes produce `ValueError` antes de enviar. La comprobación consume como máximo el límite más un elemento del iterable.
+
+El pool dedicado admite **4 lotes activos y 16 pendientes por proceso**; la saturación produce `WorkQueueFullError`. La aceptación parcial de destinatarios sigue generando su `MailResult` habitual. Si falla una transacción, `MailBatchException.completed` conserva los resultados confirmados anteriores y `failed_index` identifica la primera transacción fallida o incierta; no se intentan mensajes posteriores. Importa la excepción desde `orionis.mail.exceptions`.
+
+No hay reintentos automáticos. Cancelar un lote en ejecución espera el trabajo nativo y su limpieza, y puede permitir que termine el lote aceptado. Ni la cancelación ni una excepción demuestran que no hubo entrega. Revisa los resultados conocidos antes de decidir un reintento que podría duplicar correo. El `send()` habitual conserva su resultado individual y su vía de ejecución.
+
 <a id="smtp-settings"></a>
 
 ## SmtpSettings: opciones efectivas

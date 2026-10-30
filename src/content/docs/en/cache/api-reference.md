@@ -13,8 +13,8 @@ For application operations, use the [facade or ICacheManager](/en/cache/manager-
 
 | Contract | Public surface |
 | --- | --- |
-| `ICacheManager` | `store()` and the thirteen asynchronous value proxies in the [manager guide](/en/cache/manager-and-injection#manager-proxies). `store()` annotates `ICacheRepository`, while the implementation returns `CacheRepository`. |
-| `ICacheRepository` | Fourteen asynchronous operations: the thirteen value proxies plus `replace()`. |
+| `ICacheManager` | `store()` and the fourteen asynchronous value proxies in the [manager guide](/en/cache/manager-and-injection#manager-proxies). `store()` annotates `ICacheRepository`, while the implementation returns `CacheRepository`. |
+| `ICacheRepository` | Fifteen asynchronous operations: the fourteen value proxies plus `replace()`. |
 | `IFileBasedCache` | Synchronous `get() -> dict \| None`, `save(data: dict) -> tuple[int, str]` and `clear() -> bool`. |
 
 `lock()` exists on `CacheManager` and `CacheRepository`, but their abstract contracts do not declare it. The native provider only binds `ICacheManager`; it does not automatically supply a repository or artifact instance for the other contracts. Annotations do not replace real driver differences.
@@ -98,7 +98,7 @@ Reads keys sequentially and returns a list in the same order, using `default` fo
 
 ### multiSet(pairs: list[tuple[str, Any]], ttl: float | None = None) → bool
 
-Calls `set()` sequentially for each pair with the common TTL and returns `True`. There is no batch rollback: an exception may leave earlier writes published. `multi_set = multiSet` is the alias used by the repository.
+Writes each pair sequentially with the common TTL and returns `True`. File performs its synchronous writes inside one worker invocation; Database calls `set()` for each pair. There is no batch rollback: an exception may leave earlier writes published. `multi_set = multiSet` is the alias used by the repository.
 
 <a id="backend-add"></a>
 
@@ -225,3 +225,7 @@ This class method returns `ICacheManager`. It links the facade to the container,
 `CacheException` extends `Exception`; `CacheStoreException` extends it for unknown stores, missing configuration or a custom backend without atomic replacement. External errors are not universally converted to these types: file permissions, timeouts, Redis/Memcached connection failures, JSON errors, numeric conversion errors and `QueryException` may retain their original types.
 
 The manager does not fall back automatically to memory if a server fails. Explicitly define how your application responds when it cannot read, compute or store an entry; do not indiscriminately catch resolver errors as if they were ordinary cache misses.
+
+## File batch execution in 1.1.0
+
+`FileCacheBackend.multiGet()` and `multiSet()` perform the complete batch within one worker invocation. They preserve key order, duplicates in batch reads, missing-value defaults, per-file locks and per-key TTL. Writes remain sequential without rollback; cancellation stops between entries after the current native operation completes. The database backend retains its existing sequential path. These backend methods return lists or booleans; repository `getMany()` still returns a dictionary.
