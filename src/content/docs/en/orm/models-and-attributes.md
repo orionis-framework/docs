@@ -96,6 +96,42 @@ class SharedArticle(Model):
 
 Reuse the definition in migrations. Alternatively keep inline columns and set `table = "content_articles"`. Do not combine the approaches. Invalid definitions, own columns alongside a shared definition, or conflicting table/PK settings raise `OrmConfigurationException`. Configuring a table does not execute DDL.
 
+<a id="schema-table"></a>
+
+## Model for a table inside a schema
+
+To query `sales.products` through a model, declare `name="products"` and `schema="sales"` in a `TableDefinition`. Assign that definition to the model's `table_definition`. This example assumes the table already exists with the listed columns on the default connection:
+
+```python
+from typing import ClassVar
+from orionis.orm import Boolean, Integer, Model, String
+from orionis.orm.schema import TableDefinition
+
+
+class SalesProduct(Model):
+    table_definition: ClassVar[TableDefinition] = TableDefinition(
+        name="products",
+        schema="sales",
+        columns={
+            "id": Integer().primary().autoIncrement(),
+            "name": String(180),
+            "active": Boolean(),
+        },
+        primary_key="id",
+    )
+    timestamps = False
+    fillable: ClassVar[list[str]] = ["name", "active"]
+
+
+async def active_sales_products():
+    products = await SalesProduct.where("active", True).orderBy("id").get()
+    return [product.toDict() for product in products]
+```
+
+`SalesProduct.where(...)` creates a fresh builder, just like `SalesProduct.query().where(...)`, and `get()` returns models. Add `connection = "reporting"` to the class body if the table belongs to that registered connection. `timestamps = False` matches this example table, which declares neither `created_at` nor `updated_at`.
+
+In model configuration, `table = "sales.products"` does not separate the schema from the name: use `TableDefinition(schema="sales", name="products", ...)`. The `"schema.table"` shorthand is interpreted by `DB.table()` and joins accepting table names. Do not combine a shared definition with inline columns. Defining the model does not create the schema or table.
+
 ## Configuration options
 
 Options are read when the class is created. Set them in the class body; changing a configuration list later does not automatically rebuild metadata.

@@ -38,7 +38,9 @@ def table(self, name: str, *, alias: str | None = None,
           connection: str | None = None) -> IRawQueryBuilder:
 ```
 
-`name` is the required logical table; compilation applies the configured prefix. `alias` is an SQL alias and `connection` overrides gateway selection for that builder. Without explicit selection, it captures the migration connection or default **at construction**, not execution.
+`name` is the required logical table: use `"products"` or `"sales.products"` for a table inside a schema. Compilation prefixes the table name while preserving its schema. `alias` is an SQL alias and `connection` overrides gateway selection for that builder. Without explicit selection, it captures the migration connection or default **at construction**, not execution.
+
+For example, `DB.connection("reporting").table("sales.products", alias="p")` selects a registered connection, a table in the `sales` schema and alias `p`. Reference columns as `p.id`. See the [schema query guide](/en/database/query-builder) for an executable chain.
 
 Returns a fresh `RawQueryBuilder` without I/O. A missing table fails on execution; invalid identifiers/clauses may fail during construction or compilation. `get()` returns a `Collection` of dictionaries; `first()` returns a dictionary or `None`.
 

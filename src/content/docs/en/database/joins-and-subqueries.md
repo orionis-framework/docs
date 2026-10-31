@@ -27,6 +27,30 @@ The example avoids two `name` columns with the same result key. Selecting identi
 
 RIGHT/FULL JOIN availability depends on the server. Unsupported joins are not emulated or sent to another engine. Each terminal uses one connection: subqueries compile on the outer query’s engine even if the embedded builder selected another connection.
 
+<a id="schema-joins"></a>
+
+## Joining tables across schemas
+
+`join()` and `leftJoin()` also accept `schema.table` names. This example requires `sales.products` and `catalog.categories`, accessible through the same connection and containing the referenced columns:
+
+```python
+from orionis.support.facades import DB
+
+
+async def schema_product_categories():
+    return await (
+        DB.table("sales.products", alias="p")
+        .leftJoin("catalog.categories", "p.category_id", "=", "c.id", alias="c")
+        .select("p.id", "p.name")
+        .selectRaw("c.name", alias="category_name")
+        .where("p.active", True)
+        .orderBy("p.id")
+        .get()
+    )
+```
+
+Declare `p` and `c` through `alias=` and use them in selection, filters and the ON condition. Do not pass `"sales.products as p"` as the table name. When two schemas contain identically named tables, assign distinct aliases to resolve their columns. The JOIN executes on one connection; naming another schema does not join independent servers.
+
 ## Operation reference
 
 <a id="api-selectsub"></a>

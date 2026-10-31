@@ -45,6 +45,31 @@ class ProductController:
 
 The controller explicitly serializes every model. `get()` returns `Collection`, rather than a JSON list; `first()` and `find()` may return `None`. `firstOrFail()` and `findOrFail()` raise `ModelNotFoundException`; the [HTTP exception handler](/en/http/exceptions) determines the endpoint response.
 
+## Eloquent-style queries
+
+If you come from [Eloquent](https://laravel.com/docs/12.x/eloquent), you can start directly from the model with `Product.where(...)`. In Orionis, chain methods with dots and await the result inside an `async` function:
+
+```python
+from app.models.product import Product
+
+
+async def find_available_products():
+    return await (
+        Product.where("active", True)
+        .where("stock", ">", 0)
+        .orderBy("id")
+        .get()
+    )
+
+
+async def find_product(product_id: int):
+    return await Product.find(product_id)
+```
+
+The first function returns a collection of `Product` models; the second returns a model or `None`. Use `findOrFail()` when absence should raise an exception. For a table such as `sales.products`, configure the [schema on the model](/en/orm/models-and-attributes#schema-table); the filter chain stays the same.
+
+Similar names do not imply that all Laravel methods or arguments exist in Orionis. Select columns with `Product.select("id", "name").get()`, paginate with `paginate(page=1, per_page=20)` and load relationships with `withRelations("category")`. Use synchronous Python callbacks for groups, such as `.where(lambda q: q.where("stock", ">", 0).orWhere("reserved", 0))`. Check the signatures in this documentation before porting a call.
+
 ## Class, builder and instance methods
 
 | Form | Meaning |

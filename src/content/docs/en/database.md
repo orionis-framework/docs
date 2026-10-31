@@ -63,6 +63,12 @@ class NoteController:
 
 Import the facade from `orionis.support.facades`. Application boot registers its services. Async services, commands, jobs and MCP components use the same API; `IQueryBuilder` or `IConnectionManager` can also be injected.
 
+## Tables inside a schema
+
+Use `DB.table("schema.table")`, for example `DB.table("sales.products")`. To also select a registered connection, write `DB.connection("reporting").table("sales.products")`. The schema belongs to the selected database; it is not the connection name.
+
+The [query builder](/en/database/query-builder) explains filtering, ordering and retrieving results, with alias and qualified name examples. For models, declare the schema in a [TableDefinition](/en/orm/models-and-attributes#schema-table).
+
 ## Lifecycle
 
 1. Configuration is loaded and validated without connecting to a server.

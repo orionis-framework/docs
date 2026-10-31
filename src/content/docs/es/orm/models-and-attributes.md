@@ -96,6 +96,42 @@ class SharedArticle(Model):
 
 La definición se puede reutilizar en migraciones. Alternativamente conserva columnas inline y establece `table = "content_articles"`. No combines ambas formas. Una definición inválida, columnas propias junto a una compartida, o un nombre de tabla/PK contradictorio produce `OrmConfigurationException`. Configurar una tabla no ejecuta DDL.
 
+<a id="schema-table"></a>
+
+## Modelo de una tabla dentro de un esquema
+
+Para consultar `sales.products` con un modelo, declara `name="products"` y `schema="sales"` en una `TableDefinition`. El modelo recibe esa definición mediante `table_definition`. Este ejemplo supone que la tabla ya existe, con las columnas indicadas, en la conexión predeterminada:
+
+```python
+from typing import ClassVar
+from orionis.orm import Boolean, Integer, Model, String
+from orionis.orm.schema import TableDefinition
+
+
+class SalesProduct(Model):
+    table_definition: ClassVar[TableDefinition] = TableDefinition(
+        name="products",
+        schema="sales",
+        columns={
+            "id": Integer().primary().autoIncrement(),
+            "name": String(180),
+            "active": Boolean(),
+        },
+        primary_key="id",
+    )
+    timestamps = False
+    fillable: ClassVar[list[str]] = ["name", "active"]
+
+
+async def active_sales_products():
+    products = await SalesProduct.where("active", True).orderBy("id").get()
+    return [product.toDict() for product in products]
+```
+
+La llamada `SalesProduct.where(...)` crea un builder nuevo, igual que `SalesProduct.query().where(...)`, y `get()` devuelve modelos. Añade `connection = "reporting"` al cuerpo de la clase si la tabla pertenece a esa conexión registrada. `timestamps = False` corresponde a esta tabla de ejemplo, que no declara `created_at` ni `updated_at`.
+
+En la configuración del modelo, `table = "sales.products"` no separa el esquema del nombre: utiliza `TableDefinition(schema="sales", name="products", ...)`. La forma abreviada `"esquema.tabla"` se interpreta en `DB.table()` y los joins con nombres de tabla. No combines la definición compartida con columnas inline. Definir el modelo no crea el esquema ni la tabla.
+
 ## Opciones de configuración
 
 Las opciones se leen al crear la clase. Configúralas en el cuerpo de la clase; modificar una lista de configuración después no reconstruye sus metadatos automáticamente.

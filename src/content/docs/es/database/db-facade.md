@@ -38,7 +38,9 @@ def table(self, name: str, *, alias: str | None = None,
           connection: str | None = None) -> IRawQueryBuilder:
 ```
 
-`name` es la tabla lógica obligatoria; el prefijo se aplica al compilar. `alias` es un alias SQL y `connection` sobrescribe el nombre del gateway para ese builder. Sin selección explícita se fija el nombre de la migración activa o el predeterminado **al construir**, no al ejecutar.
+`name` es la tabla lógica obligatoria: acepta `"products"` o `"sales.products"` para una tabla dentro de un esquema. El prefijo se aplica al nombre de tabla al compilar, conservando el esquema. `alias` es un alias SQL y `connection` sobrescribe el nombre del gateway para ese builder. Sin selección explícita se fija el nombre de la migración activa o el predeterminado **al construir**, no al ejecutar.
+
+Por ejemplo, `DB.connection("reporting").table("sales.products", alias="p")` selecciona una conexión registrada, una tabla del esquema `sales` y el alias `p`. Las columnas se referencian como `p.id`. Consulta la [guía de consultas con esquemas](/es/database/query-builder) para ejecutar la cadena completa.
 
 Devuelve un `RawQueryBuilder` nuevo sin E/S. Una tabla inexistente falla al ejecutar; identificadores/cláusulas inválidos pueden fallar al construir o compilar. `get()` produce una `Collection` de diccionarios y `first()` un diccionario o `None`.
 

@@ -7,9 +7,78 @@ lastUpdated: false
 
 `DB.table("products")` crea un `RawQueryBuilder` nuevo. `Model.query()` crea un `ModelQueryBuilder` que comparte sus cláusulas; cambia cómo hidrata, serializa y aplica políticas del modelo. Las cláusulas devuelven el mismo builder y son síncronas: espera únicamente los terminales asíncronos.
 
-Los ejemplos de esta referencia requieren una aplicación iniciada y las tablas `products` y `categories` del escenario de [testing](/es/orm/testing). Los bloques son funciones de servicio/controlador o consultas que puedes ejecutar dentro de una acción `async`. Los ejemplos de escritura modifican esas tablas de ejemplo.
+Los ejemplos de esta referencia requieren una aplicación iniciada y tablas ya creadas. Usa las columnas del [modelo Product](/es/orm/factories#modelo-y-factory-completos) para `products`; los joins también requieren `categories` con `id` y `name`. La guía de [testing](/es/orm/testing) muestra cómo preparar una base aislada con sus propios modelos de ejemplo. Los bloques son funciones de servicio/controlador o consultas que puedes ejecutar dentro de una acción `async`. Los ejemplos de escritura modifican esas tablas de ejemplo.
 
 No compartas un builder mutable entre peticiones o tareas. El gateway `DB` sí es compartido: crea un builder para cada consulta y usa `clone()` para ramificar.
+
+## Construir y ejecutar una consulta
+
+La cadena sigue el estilo del [Query Builder de Laravel](https://laravel.com/docs/12.x/queries): tabla, selección, filtros, orden y operación final. En Orionis se escribe en Python, con puntos entre métodos y `await` al ejecutar:
+
+```python
+from orionis.support.facades import DB
+
+
+async def available_products():
+    products = await (
+        DB.table("products")
+        .select("id", "name", "price")
+        .where("active", True)
+        .where("stock", ">", 0)
+        .orderBy("price", "desc")
+        .orderBy("id")
+        .limit(20)
+        .get()
+    )
+    return products.all()
+```
+
+`where("active", True)` expresa igualdad; con tres argumentos, `where("stock", ">", 0)` indica el operador. Los dos filtros se combinan con AND. Los paréntesis permiten continuar la cadena en varias líneas. `get()` ejecuta la consulta; `all()` convierte la colección ya obtenida en una lista de diccionarios.
+
+| Necesidad | Expresión dentro de una función `async` |
+| --- | --- |
+| Primera fila o `None` | `await DB.table("products").where("id", product_id).first()` |
+| Un valor o `None` | `await DB.table("products").where("id", product_id).value("name")` |
+| Colección de valores | `await DB.table("products").orderBy("id").pluck("name")` |
+| Contar coincidencias | `await DB.table("products").where("active", True).count()` |
+| Página con metadatos | `await DB.table("products").orderBy("id").paginate(page=1, per_page=20)` |
+
+`product_id` representa un argumento de tu función. Escribe los nombres de paginación explícitamente: en Orionis el primer argumento es `page`. Para seleccionar columnas usa `select("id", "name").get()`; `get()` no recibe una lista de columnas. Conserva los nombres camelCase de la API, como `orderBy` y `whereIn`, y los valores Python `True`, `False` y `None`.
+
+## Consultar una tabla dentro de un esquema
+
+Pasa el nombre calificado como una sola cadena: `DB.table("sales.products")` consulta la tabla `products` del esquema `sales`. El esquema y la tabla deben existir y ser accesibles para la conexión. Este ejemplo adicional supone un motor con ese esquema, por ejemplo PostgreSQL; las tablas sin esquema del escenario de testing no lo crean.
+
+```python
+from orionis.support.facades import DB
+
+
+async def schema_products():
+    return await (
+        DB.table("sales.products")
+        .select("id", "name")
+        .where("active", True)
+        .orderBy("id")
+        .get()
+    )
+
+
+async def reporting_products():
+    return await (
+        DB.connection("reporting")
+        .table("sales.products", alias="p")
+        .select("p.id", "p.name")
+        .where("p.active", True)
+        .orderBy("p.id")
+        .get()
+    )
+```
+
+`reporting` es el nombre registrado en `config/database.py`; `sales` es el esquema dentro de esa base de datos; `p` es el alias de esta consulta. También puedes escribir `DB.table("sales.products", connection="reporting", alias="p")`. Elegir un esquema no selecciona otra conexión ni crea el esquema.
+
+Para referenciar columnas usa `id`, `products.id` sin alias, o `p.id` cuando declares `alias="p"`. El compilador resuelve las columnas por nombre de tabla o alias, por lo que no uses `sales.products.id`. Declara el alias con el argumento `alias`, no dentro de la cadena `"sales.products as p"`. Con un prefijo de conexión `app_`, la tabla física será `sales.app_products`; sigue pasando el nombre lógico `sales.products`.
+
+El significado del calificador depende del motor: en PostgreSQL representa un esquema, en MySQL una base de datos y en SQLite una base como `main` o una adjunta disponible en la conexión física. Para combinar tablas consulta [joins entre esquemas](/es/database/joins-and-subqueries#schema-joins); para usar modelos configura una [TableDefinition con schema](/es/orm/models-and-attributes#schema-table).
 
 ## Resultados de tablas y modelos
 
@@ -93,7 +162,7 @@ Selecciona la conexión de este builder. None vuelve a la predeterminada; no cam
 
 | Parámetro | Uso |
 | --- | --- |
-| `name` | Nombre de conexión o de tabla según el método. La conexión debe estar registrada. |
+| `name` | Nombre de una conexión registrada en `config/database.py`. |
 
 **Resultado:** el mismo builder mutable (`Self`); no ejecuta SQL.
 
@@ -115,7 +184,7 @@ Reemplaza la proyección por las columnas indicadas. select() selecciona todas; 
 
 | Parámetro | Uso |
 | --- | --- |
-| `columns` | Nombres de columnas; pueden estar calificados por tabla o alias. Vacío conserva la selección de todas las columnas. |
+| `columns` | Nombres de columnas como argumentos separados; pueden estar calificados por tabla o alias. |
 
 **Resultado:** el mismo builder mutable (`Self`); no ejecuta SQL.
 
@@ -137,7 +206,7 @@ Añade columnas a la proyección actual, conservando las anteriores. No elimina 
 
 | Parámetro | Uso |
 | --- | --- |
-| `columns` | Nombres de columnas; pueden estar calificados por tabla o alias. Vacío conserva la selección de todas las columnas. |
+| `columns` | Nombres de columnas como argumentos separados; pueden estar calificados por tabla o alias. |
 
 **Resultado:** el mismo builder mutable (`Self`); no ejecuta SQL.
 
@@ -201,7 +270,7 @@ Añade ordenación ascendente o descendente. Conserva las reglas anteriores; una
 
 | Parámetro | Uso |
 | --- | --- |
-| `column` | Columna de la operación; en where/having también admite un dict de igualdades o un callback de agrupación. |
+| `column` | Nombre de la columna, opcionalmente calificado por tabla o alias. |
 | `direction` | asc o desc; se recortan espacios y se normaliza a minúsculas. |
 
 **Resultado:** el mismo builder mutable (`Self`); no ejecuta SQL.
@@ -224,7 +293,7 @@ Ordena por más recientes primero. Sin columna usa created_at en tablas crudas y
 
 | Parámetro | Uso |
 | --- | --- |
-| `column` | Columna de la operación; en where/having también admite un dict de igualdades o un callback de agrupación. |
+| `column` | Nombre de la columna, opcionalmente calificado por tabla o alias. |
 
 **Resultado:** el mismo builder mutable (`Self`); no ejecuta SQL.
 
@@ -248,7 +317,7 @@ Ordena por más antiguos primero. Sin columna usa created_at en tablas crudas y 
 
 | Parámetro | Uso |
 | --- | --- |
-| `column` | Columna de la operación; en where/having también admite un dict de igualdades o un callback de agrupación. |
+| `column` | Nombre de la columna, opcionalmente calificado por tabla o alias. |
 
 **Resultado:** el mismo builder mutable (`Self`); no ejecuta SQL.
 
@@ -272,7 +341,7 @@ Añade columnas de agrupación. Las proyecciones y los agregados deben ser compa
 
 | Parámetro | Uso |
 | --- | --- |
-| `columns` | Nombres de columnas; pueden estar calificados por tabla o alias. Vacío conserva la selección de todas las columnas. |
+| `columns` | Nombres de columnas como argumentos separados; pueden estar calificados por tabla o alias. |
 
 **Resultado:** el mismo builder mutable (`Self`); no ejecuta SQL.
 
@@ -415,7 +484,7 @@ Cuenta filas coincidentes; column="*" cuenta todas y una columna cuenta sus valo
 
 | Parámetro | Uso |
 | --- | --- |
-| `column` | Columna de la operación; en where/having también admite un dict de igualdades o un callback de agrupación. |
+| `column` | Nombre de la columna, opcionalmente calificado por tabla o alias. |
 
 **Resultado:** `int`.
 
@@ -488,7 +557,7 @@ Devuelve el máximo; sin valores devuelve None.
 
 | Parámetro | Uso |
 | --- | --- |
-| `column` | Columna de la operación; en where/having también admite un dict de igualdades o un callback de agrupación. |
+| `column` | Nombre de la columna, opcionalmente calificado por tabla o alias. |
 
 **Resultado:** `Any`.
 
@@ -515,7 +584,7 @@ Devuelve el mínimo; sin valores devuelve None.
 
 | Parámetro | Uso |
 | --- | --- |
-| `column` | Columna de la operación; en where/having también admite un dict de igualdades o un callback de agrupación. |
+| `column` | Nombre de la columna, opcionalmente calificado por tabla o alias. |
 
 **Resultado:** `Any`.
 
@@ -542,7 +611,7 @@ Devuelve la media convertida a float, o None sin valores.
 
 | Parámetro | Uso |
 | --- | --- |
-| `column` | Columna de la operación; en where/having también admite un dict de igualdades o un callback de agrupación. |
+| `column` | Nombre de la columna, opcionalmente calificado por tabla o alias. |
 
 **Resultado:** `float | None`.
 
@@ -569,7 +638,7 @@ Devuelve la suma; sin valores devuelve 0.
 
 | Parámetro | Uso |
 | --- | --- |
-| `column` | Columna de la operación; en where/having también admite un dict de igualdades o un callback de agrupación. |
+| `column` | Nombre de la columna, opcionalmente calificado por tabla o alias. |
 
 **Resultado:** `Any`.
 
@@ -596,7 +665,7 @@ Selecciona una conexión registrada en este builder sin alterar el gateway DB co
 
 | Parámetro | Uso |
 | --- | --- |
-| `name` | Nombre de conexión o de tabla según el método. La conexión debe estar registrada. |
+| `name` | Nombre de una conexión registrada en `config/database.py`. |
 
 **Resultado:** el mismo builder mutable (`Self`); no ejecuta SQL.
 
@@ -620,7 +689,7 @@ Reemplaza la tabla y el alias conservando las cláusulas existentes.
 
 | Parámetro | Uso |
 | --- | --- |
-| `name` | Nombre de conexión o de tabla según el método. La conexión debe estar registrada. |
+| `name` | Nombre lógico de tabla, como `products` o `sales.products`; no es el nombre de conexión. |
 | `alias` | Alias SQL de la proyección o tabla derivada; se utiliza para referenciar su resultado. |
 
 **Resultado:** el mismo builder mutable (`Self`); no ejecuta SQL.
@@ -691,7 +760,7 @@ Selecciona una columna en una copia y devuelve su primer valor o None. None tamb
 
 | Parámetro | Uso |
 | --- | --- |
-| `column` | Columna de la operación; en where/having también admite un dict de igualdades o un callback de agrupación. |
+| `column` | Nombre de la columna, opcionalmente calificado por tabla o alias. |
 
 **Resultado:** `Any`.
 
@@ -718,7 +787,7 @@ Selecciona una columna y devuelve una Collection de sus valores, conservando el 
 
 | Parámetro | Uso |
 | --- | --- |
-| `column` | Columna de la operación; en where/having también admite un dict de igualdades o un callback de agrupación. |
+| `column` | Nombre de la columna, opcionalmente calificado por tabla o alias. |
 
 **Resultado:** `Collection`.
 

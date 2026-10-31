@@ -27,6 +27,30 @@ El ejemplo evita dos columnas `name` con la misma clave de resultado. Selecciona
 
 La disponibilidad de RIGHT/FULL JOIN depende del servidor. No se emula un JOIN no admitido ni se consulta otro motor automáticamente. Cada terminal mantiene una sola conexión: las subconsultas se compilan en el motor de la consulta exterior, aunque el builder incrustado haya elegido otra conexión.
 
+<a id="schema-joins"></a>
+
+## Joins entre tablas de esquemas
+
+El nombre `esquema.tabla` también se acepta en `join()` y `leftJoin()`. Este ejemplo requiere `sales.products` y `catalog.categories`, accesibles desde la misma conexión, con las columnas utilizadas:
+
+```python
+from orionis.support.facades import DB
+
+
+async def schema_product_categories():
+    return await (
+        DB.table("sales.products", alias="p")
+        .leftJoin("catalog.categories", "p.category_id", "=", "c.id", alias="c")
+        .select("p.id", "p.name")
+        .selectRaw("c.name", alias="category_name")
+        .where("p.active", True)
+        .orderBy("p.id")
+        .get()
+    )
+```
+
+Los alias `p` y `c` se declaran con `alias=` y se usan en selección, filtros y condición ON. No pases `"sales.products as p"` como nombre de tabla. Si dos esquemas contienen tablas con el mismo nombre, asigna alias distintos para resolver sus columnas. El JOIN se ejecuta en una sola conexión; indicar otro esquema no permite unir servidores independientes.
+
 ## Referencia por operación
 
 <a id="api-selectsub"></a>

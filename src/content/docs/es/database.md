@@ -63,6 +63,12 @@ class NoteController:
 
 Importa la fachada desde `orionis.support.facades`. La aplicación registra sus servicios durante el arranque. En servicios, comandos, jobs y componentes MCP asíncronos se utiliza la misma API; también puedes inyectar `IQueryBuilder` o `IConnectionManager`.
 
+## Tablas dentro de un esquema
+
+Usa `DB.table("esquema.tabla")`, por ejemplo `DB.table("sales.products")`. Para elegir además una conexión registrada, escribe `DB.connection("reporting").table("sales.products")`. El esquema pertenece a la base de datos seleccionada; no es el nombre de la conexión.
+
+El [constructor de consultas](/es/database/query-builder) explica cómo filtrar, ordenar y obtener resultados, con ejemplos de alias y nombres calificados. Para modelos, declara el esquema en una [TableDefinition](/es/orm/models-and-attributes#schema-table).
+
 ## Ciclo de vida
 
 1. La configuración se carga y valida sin conectarse al servidor.

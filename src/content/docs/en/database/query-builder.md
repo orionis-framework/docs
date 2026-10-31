@@ -7,9 +7,78 @@ lastUpdated: false
 
 `DB.table("products")` creates a fresh `RawQueryBuilder`. `Model.query()` creates a `ModelQueryBuilder` sharing its clauses; hydration, serialization and model policies differ. Clauses are synchronous and return the same builder: await only asynchronous terminals.
 
-Reference examples require a booted application and the `products` and `categories` tables from the [testing scenario](/en/orm/testing). Blocks are service/controller functions or queries you can run inside an `async` action. Write examples modify those sample tables.
+Reference examples require a booted application and existing tables. Use the [Product model](/en/orm/factories#complete-model-and-factory) columns for `products`; joins also require `categories` with `id` and `name`. The [testing guide](/en/orm/testing) shows how to prepare an isolated database with its own sample models. Blocks are service/controller functions or queries you can run inside an `async` action. Write examples modify those sample tables.
 
 Do not share a mutable builder across requests or tasks. The `DB` gateway itself is shared: create a builder for every query and use `clone()` to branch.
+
+## Building and executing a query
+
+The chain follows the [Laravel Query Builder](https://laravel.com/docs/12.x/queries) style: table, selection, filters, ordering and a final operation. Orionis uses Python, dots between methods and `await` for execution:
+
+```python
+from orionis.support.facades import DB
+
+
+async def available_products():
+    products = await (
+        DB.table("products")
+        .select("id", "name", "price")
+        .where("active", True)
+        .where("stock", ">", 0)
+        .orderBy("price", "desc")
+        .orderBy("id")
+        .limit(20)
+        .get()
+    )
+    return products.all()
+```
+
+`where("active", True)` expresses equality; the three-argument form `where("stock", ">", 0)` specifies the operator. Both filters are combined with AND. Parentheses allow the chain to span multiple lines. `get()` executes the query; `all()` converts the resulting collection into a list of dictionaries.
+
+| Need | Expression inside an `async` function |
+| --- | --- |
+| First row or `None` | `await DB.table("products").where("id", product_id).first()` |
+| One value or `None` | `await DB.table("products").where("id", product_id).value("name")` |
+| Collection of values | `await DB.table("products").orderBy("id").pluck("name")` |
+| Count matches | `await DB.table("products").where("active", True).count()` |
+| Page with metadata | `await DB.table("products").orderBy("id").paginate(page=1, per_page=20)` |
+
+`product_id` represents an argument to your function. Write pagination argument names explicitly: the first argument in Orionis is `page`. Select columns with `select("id", "name").get()`; `get()` does not accept a column list. Keep API camelCase names such as `orderBy` and `whereIn`, and Python values `True`, `False` and `None`.
+
+## Querying a table inside a schema
+
+Pass the qualified name as one string: `DB.table("sales.products")` queries the `products` table in the `sales` schema. The schema and table must exist and be accessible to the connection. This additional example assumes an engine with that schema, such as PostgreSQL; the unqualified tables in the testing scenario do not create it.
+
+```python
+from orionis.support.facades import DB
+
+
+async def schema_products():
+    return await (
+        DB.table("sales.products")
+        .select("id", "name")
+        .where("active", True)
+        .orderBy("id")
+        .get()
+    )
+
+
+async def reporting_products():
+    return await (
+        DB.connection("reporting")
+        .table("sales.products", alias="p")
+        .select("p.id", "p.name")
+        .where("p.active", True)
+        .orderBy("p.id")
+        .get()
+    )
+```
+
+`reporting` is the connection name registered in `config/database.py`; `sales` is the schema within that database; `p` is this query's alias. You can also write `DB.table("sales.products", connection="reporting", alias="p")`. Choosing a schema neither selects another connection nor creates the schema.
+
+Reference columns as `id`, `products.id` without an alias, or `p.id` when declaring `alias="p"`. The compiler resolves columns by table name or alias, so do not use `sales.products.id`. Declare aliases through the `alias` argument, not inside the string `"sales.products as p"`. With a connection prefix of `app_`, the physical table is `sales.app_products`; keep passing the logical name `sales.products`.
+
+The qualifier's meaning depends on the engine: a schema in PostgreSQL, a database in MySQL, and a database such as `main` or an attached database available on the physical connection in SQLite. To combine tables, see [joins across schemas](/en/database/joins-and-subqueries#schema-joins); for models, configure a [TableDefinition with schema](/en/orm/models-and-attributes#schema-table).
 
 ## Table and model results
 
@@ -93,7 +162,7 @@ Selects this builder’s connection. None returns to the default; does not chang
 
 | Parameter | Use |
 | --- | --- |
-| `name` | Connection or table name depending on the method. The connection must be registered. |
+| `name` | Name of a connection registered in `config/database.py`. |
 
 **Result:** the same mutable builder (`Self`); does not execute SQL.
 
@@ -115,7 +184,7 @@ Replaces the projection with the given columns. select() selects all; missing co
 
 | Parameter | Use |
 | --- | --- |
-| `columns` | Column names, optionally qualified by table or alias. Empty retains selection of all columns. |
+| `columns` | Column names as separate arguments, optionally qualified by table or alias. |
 
 **Result:** the same mutable builder (`Self`); does not execute SQL.
 
@@ -137,7 +206,7 @@ Appends columns to the current projection without removing earlier entries. Does
 
 | Parameter | Use |
 | --- | --- |
-| `columns` | Column names, optionally qualified by table or alias. Empty retains selection of all columns. |
+| `columns` | Column names as separate arguments, optionally qualified by table or alias. |
 
 **Result:** the same mutable builder (`Self`); does not execute SQL.
 
@@ -201,7 +270,7 @@ Appends ascending or descending ordering. Retains earlier ordering rules; an inv
 
 | Parameter | Use |
 | --- | --- |
-| `column` | Operation column; where/having also accept an equality dictionary or grouping callback. |
+| `column` | Column name, optionally qualified by table or alias. |
 | `direction` | asc or desc; whitespace is trimmed and case normalized. |
 
 **Result:** the same mutable builder (`Self`); does not execute SQL.
@@ -224,7 +293,7 @@ Orders newest first. Without a column uses created_at for raw tables and the con
 
 | Parameter | Use |
 | --- | --- |
-| `column` | Operation column; where/having also accept an equality dictionary or grouping callback. |
+| `column` | Column name, optionally qualified by table or alias. |
 
 **Result:** the same mutable builder (`Self`); does not execute SQL.
 
@@ -248,7 +317,7 @@ Orders oldest first. Without a column uses created_at for raw tables and the con
 
 | Parameter | Use |
 | --- | --- |
-| `column` | Operation column; where/having also accept an equality dictionary or grouping callback. |
+| `column` | Column name, optionally qualified by table or alias. |
 
 **Result:** the same mutable builder (`Self`); does not execute SQL.
 
@@ -272,7 +341,7 @@ Appends grouping columns. Projections and aggregates must satisfy GROUP BY rules
 
 | Parameter | Use |
 | --- | --- |
-| `columns` | Column names, optionally qualified by table or alias. Empty retains selection of all columns. |
+| `columns` | Column names as separate arguments, optionally qualified by table or alias. |
 
 **Result:** the same mutable builder (`Self`); does not execute SQL.
 
@@ -415,7 +484,7 @@ Counts matching rows; column="*" counts all and a column counts non-NULL values.
 
 | Parameter | Use |
 | --- | --- |
-| `column` | Operation column; where/having also accept an equality dictionary or grouping callback. |
+| `column` | Column name, optionally qualified by table or alias. |
 
 **Result:** `int`.
 
@@ -488,7 +557,7 @@ Returns the maximum; returns None without values.
 
 | Parameter | Use |
 | --- | --- |
-| `column` | Operation column; where/having also accept an equality dictionary or grouping callback. |
+| `column` | Column name, optionally qualified by table or alias. |
 
 **Result:** `Any`.
 
@@ -515,7 +584,7 @@ Returns the minimum; returns None without values.
 
 | Parameter | Use |
 | --- | --- |
-| `column` | Operation column; where/having also accept an equality dictionary or grouping callback. |
+| `column` | Column name, optionally qualified by table or alias. |
 
 **Result:** `Any`.
 
@@ -542,7 +611,7 @@ Returns the average converted to float, or None without values.
 
 | Parameter | Use |
 | --- | --- |
-| `column` | Operation column; where/having also accept an equality dictionary or grouping callback. |
+| `column` | Column name, optionally qualified by table or alias. |
 
 **Result:** `float | None`.
 
@@ -569,7 +638,7 @@ Returns the sum; returns 0 without values.
 
 | Parameter | Use |
 | --- | --- |
-| `column` | Operation column; where/having also accept an equality dictionary or grouping callback. |
+| `column` | Column name, optionally qualified by table or alias. |
 
 **Result:** `Any`.
 
@@ -596,7 +665,7 @@ Selects a registered connection for this builder without altering the shared DB 
 
 | Parameter | Use |
 | --- | --- |
-| `name` | Connection or table name depending on the method. The connection must be registered. |
+| `name` | Name of a connection registered in `config/database.py`. |
 
 **Result:** the same mutable builder (`Self`); does not execute SQL.
 
@@ -620,7 +689,7 @@ Replaces the table and alias while retaining existing clauses.
 
 | Parameter | Use |
 | --- | --- |
-| `name` | Connection or table name depending on the method. The connection must be registered. |
+| `name` | Logical table name, such as `products` or `sales.products`; this is not a connection name. |
 | `alias` | SQL alias for the projection or derived table, used to address its result. |
 
 **Result:** the same mutable builder (`Self`); does not execute SQL.
@@ -691,7 +760,7 @@ Selects one column on a clone and returns its first value or None. None may also
 
 | Parameter | Use |
 | --- | --- |
-| `column` | Operation column; where/having also accept an equality dictionary or grouping callback. |
+| `column` | Column name, optionally qualified by table or alias. |
 
 **Result:** `Any`.
 
@@ -718,7 +787,7 @@ Selects one column and returns a Collection of its values in query order.
 
 | Parameter | Use |
 | --- | --- |
-| `column` | Operation column; where/having also accept an equality dictionary or grouping callback. |
+| `column` | Column name, optionally qualified by table or alias. |
 
 **Result:** `Collection`.
 
