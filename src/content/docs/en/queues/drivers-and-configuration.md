@@ -94,6 +94,8 @@ It respects each definition's SQL connection, logical table name, and configured
 
 The SQL user needs permission to create missing tables, and the backend must enforce unique constraints. Success prints `Queue tables migrated successfully.` and returns `0`. A caught `DatabaseException` or `QueueError` is displayed and returns `1`. The equivalent API is [`await Queue.migrate()`](/en/queues/manager-and-injection#manager-migrate).
 
+In 1.3.0 this existing command remains the preparation entry point for queues, alongside the new [token, cache, scheduler, and session commands](/en/database/migrations#framework-storage-tables).
+
 <a id="schema-jobs"></a>
 
 ### Persisted data
@@ -192,7 +194,7 @@ from orionis.support.facades import Queue
 
 class QueueMonitor:
 
-    async def pending_reports(self) -> int:
+    async def pendingReports(self) -> int:
         driver = await Queue.connection("database")
         return await driver.size("reports")
 ```

@@ -99,7 +99,16 @@ TASKS_REPLACE_EXISTING=True
 
 La conexión `sqlite` debe existir en [Database](/es/database/configuration). El store usa sus credenciales y opciones de motor, pero crea un **motor de conexión SQL síncrono propio**. No comparte la conexión async ni las transacciones de una petición. Si SQLite usa `:memory:`, ese engine tiene su propia base en memoria; no proporciona persistencia en disco ni comparte automáticamente los datos de otra conexión.
 
-Al arrancar, el store crea la tabla si no existe. La estructura de la implementación integrada es:
+Al arrancar, el store crea la tabla si no existe. Desde 1.3.0, puedes prepararla antes de iniciar el scheduler con una de estas alternativas:
+
+```shell
+orionis schedule:migrate
+python -B reactor schedule:migrate
+```
+
+[`schedule:migrate`](/es/database/commands#schedule-migrate) usa la configuración `scheduler.stores.database` aunque `TASKS_STORE` seleccione memoria o Redis. Crea la tabla e índices nativos de APScheduler sin arrancar tareas, conserva los jobs existentes y cierra su engine temporal. No admite `--database`; selecciona la conexión con `DB_TASK_CONNECTION`. `DB_TASK_TABLE` se utiliza directamente, sin el prefijo SQL de la conexión Orionis. El comando no importa migraciones de aplicación, escribe historial ni modifica tablas incompatibles.
+
+La estructura de la implementación integrada es:
 
 | Columna | Información almacenada |
 |---|---|

@@ -668,8 +668,10 @@ class Record:
         return {"name": "José"}
 
 class Legacy:
-    def to_dict(self):
+    def toDict(self):
         return {"id": 2}
+
+    to_dict = toDict
 
 items = Collection([Record(), Legacy(), 3])
 assert items.serialize() == [{"name": "José"}, {"id": 2}, 3]
@@ -678,6 +680,8 @@ assert Collection([1, 2]).toJson() == "[1, 2]"
 assert json.loads(Collection([object()]).toJson(default=lambda item: "custom")) == ["custom"]
 assert Collection({"a": 1}).serialize() == ["a"]
 ```
+
+`to_dict` is the compatibility hook consumed by `Collection`; the method is defined as `toDict` and exposes that hook through an alias.
 
 <a id="collection-method-setappends"></a>
 
@@ -702,8 +706,10 @@ class Record:
         self.relations = {}
         self.appends = []
 
-    def set_appends(self, appends):
+    def setAppends(self, appends):
         self.appends = list(appends)
+
+    set_appends = setAppends
 
     def serialize(self):
         return {"id": 1}
@@ -723,6 +729,8 @@ assert record.appends == ["label", "secret"]
 assert items.addRelation({"team": "research", "manager": None}) is items
 assert record.relations == {"team": "research", "manager": None}
 ```
+
+The `set_appends` alias preserves the collection's item protocol while the method definition follows the framework's camelCase convention.
 
 ## Python protocols
 

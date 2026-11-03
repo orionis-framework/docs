@@ -164,7 +164,7 @@ from orionis.console import Console
 
 
 class InputTest(TestCase):
-    def test_confirm(self) -> None:
+    def testConfirm(self) -> None:
         console = Console()
         with patch("builtins.input", return_value=""):
             self.assertFalse(console.confirm("Continue?", default=False))
@@ -173,7 +173,7 @@ class InputTest(TestCase):
         with patch("builtins.input", return_value=" yes "):
             self.assertFalse(console.confirm("Continue?"))
 
-    def test_secret(self) -> None:
+    def testSecret(self) -> None:
         with patch("getpass.getpass", return_value="example-secret"):
             self.assertEqual(Console().secret("Credential:"), "example-secret")
 ```

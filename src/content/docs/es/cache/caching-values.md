@@ -159,7 +159,7 @@ from orionis.support.facades import Cache
 
 class ExportCache:
 
-    async def is_ready(self, export_id: str) -> bool:
+    async def isReady(self, export_id: str) -> bool:
         return await Cache.has(f"export:{export_id}")
 ```
 
@@ -396,7 +396,7 @@ from orionis.support.facades import Cache
 
 class NotificationCache:
 
-    async def mark_seen(self, notification_id: str) -> bool:
+    async def markSeen(self, notification_id: str) -> bool:
         return await Cache.add(f"notification:seen:{notification_id}", True, ttl=300)
 ```
 
@@ -420,7 +420,7 @@ from orionis.support.facades import Cache
 
 class ReportCache:
 
-    async def update_existing(self, report_id: str, report: dict) -> bool:
+    async def updateExisting(self, report_id: str, report: dict) -> bool:
         repository = (await Cache.resolve()).store()
         return await repository.replace(f"report:{report_id}", report, ttl=60)
 ```
@@ -537,7 +537,7 @@ from orionis.support.facades import Cache
 
 class CacheMaintenance:
 
-    async def reset_memory_store(self) -> bool:
+    async def resetMemoryStore(self) -> bool:
         repository = (await Cache.resolve()).store("memory")
         return await repository.clear()
 ```

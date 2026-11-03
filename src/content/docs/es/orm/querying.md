@@ -77,6 +77,7 @@ El parecido de los nombres no implica que todos los métodos o argumentos de Lar
 | `Product.query()` | Método de clase que crea un builder nuevo. |
 | `Product.where(...)`, `Product.orderBy(...)`, `Product.paginate(...)` | Atajos de la metaclase a métodos admitidos de un builder nuevo. No son un builder global compartido. |
 | `query.where(...)`, `query.select(...)` | Configuración síncrona del mismo builder mutable. |
+| `query.toSql()` / `Product.toSql()` | Inspección síncrona del SQL sin ejecutar consultas ni cambiar el builder. |
 | `await query.get()` / `await query.update(...)` | Ejecución sobre los registros que coinciden con ese plan. |
 | `await product.save()` / `await product.update(...)` | Persistencia de una instancia con seguimiento de atributos y eventos. |
 
@@ -98,6 +99,27 @@ No todos los nombres del builder son atajos de clase. Por ejemplo, para adoptar 
 Las mismas cláusulas sirven en `DB.table()` y `Model.query()`, con una representación distinta del resultado. `DB.table()` devuelve diccionarios y no aplica la configuración del modelo. Las tablas y columnas de joins deben calificarse; conserva la clave primaria y las claves de relaciones si después guardarás el modelo o cargarás asociaciones. Una selección parcial no hidrata las columnas omitidas por arte de magia.
 
 Los valores se enlazan como parámetros. Los identificadores, operadores y fragmentos SQL son responsabilidad de la aplicación. Las condiciones se combinan de izquierda a derecha: agrupa explícitamente las alternativas para controlar el significado lógico.
+
+<a id="query-to-sql"></a>
+
+## Inspeccionar SQL del modelo
+
+Desde **1.2.0**, `toSql(*, literal_binds=False) -> str` representa el SELECT actual de forma síncrona, con el dialecto y el prefijo de tablas de la conexión del modelo. Se llama sin `await`; no crea un engine ni abre una conexión a la base de datos, y tampoco ejecuta SQL. Requiere la aplicación inicializada o un `ConnectionResolver` configurado, pero la tabla no necesita existir.
+
+```python
+from app.models.product import Product
+
+query = Product.where("active", True).whereIn("id", [1, 2]).limit(10)
+sql = query.toSql()
+debug_sql = query.toSql(literal_binds=True)
+default_sql = Product.toSql()
+```
+
+La salida predeterminada conserva los placeholders propios del dialecto y expande los parámetros de `IN`. `literal_binds=True` incluye los valores escapados por el dialecto para depuración; puede exponer datos sensibles y lanzar `QueryException` para tipos literales no compatibles. Consulta la [referencia completa de `toSql()`](/es/database/query-builder#api-tosql), que también cubre `DB.table()`.
+
+Los scopes globales y los filtros de eliminación lógica se aplican sobre un clon. La inspección conserva el plan original y no marca sus scopes como aplicados, por lo que todavía puedes ajustar `withoutGlobalScope(...)`, `withTrashed()` u `onlyTrashed()` antes de ejecutar. Con eliminación lógica habilitada, el SQL predeterminado excluye las filas eliminadas; `withTrashed()` omite ese filtro automático y `onlyTrashed()` selecciona las eliminadas. Los filtros explícitos y scopes locales ya incorporados al builder siguen formando parte de su SQL.
+
+La salida describe únicamente el SELECT actual. No incluye consultas adicionales de eager loading o paginación ni anticipa los cambios de terminales posteriores como `count()` o `first()`. Tampoco compila escrituras.
 
 ## Reutilizar una consulta
 

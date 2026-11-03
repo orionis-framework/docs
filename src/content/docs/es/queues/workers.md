@@ -230,7 +230,7 @@ from orionis.support.facades import Queue
 
 class ReservedReportsService:
 
-    async def execute_claim(self, reserved: ReservedJob) -> None:
+    async def executeClaim(self, reserved: ReservedJob) -> None:
         manager = await Queue.resolve()
         worker = await manager.worker(
             "database",

@@ -37,7 +37,7 @@ class CatalogCache:
     def __init__(self, cache: ICacheManager) -> None:
         self.cache = cache
 
-    async def save_snapshot(self) -> dict:
+    async def saveSnapshot(self) -> dict:
         store = self.cache.store("file")
         snapshot = {"published_products": 42}
         await store.set("catalog:summary", snapshot, ttl=60)
@@ -150,6 +150,15 @@ DB_CACHE_LOCK_TABLE=cache_locks
 Sin `DB_CACHE_CONNECTION`, el store utiliza la resolución predeterminada de conexiones de Orionis. Para una conexión específica, indica un nombre declarado en `config/database.py`. El backend recibe la conexión a través de `ConnectionResolver`; no crea una configuración de conexión independiente.
 
 La primera operación de I/O crea de forma diferida las tablas de entradas y locks mediante el sistema de esquemas. La conexión debe tener permisos para crear las tablas que falten. Si existen, se conservan; no se migran estructuras incompatibles. Los nombres son lógicos y reciben el prefijo de tablas de la conexión Database.
+
+Desde 1.3.0, prepara ambas tablas antes de la primera petición con una de estas alternativas:
+
+```shell
+orionis cache:migrate
+python -B reactor cache:migrate
+```
+
+[`cache:migrate`](/es/database/commands#cache-migrate) lee `cache.stores.database`, incluidos `DB_CACHE_CONNECTION`, `DB_CACHE_TABLE` y `DB_CACHE_LOCK_TABLE`, aunque `CACHE_STORE` seleccione otro backend. El store de base de datos debe estar configurado. No admite `--database`, conserva entradas y locks al repetirlo y no ejecuta migraciones de aplicación ni registra su historial. Usa una migración explícita para un esquema existente incompatible; consulta [tablas internas y proyectos existentes](/es/database/migrations#framework-storage-tables).
 
 | Tabla | Columnas generadas | Finalidad |
 |---|---|---|

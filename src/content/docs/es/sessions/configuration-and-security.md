@@ -27,6 +27,8 @@ Los valores siguientes son los predeterminados de `config/session.py` cuando no 
 | `table` · `SESSION_DB_TABLE` | `"sessions"` | Tabla del driver `database`. |
 | `cache` · `SESSION_CACHE_STORE` | `None` | Store del driver `cache`; `None` usa el store de caché predeterminado. |
 
+Desde 1.3.0, [`session:migrate`](/es/database/commands#session-migrate) prepara la tabla SQL de sesiones configurada antes de recibir peticiones. Usa `SESSION_DB_CONNECTION` y `SESSION_DB_TABLE` aunque otro driver de sesiones esté activo, conserva las sesiones existentes y no admite `--database`.
+
 Consulta [almacenes y concurrencia](/es/sessions/stores-and-concurrency) para elegir el driver y preparar sus dependencias.
 
 ### Identidad y alcance de la cookie

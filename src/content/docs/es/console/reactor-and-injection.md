@@ -216,7 +216,7 @@ from orionis.support.facades import Reactor
 
 
 class HelpRunner:
-    async def show_greeting_help(self) -> int:
+    async def showGreetingHelp(self) -> int:
         try:
             return await Reactor.call("app:greet", ["--help"])
         except SystemExit as result:

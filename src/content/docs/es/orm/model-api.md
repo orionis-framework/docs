@@ -5,7 +5,7 @@ editUrl: true
 lastUpdated: false
 ---
 
-Esta referencia usa `Article` de [modelos y atributos](/es/orm/models-and-attributes), con la tabla ya migrada y la aplicación inicializada. Los fragmentos con `article` suponen una instancia de esa clase; los accesos SQL aparecen dentro de funciones async que puedes usar en controladores o servicios.
+Esta referencia usa `Article` de [modelos y atributos](/es/orm/models-and-attributes), con la tabla ya migrada y la aplicación inicializada. Los fragmentos con `article` suponen una instancia de esa clase; la ejecución de SQL aparece dentro de funciones async que puedes usar en controladores o servicios. La inspección síncrona mediante `toSql()` no requiere que la tabla exista.
 
 ## Diferenciar clase, instancia y builder
 
@@ -58,6 +58,25 @@ Método de clase síncrono: crea un `ModelQueryBuilder` nuevo para la tabla y co
 ```python
 query = Article.query().where("published", True)
 ```
+
+<a id="model-tosql"></a>
+
+### `toSql`
+
+```text
+toSql(*, literal_binds: bool = False) -> str
+```
+
+Método síncrono del builder, también delegado por la clase del modelo desde **1.2.0**. `Article.toSql()` crea una consulta nueva; `query.toSql()` compila el SELECT de la consulta existente sobre un clon, incluidos los scopes globales y la visibilidad de eliminación lógica. Conserva el builder original y no ejecuta SQL. Usa el dialecto y el prefijo de tablas de la conexión del modelo.
+
+```python
+default_sql = Article.toSql()
+query = Article.where("published", True).limit(10)
+sql = query.toSql()
+debug_sql = query.toSql(literal_binds=True)
+```
+
+La salida predeterminada conserva los placeholders; `literal_binds=True` representa valores compatibles para depuración. Se llama sin `await`. La aplicación o el `ConnectionResolver` deben estar inicializados, pero la compilación no crea un engine ni abre una conexión a la base de datos. Consulta la [inspección SQL del modelo](/es/orm/querying#query-to-sql) y la [firma compartida, límites y errores](/es/database/query-builder#api-tosql).
 
 <a id="model-getconnection"></a>
 

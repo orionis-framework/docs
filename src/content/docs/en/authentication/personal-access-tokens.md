@@ -13,17 +13,17 @@ The usual workflow is to sign in to the application, issue a token through an au
 
 The model configured in `auth.identity.model` must implement `IAuthenticatable` and `IAuthorizable`. For an ORM model, use the `Authenticatable` and `Authorizable` mixins exported by `orionis.auth`; the default `User` model already includes them. A token stores both the owner's identifier and its type, derived from `getAuthorizableType()`.
 
-The application includes `m0000000011_create_personal_access_tokens_table.py`, which creates `personal_access_tokens`. Once your database connection is configured, apply pending migrations using either alternative:
+Since 1.3.0, prepare token storage with `auth:migrate` after configuring the default SQL connection and `auth.tokens.table` (`AUTH_TOKEN_TABLE`, default `personal_access_tokens`). Run either alternative from the project root:
 
 ```bash
-orionis migrate
+orionis auth:migrate
 ```
 
 ```bash
-python -B reactor migrate
+python -B reactor auth:migrate
 ```
 
-These commands apply all pending migrations. If you change `auth.tokens.table`, provide a table with the corresponding schema as well; changing configuration does not rewrite the existing migration.
+The command creates the missing table from Orionis's token definition, respecting the configured name and SQL connection prefix. It requires enforced unique constraints, accepts no `--database`, and preserves existing tokens when repeated. It neither imports application migrations nor records migration history. Changing the configured table does not transfer existing tokens or alter an incompatible schema. Users, roles, permissions, and password recovery still use their application migrations; see [internal storage and existing projects](/en/database/migrations#framework-storage-tables).
 
 ## Issue a token from the browser
 

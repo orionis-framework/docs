@@ -115,6 +115,8 @@ Session driver, cookie, encryption, and lifetime belong in `config/session.py`; 
 
 `expiration` accepts `None` or a positive integer; `None` allows tokens without automatic expiration. `secret_bytes` must be an integer from `32` to `128`. Credentials can be revoked independently of expiration. See [token authentication](/en/authentication/personal-access-tokens) for issuance, storage, and transmission.
 
+Run [`auth:migrate`](/en/database/commands#auth-migrate) to create the configured token table from the framework definition. It uses the default SQL connection and its prefix, preserves existing tokens, and accepts no `--database`. This command does not create the application tables for users, authorization, or password recovery.
+
 ### passwords: password recovery
 
 | Option | Default | Purpose |

@@ -487,7 +487,7 @@ class UserLabelService:
 
 
 class UserAuditService:
-    def record_view(self, user_id: int, path: str) -> None:
+    def recordView(self, user_id: int, path: str) -> None:
         logging.getLogger(__name__).info("Viewing user %s at %s", user_id, path)
 ```
 
@@ -509,7 +509,7 @@ class ShowUserController(BaseController):
         user_id: int,
         audit: UserAuditService,
     ) -> JSONResponse:
-        audit.record_view(user_id, request.path)
+        audit.recordView(user_id, request.path)
         return response.json({
             "id": user_id,
             "label": self.labels.label(user_id),

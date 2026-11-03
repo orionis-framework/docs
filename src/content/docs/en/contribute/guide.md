@@ -115,23 +115,40 @@ Orionis follows its own style conventions, aligned with modern web frameworks. T
 - **Type annotations**: All parameters and return values must be typed with *type hints*.
 - **Readability**: Code must be clear, consistent, and follow the project's conventions.
 
+<a id="naming-conventions"></a>
+
 ### Naming Convention
+
+Version 1.3.0 applies the following convention throughout the framework's `orionis/` and `tests/` directories, including asynchronous methods, static methods, class methods, and test methods:
 
 | Element | Convention | Example |
 |---|---|---|
 | Classes | *PascalCase* | `EmailService` |
-| Methods | *camelCase* | `sendEmail` |
-| Functions | *snake_case* | `validate_input` |
+| Public methods | *camelCase* | `sendEmail` |
+| Internal methods | `_camelCase` | `_prepareMessage` |
+| Private methods | `__camelCase` | `__signMessage` |
+| Functions outside classes | *snake_case* | `validate_input` |
 | Constants | *UPPER_SNAKE_CASE* | `MAX_RETRIES` |
+
+Functions defined inside another function or method also use `snake_case`. This rule concerns callable definitions; it does not rename parameters, local variables, data fields, configuration keys, or database tables.
+
+Keep Python protocol names such as `__init__`, `__call__`, and `__aenter__` unchanged. When an integration requires a particular callback name, implement the method in camelCase and expose the required name as an alias. Do not rename methods belonging to third-party libraries.
+
+When adapting an extension to 1.3.0, check the current [API reference](https://api.orionis-framework.com/) and update method definitions, calls, string-based lookups, and test doubles together. Run the naming check from the framework repository root:
+
+```bash
+uv run --group dev python -m unittest tests.test_naming_conventions
+```
 
 ### Example: Class with Method
 
 ```python
 class EmailService:
+    """Send email notifications."""
 
     def sendNotification(self, recipient: str, subject: str) -> bool:
         """
-        Sends an email notification.
+        Send an email notification.
 
         Parameters
         ----------
@@ -153,7 +170,7 @@ class EmailService:
 ```python
 def parse_config_file(file_path: str, encoding: str = "utf-8") -> dict:
     """
-    Reads and parses a configuration file.
+    Read and parse a configuration file.
 
     Parameters
     ----------
@@ -169,6 +186,53 @@ def parse_config_file(file_path: str, encoding: str = "utf-8") -> dict:
     """
     return {}
 ```
+
+---
+
+<a id="api-docstrings"></a>
+
+## API Reference and NumPy Docstrings
+
+The [API reference](https://api.orionis-framework.com/) documents framework classes, methods, parameters, and return values. Its source is the docstrings in the framework repository's `orionis/` directory. Apply the same NumPy docstring style to `tests/`; the manual in this documentation repository explains how to use those APIs.
+
+Start each docstring with a concise, imperative summary. Keep section headings in NumPy format, with the matching underline and indented descriptions:
+
+- `Parameters`: use the actual parameter names and describe their types, defaults, and meaning.
+- `Returns`: document the returned type and its meaning. A `None` entry also needs a description.
+- `Yields`: describe values produced by generators.
+- `Raises`: describe relevant exceptions and the conditions that trigger them.
+- `Attributes`: describe class or dataclass fields when applicable.
+
+For example, a constructor can document its effect explicitly:
+
+```python
+class DatabaseClient:
+    """Store the database selected by the application."""
+
+    def __init__(self, database: str) -> None:
+        """
+        Initialize the database client.
+
+        Parameters
+        ----------
+        database : str
+            Name of the database to use.
+
+        Returns
+        -------
+        None
+            Store the database name for subsequent operations.
+        """
+        self.database = database
+```
+
+With uv available, generate the API from the **framework repository root** in PowerShell:
+
+```powershell
+.\DOCS.ps1
+```
+
+The script runs Pydoctor using the project's documentation dependencies and writes the generated site to `docs/` only after validation succeeds. Pydoctor warnings, incomplete documentation, and broken local links block a successful build; correct their source docstrings and rerun the script. Do not edit the generated HTML. A local build does not publish the API site.
 
 ---
 
@@ -222,12 +286,14 @@ If you use **Visual Studio Code**, add these keys to the root object in your `se
 This configuration is specific to VSCode. If you use a different IDE, adapt the rules according to the SonarQube/SonarLint documentation for your environment.
 :::
 
+These shared patterns accept both naming styles and do not distinguish a class method from a standalone function. Use the framework's naming check above to enforce the convention for each scope.
+
 ### Custom Rules Reference
 
 | Rule | Status | Description |
 |---|---|---|
 | `python:S100` | Active (customized) | Allows method names in *camelCase* and with leading underscores, aligned with the framework's style. |
-| `python:S1542` | Active (customized) | Enforces consistency in function and method naming. |
+| `python:S1542` | Active (customized) | Accepts the function and method naming styles used by the framework. |
 | `python:S2638` | Disabled | Incompatible with the dependency injection syntax used in Orionis. |
 
 ### Cognitive Complexity (`python:S3776`)

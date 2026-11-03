@@ -89,19 +89,19 @@ El store utiliza esta estructura:
 
 La tabla se comprueba y se crea, si falta, en la primera operación del store. La conexión debe estar disponible y disponer de los permisos necesarios para esa creación cuando corresponda. Una tabla existente debe respetar la estructura esperada; el store no transforma un esquema incompatible.
 
-El proyecto también incluye una migración para la tabla `sessions`. Si administras el esquema mediante las [migraciones del proyecto](/es/database/migrations/), puedes ejecutar el comando habitual antes de recibir peticiones:
+Desde 1.3.0, prepara la tabla SQL antes de recibir peticiones mediante [`session:migrate`](/es/database/commands#session-migrate):
 
 ```bash
-orionis migrate
+orionis session:migrate
 ```
 
 O su alternativa mediante el archivo local `reactor`:
 
 ```bash
-python -B reactor migrate
+python -B reactor session:migrate
 ```
 
-Estos comandos aplican **todas las migraciones pendientes** de la conexión seleccionada, no solamente la tabla de sesiones. Si cambias el nombre o la conexión de la tabla de sesiones, adapta también la migración que decidas utilizar.
+Son alternativas. El comando lee `SESSION_DB_CONNECTION` y `SESSION_DB_TABLE`, respeta el prefijo SQL y crea la tabla faltante desde la definición del framework aunque `SESSION_DRIVER` seleccione otro store. No admite `--database`, conserva las sesiones existentes al repetirlo y no ejecuta migraciones de aplicación ni escribe en su historial. No traslada datos ni modifica tablas incompatibles; consulta [proyectos existentes](/es/database/migrations#framework-storage-tables).
 
 El driver exige una conexión con restricciones de unicidad efectivas. La implementación rechaza Redshift para sesiones, porque no proporciona la garantía requerida de una sola fila por identificador.
 

@@ -58,7 +58,7 @@ from orionis.support.facades import Lang
 
 class WelcomeMessages:
 
-    def for_user(self, name: str, locale: str) -> dict[str, str]:
+    def forUser(self, name: str, locale: str) -> dict[str, str]:
         return {
             "title": Lang.get("messages.welcome", locale=locale),
             "greeting": Lang.get(
@@ -69,7 +69,7 @@ class WelcomeMessages:
         }
 ```
 
-`WelcomeMessages().for_user("Ada", "es")` returns `{"title": "Bienvenido a Orionis", "greeting": "Hola Ada"}`. With `"en"`, it returns `{"title": "Welcome to Orionis", "greeting": "Hello Ada"}`.
+`WelcomeMessages().forUser("Ada", "es")` returns `{"title": "Bienvenido a Orionis", "greeting": "Hola Ada"}`. With `"en"`, it returns `{"title": "Welcome to Orionis", "greeting": "Hello Ada"}`.
 
 When you omit `locale` or pass `None`, the translator uses its active locale. For a request or job with its own language, pass `locale=` on **every call**. The translator is shared by the process: `Lang.setLocale()` changes global state and does not provide an isolated locale selection for a request.
 

@@ -115,6 +115,8 @@ El driver, la cookie, el cifrado y la duración de la sesión pertenecen a `conf
 
 `expiration` admite `None` o un entero positivo; `None` permite tokens sin vencimiento automático. `secret_bytes` debe ser un entero entre `32` y `128`. Las credenciales pueden revocarse independientemente de su expiración. Emisión, almacenamiento y envío se explican en [autenticación con tokens](/es/authentication/personal-access-tokens).
 
+Ejecuta [`auth:migrate`](/es/database/commands#auth-migrate) para crear la tabla de tokens configurada desde la definición del framework. Usa la conexión SQL predeterminada y su prefijo, conserva tokens existentes y no admite `--database`. Este comando no crea las tablas de aplicación de usuarios, autorización ni recuperación de contraseñas.
+
 ### passwords: recuperación de contraseña
 
 | Opción | Valor predeterminado | Propósito |

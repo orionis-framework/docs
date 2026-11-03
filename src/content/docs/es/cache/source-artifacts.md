@@ -41,9 +41,9 @@ class ServiceIndex:
         )
 
     async def get(self) -> dict:
-        return await asyncio.to_thread(self._load_or_build)
+        return await asyncio.to_thread(self._loadOrBuild)
 
-    def _load_or_build(self) -> dict:
+    def _loadOrBuild(self) -> dict:
         cached = self.artifact.get()
         if cached is not None:
             return cached

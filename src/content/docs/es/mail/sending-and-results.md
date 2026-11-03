@@ -267,11 +267,11 @@ class StatusMail(Mailable):
 
 class StatusNotificationService:
 
-    async def from_instance(self, recipient: str) -> MailResult:
+    async def fromInstance(self, recipient: str) -> MailResult:
         manager = await Mail.resolve()
         return await manager.mailer("file").to(recipient).send(StatusMail())
 
-    async def from_container(self, recipient: str) -> MailResult:
+    async def fromContainer(self, recipient: str) -> MailResult:
         manager = await Mail.resolve()
         return await manager.mailer("file").to(recipient).send(StatusMail)
 ```
@@ -719,7 +719,7 @@ from orionis.mail.entities import MailOptions
 
 class DeliveryOptionsService:
 
-    async def envelope_for(self, recipient: str) -> Envelope:
+    async def envelopeFor(self, recipient: str) -> Envelope:
         options = MailOptions(
             subject="",
             to=(Address(recipient),),

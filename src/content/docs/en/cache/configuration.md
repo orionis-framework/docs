@@ -161,6 +161,8 @@ DB_CACHE_LOCK_TABLE=application_cache_locks
 
 Set `DB_CACHE_CONNECTION` to a name declared in `config/database.py` to use a specific connection. Entries and locks share that connection; there is no `lock_connection` field.
 
+Since 1.3.0, [`cache:migrate`](/en/database/commands#cache-migrate) can prepare both SQL tables before use. It reads these database-store settings even if another store is active, preserves existing data, and accepts no `--database`.
+
 Tables are created lazily on the first I/O operation, preserving existing tables. The connection must be able to create missing tables. The backend does not migrate incompatible existing structures; reserve dedicated names with the structure described under [the database driver](/en/cache/stores-and-drivers#driver-database). It requires enforced unique keys and rejects connections such as Amazon Redshift that do not provide that guarantee.
 
 ## Customize the complete file

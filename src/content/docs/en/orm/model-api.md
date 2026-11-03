@@ -5,7 +5,7 @@ editUrl: true
 lastUpdated: false
 ---
 
-This reference uses `Article` from [models and attributes](/en/orm/models-and-attributes), after its table is migrated and the application booted. Fragments with `article` assume an instance of that class; SQL access appears in async functions suitable for controllers or services.
+This reference uses `Article` from [models and attributes](/en/orm/models-and-attributes), after its table is migrated and the application booted. Fragments with `article` assume an instance of that class; SQL execution appears in async functions suitable for controllers or services. The synchronous `toSql()` inspection method does not require the table to exist.
 
 ## Class, instance and builder methods
 
@@ -58,6 +58,25 @@ Synchronous class method: creates a fresh `ModelQueryBuilder` for the model tabl
 ```python
 query = Article.query().where("published", True)
 ```
+
+<a id="model-tosql"></a>
+
+### `toSql`
+
+```text
+toSql(*, literal_binds: bool = False) -> str
+```
+
+Synchronous builder method, also delegated by the model class since **1.2.0**. `Article.toSql()` creates a fresh query; `query.toSql()` compiles the existing query's SELECT on a clone, including global scopes and soft-delete visibility. It preserves the original builder and executes no SQL. Uses the model connection's dialect and table prefix.
+
+```python
+default_sql = Article.toSql()
+query = Article.where("published", True).limit(10)
+sql = query.toSql()
+debug_sql = query.toSql(literal_binds=True)
+```
+
+The default keeps placeholders; `literal_binds=True` renders supported values for debugging. Call without `await`. The application or `ConnectionResolver` must be initialized, but compilation does not create an engine or open a database connection. See [model SQL inspection](/en/orm/querying#query-to-sql) and the [shared signature, limits and errors](/en/database/query-builder#api-tosql).
 
 <a id="model-getconnection"></a>
 

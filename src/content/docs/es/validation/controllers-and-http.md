@@ -247,10 +247,10 @@ from orionis.schemas.validator import Schema as Validator
 
 
 class UserImportService:
-    async def validate_record(self, record: dict) -> CreateUserSchema:
+    async def validateRecord(self, record: dict) -> CreateUserSchema:
         return await Validator.validate(record, CreateUserSchema)
 ```
 
-El llamador de este servicio debe esperar `await service.validate_record(record)` desde su propio contexto asíncrono. Las reglas y las excepciones son las mismas; la selección y la decodificación de los datos dependen de ese punto de entrada.
+El llamador de este servicio debe esperar `await service.validateRecord(record)` desde su propio contexto asíncrono. Las reglas y las excepciones son las mismas; la selección y la decodificación de los datos dependen de ese punto de entrada.
 
 La [introducción HTTP a la validación](/es/http/validation) resume este flujo. Para ampliar las condiciones del payload, continúa con el [catálogo de reglas y sus ejemplos](/es/validation/constraints-and-reference) y las [reglas personalizadas](/es/validation/application-rules).

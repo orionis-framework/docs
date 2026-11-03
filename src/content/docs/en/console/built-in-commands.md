@@ -1,11 +1,11 @@
 ---
 title: "Built-in commands"
-description: "Complete catalog of Orionis's 68 native commands, grouped by task and linked to argument/option references."
+description: "Complete catalog of Orionis's 72 native commands, grouped by task and linked to argument/option references."
 editUrl: true
 lastUpdated: false
 ---
 
-Reactor's native registry includes **68 commands**. These references cover their arguments, options, defaults, effects and execution examples. Applications can add signatures through classes and [console routes](/en/console/command-routing).
+Reactor's native registry includes **72 commands**. These references cover their arguments, options, defaults, effects and execution examples. Applications can add signatures through classes and [console routes](/en/console/command-routing).
 
 Run commands from the project root. The direct command and local file share the same registry and execution lifecycle:
 
@@ -27,6 +27,7 @@ python -B reactor make:console-command --help
 | [Application and maintenance commands](/en/console/built-in-application) | 16 | Server, tests, inspection, clearing, keys and packages. |
 | [Database commands](/en/console/built-in-database) | 11 | Inspection, migrations, rollback, seeding and wiping. |
 | [Worker and scheduler commands](/en/console/built-in-workers) | 10 | Queue table preparation, workers, failure operations, scheduler and MCP. |
+| [Additional internal storage commands](/en/database/commands#internal-storage-commands) | 4 | Token, cache, scheduler, and session tables; queue preparation remains in the worker reference. |
 | [Project bootstrap and recovery](/en/console/built-in-bootstrap) | 7 | Enable contexts and restore missing configuration. |
 
 ## Signature index
@@ -36,6 +37,7 @@ Each link opens the complete options and examples for that command.
 | Command | Purpose |
 |---|---|
 | [`about`](/en/console/built-in-application#command-about) | Show installed framework metadata. |
+| [`auth:migrate`](/en/database/commands#auth-migrate) | Create missing personal access token storage. |
 | [`bootstrap:ai`](/en/console/built-in-bootstrap#command-bootstrap-ai) | Enable MCP server routes. |
 | [`bootstrap:api`](/en/console/built-in-bootstrap#command-bootstrap-api) | Enable API routing. |
 | [`bootstrap:config`](/en/console/built-in-bootstrap#command-bootstrap-config) | Restore missing official configuration files. |
@@ -43,6 +45,7 @@ Each link opens the complete options and examples for that command.
 | [`bootstrap:lifespan`](/en/console/built-in-bootstrap#command-bootstrap-lifespan) | Create and integrate lifecycle callbacks. |
 | [`bootstrap:web`](/en/console/built-in-bootstrap#command-bootstrap-web) | Enable web routing. |
 | [`bootstrap:websocket`](/en/console/built-in-bootstrap#command-bootstrap-websocket) | Enable WebSocket routing. |
+| [`cache:migrate`](/en/database/commands#cache-migrate) | Create missing SQL cache and lock tables. |
 | [`clear:cache`](/en/console/built-in-application#command-clear-cache) | Clear the default cache store. |
 | [`clear:logs`](/en/console/built-in-application#command-clear-logs) | Remove framework log files. |
 | [`clear:testing`](/en/console/built-in-application#command-clear-testing) | Remove cached test results. |
@@ -98,9 +101,11 @@ Each link opens the complete options and examples for that command.
 | [`queue:work`](/en/console/built-in-workers#command-queue-work) | Consume persisted jobs from a queue connection. |
 | [`route:list`](/en/console/built-in-application#command-route-list) | Inspect registered HTTP routes. |
 | [`schedule:list`](/en/console/built-in-workers#command-schedule-list) | Inspect tasks defined by the scheduler. |
+| [`schedule:migrate`](/en/database/commands#schedule-migrate) | Create the native scheduler table without starting tasks. |
 | [`schedule:work`](/en/console/built-in-workers#command-schedule-work) | Start the scheduler process. |
 | [`seed`](/en/console/built-in-database#command-seed) | Run pending seeders. |
 | [`serve`](/en/console/built-in-application#command-serve) | Start the application's Granian HTTP server. |
+| [`session:migrate`](/en/database/commands#session-migrate) | Create the configured SQL session table. |
 | [`test`](/en/console/built-in-application#command-test) | Run application tests. |
 | [`up`](/en/console/built-in-application#command-up) | Disable the HTTP maintenance state. |
 

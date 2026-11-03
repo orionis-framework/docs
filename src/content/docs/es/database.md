@@ -80,7 +80,7 @@ El [constructor de consultas](/es/database/query-builder) explica cómo filtrar,
 
 ## Guías y referencia
 
-[Referencia de comandos de Database](/es/database/commands): sintaxis, argumentos y opciones de los 14 comandos, incluida inspección y borrado.
+[Referencia de comandos de Database](/es/database/commands): sintaxis, argumentos y opciones para migraciones de aplicación, almacenamiento interno, inspección y borrado.
 
 - [Drivers y dependencias](/es/database/drivers): motores y `reactor packages`.
 - [Configuración](/es/database/configuration): propiedades y variables de entorno.

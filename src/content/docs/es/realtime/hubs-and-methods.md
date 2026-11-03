@@ -235,7 +235,7 @@ class PreviewHub(Hub):
         return self._formatter.format(text)
 
     @remote
-    async def preview_once(
+    async def previewOnce(
         self,
         text: str,
         formatter: MessageFormatter,
@@ -245,7 +245,7 @@ class PreviewHub(Hub):
 
 En `__init__()`, Orionis resuelve `MessageFormatter` y lo entrega al construir el hub. `preview()` utiliza esa dependencia guardada en `self._formatter`; su slot permite almacenar el atributo en esta subclase.
 
-En `preview_once()`, Orionis identifica `text: str` como un dato del cliente y `formatter: MessageFormatter` como un servicio. Convierte y valida el texto, resuelve el servicio desde el contenedor y ejecuta el método con ambos argumentos. No necesitas instanciar ni pasar el servicio al registrar la ruta.
+En `previewOnce()`, Orionis identifica `text: str` como un dato del cliente y `formatter: MessageFormatter` como un servicio. Convierte y valida el texto, resuelve el servicio desde el contenedor y ejecuta el método con ambos argumentos. No necesitas instanciar ni pasar el servicio al registrar la ruta.
 
 Añade en `routes/websocket.py`:
 
@@ -266,7 +266,7 @@ const client = new RealtimeClient("/realtime/preview");
 try {
     await client.connect();
     console.log(await client.invoke("preview", ["  Hola  "])); // Hola
-    console.log(await client.invoke("preview_once", ["  Hola  "])); // Hola
+    console.log(await client.invoke("previewOnce", ["  Hola  "])); // Hola
 } finally {
     await client.dispose();
 }

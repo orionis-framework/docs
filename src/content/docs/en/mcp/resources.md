@@ -260,7 +260,7 @@ from app.mcp.servers.directory_server import DirectoryServer
 from orionis.support.facades import Mcp
 
 
-async def publishGreetingChange(name: str) -> None:
+async def publish_greeting_change(name: str) -> None:
     from urllib.parse import quote
 
     uri = f"demo://greetings/{quote(name, safe='')}"

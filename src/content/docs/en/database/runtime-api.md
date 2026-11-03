@@ -111,6 +111,29 @@ def supports_unique(connection: IConnection) -> bool:
     return connection.supportsUniqueConstraints()
 ```
 
+<a id="connection-tosql"></a>
+
+### toSql()
+
+```text
+def toSql(self, plan: SelectPlan, *, literal_binds: bool = False) -> str:
+```
+
+Available on `Connection` and its `IConnection` contract since **1.2.0**. Compiles a SELECT plan synchronously, without `await`, SQL execution or plan mutation. Uses the configured dialect and table prefix; if an engine already exists it reuses that engine's dialect, otherwise it loads the configured dialect without creating an engine or opening a database connection.
+
+```python
+from orionis.database.contracts.connection import IConnection
+from orionis.orm.query.expressions import SelectPlan
+
+
+def preview_sql(connection: IConnection, plan: SelectPlan) -> str:
+    return connection.toSql(plan)
+```
+
+`literal_binds=False` retains native placeholders and renders expanding parameters such as `IN` lists. `literal_binds=True` renders supported values with dialect escaping. The returned string contains neither a separate bindings mapping nor results. Literal output can reveal sensitive data and does not replace parameterized execution.
+
+Compilation or unsupported literal rendering raises `QueryException`; unavailable dialect dependencies raise `MissingDatabaseDependencyException` (including the optional Redshift dialect). No database availability or table existence check occurs. This method compiles the supplied clauses as-is; use [builder `toSql()`](/en/database/query-builder#api-tosql) to prepare model scopes and soft-delete filters. See the [standalone plan example](/en/database/query-plans#plan-to-sql).
+
 ### select()
 
 ```text

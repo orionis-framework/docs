@@ -31,7 +31,7 @@ class ReportBase:
         return "base"
 
     @property
-    def inherited_label(self) -> str:
+    def inheritedLabel(self) -> str:
         return "base label"
 
 
@@ -58,13 +58,13 @@ class ReportService(ReportBase):
     def _prepare(self) -> str:
         return self._token
 
-    async def _prepare_async(self) -> str:
+    async def _prepareAsync(self) -> str:
         return self._token
 
     def __sign(self) -> str:
         return self.__secret
 
-    async def __sign_async(self) -> str:
+    async def __signAsync(self) -> str:
         return self.__secret
 
     @classmethod
@@ -72,7 +72,7 @@ class ReportService(ReportBase):
         return cls.__name__
 
     @classmethod
-    async def category_async(cls) -> str:
+    async def categoryAsync(cls) -> str:
         return cls.__name__
 
     @classmethod
@@ -80,7 +80,7 @@ class ReportService(ReportBase):
         return cls.__name__
 
     @classmethod
-    async def _category_async(cls) -> str:
+    async def _categoryAsync(cls) -> str:
         return cls.__name__
 
     @classmethod
@@ -88,7 +88,7 @@ class ReportService(ReportBase):
         return cls.__name__
 
     @classmethod
-    async def __category_async(cls) -> str:
+    async def __categoryAsync(cls) -> str:
         return cls.__name__
 
     @staticmethod
@@ -96,7 +96,7 @@ class ReportService(ReportBase):
         return True
 
     @staticmethod
-    async def valid_async() -> bool:
+    async def validAsync() -> bool:
         return True
 
     @staticmethod
@@ -104,7 +104,7 @@ class ReportService(ReportBase):
         return True
 
     @staticmethod
-    async def _valid_async() -> bool:
+    async def _validAsync() -> bool:
         return True
 
     @staticmethod
@@ -112,7 +112,7 @@ class ReportService(ReportBase):
         return True
 
     @staticmethod
-    async def __valid_async() -> bool:
+    async def __validAsync() -> bool:
         return True
 
     @property
@@ -570,7 +570,7 @@ assert "_prepare" in reflected.getProtectedSyncMethods()
 `getProtectedAsyncMethods(self) -> list[str]` — Return protected methods that are asynchronous.
 
 ```python
-assert "_prepare_async" in reflected.getProtectedAsyncMethods()
+assert "_prepareAsync" in reflected.getProtectedAsyncMethods()
 ```
 
 <a id="reflectioninstance-method-getprivatemethods"></a>
@@ -594,7 +594,7 @@ assert "__sign" in reflected.getPrivateSyncMethods()
 `getPrivateAsyncMethods(self) -> list[str]` — Return own private methods that are asynchronous.
 
 ```python
-assert "__sign_async" in reflected.getPrivateAsyncMethods()
+assert "__signAsync" in reflected.getPrivateAsyncMethods()
 ```
 
 ### Class methods
@@ -620,7 +620,7 @@ assert "category" in reflected.getPublicClassSyncMethods()
 `getPublicClassAsyncMethods(self) -> list[str]` — Return public methods that are asynchronous.
 
 ```python
-assert "category_async" in reflected.getPublicClassAsyncMethods()
+assert "categoryAsync" in reflected.getPublicClassAsyncMethods()
 ```
 
 <a id="reflectioninstance-method-getprotectedclassmethods"></a>
@@ -644,7 +644,7 @@ assert "_category" in reflected.getProtectedClassSyncMethods()
 `getProtectedClassAsyncMethods(self) -> list[str]` — Return protected methods that are asynchronous.
 
 ```python
-assert "_category_async" in reflected.getProtectedClassAsyncMethods()
+assert "_categoryAsync" in reflected.getProtectedClassAsyncMethods()
 ```
 
 <a id="reflectioninstance-method-getprivateclassmethods"></a>
@@ -668,7 +668,7 @@ assert "__category" in reflected.getPrivateClassSyncMethods()
 `getPrivateClassAsyncMethods(self) -> list[str]` — Return own private methods that are asynchronous.
 
 ```python
-assert "__category_async" in reflected.getPrivateClassAsyncMethods()
+assert "__categoryAsync" in reflected.getPrivateClassAsyncMethods()
 ```
 
 ### Static methods
@@ -694,7 +694,7 @@ assert "valid" in reflected.getPublicStaticSyncMethods()
 `getPublicStaticAsyncMethods(self) -> list[str]` — Return public methods that are asynchronous.
 
 ```python
-assert "valid_async" in reflected.getPublicStaticAsyncMethods()
+assert "validAsync" in reflected.getPublicStaticAsyncMethods()
 ```
 
 <a id="reflectioninstance-method-getprotectedstaticmethods"></a>
@@ -718,7 +718,7 @@ assert "_valid" in reflected.getProtectedStaticSyncMethods()
 `getProtectedStaticAsyncMethods(self) -> list[str]` — Return protected methods that are asynchronous.
 
 ```python
-assert "_valid_async" in reflected.getProtectedStaticAsyncMethods()
+assert "_validAsync" in reflected.getProtectedStaticAsyncMethods()
 ```
 
 <a id="reflectioninstance-method-getprivatestaticmethods"></a>
@@ -742,7 +742,7 @@ assert "__valid" in reflected.getPrivateStaticSyncMethods()
 `getPrivateStaticAsyncMethods(self) -> list[str]` — Return own private methods that are asynchronous.
 
 ```python
-assert "__valid_async" in reflected.getPrivateStaticAsyncMethods()
+assert "__validAsync" in reflected.getPrivateStaticAsyncMethods()
 ```
 
 ## Method signatures and editing
@@ -880,7 +880,7 @@ Return `list[str]` of directly declared properties of every visibility.
 
 ```python
 assert reflected.getProperties() == ["label", "_length", "__label"]
-assert "inherited_label" not in reflected.getProperties()
+assert "inheritedLabel" not in reflected.getProperties()
 ```
 
 <a id="reflectioninstance-method-getpublicproperties"></a>

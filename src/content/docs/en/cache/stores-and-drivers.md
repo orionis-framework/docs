@@ -37,7 +37,7 @@ class CatalogCache:
     def __init__(self, cache: ICacheManager) -> None:
         self.cache = cache
 
-    async def save_snapshot(self) -> dict:
+    async def saveSnapshot(self) -> dict:
         store = self.cache.store("file")
         snapshot = {"published_products": 42}
         await store.set("catalog:summary", snapshot, ttl=60)
@@ -150,6 +150,15 @@ DB_CACHE_LOCK_TABLE=cache_locks
 Without `DB_CACHE_CONNECTION`, the store uses Orionis's default connection resolution. For a specific connection, supply a name declared in `config/database.py`. The backend receives its connection from `ConnectionResolver`; it does not create an independent connection configuration.
 
 The first I/O operation lazily creates the entry and lock tables through the schema system. The connection must be able to create missing tables. Existing tables are retained rather than migrated to compatible structures. Names are logical names, so the Database connection's table prefix applies.
+
+Since 1.3.0, prepare both tables before the first request with either alternative:
+
+```shell
+orionis cache:migrate
+python -B reactor cache:migrate
+```
+
+[`cache:migrate`](/en/database/commands#cache-migrate) reads `cache.stores.database`, including `DB_CACHE_CONNECTION`, `DB_CACHE_TABLE`, and `DB_CACHE_LOCK_TABLE`, even if `CACHE_STORE` selects another backend. The database store must be configured. It accepts no `--database`, preserves entries and locks when repeated, and does not execute application migrations or record their history. Use an explicit migration for an incompatible existing schema; see [internal tables and existing projects](/en/database/migrations#framework-storage-tables).
 
 | Table | Generated columns | Purpose |
 |---|---|---|

@@ -579,7 +579,7 @@ class ImportService:
         return reader.inspect(target)
 
 
-def importUsers(source: str, *, batch_size=100):
+def import_users(source: str, *, batch_size=100):
     return source, batch_size
 
 
@@ -588,11 +588,11 @@ class SignatureInjectionTest(TestCase):
         container = Container()
         service = await container.make(ImportService)
         self.assertIsInstance(service.reader, SignatureReader)
-        signature = await container.call(service, "describe", target=importUsers)
+        signature = await container.call(service, "describe", target=import_users)
         self.assertEqual(list(signature.ordered), ["source", "batch_size"])
 ```
 
-Save this case in the application's [Testing](/en/testing) directory. The container constructs `SignatureReader` as a concrete dependency; reflection only describes `importUsers`. The function is not executed during inspection.
+Save this case in the application's [Testing](/en/testing) directory. The container constructs `SignatureReader` as a concrete dependency; reflection only describes `import_users`. The function is not executed during inspection.
 
 ### Relationship to actual resolution
 

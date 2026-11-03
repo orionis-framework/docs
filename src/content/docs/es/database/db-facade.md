@@ -55,6 +55,16 @@ async def recent_notes():
     )
 ```
 
+Para inspeccionar SQL desde **1.2.0**, llama a `toSql()` sobre el builder devuelto, de forma síncrona y sin ejecutarlo:
+
+```python
+query = DB.table("products").where("active", True).limit(10)
+sql = query.toSql()
+debug_sql = query.toSql(literal_binds=True)
+```
+
+Conserva la consulta y utiliza el dialecto y el prefijo de tablas de la conexión seleccionada. La salida predeterminada mantiene placeholders; `literal_binds=True` representa valores compatibles para depuración. No crea un engine ni abre una conexión a la base de datos. Consulta la [referencia completa del builder](/es/database/query-builder#api-tosql) para conocer la configuración, los errores y los límites de la salida literal. `toSql()` pertenece al builder de tabla; no es una operación `DB.toSql()` del gateway.
+
 ### getDefaultName()
 
 ```text

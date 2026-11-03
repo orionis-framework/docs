@@ -80,7 +80,7 @@ The [query builder](/en/database/query-builder) explains filtering, ordering and
 
 ## Guides and reference
 
-[Database command reference](/en/database/commands): syntax, arguments and options for all 14 commands, including inspection and wiping.
+[Database command reference](/en/database/commands): syntax, arguments and options for application migrations, internal storage, inspection and wiping.
 
 - [Drivers and dependencies](/en/database/drivers): backends and `reactor packages`.
 - [Configuration](/en/database/configuration): fields and environment variables.

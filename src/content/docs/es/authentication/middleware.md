@@ -43,7 +43,7 @@ class AccessExamplesController:
     async def reports(self) -> JSONResponse:
         return response.json({"reports": ["Monthly report"]})
 
-    async def guest_offer(self) -> Response:
+    async def guestOffer(self) -> Response:
         return response.text("Create an account or sign in.")
 ```
 
@@ -61,7 +61,7 @@ Route.get(
 
 Route.get(
     "/guest-offer",
-    [AccessExamplesController, "guest_offer"],
+    [AccessExamplesController, "guestOffer"],
 ).middleware(GuestMiddleware)
 ```
 

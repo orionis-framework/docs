@@ -111,6 +111,29 @@ def supports_unique(connection: IConnection) -> bool:
     return connection.supportsUniqueConstraints()
 ```
 
+<a id="connection-tosql"></a>
+
+### toSql()
+
+```text
+def toSql(self, plan: SelectPlan, *, literal_binds: bool = False) -> str:
+```
+
+Disponible en `Connection` y su contrato `IConnection` desde **1.2.0**. Compila un plan SELECT de forma síncrona, sin `await`, ejecución de SQL ni cambios en el plan. Usa el dialecto y el prefijo de tablas configurados; si ya existe un engine reutiliza su dialecto y, en caso contrario, carga el dialecto configurado sin crear un engine ni abrir una conexión a la base de datos.
+
+```python
+from orionis.database.contracts.connection import IConnection
+from orionis.orm.query.expressions import SelectPlan
+
+
+def preview_sql(connection: IConnection, plan: SelectPlan) -> str:
+    return connection.toSql(plan)
+```
+
+`literal_binds=False` conserva los placeholders nativos y expande parámetros como las listas de `IN`. `literal_binds=True` representa los valores compatibles con el escape del dialecto. La cadena devuelta no contiene un mapping de bindings separado ni resultados. La salida literal puede revelar datos sensibles y no sustituye la ejecución parametrizada.
+
+Los fallos de compilación o representación literal lanzan `QueryException`; la ausencia de dependencias del dialecto lanza `MissingDatabaseDependencyException`, incluido el dialecto opcional de Redshift. No se comprueba la disponibilidad de la base de datos ni la existencia de la tabla. Compila las cláusulas suministradas tal como están; usa [`toSql()` del builder](/es/database/query-builder#api-tosql) para preparar los scopes de modelos y sus filtros de eliminación lógica. Consulta el [ejemplo de plan independiente](/es/database/query-plans#plan-to-sql).
+
 ### select()
 
 ```text

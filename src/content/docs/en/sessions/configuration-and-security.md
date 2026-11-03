@@ -27,6 +27,8 @@ These are the defaults in `config/session.py` when no environment variable overr
 | `table` · `SESSION_DB_TABLE` | `"sessions"` | Table for the `database` driver. |
 | `cache` · `SESSION_CACHE_STORE` | `None` | Store for the `cache` driver; `None` uses the default cache store. |
 
+Since 1.3.0, [`session:migrate`](/en/database/commands#session-migrate) prepares the configured SQL session table before requests arrive. It uses `SESSION_DB_CONNECTION` and `SESSION_DB_TABLE` even if another session driver is active, preserves existing sessions, and accepts no `--database`.
+
 See [stores and concurrency](/en/sessions/stores-and-concurrency) to select a driver and prepare its dependencies.
 
 ### Cookie identity and scope

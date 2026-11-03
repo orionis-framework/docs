@@ -220,7 +220,7 @@ from orionis.test.contracts.engine import ITestingEngine
 from orionis.test.entities.result import TestResult
 
 
-async def runSelectedTests(app: IApplication) -> list[TestResult]:
+async def run_selected_tests(app: IApplication) -> list[TestResult]:
     engine = await app.make(ITestingEngine)
     engine.setStartDir("tests/unit")
     engine.setFilePattern("test_*.py")
@@ -237,7 +237,7 @@ También puedes declarar `engine: ITestingEngine` como parámetro de un componen
 from orionis.support.facades import Test
 
 
-async def runUnitSuite():
+async def run_unit_suite():
     engine = await Test.resolve()
     engine.setStartDir("tests/unit").setVerbosity(1).withoutPanel()
     return await Test.run()

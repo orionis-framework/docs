@@ -1,11 +1,78 @@
 ---
 title: "Release notes"
-description: "Orionis 1.0.8 through 1.1.0: bounded concurrency, batch APIs, logging queues, cache limits, and upgrade notes."
+description: "Orionis 1.0.8 through 1.3.0: SQL inspection, internal storage commands, API documentation, and upgrade notes."
 editUrl: true
 lastUpdated: false
 ---
 
-These notes cover **versions 1.0.8 through 1.1.0** and link to the updated usage guides. Run Reactor examples from the application root using its Python environment.
+These notes cover **versions 1.0.8 through 1.3.0** and link to the updated usage guides. Run Reactor examples from the application root using its Python environment.
+
+<a id="v1-3-0"></a>
+
+## 1.3.0: internal storage commands and API documentation
+
+Version **1.3.0** adds commands to prepare framework-owned storage, aligns method names with the framework convention, and corrects the generated API documentation. Python **3.14+** remains required.
+
+### Prepare internal storage
+
+The new `auth:migrate`, `cache:migrate`, `schedule:migrate`, and `session:migrate` commands join the existing `queue:migrate`. Each creates missing tables from the framework's definitions using the corresponding configuration. Run the commands for the storage your application needs:
+
+```bash
+python -B reactor auth:migrate
+python -B reactor cache:migrate
+python -B reactor queue:migrate
+python -B reactor schedule:migrate
+python -B reactor session:migrate
+```
+
+These commands preserve existing records and do not drop or alter existing tables. They do not create application migration files or write entries to the migration history. They do not accept `--database`: configure each storage connection before running them. See [database commands](/en/database/commands#internal-storage-commands) and [migration ownership and upgrades](/en/database/migrations#framework-storage-tables).
+
+The framework's reference application removes five redundant migrations and their five schema definitions for scheduler tasks, cache values, cache locks, sessions, and personal access tokens. It retains users, permissions, roles, their relationships, and password recovery without renumbering the remaining files. This cleanup does not automatically remove files from existing applications or from every skeleton. Review your own migrations before adopting the commands; preserve existing migration history and use an explicit application migration for any required schema change. The release changes did not modify existing databases or their migration history.
+
+### Method names and generated reference
+
+Class methods use `camelCase`, `_camelCase`, or `__camelCase`; functions outside classes use `snake_case`. Python special methods such as `__init__` retain their required names. When upgrading, review custom subclasses, overrides, and calls to renamed methods against the [API reference](https://api.orionis-framework.com/) and the [naming convention](/en/contribute/guide#naming-conventions).
+
+Framework docstrings were corrected and completed in NumPy style for Pydoctor. The API reference is built by `DOCS.ps1` in the framework repository and published at [api.orionis-framework.com](https://api.orionis-framework.com/). The [contribution guide](/en/contribute/guide#api-docstrings) explains the format and validation workflow. In `tests/test_http_compare.py`, all **57 functions and methods** now use NumPy docstrings with imperative summaries and no `Examples` sections; that last restriction applies to this test file, not to every API docstring.
+
+<a id="http-benchmark-1-3-0"></a>
+
+### HTTP benchmark correction
+
+The benchmark launcher now enables `TCP_NODELAY` on Uvicorn's listening socket before sharing it with multiple workers. This removes the TCP penalty observed for small responses in that setup. The correction was validated on Linux and belongs to the benchmark launcher, not to Orionis's production `serve` command.
+
+**The published benchmark graphs are still pending regeneration with this fix.** Do not treat the existing graphs as measurements of the corrected launcher or infer new throughput figures from this release. A new comparison requires rerunning the benchmark with the corrected launcher and the same workload and worker counts.
+
+Tests and documentation were updated, and the checks run for the release passed, including Ruff and diagnostics.
+
+### Upgrade to 1.3.0
+
+From the application root:
+
+```bash
+uv add "orionis==1.3.0"
+uv sync
+```
+
+For pip-managed environments, use `python -m pip install --upgrade "orionis==1.3.0"`. Updating the package does not rewrite application configuration, replace the skeleton, or execute storage commands. Review method names and storage configuration, regenerate [compiled configuration](/en/environment/compiled-configuration) if used, and restart application and worker processes. Run the storage commands explicitly when the corresponding tables are needed.
+
+<a id="v1-2-0"></a>
+
+## 1.2.0: inspect SQL without executing a query
+
+Model queries and `DB.table()` now expose synchronous `toSql(*, literal_binds=False) -> str`. The default output uses the selected dialect's placeholders. Use `literal_binds=True` to render supported values as SQL literals for debugging:
+
+```python
+from orionis.support.facades import DB
+
+query = DB.table("users").where("active", True)
+sql = query.toSql()
+debug_sql = query.toSql(literal_binds=True)
+```
+
+SQL compilation respects the connection's dialect and table prefix. For model queries it also includes applicable global scopes and the soft-delete filter. It works on a copy without executing the query or changing the original builder, so the builder can still be used afterward. A bootstrapped application or configured connection resolver is required to resolve the connection settings.
+
+Literal rendering is intended for inspection and may expose sensitive values; some types cannot be rendered and raise `QueryException`. Keep parameterized execution for application queries. See [`DB.table().toSql()`](/en/database/query-builder#api-tosql) and [model SQL inspection](/en/orm/querying#query-to-sql) for examples and limitations.
 
 <a id="v1-1-0"></a>
 

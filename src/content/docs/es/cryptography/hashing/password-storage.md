@@ -186,7 +186,7 @@ Configura `HASH_DRIVER=argon2` para las nuevas contraseñas. Cuando sepas que un
 from orionis.support.facades import Hash
 
 
-async def upgradeBcrypt(
+async def upgrade_bcrypt(
     candidate: str,
     stored_bcrypt_hash: str,
 ) -> tuple[bool, str | None]:
@@ -255,7 +255,7 @@ Este ejemplo fija valores en el archivo; para conservar la lectura de `.env`, ma
 from orionis.hashing.contracts import IHashManager
 
 
-async def encodePassword(hashing: IHashManager, password: str) -> str:
+async def encode_password(hashing: IHashManager, password: str) -> str:
     return await hashing.driver("argon2").make(
         password,
         rounds=3,
@@ -283,7 +283,7 @@ También puedes crear instancias independientes para pruebas, procesos específi
 from orionis.hashing import Argon2Hasher, BcryptHasher
 
 
-async def verifyWithIndependentHashers(
+async def verify_with_independent_hashers(
     candidate: str,
     argon2_hash: str,
     bcrypt_hash: str,

@@ -148,7 +148,7 @@ class ReportArchive:
         archived = await disk.move(source, f"archive/{report_id}.txt")
         return {"backup": backup.path(), "archive": archived.path()}
 
-    async def remove_backup(self, report_id: int) -> bool:
+    async def removeBackup(self, report_id: int) -> bool:
         return await Storage.disk("local").delete(f"backups/{report_id}.txt")
 ```
 
@@ -206,7 +206,7 @@ from orionis.support.facades import Storage
 
 
 class ReportTransfer:
-    async def copy_contents(self, source_disk: str, target_disk: str) -> str:
+    async def copyContents(self, source_disk: str, target_disk: str) -> str:
         source = Storage.disk(source_disk).file("reports/annual.csv")
         target = Storage.disk(target_disk).file("imports/annual.csv")
         await target.writeStream(source.readStream(), visibility="private")
@@ -252,7 +252,7 @@ from orionis.support.facades import Storage
 
 
 class StoredReportReader:
-    async def read_if_available(self, report_id: int) -> bytes | None:
+    async def readIfAvailable(self, report_id: int) -> bytes | None:
         report = Storage.disk("local").file(f"reports/{report_id}.txt")
         try:
             return await report.read()
@@ -427,15 +427,15 @@ from orionis.support.facades import Storage
 
 
 class ReportLinks:
-    async def public_link(self, disk_name: str) -> str:
+    async def publicLink(self, disk_name: str) -> str:
         return await Storage.disk(disk_name).file("reports/public.pdf").url()
 
-    async def private_link(self, disk_name: str) -> str:
+    async def privateLink(self, disk_name: str) -> str:
         report = Storage.disk(disk_name).file("reports/private.pdf")
         return await report.temporaryUrl(expires_in=300)
 ```
 
-Llama a `private_link()` con un disco cloud configurado y capaz de firmar, después de autorizar el acceso al reporte.
+Llama a `privateLink()` con un disco cloud configurado y capaz de firmar, después de autorizar el acceso al reporte.
 
 <a id="file-download"></a>
 
@@ -451,7 +451,7 @@ from orionis.support.facades import Storage
 
 
 class ReportExport:
-    async def inspect_download(self) -> str:
+    async def inspectDownload(self) -> str:
         report = Storage.disk("local").file("reports/annual.csv")
         with TemporaryDirectory() as destination:
             saved = await report.download(destination)
@@ -551,7 +551,7 @@ from orionis.support.facades import Storage
 
 
 class ReportCleanup:
-    async def remove_obsolete(self) -> bool:
+    async def removeObsolete(self) -> bool:
         obsolete = Storage.disk("local").directory("reports/obsolete")
         return await obsolete.delete()
 ```

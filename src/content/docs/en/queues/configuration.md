@@ -136,6 +136,8 @@ Although `sync` stores no pending work, its reservation is validated against tim
 | `queue` | `str`. | `QUEUE_DB_QUEUE`. | `"default"`. | Default logical channel. |
 | `retry_after` | `float` or `int`. | `QUEUE_DB_RETRY_AFTER`. | `90.0`. | Positive finite reservation ownership seconds. An unacknowledged job becomes eligible again when they expire. |
 
+Use [`queue:migrate`](/en/queues/drivers-and-configuration#command-migrate) to prepare every configured SQL queue and the central failure repository before workers start. It remains available in 1.3.0 alongside the other [internal storage commands](/en/database/migrations#framework-storage-tables), preserves data, and uses configured connections without a `--database` option.
+
 The table is created by the first operation needing its schema. Its primary key must enforce uniqueness; the driver rejects a connection without enforced unique constraints. See [SQL persistence](/en/queues/drivers-and-configuration#driver-database).
 
 <a id="config-redis"></a>

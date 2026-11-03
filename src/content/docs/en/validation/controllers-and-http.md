@@ -247,10 +247,10 @@ from orionis.schemas.validator import Schema as Validator
 
 
 class UserImportService:
-    async def validate_record(self, record: dict) -> CreateUserSchema:
+    async def validateRecord(self, record: dict) -> CreateUserSchema:
         return await Validator.validate(record, CreateUserSchema)
 ```
 
-The service's caller awaits `await service.validate_record(record)` in its own asynchronous context. Rules and exceptions stay the same; data selection and decoding depend on that entry point.
+The service's caller awaits `await service.validateRecord(record)` in its own asynchronous context. Rules and exceptions stay the same; data selection and decoding depend on that entry point.
 
 The [HTTP validation introduction](/en/http/validation) summarizes this flow. To extend payload checks, continue with the [rule catalog and examples](/en/validation/constraints-and-reference) and [custom rules](/en/validation/application-rules).

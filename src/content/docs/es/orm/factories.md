@@ -11,7 +11,7 @@ Cada factory mantiene su propio generador de datos, estados, cantidad e índice 
 
 ## Generar el archivo
 
-[Referencia de comandos de Database](/es/database/commands): sintaxis, argumentos y opciones de los 14 comandos, incluida inspección y borrado.
+[Referencia de comandos de Database](/es/database/commands): sintaxis, argumentos y opciones para migraciones de aplicación, almacenamiento interno, inspección y borrado.
 
 ```bash
 orionis make:factory ProductFactory --model Product

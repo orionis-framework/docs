@@ -219,11 +219,11 @@ class ExtensionLoader:
     def __init__(self, inspector: ModuleInspector) -> None:
         self.inspector = inspector
 
-    def string_type(self) -> type:
+    def stringType(self) -> type:
         return self.inspector.loadClass("orionis.support.types", "Stringable")
 
 
-assert ExtensionLoader(ModuleInspector()).string_type() is Stringable
+assert ExtensionLoader(ModuleInspector()).stringType() is Stringable
 ```
 
 [Inspeccionar un módulo importado](/es/utilities/introspection/modules) · [Aplicación y contenedor](/es/application).

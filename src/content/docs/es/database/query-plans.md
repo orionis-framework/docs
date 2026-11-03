@@ -15,6 +15,32 @@ flowchart LR
   S --> D["Driver"]
 ```
 
+<a id="plan-to-sql"></a>
+
+## Inspeccionar un plan sin ejecutarlo
+
+Desde **1.2.0**, `Connection.toSql(plan, *, literal_binds=False) -> str` compila un `SelectPlan` de forma síncrona con el dialecto y el prefijo de tablas de la conexión. No crea un engine ni abre una conexión a la base de datos; tampoco ejecuta SQL ni cambia el plan. La tabla no necesita existir, por lo que este ejemplo funciona sin inicializar la aplicación:
+
+```python
+from orionis.database import Connection
+from orionis.orm.query.expressions import SelectPlan, WhereClause
+from orionis.orm.schema.table import TableDefinition
+
+connection = Connection(
+    "debug", {"driver": "sqlite", "database": ":memory:", "prefix": "app_"}
+)
+plan = SelectPlan(
+    table=TableDefinition(name="products"),
+    wheres=[WhereClause("id", value=1)],
+)
+sql = connection.toSql(plan)
+debug_sql = connection.toSql(plan, literal_binds=True)
+```
+
+La salida predeterminada conserva los placeholders del dialecto; `literal_binds=True` representa los valores literales compatibles para depuración. Consulta la [firma y los errores de Connection](/es/database/runtime-api#connection-tosql) para conocer las limitaciones de dependencias y valores literales.
+
+Si partes de un builder, utiliza [`query.toSql()`](/es/database/query-builder#api-tosql). Prepara un clon antes de compilar e incorpora los scopes globales y los filtros de eliminación lógica de los modelos. `toPlan()` devuelve el plan vivo sin esa preparación; entregarlo directamente a `Connection.toSql()` compila únicamente las cláusulas ya presentes. El método de la conexión acepta un plan SELECT, no `InsertPlan`, `UpdatePlan` ni `DeletePlan`.
+
 ## Ejecutar un plan
 
 El servicio siguiente recibe el manager por constructor. Requiere una aplicación inicializada y la tabla products creada. `Connection.select(plan)` devuelve una lista de diccionarios; es distinto de `RawQueryBuilder.get()`, que devuelve `Collection`.

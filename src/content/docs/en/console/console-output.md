@@ -248,14 +248,14 @@ class ProcessExitCommand(BaseCommand):
     signature = 'app:process-exit'
     description = 'Demonstrate inherited command output.'
 
-    def terminate_process(self, success: bool) -> None:
+    def terminateProcess(self, success: bool) -> None:
         if success:
             self.exitSuccess()
         else:
             self.exitError()
 ```
 
-Defining the class does not run the `terminate_process()` helper; it terminates the process only when called. Optional messages require the same booted application as other timestamped output. Do not call these methods from a programmatically invoked command when the calling process must continue.
+Defining the class does not run the `terminateProcess()` helper; it terminates the process only when called. Optional messages require the same booted application as other timestamped output. Do not call these methods from a programmatically invoked command when the calling process must continue.
 
 <a id="executor"></a>
 <a id="executor-running"></a>

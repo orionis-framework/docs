@@ -13,17 +13,17 @@ El recorrido habitual es: iniciar sesión en la aplicación, emitir un token des
 
 El modelo configurado en `auth.identity.model` debe implementar `IAuthenticatable` y `IAuthorizable`. En un modelo ORM se consigue con los mixins `Authenticatable` y `Authorizable` de `orionis.auth`; el modelo `User` predeterminado ya los incluye. El token conserva tanto el identificador como el tipo del propietario, derivado de `getAuthorizableType()`.
 
-La aplicación incluye la migración `m0000000011_create_personal_access_tokens_table.py`, que crea `personal_access_tokens`. Con la conexión de base de datos configurada, aplica las migraciones pendientes mediante cualquiera de estas alternativas:
+Desde 1.3.0, prepara los tokens con `auth:migrate` después de configurar la conexión SQL predeterminada y `auth.tokens.table` (`AUTH_TOKEN_TABLE`, predeterminado `personal_access_tokens`). Ejecuta una de estas alternativas desde la raíz del proyecto:
 
 ```bash
-orionis migrate
+orionis auth:migrate
 ```
 
 ```bash
-python -B reactor migrate
+python -B reactor auth:migrate
 ```
 
-Estos comandos aplican todas las migraciones pendientes. Si cambias `auth.tokens.table`, también debes disponer de una tabla con el esquema correspondiente; cambiar el nombre en la configuración no modifica la migración existente.
+El comando crea la tabla faltante desde la definición de tokens de Orionis, respetando el nombre configurado y el prefijo de la conexión SQL. Exige restricciones de unicidad efectivas, no admite `--database` y conserva los tokens existentes al repetirlo. No importa migraciones de aplicación ni registra historial. Cambiar la tabla configurada no traslada tokens existentes ni modifica esquemas incompatibles. Usuarios, roles, permisos y recuperación de contraseñas siguen usando sus migraciones de aplicación; consulta [almacenamiento interno y proyectos existentes](/es/database/migrations#framework-storage-tables).
 
 ## Emitir un token desde el navegador
 

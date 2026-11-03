@@ -179,7 +179,7 @@ Utiliza las aserciones heredadas para explicar qué condición debe cumplirse. P
 from orionis.test import TestCase
 
 
-async def parseQuantity(value: str) -> int:
+async def parse_quantity(value: str) -> int:
     return int(value)
 
 
@@ -187,11 +187,11 @@ class TestQuantities(TestCase):
     async def testValidQuantities(self) -> None:
         for text, expected in [("0", 0), ("12", 12)]:
             with self.subTest(text=text):
-                self.assertEqual(await parseQuantity(text), expected)
+                self.assertEqual(await parse_quantity(text), expected)
 
     async def testInvalidQuantity(self) -> None:
         with self.assertRaises(ValueError) as captured:
-            await parseQuantity("invalid")
+            await parse_quantity("invalid")
         self.assertIsInstance(captured.exception, ValueError)
 ```
 

@@ -77,6 +77,7 @@ Similar names do not imply that all Laravel methods or arguments exist in Orioni
 | `Product.query()` | Class method creating a fresh builder. |
 | `Product.where(...)`, `Product.orderBy(...)`, `Product.paginate(...)` | Metaclass shortcuts to supported methods of a new builder. They do not share a global builder. |
 | `query.where(...)`, `query.select(...)` | Synchronous configuration of the same mutable builder. |
+| `query.toSql()` / `Product.toSql()` | Synchronous SQL inspection without executing a query or changing the builder. |
 | `await query.get()` / `await query.update(...)` | Execution over rows matching that plan. |
 | `await product.save()` / `await product.update(...)` | Instance persistence with attribute tracking and events. |
 
@@ -98,6 +99,27 @@ Not every builder name is a class shortcut. For instance, use `Product.query().a
 The same clauses work with `DB.table()` and `Model.query()`, with different result representations. `DB.table()` returns dictionaries without applying model configuration. Qualify joined tables and columns; retain primary and relationship keys if the model will later save or load associations. Partial selection does not hydrate omitted columns automatically.
 
 Values are bound as parameters. Identifiers, operators and SQL fragments remain the application's responsibility. Conditions combine left to right: explicitly group alternatives to control logical meaning.
+
+<a id="query-to-sql"></a>
+
+## Inspect model SQL
+
+Since **1.2.0**, `toSql(*, literal_binds=False) -> str` renders the current SELECT synchronously, using the model connection's dialect and table prefix. Call it without `await`; it does not create an engine, open a database connection or execute SQL. It needs the application initialized or `ConnectionResolver` configured, but the table need not exist.
+
+```python
+from app.models.product import Product
+
+query = Product.where("active", True).whereIn("id", [1, 2]).limit(10)
+sql = query.toSql()
+debug_sql = query.toSql(literal_binds=True)
+default_sql = Product.toSql()
+```
+
+The default output keeps dialect-specific placeholders and expands `IN` parameters. `literal_binds=True` includes values escaped by the dialect for debugging; it can expose sensitive data and raise `QueryException` for unsupported literal types. See the [complete `toSql()` reference](/en/database/query-builder#api-tosql), which also covers `DB.table()`.
+
+Global scopes and soft-delete filters are applied on a clone. Inspection preserves the original plan and does not mark its scopes as applied, so you can still adjust `withoutGlobalScope(...)`, `withTrashed()` or `onlyTrashed()` before execution. With soft deletes enabled, the default SQL excludes deleted rows; `withTrashed()` removes that automatic filter and `onlyTrashed()` selects deleted rows. Explicit filters and local scopes already in the builder remain part of its SQL.
+
+The output describes the current SELECT only. It does not include additional eager-loading or pagination queries, anticipate changes by later terminals such as `count()` or `first()`, or compile writes.
 
 ## Reuse a query
 

@@ -7,7 +7,7 @@ lastUpdated: false
 
 `DB.table("products")` crea un `RawQueryBuilder` nuevo. `Model.query()` crea un `ModelQueryBuilder` que comparte sus cláusulas; cambia cómo hidrata, serializa y aplica políticas del modelo. Las cláusulas devuelven el mismo builder y son síncronas: espera únicamente los terminales asíncronos.
 
-Los ejemplos de esta referencia requieren una aplicación iniciada y tablas ya creadas. Usa las columnas del [modelo Product](/es/orm/factories#modelo-y-factory-completos) para `products`; los joins también requieren `categories` con `id` y `name`. La guía de [testing](/es/orm/testing) muestra cómo preparar una base aislada con sus propios modelos de ejemplo. Los bloques son funciones de servicio/controlador o consultas que puedes ejecutar dentro de una acción `async`. Los ejemplos de escritura modifican esas tablas de ejemplo.
+Los ejemplos de ejecución requieren una aplicación iniciada y tablas ya creadas; [`toSql()`](/es/database/query-builder#api-tosql) solo compila la consulta y no requiere que la tabla exista. Usa las columnas del [modelo Product](/es/orm/factories#modelo-y-factory-completos) para `products`; los joins también requieren `categories` con `id` y `name`. La guía de [testing](/es/orm/testing) muestra cómo preparar una base aislada con sus propios modelos de ejemplo. Los bloques son funciones de servicio/controlador o consultas que puedes ejecutar dentro de una acción `async`. Los ejemplos de escritura modifican esas tablas de ejemplo.
 
 No compartas un builder mutable entre peticiones o tareas. El gateway `DB` sí es compartido: crea un builder para cada consulta y usa `clone()` para ramificar.
 
@@ -87,6 +87,47 @@ El significado del calificador depende del motor: en PostgreSQL representa un es
 Para filtrar, unir y escribir continúa con [condiciones](/es/database/query-filters), [joins](/es/database/joins-and-subqueries) y [escrituras](/es/database/query-writes).
 
 ## Referencia por operación
+
+<a id="api-tosql"></a>
+
+### `toSql()`
+
+```text
+toSql(*, literal_binds: bool = False) -> str
+```
+
+Disponible desde **1.2.0**. Compila el SELECT actual como una cadena para depuración. Es síncrono: se llama **sin `await`** sobre un builder de `DB.table()` o de modelos. No ejecuta SQL, no crea un engine ni abre una conexión a la base de datos. Los builders requieren una aplicación inicializada o un `ConnectionResolver` configurado para resolver la configuración de su conexión; la tabla no necesita existir.
+
+```python
+from orionis.support.facades import DB
+
+query = (
+    DB.table("products")
+    .select("id", "name", "price")
+    .where("active", True)
+    .whereIn("id", [1, 2])
+    .orderBy("id")
+    .limit(10)
+)
+
+sql = query.toSql()
+debug_sql = query.toSql(literal_binds=True)
+```
+
+| Opción | Salida |
+| --- | --- |
+| `literal_binds=False` (predeterminado) | SQL con los placeholders del dialecto seleccionado; expande parámetros como las listas de `IN`. |
+| `literal_binds=True` | SQL con los valores compatibles representados y escapados por el dialecto para inspección. |
+
+Ambas formas respetan el dialecto y el prefijo de tablas de la conexión seleccionada, incluidos esquemas y alias. Por eso, la forma de los placeholders, el entrecomillado y la sintaxis de paginación pueden variar entre motores. El resultado es un `str`, no un par de SQL y bindings.
+
+La compilación utiliza un clon y conserva el builder original y su plan. Las [consultas de modelos](/es/orm/querying#query-to-sql) también aplican sus scopes globales y la visibilidad de eliminación lógica a ese clon. `DB.table()` no tiene scopes ni políticas de eliminación lógica de modelos que aplicar.
+
+La cadena describe el **SELECT actual**. No anticipa cambios de un terminal posterior, como el límite que añade `first()` o la proyección que utiliza `count()`. Tampoco incluye consultas adicionales de eager loading o paginación ni compila inserciones, actualizaciones o eliminaciones.
+
+La salida literal puede contener valores sensibles. Consérvala en salidas de depuración controladas y sigue ejecutando consultas parametrizadas. Algunos tipos, como JSON o valores personalizados sin representación literal para ese dialecto, no se pueden compilar con `literal_binds=True`.
+
+**Errores:** `InvalidQueryException` si no hay una tabla seleccionada; `QueryException` ante fallos de compilación del SQL o sus valores literales; `MissingDatabaseDependencyException` si falta un dialecto requerido. Resolver la conexión también puede lanzar `OrmConfigurationException` antes de inicializar la aplicación o `ConnectionNotFoundException` para un nombre desconocido.
 
 <a id="api-toplan"></a>
 

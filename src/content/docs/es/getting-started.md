@@ -33,7 +33,8 @@ Foundation también define entidades congeladas para cada subsistema, metadata c
 
 ## Recorrido del módulo
 
-- [Notas de versión: cambios de 1.0.8 a 1.1.0](/es/getting-started/release-notes)
+- [Notas de versión: cambios hasta 1.3.0](/es/getting-started/release-notes)
+- [Referencia de API: clases, métodos y firmas](https://api.orionis-framework.com/)
 - [Arquitectura y ciclo de vida de la aplicación](/es/getting-started/architecture-and-lifecycle)
 - [Ciclo de vida y recursos de aplicación](/es/application/lifecycle)
 - [Configuración tipada y valores en ejecución](/es/application/configuration)

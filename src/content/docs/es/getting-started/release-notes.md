@@ -1,11 +1,78 @@
 ---
 title: "Notas de versión"
-description: "Cambios de Orionis 1.0.8 a 1.1.0: concurrencia limitada, APIs por lotes, colas de logging, límites de caché y actualización."
+description: "Cambios de Orionis 1.0.8 a 1.3.0: inspección SQL, comandos de almacenamiento interno, documentación de la API y actualización."
 editUrl: true
 lastUpdated: false
 ---
 
-Estas notas reúnen los cambios de las versiones **1.0.8 a 1.1.0** y enlazan las guías de uso actualizadas. Los ejemplos de Reactor se ejecutan desde la raíz de la aplicación con su entorno de Python.
+Estas notas reúnen los cambios de las versiones **1.0.8 a 1.3.0** y enlazan las guías de uso actualizadas. Los ejemplos de Reactor se ejecutan desde la raíz de la aplicación con su entorno de Python.
+
+<a id="v1-3-0"></a>
+
+## 1.3.0: comandos de almacenamiento interno y documentación de la API
+
+La versión **1.3.0** añade comandos para preparar el almacenamiento propio del framework, ajusta nombres de métodos a su convención y corrige la documentación generada de la API. Se mantiene el requisito de **Python 3.14+**.
+
+### Preparar el almacenamiento interno
+
+Los nuevos comandos `auth:migrate`, `cache:migrate`, `schedule:migrate` y `session:migrate` se suman al existente `queue:migrate`. Cada uno crea las tablas faltantes desde las definiciones del framework y utiliza la configuración correspondiente. Ejecuta los comandos del almacenamiento que necesite tu aplicación:
+
+```bash
+python -B reactor auth:migrate
+python -B reactor cache:migrate
+python -B reactor queue:migrate
+python -B reactor schedule:migrate
+python -B reactor session:migrate
+```
+
+Estos comandos preservan los registros existentes y no eliminan ni alteran tablas existentes. Tampoco crean archivos de migración de aplicación ni escriben entradas en el historial de migraciones. No aceptan `--database`: configura la conexión de cada almacenamiento antes de ejecutarlos. Consulta los [comandos de base de datos](/es/database/commands#internal-storage-commands) y la [gestión de migraciones al actualizar](/es/database/migrations#framework-storage-tables).
+
+La aplicación de referencia del framework elimina cinco migraciones redundantes y sus cinco definiciones de schema para tareas programadas, valores de caché, bloqueos de caché, sesiones y tokens de acceso personal. Conserva usuarios, permisos, roles, sus relaciones y recuperación de contraseñas, sin renumerar los archivos restantes. Esta limpieza no elimina automáticamente archivos de aplicaciones existentes ni de todos los skeletons. Revisa tus migraciones antes de adoptar los comandos; conserva el historial existente y utiliza una migración de aplicación explícita cuando necesites modificar un schema. Los cambios de esta versión no modificaron las bases de datos existentes ni su historial de migraciones.
+
+### Nombres de métodos y referencia generada
+
+Los métodos de clase utilizan `camelCase`, `_camelCase` o `__camelCase`; las funciones fuera de clases utilizan `snake_case`. Los métodos especiales de Python, como `__init__`, conservan sus nombres obligatorios. Al actualizar, revisa subclases propias, sobrescrituras y llamadas a métodos renombrados con la [referencia de la API](https://api.orionis-framework.com/) y la [convención de nombres](/es/contribute/guide#naming-conventions).
+
+Se corrigieron y completaron los docstrings del framework al estilo NumPy para Pydoctor. La referencia de la API se compila mediante `DOCS.ps1` en el repositorio del framework y se publica en [api.orionis-framework.com](https://api.orionis-framework.com/). La [guía de contribución](/es/contribute/guide#api-docstrings) explica el formato y la validación. En `tests/test_http_compare.py`, las **57 funciones y métodos** utilizan ahora docstrings NumPy con resúmenes imperativos y sin secciones `Examples`; esta última restricción corresponde a ese archivo de pruebas, no a todos los docstrings de la API.
+
+<a id="http-benchmark-1-3-0"></a>
+
+### Corrección del benchmark HTTP
+
+El lanzador del benchmark activa ahora `TCP_NODELAY` en el socket de escucha de Uvicorn antes de compartirlo entre varios workers. Esto elimina la penalización TCP detectada para respuestas pequeñas en esa configuración. La corrección se validó en Linux y pertenece al lanzador del benchmark, no al comando `serve` de producción de Orionis.
+
+**Las gráficas publicadas del benchmark siguen pendientes de regeneración con esta corrección.** Las gráficas existentes no deben interpretarse como mediciones del lanzador corregido ni permiten deducir nuevas cifras de rendimiento para esta versión. Una nueva comparación requiere ejecutar de nuevo el benchmark con el lanzador corregido y la misma carga y cantidad de workers.
+
+Se actualizaron las pruebas y la documentación. Las validaciones ejecutadas para la versión pasaron, incluidos Ruff y los diagnósticos.
+
+### Actualizar a 1.3.0
+
+Desde la raíz de la aplicación:
+
+```bash
+uv add "orionis==1.3.0"
+uv sync
+```
+
+Para entornos administrados con pip, usa `python -m pip install --upgrade "orionis==1.3.0"`. Actualizar el paquete no reescribe la configuración de la aplicación, reemplaza el skeleton ni ejecuta comandos de almacenamiento. Revisa los nombres de métodos y la configuración de almacenamiento, regenera la [configuración compilada](/es/environment/compiled-configuration) si la utilizas y reinicia los procesos de aplicación y workers. Ejecuta explícitamente los comandos de almacenamiento cuando necesites sus tablas.
+
+<a id="v1-2-0"></a>
+
+## 1.2.0: inspeccionar SQL sin ejecutar una consulta
+
+Las consultas de modelos y `DB.table()` incorporan `toSql(*, literal_binds=False) -> str`, un método síncrono. La salida predeterminada utiliza los placeholders del dialecto seleccionado. Usa `literal_binds=True` para representar los valores admitidos como literales SQL durante la depuración:
+
+```python
+from orionis.support.facades import DB
+
+query = DB.table("users").where("active", True)
+sql = query.toSql()
+debug_sql = query.toSql(literal_binds=True)
+```
+
+La compilación respeta el dialecto y el prefijo de tablas de la conexión. En consultas de modelos también incorpora los scopes globales aplicables y el filtro de borrado lógico. Trabaja sobre una copia sin ejecutar la consulta ni cambiar el builder original, que puedes seguir utilizando después. Requiere una aplicación inicializada o un resolvedor de conexiones configurado para obtener los ajustes de conexión.
+
+La representación literal sirve para inspección y puede exponer valores sensibles; algunos tipos no pueden representarse y provocan `QueryException`. Mantén la ejecución parametrizada en las consultas de la aplicación. Consulta [`DB.table().toSql()`](/es/database/query-builder#api-tosql) y la [inspección SQL de modelos](/es/orm/querying#query-to-sql) para ver ejemplos y limitaciones.
 
 <a id="v1-1-0"></a>
 

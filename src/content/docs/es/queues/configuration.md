@@ -136,6 +136,8 @@ Aunque `sync` no almacena pendientes, su reserva se valida contra el timeout igu
 | `queue` | `str`. | `QUEUE_DB_QUEUE`. | `"default"`. | Canal lógico predeterminado. |
 | `retry_after` | `float` o `int`. | `QUEUE_DB_RETRY_AFTER`. | `90.0`. | Segundos positivos y finitos de propiedad de una reserva. Un job sin confirmación vuelve a ser elegible al vencerla. |
 
+Usa [`queue:migrate`](/es/queues/drivers-and-configuration#command-migrate) para preparar todas las colas SQL configuradas y el repositorio central de fallos antes de arrancar workers. Continúa disponible en 1.3.0 junto a los demás [comandos de almacenamiento interno](/es/database/migrations#framework-storage-tables), conserva datos y utiliza las conexiones configuradas sin opción `--database`.
+
 La tabla se crea en la primera operación que necesita el esquema. Su clave primaria debe imponer unicidad; una conexión sin restricciones únicas impuestas es rechazada por el driver. Más información en [persistencia SQL](/es/queues/drivers-and-configuration#driver-database).
 
 <a id="config-redis"></a>

@@ -1,11 +1,11 @@
 ---
 title: "Comandos incluidos"
-description: "Catálogo completo de los 68 comandos nativos de Orionis, organizado por tarea y vinculado a cada referencia de argumentos y opciones."
+description: "Catálogo completo de los 72 comandos nativos de Orionis, organizado por tarea y vinculado a cada referencia de argumentos y opciones."
 editUrl: true
 lastUpdated: false
 ---
 
-El registro nativo de Reactor incluye **68 comandos**. Las referencias de esta sección cubren sus argumentos, opciones, valores predeterminados, efectos y ejemplos de ejecución. La aplicación puede incorporar firmas adicionales mediante clases y [rutas de consola](/es/console/command-routing).
+El registro nativo de Reactor incluye **72 comandos**. Las referencias de esta sección cubren sus argumentos, opciones, valores predeterminados, efectos y ejemplos de ejecución. La aplicación puede incorporar firmas adicionales mediante clases y [rutas de consola](/es/console/command-routing).
 
 Ejecuta los comandos desde la raíz del proyecto. El comando directo y el archivo local comparten el mismo registro y ciclo de ejecución:
 
@@ -27,6 +27,7 @@ python -B reactor make:console-command --help
 | [Comandos de aplicación y mantenimiento](/es/console/built-in-application) | 16 | Servidor, pruebas, inspección, limpieza, claves y paquetes. |
 | [Comandos de bases de datos](/es/console/built-in-database) | 11 | Inspección, migraciones, reversión, seeders y borrado. |
 | [Comandos de workers y scheduler](/es/console/built-in-workers) | 10 | Preparación de tablas de colas, workers, operaciones sobre fallos, scheduler y MCP. |
+| [Comandos adicionales de almacenamiento interno](/es/database/commands#internal-storage-commands) | 4 | Tablas de tokens, cache, scheduler y sesiones; la preparación de colas sigue en la referencia de workers. |
 | [Bootstrap y recuperación del proyecto](/es/console/built-in-bootstrap) | 7 | Habilitar contextos y recuperar configuración faltante. |
 
 ## Índice de firmas
@@ -36,6 +37,7 @@ Cada enlace lleva a las opciones y ejemplos completos de ese comando.
 | Comando | Propósito |
 |---|---|
 | [`about`](/es/console/built-in-application#command-about) | Muestra metadatos del framework instalado. |
+| [`auth:migrate`](/es/database/commands#auth-migrate) | Crea el almacenamiento faltante de tokens personales. |
 | [`bootstrap:ai`](/es/console/built-in-bootstrap#command-bootstrap-ai) | Habilita rutas de servidores MCP. |
 | [`bootstrap:api`](/es/console/built-in-bootstrap#command-bootstrap-api) | Habilita el contexto de rutas API. |
 | [`bootstrap:config`](/es/console/built-in-bootstrap#command-bootstrap-config) | Restaura archivos oficiales de configuración faltantes. |
@@ -43,6 +45,7 @@ Cada enlace lleva a las opciones y ejemplos completos de ese comando.
 | [`bootstrap:lifespan`](/es/console/built-in-bootstrap#command-bootstrap-lifespan) | Crea e integra callbacks del ciclo de vida. |
 | [`bootstrap:web`](/es/console/built-in-bootstrap#command-bootstrap-web) | Habilita el contexto de rutas web. |
 | [`bootstrap:websocket`](/es/console/built-in-bootstrap#command-bootstrap-websocket) | Habilita las rutas WebSocket. |
+| [`cache:migrate`](/es/database/commands#cache-migrate) | Crea las tablas SQL faltantes de cache y locks. |
 | [`clear:cache`](/es/console/built-in-application#command-clear-cache) | Vacía el store de caché predeterminado. |
 | [`clear:logs`](/es/console/built-in-application#command-clear-logs) | Elimina los archivos de log del framework. |
 | [`clear:testing`](/es/console/built-in-application#command-clear-testing) | Borra los resultados de pruebas guardados en caché. |
@@ -98,9 +101,11 @@ Cada enlace lleva a las opciones y ejemplos completos de ese comando.
 | [`queue:work`](/es/console/built-in-workers#command-queue-work) | Consume jobs persistidos en una conexión de colas. |
 | [`route:list`](/es/console/built-in-application#command-route-list) | Inspecciona las rutas HTTP registradas. |
 | [`schedule:list`](/es/console/built-in-workers#command-schedule-list) | Inspecciona las tareas definidas por el scheduler. |
+| [`schedule:migrate`](/es/database/commands#schedule-migrate) | Crea la tabla nativa del scheduler sin arrancar tareas. |
 | [`schedule:work`](/es/console/built-in-workers#command-schedule-work) | Inicia el proceso del scheduler. |
 | [`seed`](/es/console/built-in-database#command-seed) | Ejecuta los seeders pendientes. |
 | [`serve`](/es/console/built-in-application#command-serve) | Inicia el servidor HTTP Granian de la aplicación. |
+| [`session:migrate`](/es/database/commands#session-migrate) | Crea la tabla SQL configurada para sesiones. |
 | [`test`](/es/console/built-in-application#command-test) | Ejecuta las pruebas de la aplicación. |
 | [`up`](/es/console/built-in-application#command-up) | Desactiva el estado de mantenimiento HTTP. |
 

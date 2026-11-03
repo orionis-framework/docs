@@ -132,7 +132,7 @@ from faker.providers import BaseProvider
 
 
 class ProductCodeProvider(BaseProvider):
-    def product_code(self, prefix: str = "P") -> str:
+    def productCode(self, prefix: str = "P") -> str:
         return f"{prefix}-{self.generator.random_int(min=1000, max=9999)}"
 
 
@@ -271,7 +271,7 @@ from faker.providers import BaseProvider
 
 
 class ProductCodeProvider(BaseProvider):
-    def product_code(self, prefix: str = "P") -> str:
+    def productCode(self, prefix: str = "P") -> str:
         return f"{prefix}-{self.generator.random_int(min=1000, max=9999)}"
 
 

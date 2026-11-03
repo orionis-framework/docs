@@ -7,9 +7,41 @@ lastUpdated: false
 
 Migrations are asynchronous classes describing ordered physical changes. up applies a change and down describes its reversal. Every applied file is recorded in the migrations table on the same connection. [Seeders](/en/database/seeders) have separate history and run after the schema is ready.
 
+<a id="framework-storage-tables"></a>
+
+## Prepare framework storage tables
+
+Since 1.3.0, `auth:migrate`, `cache:migrate`, `schedule:migrate`, and `session:migrate` prepare internal SQL storage alongside the existing `queue:migrate`. They create missing tables from definitions shipped in Orionis, independently of application migrations. They neither discover files under `database/` nor add entries to the `migrations` history.
+
+| Command | Configured tables | SQL connection |
+|---|---|---|
+| [`auth:migrate`](/en/database/commands#auth-migrate) | `AUTH_TOKEN_TABLE` (`personal_access_tokens`) | Application default connection. |
+| [`cache:migrate`](/en/database/commands#cache-migrate) | `DB_CACHE_TABLE` (`cache`) and `DB_CACHE_LOCK_TABLE` (`cache_locks`) | `DB_CACHE_CONNECTION`. |
+| [`queue:migrate`](/en/database/commands#queue-migrate) | Every configured SQL queue table, including `QUEUE_TABLE` (`jobs`), plus `QUEUE_FAILED_TABLE` (`failed_jobs`) | Each queue's SQL connection, including `QUEUE_DB_CONNECTION`, and `QUEUE_FAILED_DB_CONNECTION` for failures. |
+| [`schedule:migrate`](/en/database/commands#schedule-migrate) | `DB_TASK_TABLE` (`scheduler_tasks`) | `DB_TASK_CONNECTION`. |
+| [`session:migrate`](/en/database/commands#session-migrate) | `SESSION_DB_TABLE` (`sessions`) | `SESSION_DB_CONNECTION`. |
+
+Connection values are names declared in `config/database.py`; omitted optional connections use the default. Run the relevant command from the application root, for example:
+
+```shell
+python -B reactor auth:migrate
+```
+
+These commands accept only `-h`/`--help`, **not `--database`**. Configure their destination before executing them. They can prepare SQL storage even when the corresponding active driver uses memory, files, Redis, or `sync`; cache and scheduler still require their `stores.database` configuration. They do not start workers, execute scheduled tasks, or switch the active driver.
+
+Token, cache, queue, and session table names respect their SQL connection's prefix. Scheduler storage uses the native APScheduler schema and indexes, taking `DB_TASK_TABLE` directly without applying that prefix. The connection needs the required DDL permissions and backend guarantees, including enforced unique constraints.
+
+Rerunning a command preserves existing rows and tables. It does not run `DROP` or `ALTER`, repair incompatible schemas, or relocate existing data after a configuration change. Use an explicit application migration for a deliberate schema change. Successful preparation returns `0`; a reported storage or configuration failure returns `1`.
+
+### Existing projects and the 1.3.0 cleanup
+
+The framework's reference application removed five duplicate migration files: `m0000000001_create_scheduler_tasks_table.py`, `m0000000002_create_cache_table.py`, `m0000000003_create_cache_locks_table.py`, `m0000000004_create_sessions_table.py`, and `m0000000011_create_personal_access_tokens_table.py`, together with their five corresponding `_v1.py` schemas. Users, permissions, roles, their association tables, and password recovery retain their application migrations and original numbers. Queue preparation remains provided by `queue:migrate`.
+
+That source cleanup does not alter existing databases or migration history. An existing project or skeleton may still contain those files: retain already-applied migrations and their schemas so rollback can resolve their identities. Do not renumber the remaining files or clear history to adopt these commands. New storage can be prepared with the commands above; business tables continue to use `migrate`.
+
 ## Generating a migration
 
-[Database command reference](/en/database/commands): syntax, arguments and options for all 14 commands, including inspection and wiping.
+[Database command reference](/en/database/commands): syntax, arguments and options for application migrations, internal storage, inspection and wiping.
 
 ```shell
 orionis make:database-migration create_flags
@@ -50,7 +82,7 @@ Discovery is cached on each `Migrator` instance. A new process sees new files. D
 
 ## Every command and option
 
-Run from the project root using orionis <command> or python -B reactor <command>. Shared options are --database NAME or -d NAME (optional str, None selects the default connection) and -h/--help. The name must be declared in config/database.py.
+Run the application migration commands below from the project root using orionis <command> or python -B reactor <command>. Their shared options are --database NAME or -d NAME (optional str, None selects the default connection) and -h/--help. The name must be declared in config/database.py. The internal storage commands above do not accept --database.
 
 | Command | Specific options | Result |
 |---|---|---|

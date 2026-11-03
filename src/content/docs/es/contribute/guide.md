@@ -115,19 +115,36 @@ Orionis sigue convenciones propias de estilo, alineadas con frameworks web moder
 - **Anotaciones de tipos**: Todos los parámetros y valores de retorno deben estar tipados con *type hints*.
 - **Legibilidad**: El código debe ser claro, coherente y seguir las convenciones del proyecto.
 
+<a id="naming-conventions"></a>
+
 ### Convención de nomenclatura
+
+La versión 1.3.0 aplica la siguiente convención en los directorios `orionis/` y `tests/` del framework, incluidos métodos asíncronos, estáticos, de clase y de pruebas:
 
 | Elemento | Convención | Ejemplo |
 |---|---|---|
 | Clases | *PascalCase* | `EmailService` |
-| Métodos | *camelCase* | `sendEmail` |
-| Funciones | *snake_case* | `validate_input` |
+| Métodos públicos | *camelCase* | `sendEmail` |
+| Métodos internos | `_camelCase` | `_prepareMessage` |
+| Métodos privados | `__camelCase` | `__signMessage` |
+| Funciones fuera de clases | *snake_case* | `validate_input` |
 | Constantes | *UPPER_SNAKE_CASE* | `MAX_RETRIES` |
+
+Las funciones definidas dentro de otra función o método también usan `snake_case`. Esta regla afecta a las definiciones de funciones y métodos; no cambia nombres de parámetros, variables locales, campos de datos, claves de configuración ni tablas de base de datos.
+
+Conserva los nombres de los protocolos de Python, como `__init__`, `__call__` y `__aenter__`. Cuando una integración exige un nombre específico para un callback, implementa el método en camelCase y expón el nombre requerido mediante un alias. No renombres métodos de bibliotecas externas.
+
+Al adaptar una extensión a 1.3.0, consulta la [referencia de API](https://api.orionis-framework.com/) actual y actualiza conjuntamente definiciones, llamadas, búsquedas por nombre y dobles de prueba. Ejecuta la comprobación de nombres desde la raíz del repositorio del framework:
+
+```bash
+uv run --group dev python -m unittest tests.test_naming_conventions
+```
 
 ### Ejemplo: clase con método
 
 ```python
 class EmailService:
+    """Envía notificaciones por correo electrónico."""
 
     def sendNotification(self, recipient: str, subject: str) -> bool:
         """
@@ -169,6 +186,53 @@ def parse_config_file(file_path: str, encoding: str = "utf-8") -> dict:
     """
     return {}
 ```
+
+---
+
+<a id="api-docstrings"></a>
+
+## Referencia de API y docstrings NumPy
+
+La [referencia de API](https://api.orionis-framework.com/) documenta clases, métodos, parámetros y valores de retorno del framework. Su fuente son los docstrings del directorio `orionis/` del repositorio del framework. Aplica el mismo estilo NumPy a `tests/`; el manual de este repositorio de documentación explica cómo utilizar esas APIs.
+
+Inicia cada docstring con un resumen breve e imperativo. Conserva los encabezados de sección en formato NumPy, con su subrayado y las descripciones indentadas:
+
+- `Parameters`: utiliza los nombres reales de los parámetros y describe sus tipos, valores predeterminados y significado.
+- `Returns`: documenta el tipo devuelto y su significado. Una entrada `None` también necesita descripción.
+- `Yields`: describe los valores producidos por generadores.
+- `Raises`: describe las excepciones relevantes y las condiciones que las provocan.
+- `Attributes`: describe los campos de clases o dataclasses cuando corresponda.
+
+Por ejemplo, un constructor puede documentar su efecto explícitamente:
+
+```python
+class DatabaseClient:
+    """Guarda la base de datos seleccionada por la aplicación."""
+
+    def __init__(self, database: str) -> None:
+        """
+        Inicializa el cliente de base de datos.
+
+        Parameters
+        ----------
+        database : str
+            Nombre de la base de datos que se utilizará.
+
+        Returns
+        -------
+        None
+            Guarda el nombre de la base de datos para operaciones posteriores.
+        """
+        self.database = database
+```
+
+Con uv disponible, genera la API desde la **raíz del repositorio del framework** en PowerShell:
+
+```powershell
+.\DOCS.ps1
+```
+
+El script ejecuta Pydoctor con las dependencias de documentación del proyecto y escribe el sitio generado en `docs/` únicamente cuando la validación termina correctamente. Las advertencias de Pydoctor, la documentación incompleta y los enlaces locales rotos impiden completar la compilación; corrige los docstrings de origen y ejecuta de nuevo el script. No edites el HTML generado. Una compilación local no publica el sitio de API.
 
 ---
 
@@ -222,12 +286,14 @@ Si usas **Visual Studio Code**, añade estas claves al objeto principal de tu ar
 Esta configuración es específica para VSCode. Si usas otro IDE, adapta las reglas según la documentación de SonarQube/SonarLint para tu entorno.
 :::
 
+Estos patrones compartidos aceptan ambos estilos de nombres y no distinguen un método de clase de una función independiente. Utiliza la comprobación de nombres del framework indicada arriba para aplicar la convención de cada ámbito.
+
 ### Referencia de reglas personalizadas
 
 | Regla | Estado | Descripción |
 |---|---|---|
 | `python:S100` | Activa (personalizada) | Permite nombres de métodos en *camelCase* y con guiones bajos iniciales, alineados con el estilo del framework. |
-| `python:S1542` | Activa (personalizada) | Refuerza la consistencia en la nomenclatura de funciones y métodos. |
+| `python:S1542` | Activa (personalizada) | Acepta los estilos de nombres de funciones y métodos utilizados por el framework. |
 | `python:S2638` | Desactivada | Incompatible con la sintaxis de inyección de dependencias utilizada en Orionis. |
 
 ### Complejidad cognitiva (`python:S3776`)

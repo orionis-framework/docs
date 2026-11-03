@@ -7,6 +7,38 @@ lastUpdated: false
 
 Las migraciones son clases async que describen cambios físicos ordenados. up aplica el cambio y down describe su reversión. Cada archivo aplicado queda registrado en la tabla migrations, en la misma conexión. Los [seeders](/es/database/seeders) tienen su propio historial y se ejecutan después de disponer del esquema.
 
+<a id="framework-storage-tables"></a>
+
+## Preparar las tablas internas del framework
+
+Desde 1.3.0, `auth:migrate`, `cache:migrate`, `schedule:migrate` y `session:migrate` preparan el almacenamiento SQL interno junto al comando existente `queue:migrate`. Crean las tablas faltantes desde las definiciones incluidas en Orionis, de forma independiente de las migraciones de aplicación. No descubren archivos dentro de `database/` ni agregan registros al historial `migrations`.
+
+| Comando | Tablas configuradas | Conexión SQL |
+|---|---|---|
+| [`auth:migrate`](/es/database/commands#auth-migrate) | `AUTH_TOKEN_TABLE` (`personal_access_tokens`) | Conexión predeterminada de la aplicación. |
+| [`cache:migrate`](/es/database/commands#cache-migrate) | `DB_CACHE_TABLE` (`cache`) y `DB_CACHE_LOCK_TABLE` (`cache_locks`) | `DB_CACHE_CONNECTION`. |
+| [`queue:migrate`](/es/database/commands#queue-migrate) | La tabla de cada cola SQL configurada, incluida `QUEUE_TABLE` (`jobs`), y `QUEUE_FAILED_TABLE` (`failed_jobs`) | La conexión SQL de cada cola, incluida `QUEUE_DB_CONNECTION`, y `QUEUE_FAILED_DB_CONNECTION` para fallos. |
+| [`schedule:migrate`](/es/database/commands#schedule-migrate) | `DB_TASK_TABLE` (`scheduler_tasks`) | `DB_TASK_CONNECTION`. |
+| [`session:migrate`](/es/database/commands#session-migrate) | `SESSION_DB_TABLE` (`sessions`) | `SESSION_DB_CONNECTION`. |
+
+Las conexiones son nombres declarados en `config/database.py`; las conexiones opcionales omitidas usan la predeterminada. Ejecuta el comando pertinente desde la raíz de la aplicación, por ejemplo:
+
+```shell
+python -B reactor auth:migrate
+```
+
+Estos comandos solo aceptan `-h`/`--help`, **no `--database`**. Configura su destino antes de ejecutarlos. Pueden preparar SQL aunque el driver activo correspondiente use memoria, archivos, Redis o `sync`; cache y scheduler requieren que exista su configuración `stores.database`. No arrancan workers, ejecutan tareas programadas ni cambian el driver activo.
+
+Los nombres de tablas de tokens, cache, colas y sesiones respetan el prefijo de su conexión SQL. El scheduler utiliza el esquema e índices nativos de APScheduler y toma `DB_TASK_TABLE` directamente, sin aplicar ese prefijo. La conexión requiere los permisos DDL y las garantías del backend correspondientes, incluidas restricciones de unicidad efectivas.
+
+Repetir un comando conserva las filas y tablas existentes. No ejecuta `DROP` ni `ALTER`, repara esquemas incompatibles ni traslada datos después de cambiar la configuración. Usa una migración de aplicación explícita para un cambio deliberado de esquema. La preparación correcta devuelve `0`; un fallo de almacenamiento o configuración reportado devuelve `1`.
+
+### Proyectos existentes y limpieza de 1.3.0
+
+La aplicación de referencia del framework retiró cinco migraciones duplicadas: `m0000000001_create_scheduler_tasks_table.py`, `m0000000002_create_cache_table.py`, `m0000000003_create_cache_locks_table.py`, `m0000000004_create_sessions_table.py` y `m0000000011_create_personal_access_tokens_table.py`, junto a sus cinco schemas `_v1.py` correspondientes. Usuarios, permisos, roles, sus tablas de asociación y recuperación de contraseñas conservan sus migraciones de aplicación y números originales. La preparación de colas continúa mediante `queue:migrate`.
+
+Esa limpieza de código no modifica bases de datos existentes ni su historial. Un proyecto o skeleton existente puede conservar esos archivos: mantén las migraciones ya aplicadas y sus schemas para que el rollback resuelva sus identidades. No renumeres los archivos restantes ni limpies el historial para adoptar estos comandos. El almacenamiento nuevo se prepara con los comandos anteriores; las tablas de negocio continúan utilizando `migrate`.
+
 ## Generar una migración
 
 ```shell
@@ -48,9 +80,9 @@ El descubrimiento se guarda en la instancia de `Migrator`. Un proceso nuevo ve a
 
 ## Todos los comandos y opciones
 
-[Referencia de comandos de Database](/es/database/commands): sintaxis, argumentos y opciones de los 14 comandos, incluida inspección y borrado.
+[Referencia de comandos de Database](/es/database/commands): sintaxis, argumentos y opciones para migraciones de aplicación, almacenamiento interno, inspección y borrado.
 
-Todos se ejecutan desde la raíz mediante orionis <comando> o python -B reactor <comando>. Opciones comunes: --database NAME o -d NAME (str opcional, None usa la conexión default) y -h/--help. El nombre debe estar declarado en config/database.py.
+Los comandos de migraciones de aplicación de la tabla siguiente se ejecutan desde la raíz mediante orionis <comando> o python -B reactor <comando>. Sus opciones comunes son --database NAME o -d NAME (str opcional, None usa la conexión default) y -h/--help. El nombre debe estar declarado en config/database.py. Los comandos de almacenamiento interno anteriores no admiten --database.
 
 | Comando | Opciones propias | Resultado |
 |---|---|---|

@@ -302,7 +302,7 @@ from app.mcp.servers.status_server import StatusServer
 from orionis.support.facades import Mcp
 
 
-async def notifyReportStatusChanged() -> None:
+async def notify_report_status_changed() -> None:
     await Mcp.resourceUpdated(StatusServer, "reports://status")
 ```
 

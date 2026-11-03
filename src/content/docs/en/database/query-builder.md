@@ -7,7 +7,7 @@ lastUpdated: false
 
 `DB.table("products")` creates a fresh `RawQueryBuilder`. `Model.query()` creates a `ModelQueryBuilder` sharing its clauses; hydration, serialization and model policies differ. Clauses are synchronous and return the same builder: await only asynchronous terminals.
 
-Reference examples require a booted application and existing tables. Use the [Product model](/en/orm/factories#complete-model-and-factory) columns for `products`; joins also require `categories` with `id` and `name`. The [testing guide](/en/orm/testing) shows how to prepare an isolated database with its own sample models. Blocks are service/controller functions or queries you can run inside an `async` action. Write examples modify those sample tables.
+Execution examples require a booted application and existing tables; [`toSql()`](/en/database/query-builder#api-tosql) only compiles the query and does not require the table to exist. Use the [Product model](/en/orm/factories#complete-model-and-factory) columns for `products`; joins also require `categories` with `id` and `name`. The [testing guide](/en/orm/testing) shows how to prepare an isolated database with its own sample models. Blocks are service/controller functions or queries you can run inside an `async` action. Write examples modify those sample tables.
 
 Do not share a mutable builder across requests or tasks. The `DB` gateway itself is shared: create a builder for every query and use `clone()` to branch.
 
@@ -87,6 +87,47 @@ The qualifier's meaning depends on the engine: a schema in PostgreSQL, a databas
 Continue with [conditions](/en/database/query-filters), [joins](/en/database/joins-and-subqueries) and [writes](/en/database/query-writes).
 
 ## Operation reference
+
+<a id="api-tosql"></a>
+
+### `toSql()`
+
+```text
+toSql(*, literal_binds: bool = False) -> str
+```
+
+Available since **1.2.0**. Compiles the current SELECT into a string for debugging. This method is synchronous: call it **without `await`** on a `DB.table()` or model builder. It does not execute SQL, create an engine or open a database connection. Builders require a booted application or a configured `ConnectionResolver` to resolve their connection settings; the table does not need to exist.
+
+```python
+from orionis.support.facades import DB
+
+query = (
+    DB.table("products")
+    .select("id", "name", "price")
+    .where("active", True)
+    .whereIn("id", [1, 2])
+    .orderBy("id")
+    .limit(10)
+)
+
+sql = query.toSql()
+debug_sql = query.toSql(literal_binds=True)
+```
+
+| Option | Output |
+| --- | --- |
+| `literal_binds=False` (default) | SQL with the selected dialect's placeholders; expanding parameters such as `IN` lists are rendered. |
+| `literal_binds=True` | SQL with supported values rendered and escaped by the dialect for inspection. |
+
+Both forms respect the selected connection's dialect and table prefix, including schemas and aliases. Placeholder spelling, quoting and pagination syntax can therefore differ between engines. The result is a `str`, not a SQL-and-bindings pair.
+
+Compilation uses a clone, preserving the original builder and its plan. [Model queries](/en/orm/querying#query-to-sql) also apply their global scopes and soft-delete visibility to that clone. `DB.table()` has no model scopes or soft-delete policy to apply.
+
+The string describes the **current SELECT**. It does not anticipate a later terminal's changes, such as the limit added by `first()` or the projection used by `count()`, include additional eager-loading or pagination queries, or compile inserts, updates or deletes.
+
+Literal output can contain sensitive values. Keep it in controlled debugging output and continue using parameterized queries for execution. Some types, including JSON or custom values without a dialect literal renderer, cannot be rendered with `literal_binds=True`.
+
+**Errors:** `InvalidQueryException` when no table is selected; `QueryException` for SQL or literal compilation failures; `MissingDatabaseDependencyException` when a required dialect is unavailable. Connection resolution can also raise `OrmConfigurationException` before initialization or `ConnectionNotFoundException` for an unknown connection name.
 
 <a id="api-toplan"></a>
 

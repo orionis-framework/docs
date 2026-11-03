@@ -1,6 +1,6 @@
 ---
 title: "Database commands"
-description: "Reference for all 14 commands: inspection, generators, migrations, seeders and wiping, with options and examples."
+description: "Reference for 19 commands: internal storage, inspection, generators, migrations, seeders and wiping, with options and examples."
 editUrl: true
 lastUpdated: false
 ---
@@ -13,7 +13,7 @@ Each example pair shows **two alternatives**: `orionis` and `python -B reactor`.
 
 | Option | Available on | Default and effect |
 | --- | --- | --- |
-| `-h`, `--help` | All 14 commands | Displays help without performing the operation or generating files. |
+| `-h`, `--help` | All 19 commands | Displays help without performing the operation or generating files. |
 | `--database NAME`, `-d NAME` | This page's `db:*` and `migrate*` commands | `None`: uses the default connection. `NAME` is a registered connection name, not a URL, file or table name. |
 
 The `make:*` generators do not accept `--database`: they create files using [application paths](/en/getting-started/architecture-and-lifecycle). Configure the connection under [Database configuration](/en/database/configuration); examples using `--database sqlite` assume that connection is registered. An unknown connection, missing driver dependency or invalid credentials produces a resolution or execution error rather than automatically creating a different connection.
@@ -29,6 +29,11 @@ python -B reactor db:show --help
 
 | Command | Purpose |
 | --- | --- |
+| [`auth:migrate`](#auth-migrate) | Creates missing personal access token storage using the framework schema. |
+| [`cache:migrate`](#cache-migrate) | Creates missing SQL cache and lock tables. |
+| [`queue:migrate`](#queue-migrate) | Creates missing tables for every SQL queue and the central failure repository. |
+| [`schedule:migrate`](#schedule-migrate) | Creates the scheduler's native SQL table and indexes without starting tasks. |
+| [`session:migrate`](#session-migrate) | Creates the configured SQL session table. |
 | [`db:show`](#db-show) | Shows a connection summary and its visible tables. Use it to confirm the target and understand its contents before migrating or inspecting a table. |
 | [`db:table`](#db-table) | Inspects an existing physical table: connection, resolved name, row count, size, columns, indexes and foreign keys. |
 | [`db:wipe`](#db-wipe) | Removes discovered user objects from the selected connection. Use it to empty a development or test database when tables outside migration history must also be removed. |
@@ -43,6 +48,67 @@ python -B reactor db:show --help
 | [`migrate:reset`](#migrate-reset) | Reverts all migrations recorded as applied on the connection, calling down() in reverse order. |
 | [`migrate:refresh`](#migrate-refresh) | Reverts selected migrations, then applies all pending migrations. Use it to rebuild changes through the down()/up() cycle. |
 | [`migrate:fresh`](#migrate-fresh) | Reverts all applied migrations, removes migration and seeder history tables, and applies discovered migrations again. |
+
+<a id="internal-storage-commands"></a>
+
+## Internal storage commands
+
+These commands use framework-owned definitions and the application's service configuration. They take **no positional arguments** and accept only `-h`/`--help`, with **no `--database` or `--force` option**. They preserve existing tables and records, do not import application migrations or write migration history, and do not change incompatible schemas. Preparation returns `0` on success and `1` for a reported storage or configuration error. See [storage tables and existing projects](/en/database/migrations#framework-storage-tables).
+
+<a id="auth-migrate"></a>
+
+### `auth:migrate`
+
+Creates `auth.tokens.table` (`AUTH_TOKEN_TABLE`, default `personal_access_tokens`) on the default SQL connection, including its connection prefix. Requires enforced unique constraints. It does not create users, permissions, roles, or password recovery tables; those retain their application migrations.
+
+```shell
+orionis auth:migrate
+python -B reactor auth:migrate
+```
+
+<a id="cache-migrate"></a>
+
+### `cache:migrate`
+
+Creates the entries and lock tables from `cache.stores.database`: `DB_CACHE_TABLE` and `DB_CACHE_LOCK_TABLE`, using `DB_CACHE_CONNECTION` and its table prefix. The database store must be configured, even if `CACHE_STORE` selects another backend. See [SQL cache](/en/cache/stores-and-drivers#driver-database).
+
+```shell
+orionis cache:migrate
+python -B reactor cache:migrate
+```
+
+<a id="queue-migrate"></a>
+
+### `queue:migrate`
+
+The existing command prepares every configured `database` queue connection and the central `queue.failed` repository, including their SQL table prefixes. `QUEUE_DB_CONNECTION` selects a SQL connection for the standard database queue; `QUEUE_FAILED_DB_CONNECTION` selects failure storage. It also works with `QUEUE_CONNECTION=sync` or `redis`, without opening Redis clients, creating queue drivers, or starting consumers. See [queue preparation](/en/queues/drivers-and-configuration#command-migrate).
+
+```shell
+orionis queue:migrate
+python -B reactor queue:migrate
+```
+
+<a id="schedule-migrate"></a>
+
+### `schedule:migrate`
+
+Creates APScheduler's native table and indexes using `scheduler.stores.database`, `DB_TASK_CONNECTION`, and `DB_TASK_TABLE`. The configured table name is used directly, without the Orionis connection prefix. The database store must exist even when `TASKS_STORE` selects memory or Redis. It closes its temporary synchronous engine after preparation, without starting the scheduler or running tasks. See [scheduler storage](/en/console/scheduler-configuration#config-database).
+
+```shell
+orionis schedule:migrate
+python -B reactor schedule:migrate
+```
+
+<a id="session-migrate"></a>
+
+### `session:migrate`
+
+Creates `session.table` (`SESSION_DB_TABLE`, default `sessions`) using `session.connection` (`SESSION_DB_CONNECTION`) and its SQL prefix. An omitted connection selects the default. It also works when `SESSION_DRIVER` uses another store and preserves existing sessions. See [SQL sessions](/en/sessions/stores-and-concurrency).
+
+```shell
+orionis session:migrate
+python -B reactor session:migrate
+```
 
 <a id="db-show"></a>
 

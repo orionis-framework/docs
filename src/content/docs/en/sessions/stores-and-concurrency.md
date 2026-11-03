@@ -89,19 +89,19 @@ The store uses this structure:
 
 The table is checked and created, if missing, on the store's first operation. The connection must be available and have the permissions needed for that creation when applicable. An existing table must match the expected structure; the store does not transform an incompatible schema.
 
-The project also includes a migration for the `sessions` table. If you manage the schema through [project migrations](/en/database/migrations/), you can run the usual command before serving requests:
+Since 1.3.0, prepare the SQL table before serving requests with [`session:migrate`](/en/database/commands#session-migrate):
 
 ```bash
-orionis migrate
+orionis session:migrate
 ```
 
 Or its alternative through the local `reactor` file:
 
 ```bash
-python -B reactor migrate
+python -B reactor session:migrate
 ```
 
-These commands apply **all pending migrations** on the selected connection, not just the sessions table. If you change the session table name or connection, also adapt any migration you choose to use.
+These are alternatives. The command reads `SESSION_DB_CONNECTION` and `SESSION_DB_TABLE`, respects the SQL prefix, and creates the missing table from the framework definition even when `SESSION_DRIVER` selects another store. It accepts no `--database`, preserves existing sessions on repeated runs, and does not execute application migrations or write their history. It does not relocate data or alter incompatible existing tables; see [existing projects](/en/database/migrations#framework-storage-tables).
 
 The driver requires a connection with enforced unique constraints. The implementation rejects Redshift for sessions because it does not provide the required guarantee of a single row per identifier.
 
