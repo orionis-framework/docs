@@ -63,16 +63,18 @@ No necesitas llamar al validador en esta acción. La anotación del parámetro a
 
 Durante la inyección, el contenedor utiliza el único punto de entrada asíncrono del validador: `await Validator.validate(data, UserSchema)`. `Validator` es un alias de la utilidad `Schema` de `orionis.schemas.validator`, distinto de la clase base declarativa importada desde `orionis.schemas`. La conversión de tipos se realiza directamente; las comprobaciones que requieren I/O pueden esperar sus operaciones sin bloquear la petición. Que el validador sea asíncrono no significa que todas sus operaciones se ejecuten en paralelo.
 
-El proceso combina dos capas de validación:
+El proceso se ejecuta en este orden:
 
-1. **Tipos y restricciones estructurales.** `msgspec` convierte los datos a la estructura declarada y comprueba tipos, campos obligatorios y restricciones como `MinLength`.
-2. **Reglas.** Orionis espera la validación de cada instancia de `Rule`, como `Email()`, sobre los valores convertidos. Todas implementan `async def enforce(...)`, tanto las comprobaciones sencillas como las que esperan I/O. Las reglas pueden inspeccionar otros campos y utilizar servicios externos. Un `enforce` síncrono se rechaza al definir la clase.
+1. **Conversión previa opcional.** Desde **1.4.0**, [`Coerce()`](/es/validation/declaring-schemas#field-coercion) prepara los valores marcados según su tipo declarado, sin modificar el payload original.
+2. **Tipos y restricciones estructurales.** `msgspec` convierte los datos a la estructura declarada y comprueba tipos, campos obligatorios y restricciones como `MinLength`.
+3. **Reglas.** Orionis espera la validación de cada instancia de `Rule`, como `Email()`, sobre los valores convertidos. Todas implementan `async def enforce(...)`, tanto las comprobaciones sencillas como las que esperan I/O. Las reglas pueden inspeccionar otros campos y utilizar servicios externos. Un `enforce` síncrono se rechaza al definir la clase.
 
 | Componente | Responsabilidad |
 | --- | --- |
 | `Schema` | Declara campos sobre `msgspec.Struct` y expone `toDict()`. |
 | `SchemaMeta` | Procesa las anotaciones al crear la clase y prepara sus metadatos y planes de reglas. No necesitas utilizarla directamente. |
 | `Annotated` / `Field` | Adjunta restricciones, reglas y metadatos a un tipo sin cambiar el tipo del campo. `Field` es un alias de `typing.Annotated`. |
+| `Coerce()` | Habilita la conversión antes de comprobar tipos, restricciones y reglas para el campo marcado y sus valores descendientes; las claves de diccionario permanecen estrictas. |
 | Compilador de metadatos | Transforma restricciones y metadatos documentales en `msgspec.Meta`; detecta declaraciones incompatibles. |
 | Ejecutor de reglas | Recorre schemas hijos y colecciones; espera las reglas de cada campo en orden de declaración y acumula sus fallos. |
 | `ValidationException` | Reúne los fallos y expone listas de objetos `{rule, message}` agrupadas por campo. |
@@ -81,7 +83,9 @@ Los tipos, las restricciones y los metadatos documentales tienen funciones disti
 
 ### Conversión y errores
 
-La conversión conserva el comportamiento estricto de `msgspec`: `"36"` no es un `int` válido para `age`. Determinados tipos sí admiten representaciones de texto, como fechas ISO y UUID, según el tipo declarado.
+Sin `Coerce()`, la conversión conserva el comportamiento estricto de `msgspec`: `"36"` no es un `int` válido para `age` en el ejemplo anterior. Determinados tipos sí admiten representaciones de texto, como fechas ISO y UUID, según el tipo declarado. Declara `Field[int, Coerce(), GreaterThanOrEqual(18)]` e importa `Coerce` desde `orionis.schemas.metadata` para habilitarla en ese campo. Un marcador en un schema o una colección padre también habilita sus valores descendientes; los campos ajenos permanecen estrictos.
+
+La versión **1.4.0** también añade [`Empty()` y `NoEmpty()`](/es/validation/application-rules#empty-and-no-empty), reglas opuestas exactas para valores vacíos y presentes. Contemplan `None`, cadenas en blanco, cero numérico, `False`, colecciones de longitud cero y archivos subidos de cero bytes, sin modificar el valor. Se ejecutan después de la conversión: `"0"` está presente como string, mientras que el cero numérico convertido está vacío. Consulta el [ejemplo integrado de un pedido](/es/validation/validation-and-errors#coercion-and-empty-rules) para ver campos anidados, preservación del payload, mensajes personalizados y códigos de error.
 
 Orionis acumula los errores de cada campo: restricciones incumplidas y reglas que devuelven `False`. Si falla la conversión inicial, inspecciona los campos para completar el diagnóstico. Un tipo incompatible o un campo ausente impide evaluar las condiciones que requieren su valor convertido; los demás campos y elementos siguen validándose.
 
@@ -99,7 +103,7 @@ Cada elemento de `errors` incluye `rule` y `message`. Las reglas propias publica
 }
 ```
 
-La ruta rápida conserva la conversión y las restricciones de `msgspec`, implementadas en código nativo. Los metadatos y planes se preparan al declarar la clase; la recopilación detallada se reserva para los datos inválidos. Las reglas Python y su I/O tienen su propio coste. La validación de salida HTTP sólo se activa al devolver directamente una instancia de `Schema`; las otras respuestas no recorren el validador.
+Después de la conversión previa opcional, la ruta rápida conserva la conversión y las restricciones de `msgspec`, implementadas en código nativo. Los metadatos y planes se preparan al declarar la clase; la recopilación detallada se reserva para los datos inválidos. Las reglas Python y su I/O tienen su propio coste. La validación de salida HTTP sólo se activa al devolver directamente una instancia de `Schema`; las otras respuestas no recorren el validador.
 
 Las reglas de los schemas hijos también se ejecutan cuando están dentro de listas, tuplas, conjuntos o valores de diccionarios, incluso si otro campo falla la conversión. Los errores conservan su ubicación, como `contacts[0].email` o `contacts['primary'].email`. Consulta los [ejemplos de colecciones y errores parciales](/es/validation/validation-and-errors#schemas-en-colecciones).
 
@@ -109,7 +113,7 @@ Consulta el formato de `errors`, `failures` y los mensajes en [Validación y err
 
 1. [Declarar schemas y convertir datos](/es/validation/declaring-schemas): campos obligatorios, valores predeterminados, tipos, metadatos y el generador `make:http-schema`.
 2. [Schemas en HTTP, MCP y Realtime](/es/validation/integrations): inyección automática, origen de los datos y validación explícita en otros contextos.
-3. [Referencia completa de restricciones y reglas nativas](/es/validation/constraints-and-reference): firmas, parámetros, valores admitidos y ejemplos de las 47 declaraciones públicas.
+3. [Referencia completa de restricciones y reglas nativas](/es/validation/constraints-and-reference): firmas, parámetros, valores admitidos y ejemplos de todas las restricciones y reglas públicas.
 4. [Reglas de aplicación y reglas personalizadas](/es/validation/application-rules): contrato asíncrono, I/O y reutilización.
 5. [Validación y errores](/es/validation/validation-and-errors): ejecución asíncrona, colecciones, fallos y mensajes.
 6. [Schemas en controladores HTTP](/es/validation/controllers-and-http): entrada automática, errores HTTP y schemas como respuestas. La [introducción de HTTP](/es/http/validation) resume esta integración.

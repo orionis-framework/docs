@@ -35,6 +35,8 @@ This location follows the HTTP generator convention; it does not prevent importi
 
 Injection depends on the adapter. An annotation in a direct Python call neither reads data nor activates validation. It also does not imply that every framework component automatically looks for an HTTP request.
 
+Since 1.4.0, entry points that invoke the Orionis Schema validator also honor [`Coerce()`](/en/validation/declaring-schemas#field-coercion) before type, constraint, and rule checks. [`Empty()` and `NoEmpty()`](/en/validation/application-rules#empty-and-no-empty) inspect the resulting values. This does not change which entry points perform validation: direct construction and serialization alone do not activate it. See the [combined example and error paths](/en/validation/validation-and-errors#coercion-and-empty-rules).
+
 ## HTTP: functions and controllers
 
 In `app/http/controllers/contact_controller.py`:

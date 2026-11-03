@@ -5,11 +5,11 @@ editUrl: true
 lastUpdated: false
 ---
 
-Esta referencia reúne los **47 nombres públicos** de `orionis.schemas.constraints`: **10 restricciones estructurales** y **37 reglas ejecutables**. Las categorías siguientes organizan su consulta; no representan módulos internos separados.
+Esta referencia reúne los **49 nombres públicos** de `orionis.schemas.constraints`: **10 restricciones estructurales** y **39 reglas ejecutables**. Las categorías siguientes organizan su consulta; no representan módulos internos separados.
 
 ## Cómo leer los ejemplos
 
-Cada uno de los **47 elementos** incluye un schema, un método de controlador con **inyección del schema** y entradas aceptadas/rechazadas. Las tablas conservan sus firmas, valores predeterminados y tipos.
+Cada uno de los **49 elementos** incluye un schema, un método de controlador con **inyección del schema** y entradas aceptadas/rechazadas. Las tablas conservan sus firmas, valores predeterminados y tipos.
 
 Para probar un ejemplo, copia estos imports y el bloque del elemento elegido a `app/http/controllers/rule_example_controller.py`:
 
@@ -51,7 +51,7 @@ Las restricciones estructurales se compilan para la conversión de tipos. Las cl
 
 ### Ejecución asíncrona y schemas anidados
 
-Las **37 reglas ejecutables** implementan `async def enforce(...)`: el validador siempre espera su evaluación, incluidas las comprobaciones locales sin I/O. No hay una variante síncrona de regla ni un método alternativo `enforceAsync`. La conversión y las restricciones estructurales permanecen en la primera fase; después se recorren las reglas en su orden de declaración, sin lanzar tareas concurrentes por campo. `ActiveUrl` espera la resolución de nombres, `Unique` espera la consulta de la conexión activa y las reglas que leen archivos delegan esa lectura a un hilo auxiliar.
+Las **39 reglas ejecutables** implementan `async def enforce(...)`: el validador siempre espera su evaluación, incluidas las comprobaciones locales sin I/O. No hay una variante síncrona de regla ni un método alternativo `enforceAsync`. Un [marcador `Coerce()` explícito](/es/validation/declaring-schemas#field-coercion) convierte los valores antes de comprobar el tipo y las restricciones estructurales; después se recorren las reglas en su orden de declaración, sin lanzar tareas concurrentes por campo. `ActiveUrl` espera la resolución de nombres, `Unique` espera la consulta de la conexión activa y las reglas que leen archivos delegan esa lectura a un hilo auxiliar.
 
 Las reglas de un schema hijo también se aplican cuando el hijo está dentro de listas, valores de diccionarios, tuplas, sets o frozensets compatibles con la conversión, incluidas colecciones anidadas y opcionales. No necesitas validar manualmente cada elemento. Por ejemplo, si `ContactSchema.email` declara `Email()`, un campo `contacts: list[ContactSchema]` comprueba cada correo y conserva rutas de error como `contacts[0].email`. La [guía de errores](/es/validation/validation-and-errors) explica las rutas y la acumulación de fallos, incluso cuando otro elemento no se pudo convertir.
 
@@ -1206,6 +1206,71 @@ Cuerpo inválido (422):
 ```
 
 
+<a id="empty-and-no-empty"></a>
+
+## Valores vacíos y no vacíos
+
+Disponibles desde **1.4.0**. Estas reglas comparten una definición de vacío y son opuestas exactas. La [guía de valores vacíos](/es/validation/application-rules#empty-and-no-empty) detalla los espacios en blanco, ceros numéricos, colecciones, archivos subidos, campos ausentes y coerción.
+
+| Regla | Condición y tipos | Parámetros adicionales | Campo de ejemplo | Código de error |
+| --- | --- | --- | --- | --- |
+| `Empty` | Acepta `None`, cadenas vacías o sólo con espacios en blanco, ceros numéricos, `False`, valores de longitud cero y archivos subidos de cero bytes. | — | `value: Field[str \| None, C.Empty()]` | `empty` |
+| `NoEmpty` | Rechaza exactamente los valores aceptados por `Empty`. | — | `value: Field[str, C.NoEmpty()]` | `no_empty` |
+
+Ambas admiten el argumento compartido `message=`. No recortan texto, inspeccionan recursivamente elementos de colecciones, leen contenido de archivos ni consumen iteradores sin longitud. El tipo y la obligatoriedad del campo siguen aplicándose: un campo obligatorio ausente produce `missing` y un tipo incompatible produce `type` antes de que la regla pueda inspeccionarlo.
+
+### Empty
+
+El campo nullable acepta `null` y cadenas compuestas sólo por espacios. Un texto no vacío falla con `empty` y el mensaje personalizado.
+
+```python
+class EmptySchema(Schema):
+    value: Field[str | None, C.Empty(message="Deja este campo vacío.")]
+
+
+class EmptyController(BaseController):
+    async def __call__(self, payload: EmptySchema) -> dict:
+        return {"value": payload.value}
+```
+
+Cuerpo válido (200), conservando los espacios:
+
+```json
+{"value": "   "}
+```
+
+Cuerpo inválido (422):
+
+```json
+{"value": "text"}
+```
+
+### NoEmpty
+
+La cadena `"0"` se considera presente. Una cadena compuesta sólo por espacios falla con `no_empty` y el mensaje personalizado.
+
+```python
+class NoEmptySchema(Schema):
+    value: Field[str, C.NoEmpty(message="Proporciona un valor.")]
+
+
+class NoEmptyController(BaseController):
+    async def __call__(self, payload: NoEmptySchema) -> dict:
+        return {"value": payload.value}
+```
+
+Cuerpo válido (200):
+
+```json
+{"value": "0"}
+```
+
+Cuerpo inválido (422):
+
+```json
+{"value": "   "}
+```
+
 ## Aceptación, valores y contraseñas
 
 | Regla o restricción | Condición y tipos | Parámetros adicionales | Campo de ejemplo |
@@ -1586,6 +1651,7 @@ Los siguientes objetos se importan de `orionis.schemas.metadata`, no de `constra
 
 | Metadato | Constructor | Propósito |
 | --- | --- | --- |
+| `Coerce` | `Coerce()` | Convierte al tipo declarado antes de comprobar el tipo, las restricciones y las reglas; consulta [coerción de campos](/es/validation/declaring-schemas#field-coercion). No recibe argumentos. |
 | `Title` | `Title(value: str)` | Título descriptivo del campo. |
 | `Description` | `Description(value: str)` | Descripción del campo. |
 | `Examples` | `Examples(values: list[object])` | Ejemplos serializables para JSON Schema. |
@@ -1593,7 +1659,7 @@ Los siguientes objetos se importan de `orionis.schemas.metadata`, no de `constra
 | `Extra` | `Extra(data: dict[str, object])` | Datos adicionales asociados al campo. |
 | `Message` | `Message(text: str)` | Mensaje personalizado para errores de tipo; no sustituye el mensaje de todas las reglas. |
 
-`DocumentMetadata`, también expuesta por ese módulo, es la base de esos metadatos, no una condición de validación. Para una regla usa su argumento `message`; para errores del tipo declarado usa `Message`:
+`DocumentMetadata`, también expuesta por ese módulo, es la base de los metadatos descriptivos, no una condición de validación. `Coerce()` controla la fase de conversión y no es una `Rule` ni una restricción estructural. Para una regla usa su argumento `message`; para errores del tipo declarado usa `Message`:
 
 ```python
 from orionis.schemas import Schema
@@ -1612,7 +1678,7 @@ class QuantitySchema(Schema):
     ]
 ```
 
-En un campo `int`, los límites exclusivos pueden normalizarse a límites inclusivos en la capa de conversión. Para personalizar el mensaje de una condición como entero positivo, `GreaterThanOrEqual(1, message=...)` conserva una correspondencia directa entre la condición y su mensaje.
+Con `Field[int, Coerce(), C.GreaterThan(0, message="La cantidad debe ser positiva.")]`, la entrada `"0"` se convierte en `0` e informa `gt` con el mensaje declarado. Una entrada numérica inválida como `"abc"` sigue produciendo `type`; el `message` de una restricción no sustituye ese error de tipo.
 
 Consulta la [creación de reglas personalizadas](/es/validation/application-rules) para extender estas comprobaciones.
 

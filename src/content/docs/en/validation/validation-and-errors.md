@@ -9,6 +9,69 @@ When an action declares a parameter such as `payload: Order`, the container vali
 
 You do not need to catch the exception inside the action or call the validator manually to enable injection. Start with [schema declarations](/en/validation/declaring-schemas) and [controller integration](/en/validation/controllers-and-http). The same validator is reused in [MCP, Realtime, and other entry points](/en/validation/integrations); the HTTP `422` response shown here belongs to API handling, rather than all those transports.
 
+<a id="coercion-and-empty-rules"></a>
+
+## Combine coercion and empty-value rules
+
+Since **1.4.0**, [`Coerce()`](/en/validation/declaring-schemas#field-coercion) converts marked values before checking their declared types, constraints, and rules. [`Empty()` and `NoEmpty()`](/en/validation/application-rules#empty-and-no-empty) then inspect the validated value using the same definition of emptiness, with opposite acceptance conditions.
+
+This example accepts a textual quantity, requires a non-empty item name and collection, and reserves an optional field for empty values:
+
+```python
+from orionis.schemas import Schema
+from orionis.schemas.constraints import GreaterThan
+from orionis.schemas.fields import Field
+from orionis.schemas.metadata import Coerce
+from orionis.schemas.rules import Empty, NoEmpty
+from orionis.schemas.validator import Schema as Validator
+
+
+class ItemInput(Schema):
+    name: Field[str, NoEmpty(message="Name is required.")]
+    quantity: Field[
+        int,
+        Coerce(),
+        GreaterThan(0, message="Quantity must be positive."),
+    ]
+    reserved: Field[str | None, Empty()] = None
+
+
+class OrderInput(Schema):
+    items: Field[list[ItemInput], NoEmpty()]
+
+
+async def example() -> OrderInput:
+    payload = {
+        "items": [
+            {"name": "Book", "quantity": "2", "reserved": "   "},
+        ],
+    }
+
+    order = await Validator.validate(payload, OrderInput)
+
+    assert order.items[0].quantity == 2
+    assert payload["items"][0]["quantity"] == "2"
+    assert order.items[0].reserved == "   "
+
+    return order
+```
+
+Run `await example()` from an asynchronous caller, or `asyncio.run(example())` after importing `asyncio` in a standalone script. Coercion leaves the original payload unchanged. `Empty()` recognizes the blank string without trimming or replacing it. An omitted `reserved` uses its `None` default, which its nullable type and `Empty()` both accept. The other fields remain required by their schema declarations.
+
+Change one value in the payload at a time to see these failures in `ValidationException.errors`:
+
+| Rejected input | Field path | Error code |
+| --- | --- | --- |
+| `"items": []` | `items` | `no_empty` |
+| Item `name` containing only whitespace | `items[0].name` | `no_empty` |
+| Item `quantity` set to `"0"` | `items[0].quantity` | `gt` |
+| Item `quantity` set to `"abc"` or `"1.5"` | `items[0].quantity` | `type` |
+| Item `reserved` set to `"text"` | `items[0].reserved` | `empty` |
+
+The quantity `"0"` converts to `0` before failing `GreaterThan(0)`. Invalid numeric text stays a type error; it is not truncated or replaced with zero. The name and quantity failures retain their declared custom messages and indexed field paths. For example, `error.errors["items[0].name"]` contains `{"rule": "no_empty", "message": "Name is required."}`.
+
+The string `"0"` is non-empty, but a field declared as `Field[int, Coerce(), NoEmpty()]` converts it to numeric zero and reports `no_empty`. Missing required fields still report `missing`; neither rule replaces schema requiredness. Direct construction of `ItemInput(...)` does not run coercion or validation: use the validator or an entry point that invokes it.
+
 ## Example: several errors in one operation
 
 This schema combines a numeric bound, two rules on the same field, and a direct child schema. Save the example in `app/http/controllers/preview_order_controller.py`; the classes are shown together for clarity, although schemas can live in separate modules.
@@ -135,10 +198,11 @@ Field paths include dots for nested objects, such as `contact.email`, collection
 
 ## How failures are collected
 
-1. The validator attempts to convert the whole payload and apply structural constraints through `msgspec`.
-2. If conversion succeeds, it awaits rules on converted fields and traverses child schemas, including those inside collections. Every rule uses `async def enforce()` and is awaited through `Rule.validate()`.
-3. If conversion fails, it inspects declared fields to collect conversion errors and missing required fields. For each type-compatible value, it checks every constraint and awaits every rule, even when a constraint fails. It also descends into collection children to preserve their failures.
-4. It groups the collected failures into one `ValidationException`.
+1. The validator prepares fields marked with `Coerce()` without mutating the original payload. Unmarked fields retain strict conversion, unless coercion is inherited from a marked parent schema or collection.
+2. It attempts to convert the prepared payload and apply structural constraints through `msgspec`.
+3. If conversion succeeds, it awaits rules on converted fields and traverses child schemas, including those inside collections. Every rule uses `async def enforce()` and is awaited through `Rule.validate()`.
+4. If conversion fails, it inspects declared fields to collect conversion errors and missing required fields. For each type-compatible value, it checks every constraint and awaits every rule, even when a constraint fails. It also descends into collection children to preserve their failures.
+5. It groups the collected failures into one `ValidationException`.
 
 Rules on a field follow declaration order; a `False` result does not cancel subsequent checks. During nested traversal, children are validated before rules on their containing field. Checks are awaited sequentially rather than launching every field in parallel. An incompatible type or missing field prevents conditions requiring its converted value from running; valid fields on that child and other elements are still checked.
 
@@ -180,7 +244,7 @@ asyncio.run(main())
 
 `"ABC"` has the correct type but violates both constraints and the rule: `errors["value"]` contains three objects. Supplying `42` reports a `type` error; string conditions are not applied to that integer.
 
-Valid data retains msgspec's native conversion and the plans prepared when the class is declared. Detailed traversal runs after that conversion fails; it is not repeated for every valid request. Python rules and their I/O waits still have their own cost.
+After optional coercion, valid data retains msgspec's native conversion and the plans prepared when the class is declared. Detailed error collection runs after that conversion fails; it is not repeated for every valid request. Python rules and their I/O waits still have their own cost.
 
 The validator accepts no `bail`, `max_errors`, or first-error policy options: its `async validate()` method takes only `payload` and `schema`.
 

@@ -523,13 +523,104 @@ Estos objetos se importan desde `orionis.schemas.metadata`:
 
 Los cinco primeros no comprueban el valor ni lo transforman. `Message` personaliza errores, no constituye una condición adicional. Las restricciones y muchas reglas también admiten `message=` para su propio fallo; revisa cada firma en la referencia.
 
+<a id="field-coercion"></a>
+
+## Convertir campos marcados con `Coerce()`
+
+Desde **1.4.0**, importa `Coerce` desde `orionis.schemas.metadata` para convertir un campo a su tipo declarado **antes de validar tipos, restricciones y reglas**. El marcador no recibe argumentos y funciona con `Field` o `Annotated`. Los campos fuera de su alcance siguen siendo estrictos; el validador tampoco incorpora una opción global `strict=False`.
+
+```python
+from orionis.schemas import Schema
+from orionis.schemas.constraints import GreaterThan
+from orionis.schemas.fields import Field
+from orionis.schemas.metadata import Coerce
+from orionis.schemas.validator import Schema as Validator
+
+
+class QuantityInput(Schema):
+    quantity: Field[int, Coerce(), GreaterThan(0)]
+
+
+async def parse_quantity() -> QuantityInput:
+    payload = {"quantity": "12.0"}
+    result = await Validator.validate(payload, QuantityInput)
+    assert result.quantity == 12
+    assert type(result.quantity) is int
+    assert payload == {"quantity": "12.0"}
+    return result
+```
+
+| Entrada para `quantity` | Resultado |
+| --- | --- |
+| `"12"` o `"12.0"` | Se convierte a `12` y pasa. |
+| `"0"` | Se convierte a `0` y después incumple `GreaterThan(0)` con código `gt`. |
+| `"abc"` o `"1.5"` | Falla con código `type`; no se trunca ni se reemplaza por cero. |
+| Campo omitido | Sigue ausente; se conserva el error de campo obligatorio. |
+
+`Coerce()` utiliza el destino declarado y las reglas de conversión nativas; no equivale a llamar constructores arbitrarios de Python. Por ejemplo, la conversión booleana no considera `True` cualquier cadena no vacía:
+
+```python
+from decimal import Decimal
+
+from orionis.schemas import Schema
+from orionis.schemas.fields import Field
+from orionis.schemas.metadata import Coerce
+from orionis.schemas.validator import Schema as Validator
+
+
+class ConvertedValues(Schema):
+    price: Field[float, Coerce()]
+    enabled: Field[bool, Coerce()]
+    amount: Field[Decimal, Coerce()]
+
+
+async def parse_values() -> ConvertedValues:
+    result = await Validator.validate(
+        {"price": "12.5", "enabled": "false", "amount": "12.50"},
+        ConvertedValues,
+    )
+    assert result.price == 12.5
+    assert result.enabled is False
+    assert result.amount == Decimal("12.50")
+    return result
+```
+
+### Valores anidados y alcance del marcador
+
+Un marcador sobre una colección o un schema hijo habilita la conversión de sus valores y campos descendientes. Un marcador sobre la anotación de un elemento afecta únicamente a esa anotación. Las **claves de diccionario siguen siendo estrictas**, incluso cuando el diccionario está marcado.
+
+```python
+from orionis.schemas import Schema
+from orionis.schemas.fields import Field
+from orionis.schemas.metadata import Coerce
+
+
+class Quantity(Schema):
+    quantity: int
+
+
+class BatchInput(Schema):
+    items: Field[list[Quantity], Coerce()]
+    by_name: Field[dict[str, int], Coerce()]
+    strict_count: int
+    limit: Field[int | None, Coerce()] = None
+```
+
+En este schema, `items=[{"quantity": "2"}]` se convierte en una lista que contiene `Quantity(quantity=2)`, y `by_name={"first": "3"}` pasa a ser `{"first": 3}`. `strict_count="4"` sigue fallando; envía un entero como `4`. Una clave como `1` en `by_name` también falla, en lugar de convertirse en `"1"`. `limit` acepta `None` o convierte `"5"` en `5`.
+
+La conversión también respeta campos heredados, nombres de entrada renombrados y rutas de error anidadas. Los campos nullable conservan su obligatoriedad y sus valores predeterminados. Se preserva una alternativa de unión ya compatible: `Field[int | str, Coerce()]` conserva `"12"` como cadena porque la declaración ya la admite. Al combinar un número nullable con restricciones numéricas, coloca la restricción en la alternativa numérica, por ejemplo `Field[int, Coerce(), GreaterThan(0)] | None`.
+
+El payload original y sus contenedores anidados no se modifican. Las restricciones y reglas reciben valores convertidos, por lo que combinar `Coerce()` con [`Empty()` o `NoEmpty()`](/es/validation/constraints-and-reference) puede cambiar el resultado de vacío: el texto `"0"` está presente, pero el entero convertido `0` está vacío. Las conversiones inválidas conservan los errores habituales de `ValidationException` y sus rutas; `Message(...)` personaliza un error de tipo y `message=` de una restricción personaliza su propio fallo.
+
+La conversión se ejecuta al validar, incluida la inyección de schemas, no al construir directamente. `QuantityInput(quantity="12")` no convierte ni valida ese valor. Usa `await Validator.validate(payload, QuantityInput)` para entradas externas. Repetir `Coerce()` en el mismo `Field` es un error de declaración del schema.
+
 ## Validación durante la petición
 
 El parámetro `payload: UserSchema` activa el flujo HTTP: el contenedor obtiene `await request.data()`, espera `Validator.validate(data, UserSchema)` e invoca el método únicamente si la validación tiene éxito. No combina automáticamente el cuerpo con la query string o los parámetros de ruta.
 
-La conversión es estricta: enviar `"36"` como edad produce un error de tipo, aunque la cadena contenga dígitos. El método del validador no admite `strict=False`. Los campos desconocidos se ignoran de forma predeterminada; puedes rechazarlos declarando la clase con `class UserSchema(Schema, forbid_unknown_fields=True):`.
+La conversión sigue siendo estricta para el campo `age` sin marcar del ejemplo: enviar `"36"` produce un error de tipo. Desde 1.4.0, habilita la conversión con [`Coerce()`](#field-coercion) en los campos que la necesiten; el método del validador no admite una opción global `strict=False`. Los campos desconocidos se ignoran de forma predeterminada; puedes rechazarlos declarando la clase con `class UserSchema(Schema, forbid_unknown_fields=True):`.
 
-Construir `UserSchema(name=..., email=..., age=...)` directamente utiliza el constructor de `msgspec.Struct`, que no ejecuta estas comprobaciones de tipos, restricciones y reglas. Reserva esa construcción para datos confiables; en una acción usa el parámetro inyectado para recibir entradas externas.
+Construir `UserSchema(name=..., email=..., age=...)` directamente utiliza el constructor de `msgspec.Struct`, que no ejecuta la coerción ni estas comprobaciones de tipos, restricciones y reglas. Reserva esa construcción para datos confiables; en una acción usa el parámetro inyectado para recibir entradas externas.
 
 ### Ejecución asíncrona
 

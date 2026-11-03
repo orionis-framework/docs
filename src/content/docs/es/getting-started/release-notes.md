@@ -1,11 +1,65 @@
 ---
 title: "Notas de versión"
-description: "Cambios de Orionis 1.0.8 a 1.3.0: inspección SQL, comandos de almacenamiento interno, documentación de la API y actualización."
+description: "Cambios de Orionis 1.0.8 a 1.4.0: conversión de campos, reglas de vacío, inspección SQL, comandos de almacenamiento y actualización."
 editUrl: true
 lastUpdated: false
 ---
 
-Estas notas reúnen los cambios de las versiones **1.0.8 a 1.3.0** y enlazan las guías de uso actualizadas. Los ejemplos de Reactor se ejecutan desde la raíz de la aplicación con su entorno de Python.
+Estas notas reúnen los cambios de las versiones **1.0.8 a 1.4.0** y enlazan las guías de uso actualizadas. Los ejemplos de Reactor se ejecutan desde la raíz de la aplicación con su entorno de Python.
+
+<a id="v1-4-0"></a>
+
+## 1.4.0: conversión de campos y reglas de vacío
+
+La versión **1.4.0** incorpora conversión opcional previa a la validación mediante `Coerce()` y las reglas complementarias `Empty()` y `NoEmpty()`. Los campos sin conversión siguen siendo estrictos. Se mantiene el requisito de **Python 3.14+**.
+
+### Convertir antes de validar con `Coerce()`
+
+Importa `Coerce` desde `orionis.schemas.metadata` y añádelo al tipo declarado del campo:
+
+```python
+from orionis.schemas import Schema
+from orionis.schemas.constraints import GreaterThan
+from orionis.schemas.fields import Field
+from orionis.schemas.metadata import Coerce
+
+
+class QuantityInput(Schema):
+    quantity: Field[int, Coerce(), GreaterThan(0)]
+```
+
+Cuando el validador procesa este schema, convierte el valor marcado antes de comprobar su tipo, restricciones y reglas:
+
+| Entrada | Resultado |
+| --- | --- |
+| `"12"` o `"12.0"` | Se convierte al entero `12` y pasa. |
+| `"0"` | Se convierte a `0` y falla `GreaterThan(0)` con código `gt`. |
+| `"abc"` o `"1.5"` | Falla con código `type`; no se trunca ni se reemplaza por cero. |
+
+También admite destinos como `float`, `bool` y `Decimal`, según las reglas de conversión del tipo declarado. El marcador funciona con schemas anidados, colecciones, campos renombrados y tipos nullable. Marcar una colección o schema habilita la conversión de sus valores y campos descendientes; las claves de diccionario siguen siendo estrictas y los campos hermanos sin marcar no cambian.
+
+La validación preserva el payload original. Construir directamente una instancia del schema no ejecuta la conversión. Consulta [conversión de campos](/es/validation/declaring-schemas#field-coercion) y [entrada de formularios](/es/validation/controllers-and-http#form-field-coercion).
+
+### Definir el vacío con `Empty()` y `NoEmpty()`
+
+Ambas reglas comparten una definición y son opuestas exactas. Son vacíos `None`, strings vacíos o compuestos solo por espacios en blanco, ceros numéricos, `False`, colecciones de longitud cero y archivos subidos de cero bytes. El contenido de los archivos no se lee.
+
+El string `"0"` está presente; tras convertirlo a `int`, su valor es un cero numérico vacío. `[None]` y `{"key": None}` están presentes porque contienen elementos. Las reglas no recortan strings ni consumen iteradores sin longitud; estos iteradores se consideran presentes. Un campo ausente sigue sujeto a la obligatoriedad del schema y su valor debe satisfacer el tipo declarado antes de aplicar una regla de vacío.
+
+Importa ambas reglas desde `orionis.schemas.rules`. Cada una admite `message=`; sus códigos de fallo son `empty` y `no_empty`. Los fallos anidados conservan rutas como `items[0].name` y sus mensajes personalizados. Consulta la [referencia de las reglas](/es/validation/application-rules#empty-and-no-empty) y el [ejemplo completo de validación de un pedido](/es/validation/validation-and-errors#coercion-and-empty-rules), incluidos los casos de rechazo.
+
+### Pruebas y calidad
+
+La versión añade **38 pruebas: 22 de conversión y 16 de vacío**, que cubren una petición multipart real, anidamiento, mensajes personalizados, conversiones y preservación del payload. La validación de la versión aprobó **561 pruebas de schemas** y **3 pruebas de respuestas HTTP**. Se compartió lógica de validación para reducir duplicación y complejidad; Ruff y SonarLint quedaron sin avisos, con supresiones puntuales justificadas. La documentación del framework se actualizó en español e inglés.
+
+### Actualizar a 1.4.0
+
+```bash
+uv add "orionis==1.4.0"
+uv sync
+```
+
+Para entornos administrados con pip, usa `python -m pip install --upgrade "orionis==1.4.0"`. Activa la conversión explícitamente en los campos que deban aceptar entradas convertibles. Usa `NoEmpty()` cuando también debas rechazar cero y `False`; no sustituye la declaración de un campo obligatorio. Revisa la [secuencia de validación y sus errores](/es/validation/validation-and-errors) antes de cambiar contratos existentes.
 
 <a id="v1-3-0"></a>
 

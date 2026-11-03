@@ -63,16 +63,18 @@ You do not need to call the validator in this action. The parameter annotation a
 
 During injection, the container uses the validator's single asynchronous entry point: `await Validator.validate(data, UserSchema)`. `Validator` aliases the `Schema` utility in `orionis.schemas.validator`, separate from the declaration base imported from `orionis.schemas`. Type conversion runs directly; checks that require I/O can await their operations without blocking the request. An asynchronous validator does not mean all operations run in parallel.
 
-The process combines two validation layers:
+The process runs in this order:
 
-1. **Types and structural constraints.** `msgspec` converts data into the declared structure and checks types, required fields and constraints such as `MinLength`.
-2. **Rules.** Orionis awaits validation by each `Rule` instance, such as `Email()`, on converted values. All implement `async def enforce(...)`, including simple checks and checks awaiting I/O. Rules can inspect other fields and use external services. A synchronous `enforce` is rejected when its class is defined.
+1. **Optional coercion.** Since **1.4.0**, [`Coerce()`](/en/validation/declaring-schemas#field-coercion) prepares marked values using their declared type, without changing the original payload.
+2. **Types and structural constraints.** `msgspec` converts data into the declared structure and checks types, required fields and constraints such as `MinLength`.
+3. **Rules.** Orionis awaits validation by each `Rule` instance, such as `Email()`, on converted values. All implement `async def enforce(...)`, including simple checks and checks awaiting I/O. Rules can inspect other fields and use external services. A synchronous `enforce` is rejected when its class is defined.
 
 | Component | Responsibility |
 | --- | --- |
 | `Schema` | Declares fields on top of `msgspec.Struct` and exposes `toDict()`. |
 | `SchemaMeta` | Processes annotations when the class is created and prepares its metadata and rule plans. You do not need to use it directly. |
 | `Annotated` / `Field` | Attaches constraints, rules and metadata to a type without changing the field type. `Field` aliases `typing.Annotated`. |
+| `Coerce()` | Enables conversion before type, constraint, and rule checks for the marked field and its descendant values; dictionary keys remain strict. |
 | Metadata compiler | Transforms constraints and documentation metadata into `msgspec.Meta`; detects incompatible declarations. |
 | Rule executor | Traverses child schemas and collections, awaits each field's rules in declaration order, and collects their failures. |
 | `ValidationException` | Collects failures and exposes lists of `{rule, message}` objects grouped by field. |
@@ -81,7 +83,9 @@ Types, constraints and documentation metadata have different purposes. For examp
 
 ### Conversion and errors
 
-Conversion preserves `msgspec`'s strict behavior: `"36"` is not a valid `int` for `age`. Certain types accept string representations, such as ISO dates and UUIDs, according to the declared type.
+Without `Coerce()`, conversion preserves `msgspec`'s strict behavior: `"36"` is not a valid `int` for `age` in the example above. Certain types accept string representations, such as ISO dates and UUIDs, according to the declared type. Declare `Field[int, Coerce(), GreaterThanOrEqual(18)]` and import `Coerce` from `orionis.schemas.metadata` to opt in for that field. A marker on a parent schema or collection also enables descendant values; unrelated fields remain strict.
+
+Version **1.4.0** also adds [`Empty()` and `NoEmpty()`](/en/validation/application-rules#empty-and-no-empty), exact opposites for empty and present values. They cover `None`, blank strings, numeric zero, `False`, zero-length collections, and zero-byte uploads without modifying the value. They run after coercion: `"0"` is present as a string, while coerced numeric zero is empty. See the [integrated order example](/en/validation/validation-and-errors#coercion-and-empty-rules) for nested fields, payload preservation, custom messages, and error codes.
 
 Orionis collects each field's errors: failed constraints and rules returning `False`. If initial conversion fails, it inspects the fields to complete the diagnosis. An incompatible type or missing field prevents conditions that require its converted value from running; other fields and elements continue to be validated.
 
@@ -99,7 +103,7 @@ Each `errors` entry includes `rule` and `message`. Custom rules publish their `_
 }
 ```
 
-The fast path retains msgspec's native conversion and constraint checks. Metadata and plans are prepared when the class is declared; detailed collection is reserved for invalid data. Python rules and their I/O have their own cost. HTTP output validation only activates for a directly returned `Schema` instance; other responses do not run the validator.
+After optional coercion, the fast path retains msgspec's native conversion and constraint checks. Metadata and plans are prepared when the class is declared; detailed collection is reserved for invalid data. Python rules and their I/O have their own cost. HTTP output validation only activates for a directly returned `Schema` instance; other responses do not run the validator.
 
 Child schemas' rules also run inside lists, tuples, sets, and dictionary values, even when another field fails conversion. Errors retain their location, such as `contacts[0].email` or `contacts['primary'].email`. See the [collection and partial error examples](/en/validation/validation-and-errors#schemas-in-collections).
 
@@ -109,7 +113,7 @@ See the format of `errors`, `failures` and messages in [Validation and errors](/
 
 1. [Declaring schemas and converting data](/en/validation/declaring-schemas): required fields, defaults, types, metadata and the `make:http-schema` generator.
 2. [Schemas across HTTP, MCP, and Realtime](/en/validation/integrations): automatic injection, data sources, and explicit validation in other contexts.
-3. [Complete native constraints and rules reference](/en/validation/constraints-and-reference): signatures, parameters, accepted values, and examples for all 47 public declarations.
+3. [Complete native constraints and rules reference](/en/validation/constraints-and-reference): signatures, parameters, accepted values, and examples for every public constraint and rule.
 4. [Application rules and custom rules](/en/validation/application-rules): the asynchronous contract, I/O, and reuse.
 5. [Validation and errors](/en/validation/validation-and-errors): asynchronous execution, collections, failures, and messages.
 6. [Schemas in HTTP controllers](/en/validation/controllers-and-http): automatic input validation, HTTP errors and schemas as responses. The [HTTP introduction](/en/http/validation) summarizes this integration.

@@ -9,7 +9,7 @@ A controller parameter annotated with a concrete `Schema` class receives a valid
 
 This chapter covers HTTP integration; the same mechanism applies to route functions resolved by the container. Schemas are also reused in [MCP, Realtime, and other entry points](/en/validation/integrations), with their own data sources and error responses.
 
-Start with [schemas and validation](/en/validation) and [declaring schemas and generating them with the CLI](/en/validation/declaring-schemas). The [reference for all 47 native constraints and rules](/en/validation/constraints-and-reference), [custom rules](/en/validation/application-rules), and [error API](/en/validation/validation-and-errors) complete this guide.
+Start with [schemas and validation](/en/validation) and [declaring schemas and generating them with the CLI](/en/validation/declaring-schemas). The [complete reference for native constraints and rules](/en/validation/constraints-and-reference), [custom rules](/en/validation/application-rules), and [error API](/en/validation/validation-and-errors) complete this guide.
 
 ## A controller with input and output schemas
 
@@ -118,7 +118,49 @@ Injection uses only the dictionary returned by `Request.data()`. It does not aut
 
 These are the content types recognized by `data()`; it does not automatically recognize every subtype ending in `+json`. A top-level JSON array is not the dictionary this flow requires.
 
-Conversion keeps the validator's strict behavior. In this example, `"age": "36"` fails because it is a string. Text form fields also arrive as strings: declaring `age: int` does not automatically convert them to integers. Deliberately adapt input through [explicit validation](/en/validation/declaring-schemas) when your format requires it.
+Unmarked fields keep the validator's strict behavior. In this example, `"age": "36"` fails because it is a string. Text form fields also arrive as strings: declaring `age: int` does not automatically convert them to integers. Since 1.4.0, use [`Coerce()`](/en/validation/declaring-schemas#field-coercion) to opt in on fields that accept textual numbers; manual body parsing is not required.
+
+<a id="form-field-coercion"></a>
+
+### Convert a numeric form field
+
+Since 1.4.0, `Coerce()` lets the schema opt in to conversion for selected fields before the controller runs. Save this independent example in `app/http/controllers/quantity_preview_controller.py`:
+
+```python
+from orionis.http.base import BaseController
+from orionis.schemas import Schema
+from orionis.schemas.constraints import GreaterThan
+from orionis.schemas.fields import Field
+from orionis.schemas.metadata import Coerce
+
+
+class QuantityInput(Schema):
+    quantity: Field[int, Coerce(), GreaterThan(0)]
+
+
+class QuantityPreviewController(BaseController):
+    async def __call__(self, payload: QuantityInput) -> dict[str, int]:
+        return {"quantity": payload.quantity}
+```
+
+Register it in the configured API route file:
+
+```python
+from app.http.controllers.quantity_preview_controller import QuantityPreviewController
+from orionis.support.facades import Route
+
+Route.post("/quantities/preview", QuantityPreviewController)
+```
+
+With the application running locally, send a multipart form request; adapt the host, port, and any route prefix to your application:
+
+```bash
+curl --form "quantity=12" http://localhost:8000/quantities/preview
+```
+
+The multipart parser supplies `"12"` as text. Validation converts it to the integer `12`, checks the positive bound, and injects it into the action. The response is `{"quantity":12}` with status `200`. The original request data still contains `"12"`; coercion does not rewrite it. URL-encoded form fields follow the same schema validation flow.
+
+For this API endpoint, `quantity=0` fails with rule `gt`; `quantity=abc` and `quantity=1.5` fail with rule `type`. With the default API handler these failures produce `422` without calling the action. Removing `Coerce()` restores the strict integer requirement, so the text `"12"` also fails. Other unmarked fields keep their existing behavior. See [coercion scope and nested values](/en/validation/declaring-schemas#field-coercion).
 
 ## Schema or Request
 

@@ -523,13 +523,104 @@ Import these objects from `orionis.schemas.metadata`:
 
 The first five do not check or transform values. `Message` customizes errors rather than adding a condition. Constraints and many rules also accept `message=` for their own failures; consult each signature in the reference.
 
+<a id="field-coercion"></a>
+
+## Convert marked fields with `Coerce()`
+
+Since **1.4.0**, import `Coerce` from `orionis.schemas.metadata` to convert a field to its declared type **before validating types, constraints, and rules**. The marker takes no arguments and works with `Field` or `Annotated`. Fields outside its scope remain strict; the validator still has no global `strict=False` option.
+
+```python
+from orionis.schemas import Schema
+from orionis.schemas.constraints import GreaterThan
+from orionis.schemas.fields import Field
+from orionis.schemas.metadata import Coerce
+from orionis.schemas.validator import Schema as Validator
+
+
+class QuantityInput(Schema):
+    quantity: Field[int, Coerce(), GreaterThan(0)]
+
+
+async def parse_quantity() -> QuantityInput:
+    payload = {"quantity": "12.0"}
+    result = await Validator.validate(payload, QuantityInput)
+    assert result.quantity == 12
+    assert type(result.quantity) is int
+    assert payload == {"quantity": "12.0"}
+    return result
+```
+
+| Input for `quantity` | Result |
+| --- | --- |
+| `"12"` or `"12.0"` | Converts to `12` and passes. |
+| `"0"` | Converts to `0`, then fails `GreaterThan(0)` with code `gt`. |
+| `"abc"` or `"1.5"` | Fails with code `type`; does not truncate or substitute zero. |
+| Omitted field | Remains missing; the required-field error is unchanged. |
+
+`Coerce()` uses the declared destination and the native conversion rules; it is not equivalent to calling arbitrary Python constructors. For example, boolean conversion does not treat every nonempty string as `True`:
+
+```python
+from decimal import Decimal
+
+from orionis.schemas import Schema
+from orionis.schemas.fields import Field
+from orionis.schemas.metadata import Coerce
+from orionis.schemas.validator import Schema as Validator
+
+
+class ConvertedValues(Schema):
+    price: Field[float, Coerce()]
+    enabled: Field[bool, Coerce()]
+    amount: Field[Decimal, Coerce()]
+
+
+async def parse_values() -> ConvertedValues:
+    result = await Validator.validate(
+        {"price": "12.5", "enabled": "false", "amount": "12.50"},
+        ConvertedValues,
+    )
+    assert result.price == 12.5
+    assert result.enabled is False
+    assert result.amount == Decimal("12.50")
+    return result
+```
+
+### Nested values and marker scope
+
+A marker on a collection or child schema enables coercion for its descendant values and fields. A marker on one item annotation affects that annotation only. Dictionary **keys remain strict**, even when the dictionary itself is marked.
+
+```python
+from orionis.schemas import Schema
+from orionis.schemas.fields import Field
+from orionis.schemas.metadata import Coerce
+
+
+class Quantity(Schema):
+    quantity: int
+
+
+class BatchInput(Schema):
+    items: Field[list[Quantity], Coerce()]
+    by_name: Field[dict[str, int], Coerce()]
+    strict_count: int
+    limit: Field[int | None, Coerce()] = None
+```
+
+For this schema, `items=[{"quantity": "2"}]` becomes a list containing `Quantity(quantity=2)`, and `by_name={"first": "3"}` becomes `{"first": 3}`. `strict_count="4"` still fails; supply an integer such as `4`. A key such as `1` in `by_name` also fails rather than becoming `"1"`. `limit` accepts `None` or converts `"5"` to `5`.
+
+Coercion also respects inherited fields, renamed input fields, and nested error paths. Nullable fields retain their required/default behavior. An already compatible union branch is preserved: `Field[int | str, Coerce()]` keeps `"12"` as a string because the declaration already accepts it. When combining a nullable number with numeric constraints, keep the constraint on the numeric branch, for example `Field[int, Coerce(), GreaterThan(0)] | None`.
+
+The source payload and nested containers are not modified. Constraints and rules receive converted values, so combining `Coerce()` with [`Empty()` or `NoEmpty()`](/en/validation/constraints-and-reference) can change which emptiness result applies: textual `"0"` is present, but the converted integer `0` is empty. Invalid conversions keep normal `ValidationException` errors and their field paths; `Message(...)` customizes a type error and a constraint's `message=` customizes its own failure.
+
+Coercion runs through validation, including schema injection, not through direct construction. `QuantityInput(quantity="12")` does not convert or validate that value. Use `await Validator.validate(payload, QuantityInput)` for external input. Repeating `Coerce()` in the same `Field` is a schema declaration error.
+
 ## Validation during the request
 
 The `payload: UserSchema` parameter activates the HTTP flow: the container obtains `await request.data()`, awaits `Validator.validate(data, UserSchema)` and invokes the method only if validation succeeds. It does not automatically merge the body with the query string or route parameters.
 
-Conversion is strict: sending `"36"` as the age produces a type error even though the string contains digits. The validator method has no `strict=False` option. Unknown fields are ignored by default; reject them by declaring the class as `class UserSchema(Schema, forbid_unknown_fields=True):`.
+Conversion remains strict for the unmarked `age` field above: sending `"36"` produces a type error. Since 1.4.0, opt in to conversion with [`Coerce()`](#field-coercion) on the fields that need it; the validator method has no global `strict=False` option. Unknown fields are ignored by default; reject them by declaring the class as `class UserSchema(Schema, forbid_unknown_fields=True):`.
 
-Constructing `UserSchema(name=..., email=..., age=...)` directly uses the `msgspec.Struct` constructor, which does not run these type, constraint and rule checks. Reserve direct construction for trusted data; use the injected parameter in an action to receive external input.
+Constructing `UserSchema(name=..., email=..., age=...)` directly uses the `msgspec.Struct` constructor, which does not run coercion or these type, constraint and rule checks. Reserve direct construction for trusted data; use the injected parameter in an action to receive external input.
 
 ### Asynchronous execution
 

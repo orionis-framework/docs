@@ -9,7 +9,7 @@ Un parámetro de controlador anotado con una clase concreta de `Schema` permite 
 
 Este capítulo desarrolla la integración HTTP; también se aplica a funciones de ruta resueltas por el contenedor. Los schemas se reutilizan en [MCP, Realtime y otros puntos de entrada](/es/validation/integrations), con sus propias fuentes de datos y respuestas de error.
 
-Para comenzar con la declaración de campos, consulta [schemas y validación](/es/validation) y [declarar schemas y generarlos mediante el CLI](/es/validation/declaring-schemas). La [referencia de las 47 restricciones y reglas nativas](/es/validation/constraints-and-reference), las [reglas personalizadas](/es/validation/application-rules) y la [API de errores](/es/validation/validation-and-errors) completan esta guía.
+Para comenzar con la declaración de campos, consulta [schemas y validación](/es/validation) y [declarar schemas y generarlos mediante el CLI](/es/validation/declaring-schemas). La [referencia completa de restricciones y reglas nativas](/es/validation/constraints-and-reference), las [reglas personalizadas](/es/validation/application-rules) y la [API de errores](/es/validation/validation-and-errors) completan esta guía.
 
 ## Un controlador con schemas de entrada y salida
 
@@ -118,7 +118,49 @@ La inyección utiliza exclusivamente el diccionario devuelto por `Request.data()
 
 Estos son los tipos de contenido reconocidos por `data()`; no reconoce automáticamente cualquier subtipo terminado en `+json`. Un array JSON superior no es el diccionario que exige este flujo.
 
-La conversión conserva el comportamiento estricto del validador. En el ejemplo, `"age": "36"` falla porque es una cadena. Los campos de texto de un formulario también llegan como cadenas: declarar `age: int` no los convierte automáticamente a enteros. Adapta la entrada deliberadamente mediante [validación explícita](/es/validation/declaring-schemas) cuando tu formato lo requiera.
+Los campos sin marcar conservan el comportamiento estricto del validador. En el ejemplo, `"age": "36"` falla porque es una cadena. Los campos de texto de un formulario también llegan como cadenas: declarar `age: int` no los convierte automáticamente a enteros. Desde 1.4.0, usa [`Coerce()`](/es/validation/declaring-schemas#field-coercion) para habilitar la conversión en los campos que acepten números textuales; no necesitas parsear manualmente el cuerpo.
+
+<a id="form-field-coercion"></a>
+
+### Convertir un campo numérico de formulario
+
+Desde 1.4.0, `Coerce()` permite habilitar la conversión en campos concretos del schema antes de ejecutar el controlador. Guarda este ejemplo independiente en `app/http/controllers/quantity_preview_controller.py`:
+
+```python
+from orionis.http.base import BaseController
+from orionis.schemas import Schema
+from orionis.schemas.constraints import GreaterThan
+from orionis.schemas.fields import Field
+from orionis.schemas.metadata import Coerce
+
+
+class QuantityInput(Schema):
+    quantity: Field[int, Coerce(), GreaterThan(0)]
+
+
+class QuantityPreviewController(BaseController):
+    async def __call__(self, payload: QuantityInput) -> dict[str, int]:
+        return {"quantity": payload.quantity}
+```
+
+Regístralo en el archivo de rutas API configurado:
+
+```python
+from app.http.controllers.quantity_preview_controller import QuantityPreviewController
+from orionis.support.facades import Route
+
+Route.post("/quantities/preview", QuantityPreviewController)
+```
+
+Con la aplicación ejecutándose localmente, envía una petición multipart; adapta el host, el puerto y cualquier prefijo de ruta a tu aplicación:
+
+```bash
+curl --form "quantity=12" http://localhost:8000/quantities/preview
+```
+
+El parser multipart entrega `"12"` como texto. La validación lo convierte al entero `12`, comprueba el límite positivo y lo inyecta en la acción. La respuesta es `{"quantity":12}` con estado `200`. Los datos originales de la petición siguen conteniendo `"12"`; la coerción no los reescribe. Los campos de formularios URL-encoded siguen el mismo flujo de validación del schema.
+
+En este endpoint API, `quantity=0` falla con la regla `gt`; `quantity=abc` y `quantity=1.5` fallan con la regla `type`. Con el manejador API predeterminado, estos fallos producen un `422` sin invocar la acción. Quitar `Coerce()` restaura el requisito de entero estricto, de modo que el texto `"12"` también falla. Los demás campos sin marcar conservan su comportamiento. Consulta el [alcance de la coerción y los valores anidados](/es/validation/declaring-schemas#field-coercion).
 
 ## Schema o Request
 

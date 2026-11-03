@@ -9,6 +9,69 @@ Cuando una acción declara un parámetro como `payload: Order`, el contenedor va
 
 No necesitas capturar esa excepción dentro de la acción ni llamar manualmente al validador para activar la inyección. Consulta la [declaración de schemas](/es/validation/declaring-schemas) y la [integración con controladores](/es/validation/controllers-and-http) para comenzar. El mismo validador se reutiliza en [MCP, Realtime y otros puntos de entrada](/es/validation/integrations); la respuesta HTTP `422` mostrada aquí pertenece al manejo API, no a todos esos transportes.
 
+<a id="coercion-and-empty-rules"></a>
+
+## Combinar conversión previa y reglas de vacío
+
+Desde **1.4.0**, [`Coerce()`](/es/validation/declaring-schemas#field-coercion) convierte los valores marcados antes de comprobar sus tipos declarados, restricciones y reglas. [`Empty()` y `NoEmpty()`](/es/validation/application-rules#empty-and-no-empty) inspeccionan después el valor validado con la misma definición de vacío y condiciones de aceptación opuestas.
+
+Este ejemplo admite una cantidad enviada como texto, exige un nombre y una colección no vacíos y reserva un campo opcional para valores vacíos:
+
+```python
+from orionis.schemas import Schema
+from orionis.schemas.constraints import GreaterThan
+from orionis.schemas.fields import Field
+from orionis.schemas.metadata import Coerce
+from orionis.schemas.rules import Empty, NoEmpty
+from orionis.schemas.validator import Schema as Validator
+
+
+class ItemInput(Schema):
+    name: Field[str, NoEmpty(message="Nombre obligatorio.")]
+    quantity: Field[
+        int,
+        Coerce(),
+        GreaterThan(0, message="La cantidad debe ser positiva."),
+    ]
+    reserved: Field[str | None, Empty()] = None
+
+
+class OrderInput(Schema):
+    items: Field[list[ItemInput], NoEmpty()]
+
+
+async def example() -> OrderInput:
+    payload = {
+        "items": [
+            {"name": "Libro", "quantity": "2", "reserved": "   "},
+        ],
+    }
+
+    order = await Validator.validate(payload, OrderInput)
+
+    assert order.items[0].quantity == 2
+    assert payload["items"][0]["quantity"] == "2"
+    assert order.items[0].reserved == "   "
+
+    return order
+```
+
+Ejecuta `await example()` desde un llamador asíncrono o `asyncio.run(example())` después de importar `asyncio` en un script independiente. La conversión conserva el payload original. `Empty()` reconoce la cadena de espacios sin recortarla ni reemplazarla. Si omites `reserved`, se utiliza su valor predeterminado `None`, admitido tanto por su tipo nullable como por `Empty()`. Los demás campos siguen siendo obligatorios según sus declaraciones.
+
+Cambia un valor del payload a la vez para obtener estos fallos en `ValidationException.errors`:
+
+| Entrada rechazada | Ruta del campo | Código de error |
+| --- | --- | --- |
+| `"items": []` | `items` | `no_empty` |
+| `name` del elemento compuesto sólo por espacios en blanco | `items[0].name` | `no_empty` |
+| `quantity` del elemento con `"0"` | `items[0].quantity` | `gt` |
+| `quantity` del elemento con `"abc"` o `"1.5"` | `items[0].quantity` | `type` |
+| `reserved` del elemento con `"texto"` | `items[0].reserved` | `empty` |
+
+La cantidad `"0"` se convierte a `0` antes de incumplir `GreaterThan(0)`. El texto numérico inválido conserva un error de tipo; no se trunca ni se reemplaza por cero. Los fallos de nombre y cantidad mantienen sus mensajes personalizados y las rutas con índices. Por ejemplo, `error.errors["items[0].name"]` contiene `{"rule": "no_empty", "message": "Nombre obligatorio."}`.
+
+El string `"0"` no está vacío, pero un campo declarado como `Field[int, Coerce(), NoEmpty()]` lo convierte a cero numérico e informa `no_empty`. Los campos obligatorios ausentes siguen informando `missing`; ninguna de las reglas sustituye la obligatoriedad del schema. Construir directamente `ItemInput(...)` no ejecuta la conversión ni la validación: utiliza el validador o un punto de entrada que lo invoque.
+
 ## Ejemplo: varios errores en una operación
 
 Este schema combina un límite numérico, dos reglas sobre un mismo campo y un schema hijo directo. Guarda el ejemplo en `app/http/controllers/preview_order_controller.py`; las clases se muestran juntas para facilitar la lectura, aunque puedes separar los schemas en sus propios módulos.
@@ -135,10 +198,11 @@ Las rutas de campos incluyen puntos para objetos anidados, como `contact.email`,
 
 ## Cómo se recopilan los fallos
 
-1. El validador intenta convertir todo el payload y aplicar las restricciones estructurales mediante `msgspec`.
-2. Si esa conversión funciona, espera las reglas de los campos convertidos y recorre los schemas hijos, también dentro de colecciones. Cada regla utiliza `async def enforce()` y se espera mediante `Rule.validate()`.
-3. Si la conversión falla, inspecciona los campos declarados para recopilar los errores de conversión y los obligatorios ausentes. Sobre cada valor compatible con su tipo comprueba todas las restricciones y espera todas sus reglas, aunque alguna restricción falle. Desciende también a los hijos de las colecciones para conservar sus fallos.
-4. Agrupa los fallos encontrados en una sola `ValidationException`.
+1. El validador prepara los campos marcados con `Coerce()` sin modificar el payload original. Los campos sin marcar conservan la conversión estricta, salvo que hereden la conversión de un schema o una colección padre marcados.
+2. Intenta convertir el payload preparado y aplicar las restricciones estructurales mediante `msgspec`.
+3. Si esa conversión funciona, espera las reglas de los campos convertidos y recorre los schemas hijos, también dentro de colecciones. Cada regla utiliza `async def enforce()` y se espera mediante `Rule.validate()`.
+4. Si la conversión falla, inspecciona los campos declarados para recopilar los errores de conversión y los obligatorios ausentes. Sobre cada valor compatible con su tipo comprueba todas las restricciones y espera todas sus reglas, aunque alguna restricción falle. Desciende también a los hijos de las colecciones para conservar sus fallos.
+5. Agrupa los fallos encontrados en una sola `ValidationException`.
 
 Las reglas de un campo siguen el orden de su declaración y un resultado `False` no cancela las siguientes. En un recorrido anidado, los hijos se validan antes de las reglas del campo que los contiene. Las comprobaciones se esperan secuencialmente, sin lanzar todos los campos en paralelo. Un tipo incompatible o un campo ausente impide ejecutar las condiciones que requieren su valor convertido, pero eso no impide comprobar los campos válidos de ese hijo ni otros elementos.
 
@@ -180,7 +244,7 @@ asyncio.run(main())
 
 `"ABC"` tiene el tipo correcto, pero incumple las dos restricciones y la regla: `errors["value"]` contiene tres objetos. Si envías `42`, se informa el error `type`; no se aplican las condiciones de cadena a ese entero.
 
-El caso válido conserva la conversión nativa de `msgspec` y los planes preparados al declarar la clase. El recorrido detallado se utiliza al fallar esa conversión; no se repite para cada petición válida. Las reglas Python y sus esperas de I/O siguen teniendo su propio coste.
+Tras la conversión previa opcional, el caso válido conserva la conversión nativa de `msgspec` y los planes preparados al declarar la clase. La recopilación detallada de errores se utiliza al fallar esa conversión; no se repite para cada petición válida. Las reglas Python y sus esperas de I/O siguen teniendo su propio coste.
 
 El validador no recibe opciones `bail`, `max_errors` ni una política para detenerse en el primer error: su método `async validate()` acepta únicamente `payload` y `schema`.
 

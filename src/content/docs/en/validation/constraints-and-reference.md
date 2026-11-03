@@ -5,11 +5,11 @@ editUrl: true
 lastUpdated: false
 ---
 
-This reference covers the **47 public names** in `orionis.schemas.constraints`: **10 structural constraints** and **37 executable rules**. The categories below organize the reference; they do not represent separate internal modules.
+This reference covers the **49 public names** in `orionis.schemas.constraints`: **10 structural constraints** and **39 executable rules**. The categories below organize the reference; they do not represent separate internal modules.
 
 ## Reading the examples
 
-Each of the **47 elements** includes a schema, a controller method with **schema injection**, and accepted/rejected inputs. Tables retain signatures, defaults and accepted types.
+Each of the **49 elements** includes a schema, a controller method with **schema injection**, and accepted/rejected inputs. Tables retain signatures, defaults and accepted types.
 
 To try an example, copy these imports and the selected element's block into `app/http/controllers/rule_example_controller.py`:
 
@@ -51,7 +51,7 @@ Structural constraints compile into the type-conversion layer. `Rule` subclasses
 
 ### Asynchronous execution and nested schemas
 
-All **37 executable rules** implement `async def enforce(...)`: validation always awaits their evaluation, including local checks without I/O. There is no synchronous rule variant or alternate `enforceAsync` method. Type conversion and structural constraints remain the first phase; rules then run in declaration order without launching concurrent tasks per field. `ActiveUrl` awaits name resolution, `Unique` awaits the active connection's query, and rules that read files delegate that read to a worker thread.
+All **39 executable rules** implement `async def enforce(...)`: validation always awaits their evaluation, including local checks without I/O. There is no synchronous rule variant or alternate `enforceAsync` method. An explicit [`Coerce()` marker](/en/validation/declaring-schemas#field-coercion) converts values before type and structural constraint checks; rules then run in declaration order without launching concurrent tasks per field. `ActiveUrl` awaits name resolution, `Unique` awaits the active connection's query, and rules that read files delegate that read to a worker thread.
 
 A child schema's rules also run when it is held in lists, dictionary values, tuples, sets or frozensets supported by conversion, including nested and optional collections. No manual per-element validation is required. For example, if `ContactSchema.email` declares `Email()`, a `contacts: list[ContactSchema]` field checks every email and retains error paths such as `contacts[0].email`. The [error guide](/en/validation/validation-and-errors) explains paths and failure collection, including when another item could not be converted.
 
@@ -1206,6 +1206,71 @@ Invalid body (422):
 ```
 
 
+<a id="empty-and-no-empty"></a>
+
+## Empty and non-empty values
+
+Available since **1.4.0**. These rules share one emptiness definition and are exact opposites. The full [emptiness guide](/en/validation/application-rules#empty-and-no-empty) explains whitespace, numeric zeros, collections, uploads, missing fields, and coercion.
+
+| Rule | Condition and types | Additional parameters | Example field | Failure code |
+| --- | --- | --- | --- | --- |
+| `Empty` | Accepts `None`, whitespace-only or empty strings, numeric zero, `False`, zero-length values, and zero-byte uploads. | — | `value: Field[str \| None, C.Empty()]` | `empty` |
+| `NoEmpty` | Rejects exactly the values accepted by `Empty`. | — | `value: Field[str, C.NoEmpty()]` | `no_empty` |
+
+Both accept the shared `message=` argument. They do not trim text, inspect collection elements recursively, read file contents, or consume unsized iterators. Types and required fields still apply: a missing required field produces `missing`, and an incompatible type produces `type` before either rule can inspect it.
+
+### Empty
+
+The nullable field accepts `null` and whitespace-only strings. Non-empty text fails with `empty` and the custom message.
+
+```python
+class EmptySchema(Schema):
+    value: Field[str | None, C.Empty(message="Leave this field empty.")]
+
+
+class EmptyController(BaseController):
+    async def __call__(self, payload: EmptySchema) -> dict:
+        return {"value": payload.value}
+```
+
+Valid body (200), with whitespace preserved:
+
+```json
+{"value": "   "}
+```
+
+Invalid body (422):
+
+```json
+{"value": "text"}
+```
+
+### NoEmpty
+
+The string `"0"` is present. A whitespace-only string fails with `no_empty` and the custom message.
+
+```python
+class NoEmptySchema(Schema):
+    value: Field[str, C.NoEmpty(message="Provide a value.")]
+
+
+class NoEmptyController(BaseController):
+    async def __call__(self, payload: NoEmptySchema) -> dict:
+        return {"value": payload.value}
+```
+
+Valid body (200):
+
+```json
+{"value": "0"}
+```
+
+Invalid body (422):
+
+```json
+{"value": "   "}
+```
+
 ## Acceptance, values and passwords
 
 | Rule or constraint | Condition and types | Additional parameters | Example field |
@@ -1586,6 +1651,7 @@ Import the following objects from `orionis.schemas.metadata`, rather than `const
 
 | Metadata | Constructor | Purpose |
 | --- | --- | --- |
+| `Coerce` | `Coerce()` | Convert to the declared type before type, constraint, and rule checks; see [field coercion](/en/validation/declaring-schemas#field-coercion). Accepts no arguments. |
 | `Title` | `Title(value: str)` | A descriptive field title. |
 | `Description` | `Description(value: str)` | A field description. |
 | `Examples` | `Examples(values: list[object])` | JSON-serializable JSON Schema examples. |
@@ -1593,7 +1659,7 @@ Import the following objects from `orionis.schemas.metadata`, rather than `const
 | `Extra` | `Extra(data: dict[str, object])` | Additional data associated with the field. |
 | `Message` | `Message(text: str)` | A custom type-error message; it does not override every rule message. |
 
-`DocumentMetadata`, also exported by that module, is the metadata base rather than a validation condition. For a rule, use its `message` argument; for declared type errors, use `Message`:
+`DocumentMetadata`, also exported by that module, is the base for descriptive metadata rather than a validation condition. `Coerce()` controls the conversion phase and is not a `Rule` or structural constraint. For a rule, use its `message` argument; for declared type errors, use `Message`:
 
 ```python
 from orionis.schemas import Schema
@@ -1612,7 +1678,7 @@ class QuantitySchema(Schema):
     ]
 ```
 
-On an `int` field, the conversion layer may normalize exclusive bounds into inclusive ones. For a custom message on a positive integer condition, `GreaterThanOrEqual(1, message=...)` keeps a direct match between the condition and its message.
+For `Field[int, Coerce(), C.GreaterThan(0, message="Quantity must be positive.")]`, input `"0"` becomes `0` and reports `gt` with the declared message. Invalid numeric input such as `"abc"` remains a `type` failure; a constraint's `message` does not replace that type error.
 
 See [custom validation rules](/en/validation/application-rules) to extend these checks.
 

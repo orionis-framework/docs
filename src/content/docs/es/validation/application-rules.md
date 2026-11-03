@@ -9,6 +9,56 @@ Una regla de aplicación comprueba una condición sobre un valor ya convertido a
 
 En una acción HTTP, declara el schema como parámetro: el contenedor valida el cuerpo de la petición y espera las reglas antes de inyectar la instancia. La acción sólo se ejecuta si esa validación termina correctamente. El mismo pipeline combina restricciones estructurales, reglas locales y reglas con I/O asíncrono. Los schemas no dependen de los controladores: puedes reutilizar sus reglas en [MCP, Realtime y otros puntos de entrada](/es/validation/integrations).
 
+<a id="empty-and-no-empty"></a>
+
+## Valores vacíos y no vacíos
+
+Desde **1.4.0**, importa `Empty` y `NoEmpty` desde `orionis.schemas.rules` para exigir un valor vacío o presente. Son opuestas exactas y comparten esta definición:
+
+| Categoría del valor | Se considera vacío cuando |
+| --- | --- |
+| Nulo | El valor es `None`. |
+| Texto | La cadena es `""` o contiene sólo espacios en blanco, incluidos tabuladores y saltos de línea. |
+| Números y booleanos | El valor es un cero numérico, incluidos `0`, `0.0`, ceros equivalentes de `Decimal` o `Fraction`, o `False`. |
+| Colecciones con longitud y datos binarios | La longitud es cero: listas, tuplas, diccionarios, sets, arrays, `bytes` y otros valores con longitud. |
+| Archivos subidos | El tamaño del archivo en bytes es cero. Las comprobaciones utilizan sus metadatos sin leer el contenido. |
+
+`"0"` es una cadena no vacía. `[None]`, `{"key": None}` y `b" "` tampoco están vacíos: contienen elementos o bytes. Las reglas no inspeccionan recursivamente los elementos de las colecciones ni recortan las cadenas almacenadas. Un iterador sin longitud se considera presente; ninguna regla lo consume para descubrir si produce valores.
+
+| Declaración | Valor aceptado | Código de error | Mensaje predeterminado |
+| --- | --- | --- | --- |
+| `Empty(*, message=None)` | Cualquier valor clasificado como vacío. | `empty` | `Value must be empty.` |
+| `NoEmpty(*, message=None)` | Cualquier valor no clasificado como vacío. | `no_empty` | `Value must not be empty.` |
+
+Ambas admiten `message: str | None = None` como argumento por nombre. Por ejemplo:
+
+```python
+from orionis.schemas import Schema
+from orionis.schemas.fields import Field
+from orionis.schemas.rules import Empty, NoEmpty
+from orionis.schemas.validator import Schema as Validator
+
+
+class ReservationInput(Schema):
+    name: Field[str, NoEmpty(message="Nombre obligatorio.")]
+    reserved: Field[str | None, Empty(message="Deja este campo vacío.")] = None
+
+
+async def validate_reservation() -> ReservationInput:
+    payload = {"name": " Libro ", "reserved": "   "}
+    result = await Validator.validate(payload, ReservationInput)
+    assert result.name == " Libro "
+    assert result.reserved == "   "
+    assert payload == {"name": " Libro ", "reserved": "   "}
+    return result
+```
+
+Un `name` compuesto sólo por espacios falla con `no_empty` y el mensaje personalizado; un texto en `reserved` falla con `empty`. Los espacios alrededor de un valor aceptado permanecen sin cambios.
+
+Estas reglas no hacen que un campo sea opcional ni omiten la comprobación de su tipo. Un campo obligatorio ausente sigue produciendo `missing`; un `None` para `Field[int, Empty()]` produce `type`. Si el tipo permite `None`, `Empty()` lo acepta y `NoEmpty()` lo rechaza. Un valor predeterminado como `reserved = None` controla la omisión por separado.
+
+Cuando un campo utiliza [`Coerce()`](/es/validation/declaring-schemas#field-coercion), las reglas reciben su valor convertido. Por ejemplo, `Field[int, Coerce(), NoEmpty()]` rechaza la entrada `"0"` con `no_empty` después de convertirla en `0`, mientras que `Field[str, NoEmpty()]` acepta esa misma cadena. Una conversión fallida sigue siendo un error de tipo. Consulta el [ejemplo combinado y las rutas de errores anidados](/es/validation/validation-and-errors#coercion-and-empty-rules).
+
 ## Contrato de una regla personalizada
 
 Importa `Rule` desde `orionis.schemas.rule` y crea una subclase. El ejecutor reconoce instancias de `Rule`; implementar únicamente el contrato `IRule` no basta para incorporarlas a un schema.

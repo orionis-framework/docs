@@ -1,11 +1,65 @@
 ---
 title: "Release notes"
-description: "Orionis 1.0.8 through 1.3.0: SQL inspection, internal storage commands, API documentation, and upgrade notes."
+description: "Orionis 1.0.8 through 1.4.0: schema coercion, empty-value rules, SQL inspection, storage commands, and upgrade notes."
 editUrl: true
 lastUpdated: false
 ---
 
-These notes cover **versions 1.0.8 through 1.3.0** and link to the updated usage guides. Run Reactor examples from the application root using its Python environment.
+These notes cover **versions 1.0.8 through 1.4.0** and link to the updated usage guides. Run Reactor examples from the application root using its Python environment.
+
+<a id="v1-4-0"></a>
+
+## 1.4.0: field coercion and empty-value rules
+
+Version **1.4.0** adds optional conversion before validation with `Coerce()`, plus the complementary rules `Empty()` and `NoEmpty()`. Fields without coercion remain strict. Python **3.14+** remains required.
+
+### Convert before validating with `Coerce()`
+
+Import `Coerce` from `orionis.schemas.metadata` and attach it to a field's declared type:
+
+```python
+from orionis.schemas import Schema
+from orionis.schemas.constraints import GreaterThan
+from orionis.schemas.fields import Field
+from orionis.schemas.metadata import Coerce
+
+
+class QuantityInput(Schema):
+    quantity: Field[int, Coerce(), GreaterThan(0)]
+```
+
+When the validator processes this schema, it converts the marked value before checking its type, constraints, and rules:
+
+| Input | Result |
+| --- | --- |
+| `"12"` or `"12.0"` | Becomes the integer `12` and passes. |
+| `"0"` | Becomes `0` and fails `GreaterThan(0)` with code `gt`. |
+| `"abc"` or `"1.5"` | Fails with code `type`; no truncation or replacement with zero. |
+
+Other supported destinations include `float`, `bool`, and `Decimal`, according to the declared type's conversion rules. The marker works with nested schemas, collections, renamed fields, and nullable types. Marking a collection or schema enables conversion of its descendant values and fields; dictionary keys remain strict, and unmarked sibling fields are unaffected.
+
+Validation preserves the original payload. Directly constructing a schema instance does not run coercion. See [field coercion](/en/validation/declaring-schemas#field-coercion) and [form input](/en/validation/controllers-and-http#form-field-coercion).
+
+### Define emptiness with `Empty()` and `NoEmpty()`
+
+Both rules share one definition and are exact opposites. Empty values include `None`, empty or whitespace-only strings, numeric zeros, `False`, collections with length zero, and uploaded files with zero bytes. File contents are not read.
+
+The string `"0"` is present; after coercion to `int`, its value is an empty numeric zero. `[None]` and `{"key": None}` are present because they contain elements. The rules neither trim strings nor consume iterators without a length; those iterators are treated as present. A missing field still follows the schema's required-field rules, and a value must satisfy its declared type before an emptiness rule can apply.
+
+Import both rules from `orionis.schemas.rules`. Each accepts `message=`; failure codes are `empty` and `no_empty`. Nested failures preserve paths such as `items[0].name` and their custom messages. See the [rule reference](/en/validation/application-rules#empty-and-no-empty) and the [complete order-validation example](/en/validation/validation-and-errors#coercion-and-empty-rules), including the rejection cases.
+
+### Validation and quality
+
+The release adds **38 tests: 22 for coercion and 16 for emptiness**, covering a real multipart request, nesting, custom messages, conversions, and payload preservation. Release validation passed **561 schema tests** and **3 HTTP response tests**. Shared validation logic reduced duplication and complexity; Ruff and SonarLint reported no warnings, with targeted suppressions documented. Framework documentation was updated in English and Spanish.
+
+### Upgrade to 1.4.0
+
+```bash
+uv add "orionis==1.4.0"
+uv sync
+```
+
+For pip-managed environments, use `python -m pip install --upgrade "orionis==1.4.0"`. Adopt coercion explicitly on fields that should accept convertible input. Use `NoEmpty()` when zero and `False` must also be rejected; it is not a substitute for declaring a required field. Review the [validation sequence and errors](/en/validation/validation-and-errors) before changing existing contracts.
 
 <a id="v1-3-0"></a>
 

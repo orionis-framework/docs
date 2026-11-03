@@ -9,6 +9,56 @@ An application rule checks a condition on a value already converted to its decla
 
 Declare the schema as an HTTP action parameter: the container validates the request body and awaits its rules before injecting the instance. The action runs only when validation succeeds. The same pipeline combines structural constraints, local rules, and asynchronous I/O rules. Schemas do not depend on controllers: reuse their rules in [MCP, Realtime, and other entry points](/en/validation/integrations).
 
+<a id="empty-and-no-empty"></a>
+
+## Empty and non-empty values
+
+Since **1.4.0**, import `Empty` and `NoEmpty` from `orionis.schemas.rules` to require an empty or present value. They are exact opposites and share this definition:
+
+| Value category | Empty when |
+| --- | --- |
+| Null | The value is `None`. |
+| Text | The string is `""` or contains only whitespace, including tabs and line breaks. |
+| Numbers and booleans | The value is numeric zero, including `0`, `0.0`, equivalent `Decimal` or `Fraction` zeros, or `False`. |
+| Sized collections and binary data | The length is zero: lists, tuples, dictionaries, sets, arrays, `bytes`, and other sized values. |
+| Uploaded files | The file's byte size is zero. The checks use its metadata without reading the content. |
+
+`"0"` is a non-empty string. `[None]`, `{"key": None}`, and `b" "` are also non-empty because they contain elements or bytes. The rules do not inspect collection elements recursively or trim stored strings. An iterator without a length is considered present; neither rule consumes it to discover whether it yields values.
+
+| Declaration | Accepted value | Failure code | Default message |
+| --- | --- | --- | --- |
+| `Empty(*, message=None)` | Any value classified as empty. | `empty` | `Value must be empty.` |
+| `NoEmpty(*, message=None)` | Any value not classified as empty. | `no_empty` | `Value must not be empty.` |
+
+Both accept a keyword-only `message: str | None = None`. For example:
+
+```python
+from orionis.schemas import Schema
+from orionis.schemas.fields import Field
+from orionis.schemas.rules import Empty, NoEmpty
+from orionis.schemas.validator import Schema as Validator
+
+
+class ReservationInput(Schema):
+    name: Field[str, NoEmpty(message="Name is required.")]
+    reserved: Field[str | None, Empty(message="Leave this field empty.")] = None
+
+
+async def validate_reservation() -> ReservationInput:
+    payload = {"name": " Book ", "reserved": "   "}
+    result = await Validator.validate(payload, ReservationInput)
+    assert result.name == " Book "
+    assert result.reserved == "   "
+    assert payload == {"name": " Book ", "reserved": "   "}
+    return result
+```
+
+Whitespace-only `name` fails with `no_empty` and the custom message; text in `reserved` fails with `empty`. The surrounding spaces in an accepted value remain unchanged.
+
+These rules do not make a field optional or bypass its declared type. An absent required field still produces `missing`; `None` for `Field[int, Empty()]` produces `type`. If the type permits `None`, `Empty()` accepts it and `NoEmpty()` rejects it. A default such as `reserved = None` controls omission separately.
+
+When a field uses [`Coerce()`](/en/validation/declaring-schemas#field-coercion), the rules receive its converted value. For example, `Field[int, Coerce(), NoEmpty()]` rejects the input `"0"` with `no_empty` after conversion to `0`, while `Field[str, NoEmpty()]` accepts the same string. Failed conversion remains a type error. See the [combined example and nested error paths](/en/validation/validation-and-errors#coercion-and-empty-rules).
+
 ## Custom rule contract
 
 Import `Rule` from `orionis.schemas.rule` and subclass it. The executor recognizes `Rule` instances; implementing only the `IRule` contract is not sufficient to attach a rule to a schema.
