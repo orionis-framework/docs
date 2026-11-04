@@ -22,12 +22,22 @@ La fachada `Auth` y los contratos del contenedor permiten acceder a ambos mecani
 ## Preparar una aplicación
 
 1. Configura el modelo y los campos de `config/auth.py` en [Configuración y guards](/es/authentication/configuration-and-guards).
-2. Prepara la base de datos y ejecuta las [migraciones del proyecto](/es/database/migrations). Las guías de sesión, tokens y roles indican qué tablas utiliza cada mecanismo.
+2. Aplica las [migraciones del proyecto](/es/database/migrations) para identidad y negocio, y ejecuta [`auth:migrate`](/es/database/commands#auth-migrate) para las tablas internas de autenticación y autorización. Después ejecuta los seeders que necesiten esas tablas.
 3. Elige rutas WEB para login de navegador y rutas API para credenciales Bearer.
 4. Añade [middleware de acceso](/es/authentication/middleware) a las rutas privadas.
 5. Asigna [roles y permisos](/es/authentication/authorization), o registra [policies](/es/authentication/policies) para decisiones sobre recursos.
 
 El modelo habitual es `app.models.user.User`, con los concerns `Authenticatable` y `Authorizable`. La guía de sesiones muestra su definición completa, cómo crear una cuenta y cómo guardar su contraseña mediante la fachada `Hash`.
+
+Desde **1.5.0**, el core proporciona las tablas de roles, permisos, sus tres relaciones, tokens personales y recuperación de contraseñas. En una base nueva, ejecuta desde la raíz de la aplicación:
+
+```bash
+python -B reactor migrate
+python -B reactor auth:migrate
+python -B reactor seed
+```
+
+`auth:migrate` usa la conexión SQL predeterminada y su prefijo, respeta `AUTH_TOKEN_TABLE` y `AUTH_PASSWORD_RESET_TABLE` y conserva los registros existentes. El modelo de identidad, su migración y las reglas y seeders de negocio siguen en la aplicación. Preparar las tablas no crea usuarios ni concede privilegios. Para proyectos existentes, consulta la [actualización sin reescribir el historial](/es/database/migrations#auth-storage-1-5-0).
 
 ## Consultar la identidad actual
 

@@ -29,7 +29,7 @@ python -B reactor db:show --help
 
 | Comando | Propósito |
 | --- | --- |
-| [`auth:migrate`](#auth-migrate) | Crea el almacenamiento faltante de tokens personales con el esquema del framework. |
+| [`auth:migrate`](#auth-migrate) | Crea las tablas internas de roles, permisos, sus relaciones, tokens personales y recuperación de contraseñas. |
 | [`cache:migrate`](#cache-migrate) | Crea las tablas SQL faltantes de cache y locks. |
 | [`queue:migrate`](#queue-migrate) | Crea las tablas faltantes de todas las colas SQL y del repositorio central de fallos. |
 | [`schedule:migrate`](#schedule-migrate) | Crea la tabla SQL e índices nativos del scheduler sin arrancar tareas. |
@@ -59,12 +59,24 @@ Estos comandos utilizan las definiciones del framework y la configuración de se
 
 ### `auth:migrate`
 
-Crea `auth.tokens.table` (`AUTH_TOKEN_TABLE`, predeterminado `personal_access_tokens`) en la conexión SQL predeterminada, incluido su prefijo de tablas. Requiere restricciones de unicidad efectivas. No crea usuarios, permisos, roles ni recuperación de contraseñas; esas tablas conservan sus migraciones de aplicación.
+Desde **1.5.0**, crea las siete tablas internas de autenticación y autorización desde las definiciones del core, en la conexión SQL predeterminada y con su prefijo de tablas:
+
+| Tablas | Nombre o configuración |
+| --- | --- |
+| Roles y permisos | `permissions`, `roles`, `model_has_permissions`, `model_has_roles` y `role_has_permissions`. |
+| Tokens personales | `auth.tokens.table` (`AUTH_TOKEN_TABLE`, predeterminado `personal_access_tokens`). |
+| Recuperación de contraseñas | `auth.passwords.table` (`AUTH_PASSWORD_RESET_TABLE`, predeterminado `password_reset_tokens`). |
+
+Requiere restricciones de unicidad efectivas. Los nombres configurados de tokens y recuperación deben ser distintos entre sí y de las tablas de autorización, sin distinguir mayúsculas; una colisión devuelve `1` antes de crear tablas. El comando conserva los datos existentes y no ejecuta `ALTER` para adaptar esquemas incompatibles.
+
+La identidad (`users` y su modelo), las migraciones de negocio, los nombres de roles y permisos, sus asignaciones y las policies siguen en la aplicación. Este comando prepara sus tablas técnicas; no crea cuentas, concede privilegios, ejecuta seeders ni escribe historial de migraciones.
 
 ```shell
 orionis auth:migrate
 python -B reactor auth:migrate
 ```
+
+En una base nueva, ejecuta `migrate`, luego `auth:migrate` y finalmente `seed`. Para una aplicación existente, conserva las migraciones aplicadas y sus schemas; consulta la [actualización a 1.5.0](/es/database/migrations#auth-storage-1-5-0).
 
 <a id="cache-migrate"></a>
 

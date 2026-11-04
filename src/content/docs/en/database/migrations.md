@@ -15,7 +15,7 @@ Since 1.3.0, `auth:migrate`, `cache:migrate`, `schedule:migrate`, and `session:m
 
 | Command | Configured tables | SQL connection |
 |---|---|---|
-| [`auth:migrate`](/en/database/commands#auth-migrate) | `AUTH_TOKEN_TABLE` (`personal_access_tokens`) | Application default connection. |
+| [`auth:migrate`](/en/database/commands#auth-migrate) | `AUTH_TOKEN_TABLE` (`personal_access_tokens`), `AUTH_PASSWORD_RESET_TABLE` (`password_reset_tokens`), and the five authorization tables. | Application default connection. |
 | [`cache:migrate`](/en/database/commands#cache-migrate) | `DB_CACHE_TABLE` (`cache`) and `DB_CACHE_LOCK_TABLE` (`cache_locks`) | `DB_CACHE_CONNECTION`. |
 | [`queue:migrate`](/en/database/commands#queue-migrate) | Every configured SQL queue table, including `QUEUE_TABLE` (`jobs`), plus `QUEUE_FAILED_TABLE` (`failed_jobs`) | Each queue's SQL connection, including `QUEUE_DB_CONNECTION`, and `QUEUE_FAILED_DB_CONNECTION` for failures. |
 | [`schedule:migrate`](/en/database/commands#schedule-migrate) | `DB_TASK_TABLE` (`scheduler_tasks`) | `DB_TASK_CONNECTION`. |
@@ -29,13 +29,33 @@ python -B reactor auth:migrate
 
 These commands accept only `-h`/`--help`, **not `--database`**. Configure their destination before executing them. They can prepare SQL storage even when the corresponding active driver uses memory, files, Redis, or `sync`; cache and scheduler still require their `stores.database` configuration. They do not start workers, execute scheduled tasks, or switch the active driver.
 
-Token, cache, queue, and session table names respect their SQL connection's prefix. Scheduler storage uses the native APScheduler schema and indexes, taking `DB_TASK_TABLE` directly without applying that prefix. The connection needs the required DDL permissions and backend guarantees, including enforced unique constraints.
+All authentication, cache, queue, and session table names respect their SQL connection's prefix. Scheduler storage uses the native APScheduler schema and indexes, taking `DB_TASK_TABLE` directly without applying that prefix. The connection needs the required DDL permissions and backend guarantees, including enforced unique constraints.
 
 Rerunning a command preserves existing rows and tables. It does not run `DROP` or `ALTER`, repair incompatible schemas, or relocate existing data after a configuration change. Use an explicit application migration for a deliberate schema change. Successful preparation returns `0`; a reported storage or configuration failure returns `1`.
 
+<a id="auth-storage-1-5-0"></a>
+
+### Authorization and recovery since 1.5.0
+
+`auth:migrate` prepares `permissions`, `roles`, `model_has_permissions`, `model_has_roles`, and `role_has_permissions`, plus the configured personal access token and password recovery tables. The two configurable table names must differ from each other and from the five authorization tables, ignoring case. Configure them before running the command: a collision is rejected before storage is created.
+
+The core provides the technical schema. Identity (`users`, its model, and its migration), the domain, business capability names, their assignments, and policies belong to the application. For a new database, use this sequence so seeders have all their required tables:
+
+```shell
+python -B reactor migrate
+python -B reactor auth:migrate
+python -B reactor seed
+```
+
+`auth:migrate` does not create users or insert roles, permissions, or administrator accounts. It does not execute seeders either. `migrate --seed` does not prepare internal auth storage by itself; use the sequence above when a seeder depends on it.
+
+The reference application removes `m0000000006_create_permissions_table.py`, `m0000000007_create_roles_table.py`, `m0000000008_create_model_has_permissions_table.py`, `m0000000009_create_model_has_roles_table.py`, `m0000000010_create_role_has_permissions_table.py`, and `m0000000012_create_password_reset_tokens_table.py`, together with their `_v1.py` schemas. The `users` migration and business seeders remain in the application.
+
+In an existing project, `auth:migrate` reuses existing tables and preserves their records and history. **Keep already-applied migration files and the schemas they import** so their recorded batches can be rolled back. Do not clear history, renumber files, or run a reset to adopt 1.5.0. Updating the package does not automatically remove files from your application or skeleton. Use an explicit migration to change an existing schema: the command only creates missing tables.
+
 ### Existing projects and the 1.3.0 cleanup
 
-The framework's reference application removed five duplicate migration files: `m0000000001_create_scheduler_tasks_table.py`, `m0000000002_create_cache_table.py`, `m0000000003_create_cache_locks_table.py`, `m0000000004_create_sessions_table.py`, and `m0000000011_create_personal_access_tokens_table.py`, together with their five corresponding `_v1.py` schemas. Users, permissions, roles, their association tables, and password recovery retain their application migrations and original numbers. Queue preparation remains provided by `queue:migrate`.
+The framework's reference application removed five duplicate migration files: `m0000000001_create_scheduler_tasks_table.py`, `m0000000002_create_cache_table.py`, `m0000000003_create_cache_locks_table.py`, `m0000000004_create_sessions_table.py`, and `m0000000011_create_personal_access_tokens_table.py`, together with their five corresponding `_v1.py` schemas. In 1.3.0 it retained migrations for users, permissions, roles, their associations, and recovery with their original numbers. The [1.5.0 section](#auth-storage-1-5-0) describes the subsequent move of authorization and recovery into the core. Queue preparation remains provided by `queue:migrate`.
 
 That source cleanup does not alter existing databases or migration history. An existing project or skeleton may still contain those files: retain already-applied migrations and their schemas so rollback can resolve their identities. Do not renumber the remaining files or clear history to adopt these commands. New storage can be prepared with the commands above; business tables continue to use `migrate`.
 

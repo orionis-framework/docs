@@ -7,6 +7,8 @@ lastUpdated: false
 
 Un seeder describe datos iniciales o de desarrollo en una clase con run async. `SeederRunner` descubre los archivos pendientes y registra su ejecución en la tabla seeders. Un seeder registrado no se repite en esa conexión; una factory genera modelos cada vez que la invocas y no sustituye ese historial. Migra primero las tablas utilizadas.
 
+Desde **1.5.0**, si un seeder crea roles, permisos o sus asignaciones, prepara también las tablas internas con [`auth:migrate`](/es/database/commands#auth-migrate). Para una base nueva, ejecuta `python -B reactor migrate`, `python -B reactor auth:migrate` y luego `python -B reactor seed`. `migrate --seed` no prepara por sí solo ese almacenamiento. Los datos y privilegios del negocio siguen definidos por tus seeders; el comando de auth solo crea las tablas faltantes.
+
 ## Crear un seeder
 
 ```shell

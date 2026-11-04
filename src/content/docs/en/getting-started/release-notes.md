@@ -1,11 +1,51 @@
 ---
 title: "Release notes"
-description: "Orionis 1.0.8 through 1.4.0: schema coercion, empty-value rules, SQL inspection, storage commands, and upgrade notes."
+description: "Orionis 1.0.8 through 1.5.0: core authorization storage, password recovery, validation, and upgrade notes."
 editUrl: true
 lastUpdated: false
 ---
 
-These notes cover **versions 1.0.8 through 1.4.0** and link to the updated usage guides. Run Reactor examples from the application root using its Python environment.
+These notes cover **versions 1.0.8 through 1.5.0** and link to the updated usage guides. Run Reactor examples from the application root using its Python environment.
+
+<a id="v1-5-0"></a>
+
+## 1.5.0: authorization and recovery storage in the core
+
+Version **1.5.0** moves the technical schema for roles, permissions, their relationships, and password recovery into the core. `auth:migrate`, which has prepared personal access tokens since 1.3.0, now creates all seven internal authentication and authorization tables. Python **3.14+** remains required.
+
+### Prepare authentication tables
+
+| Tables | Responsibility |
+| --- | --- |
+| `permissions` and `roles` | Store capabilities and roles with unique names. |
+| `model_has_permissions`, `model_has_roles`, and `role_has_permissions` | Link identities to capabilities and roles, and roles to permissions. |
+| `auth.tokens.table` (`AUTH_TOKEN_TABLE`, default `personal_access_tokens`) | Store personal access tokens. |
+| `auth.passwords.table` (`AUTH_PASSWORD_RESET_TABLE`, default `password_reset_tokens`) | Store password recovery credentials. |
+
+The command uses the default SQL connection and its table prefix, requires enforced unique constraints, and accepts no `--database`. Configured personal access token and recovery table names must differ from each other and from the five authorization tables, ignoring case. A collision is rejected before any tables are created.
+
+For a new database, apply identity and business migrations, prepare auth storage, then run application seeders:
+
+```bash
+python -B reactor migrate
+python -B reactor auth:migrate
+python -B reactor seed
+```
+
+`auth:migrate` creates missing storage from framework definitions without importing files from `database/`, executing seeders, or recording entries in `migrations`. The `User` model, its `users` table, and its migration remain in the application, as do business role and permission names, their assignments, and policies. Preparing tables does not create accounts or grant administrator privileges. See [roles and permissions](/en/authentication/authorization), [account recovery](/en/authentication/account-recovery), and the [`auth:migrate` reference](/en/database/commands#auth-migrate).
+
+### Upgrade to 1.5.0
+
+```bash
+uv add "orionis==1.5.0"
+uv sync
+```
+
+For pip-managed environments, use `python -m pip install --upgrade "orionis==1.5.0"`. Review the default connection, `AUTH_TOKEN_TABLE`, and `AUTH_PASSWORD_RESET_TABLE`; if you use [compiled configuration](/en/environment/compiled-configuration), regenerate it before running `python -B reactor auth:migrate`. Restart application processes and workers with the updated version.
+
+Rerunning `auth:migrate` preserves existing tables and records, including assignments, tokens, and recovery requests. It does not run `DROP` or `ALTER`, relocate data when a table name changes, or rewrite migration history. An incompatible existing schema needs an explicit application migration.
+
+The reference application removes the six authorization and recovery migrations and schemas now provided by the core. **Keep already-applied migrations and the schemas they import in existing projects**: deleting them can prevent rollback of their recorded batches. Do not renumber files or clear history to adopt the command. Updating the package does not automatically modify your application's or skeleton's migrations. See the [auth storage upgrade guide](/en/database/migrations#auth-storage-1-5-0).
 
 <a id="v1-4-0"></a>
 
@@ -81,7 +121,7 @@ python -B reactor session:migrate
 
 These commands preserve existing records and do not drop or alter existing tables. They do not create application migration files or write entries to the migration history. They do not accept `--database`: configure each storage connection before running them. See [database commands](/en/database/commands#internal-storage-commands) and [migration ownership and upgrades](/en/database/migrations#framework-storage-tables).
 
-The framework's reference application removes five redundant migrations and their five schema definitions for scheduler tasks, cache values, cache locks, sessions, and personal access tokens. It retains users, permissions, roles, their relationships, and password recovery without renumbering the remaining files. This cleanup does not automatically remove files from existing applications or from every skeleton. Review your own migrations before adopting the commands; preserve existing migration history and use an explicit application migration for any required schema change. The release changes did not modify existing databases or their migration history.
+The framework's reference application removes five redundant migrations and their five schema definitions for scheduler tasks, cache values, cache locks, sessions, and personal access tokens. In 1.3.0 it retained users, permissions, roles, their relationships, and password recovery without renumbering the remaining files; [1.5.0](#v1-5-0) expands auth storage managed by the core. This cleanup does not automatically remove files from existing applications or from every skeleton. Review your own migrations before adopting the commands; preserve existing migration history and use an explicit application migration for any required schema change. The release changes did not modify existing databases or their migration history.
 
 ### Method names and generated reference
 

@@ -1,11 +1,51 @@
 ---
 title: "Notas de versión"
-description: "Cambios de Orionis 1.0.8 a 1.4.0: conversión de campos, reglas de vacío, inspección SQL, comandos de almacenamiento y actualización."
+description: "Cambios de Orionis 1.0.8 a 1.5.0: almacenamiento de autorización en el core, recuperación de contraseñas, validación y actualización."
 editUrl: true
 lastUpdated: false
 ---
 
-Estas notas reúnen los cambios de las versiones **1.0.8 a 1.4.0** y enlazan las guías de uso actualizadas. Los ejemplos de Reactor se ejecutan desde la raíz de la aplicación con su entorno de Python.
+Estas notas reúnen los cambios de las versiones **1.0.8 a 1.5.0** y enlazan las guías de uso actualizadas. Los ejemplos de Reactor se ejecutan desde la raíz de la aplicación con su entorno de Python.
+
+<a id="v1-5-0"></a>
+
+## 1.5.0: almacenamiento de autorización y recuperación en el core
+
+La versión **1.5.0** traslada al core el esquema técnico de roles, permisos, sus relaciones y recuperación de contraseñas. `auth:migrate`, que ya preparaba tokens personales desde 1.3.0, crea ahora las siete tablas internas de autenticación y autorización. Se mantiene el requisito de **Python 3.14+**.
+
+### Preparar las tablas de autenticación
+
+| Tablas | Responsabilidad |
+| --- | --- |
+| `permissions` y `roles` | Almacenar capacidades y roles con nombres únicos. |
+| `model_has_permissions`, `model_has_roles` y `role_has_permissions` | Relacionar identidades con capacidades y roles, y roles con permisos. |
+| `auth.tokens.table` (`AUTH_TOKEN_TABLE`, predeterminado `personal_access_tokens`) | Almacenar tokens personales. |
+| `auth.passwords.table` (`AUTH_PASSWORD_RESET_TABLE`, predeterminado `password_reset_tokens`) | Almacenar credenciales de recuperación de contraseña. |
+
+El comando utiliza la conexión SQL predeterminada y su prefijo de tablas, requiere restricciones de unicidad efectivas y no admite `--database`. Los nombres configurados para tokens personales y recuperación deben ser distintos entre sí y de las cinco tablas de autorización, sin distinguir mayúsculas. Una colisión se rechaza antes de crear tablas.
+
+En una base nueva, aplica las migraciones de identidad y negocio, prepara el almacenamiento de auth y después ejecuta los seeders de la aplicación:
+
+```bash
+python -B reactor migrate
+python -B reactor auth:migrate
+python -B reactor seed
+```
+
+`auth:migrate` crea el almacenamiento faltante desde las definiciones del framework, sin importar archivos de `database/`, ejecutar seeders ni registrar entradas en `migrations`. El modelo `User`, su tabla `users` y su migración siguen en la aplicación, al igual que los nombres de roles y permisos del negocio, sus asignaciones y las policies. Preparar las tablas no crea cuentas ni concede privilegios de administrador. Consulta [roles y permisos](/es/authentication/authorization), [recuperación de cuentas](/es/authentication/account-recovery) y la [referencia de `auth:migrate`](/es/database/commands#auth-migrate).
+
+### Actualizar a 1.5.0
+
+```bash
+uv add "orionis==1.5.0"
+uv sync
+```
+
+Para entornos administrados con pip, usa `python -m pip install --upgrade "orionis==1.5.0"`. Revisa la conexión predeterminada, `AUTH_TOKEN_TABLE` y `AUTH_PASSWORD_RESET_TABLE`; si utilizas [configuración compilada](/es/environment/compiled-configuration), regénérala antes de ejecutar `python -B reactor auth:migrate`. Reinicia los procesos de aplicación y workers con la versión actualizada.
+
+Repetir `auth:migrate` conserva tablas y registros existentes, incluidas asignaciones, tokens y solicitudes de recuperación. No ejecuta `DROP` ni `ALTER`, traslada datos al cambiar un nombre de tabla ni reescribe el historial de migraciones. Un esquema existente incompatible necesita una migración de aplicación explícita.
+
+La aplicación de referencia retira las seis migraciones y schemas de autorización y recuperación que ahora proporciona el core. **Conserva en los proyectos existentes las migraciones ya aplicadas y los schemas que importan**: eliminarlos puede impedir revertir sus lotes registrados. No renumeres archivos ni borres historial para adoptar el comando. Actualizar el paquete no modifica automáticamente las migraciones de tu aplicación o skeleton. Consulta la [guía para actualizar el almacenamiento de auth](/es/database/migrations#auth-storage-1-5-0).
 
 <a id="v1-4-0"></a>
 
@@ -81,7 +121,7 @@ python -B reactor session:migrate
 
 Estos comandos preservan los registros existentes y no eliminan ni alteran tablas existentes. Tampoco crean archivos de migración de aplicación ni escriben entradas en el historial de migraciones. No aceptan `--database`: configura la conexión de cada almacenamiento antes de ejecutarlos. Consulta los [comandos de base de datos](/es/database/commands#internal-storage-commands) y la [gestión de migraciones al actualizar](/es/database/migrations#framework-storage-tables).
 
-La aplicación de referencia del framework elimina cinco migraciones redundantes y sus cinco definiciones de schema para tareas programadas, valores de caché, bloqueos de caché, sesiones y tokens de acceso personal. Conserva usuarios, permisos, roles, sus relaciones y recuperación de contraseñas, sin renumerar los archivos restantes. Esta limpieza no elimina automáticamente archivos de aplicaciones existentes ni de todos los skeletons. Revisa tus migraciones antes de adoptar los comandos; conserva el historial existente y utiliza una migración de aplicación explícita cuando necesites modificar un schema. Los cambios de esta versión no modificaron las bases de datos existentes ni su historial de migraciones.
+La aplicación de referencia del framework elimina cinco migraciones redundantes y sus cinco definiciones de schema para tareas programadas, valores de caché, bloqueos de caché, sesiones y tokens de acceso personal. En 1.3.0 conservaba usuarios, permisos, roles, sus relaciones y recuperación de contraseñas, sin renumerar los archivos restantes; [1.5.0](#v1-5-0) amplía el almacenamiento de auth administrado por el core. Esta limpieza no elimina automáticamente archivos de aplicaciones existentes ni de todos los skeletons. Revisa tus migraciones antes de adoptar los comandos; conserva el historial existente y utiliza una migración de aplicación explícita cuando necesites modificar un schema. Los cambios de esta versión no modificaron las bases de datos existentes ni su historial de migraciones.
 
 ### Nombres de métodos y referencia generada
 

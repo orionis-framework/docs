@@ -23,7 +23,9 @@ orionis auth:migrate
 python -B reactor auth:migrate
 ```
 
-El comando crea la tabla faltante desde la definición de tokens de Orionis, respetando el nombre configurado y el prefijo de la conexión SQL. Exige restricciones de unicidad efectivas, no admite `--database` y conserva los tokens existentes al repetirlo. No importa migraciones de aplicación ni registra historial. Cambiar la tabla configurada no traslada tokens existentes ni modifica esquemas incompatibles. Usuarios, roles, permisos y recuperación de contraseñas siguen usando sus migraciones de aplicación; consulta [almacenamiento interno y proyectos existentes](/es/database/migrations#framework-storage-tables).
+Desde **1.5.0**, el comando prepara también roles, permisos, sus tres relaciones y recuperación de contraseñas. Crea las tablas faltantes desde las definiciones de Orionis, respetando el prefijo SQL y los nombres configurados en `auth.tokens.table` y `auth.passwords.table`. Ambos nombres deben ser distintos entre sí y de las tablas de autorización, sin distinguir mayúsculas.
+
+Exige restricciones de unicidad efectivas, no admite `--database` y conserva los tokens existentes al repetirlo. No importa migraciones de aplicación ni registra historial. Cambiar la tabla configurada no traslada tokens existentes ni modifica esquemas incompatibles. Los usuarios y su migración, las capacidades del negocio y sus seeders siguen en la aplicación; en una base nueva, ejecuta `migrate`, `auth:migrate` y después `seed`. Consulta [almacenamiento interno y proyectos existentes](/es/database/migrations#auth-storage-1-5-0).
 
 ## Emitir un token desde el navegador
 

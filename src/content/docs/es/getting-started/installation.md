@@ -293,24 +293,30 @@ Para servicios externos, sustituye los valores pendientes de conexión y configu
 
 ### Migraciones y datos iniciales
 
-Para preparar el esquema —por ejemplo, las tablas de autenticación de SSR— ejecuta desde la raíz del proyecto:
+Para preparar las tablas de identidad y negocio, ejecuta desde la raíz del proyecto:
 
 ```bash
 uv run python -B reactor migrate
 ```
 
-Este comando aplica las migraciones sin solicitar seeders. Si ya se ejecutaron correctamente, no es necesario volver a prepararlas para iniciar el servidor. Blank, Slim API y Slim MCP no incluyen migraciones iniciales necesarias para probar sus endpoints de partida.
+Este comando aplica las migraciones sin solicitar seeders. Con Orionis **1.5.0**, si utilizas autenticación —por ejemplo, en SSR— prepara después las tablas internas de roles, permisos, sus relaciones, tokens personales y recuperación:
+
+```bash
+uv run python -B reactor auth:migrate
+```
+
+`auth:migrate` utiliza la conexión SQL predeterminada y conserva los registros existentes. Un skeleton puede conservar migraciones anteriores para algunas de esas tablas; consulta la [adopción del almacenamiento del core](/es/database/migrations#auth-storage-1-5-0) antes de retirar archivos aplicados. Blank, Slim API y Slim MCP no incluyen migraciones iniciales necesarias para probar sus endpoints de partida.
 
 :::caution[La opción del instalador también ejecuta seeders]
-Aceptar las migraciones del asistente o pasar `--migrate` ejecuta `reactor migrate --seed`. Revisa los seeders antes de elegir esa opción: SSR incluye datos administrativos con credenciales de ejemplo. Para preparar sólo el esquema, crea el proyecto con `--no-migrate` y ejecuta manualmente `reactor migrate`.
+Aceptar las migraciones del asistente o pasar `--migrate` ejecuta `reactor migrate --seed`. Revisa los seeders antes de elegir esa opción: SSR incluye datos administrativos con credenciales de ejemplo. Para controlar la preparación con 1.5.0, crea el proyecto con `--no-migrate`, ejecuta manualmente `reactor migrate` y, si utilizas auth, `reactor auth:migrate` antes de solicitar los seeders.
 :::
 
 Con Redshift como conexión activa, utiliza `--no-migrate` y ejecuta las migraciones de esquema manualmente, sin `--seed`: el framework rechaza la ejecución de seeders en Redshift porque requiere restricciones únicas efectivas para registrar cada ejecución una sola vez.
 
-En una base compatible con seeders, cuando hayas revisado y adaptado los datos iniciales y sus credenciales, puedes solicitarlos explícitamente:
+En una base compatible con seeders, cuando hayas preparado las tablas anteriores y revisado y adaptado los datos iniciales y sus credenciales, puedes solicitarlos explícitamente:
 
 ```bash
-uv run python -B reactor migrate --seed
+uv run python -B reactor seed
 ```
 
 Los flujos de verificación y recuperación de cuenta de SSR también requieren configurar el envío de correo. El stack no incluye credenciales SMTP; consulta [Correo](/es/mail).

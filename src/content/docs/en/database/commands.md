@@ -29,7 +29,7 @@ python -B reactor db:show --help
 
 | Command | Purpose |
 | --- | --- |
-| [`auth:migrate`](#auth-migrate) | Creates missing personal access token storage using the framework schema. |
+| [`auth:migrate`](#auth-migrate) | Creates internal tables for roles, permissions, their relationships, personal access tokens, and password recovery. |
 | [`cache:migrate`](#cache-migrate) | Creates missing SQL cache and lock tables. |
 | [`queue:migrate`](#queue-migrate) | Creates missing tables for every SQL queue and the central failure repository. |
 | [`schedule:migrate`](#schedule-migrate) | Creates the scheduler's native SQL table and indexes without starting tasks. |
@@ -59,12 +59,24 @@ These commands use framework-owned definitions and the application's service con
 
 ### `auth:migrate`
 
-Creates `auth.tokens.table` (`AUTH_TOKEN_TABLE`, default `personal_access_tokens`) on the default SQL connection, including its connection prefix. Requires enforced unique constraints. It does not create users, permissions, roles, or password recovery tables; those retain their application migrations.
+Since **1.5.0**, creates all seven internal authentication and authorization tables from core definitions on the default SQL connection, including its table prefix:
+
+| Tables | Name or configuration |
+| --- | --- |
+| Roles and permissions | `permissions`, `roles`, `model_has_permissions`, `model_has_roles`, and `role_has_permissions`. |
+| Personal access tokens | `auth.tokens.table` (`AUTH_TOKEN_TABLE`, default `personal_access_tokens`). |
+| Password recovery | `auth.passwords.table` (`AUTH_PASSWORD_RESET_TABLE`, default `password_reset_tokens`). |
+
+Requires enforced unique constraints. Configured token and recovery table names must differ from each other and from authorization tables, ignoring case; a collision returns `1` before any tables are created. The command preserves existing data and does not run `ALTER` to adapt incompatible schemas.
+
+Identity (`users` and its model), business migrations, role and permission names, their assignments, and policies remain in the application. This command prepares their technical storage; it does not create accounts, grant privileges, execute seeders, or record migration history.
 
 ```shell
 orionis auth:migrate
 python -B reactor auth:migrate
 ```
+
+For a new database, run `migrate`, then `auth:migrate`, and finally `seed`. For an existing application, retain applied migrations and their schemas; see the [1.5.0 upgrade guide](/en/database/migrations#auth-storage-1-5-0).
 
 <a id="cache-migrate"></a>
 

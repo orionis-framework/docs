@@ -13,17 +13,21 @@ Orionis includes routes, controllers, schemas and templates for these workflows.
 
 Configure the database connection, the identity model in `config/auth.py` and [mail delivery](/en/mail). Recovery uses `email` and the password of the configured model; built-in registration and verification explicitly use `app.models.user.User`.
 
-The project includes migrations for `users`, `personal_access_tokens` and `password_reset_tokens`. The latter creates one record per email address containing the token digest, user identifier, password fingerprint and issuance time. Apply pending migrations using either alternative:
+The `users` table and its migration belong to the application. Since **1.5.0**, `auth:migrate` prepares the core recovery table using `auth.passwords.table` (`AUTH_PASSWORD_RESET_TABLE`, default `password_reset_tokens`), alongside personal access tokens and authorization. Recovery stores one record per email address, with the token digest, user identifier, password fingerprint, and issuance time.
+
+For a new database, apply application migrations and prepare internal storage using either of these two sequences:
 
 ```bash
 orionis migrate
+orionis auth:migrate
 ```
 
 ```bash
 python -B reactor migrate
+python -B reactor auth:migrate
 ```
 
-These commands apply all pending migrations on the configured connection. Registering routes does not create an account or configure mail delivery.
+`auth:migrate` uses the default SQL connection and its prefix, preserves existing records, and does not change migration history. Configured recovery and personal access token table names must differ from each other and from authorization tables, ignoring case. Run application seeders after preparing the tables. For existing databases, see the [upgrade precautions](/en/database/migrations#auth-storage-1-5-0). Registering routes does not create an account or configure mail delivery.
 
 ## Enable the built-in pages
 

@@ -22,12 +22,22 @@ Remember-me extends session login through an optional persistent credential. Tok
 ## Prepare an application
 
 1. Configure the model and `config/auth.py` fields in [Configuration and guards](/en/authentication/configuration-and-guards).
-2. Prepare the database and run the [project migrations](/en/database/migrations). Session, token, and role guides identify the tables each mechanism uses.
+2. Apply [project migrations](/en/database/migrations) for identity and business tables, then run [`auth:migrate`](/en/database/commands#auth-migrate) for internal authentication and authorization tables. Run seeders that need those tables afterward.
 3. Use WEB routes for browser login and API routes for Bearer credentials.
 4. Attach [access middleware](/en/authentication/middleware) to private routes.
 5. Assign [roles and permissions](/en/authentication/authorization), or register [policies](/en/authentication/policies) for resource decisions.
 
 The usual model is `app.models.user.User` with the `Authenticatable` and `Authorizable` concerns. The session guide includes its complete definition, account creation, and password hashing with the `Hash` facade.
+
+Since **1.5.0**, the core provides tables for roles, permissions, their three relationships, personal access tokens, and password recovery. For a new database, run from the application root:
+
+```bash
+python -B reactor migrate
+python -B reactor auth:migrate
+python -B reactor seed
+```
+
+`auth:migrate` uses the default SQL connection and its prefix, respects `AUTH_TOKEN_TABLE` and `AUTH_PASSWORD_RESET_TABLE`, and preserves existing records. The identity model, its migration, and business rules and seeders remain in the application. Preparing tables does not create users or grant privileges. For existing projects, see the [upgrade without rewriting history](/en/database/migrations#auth-storage-1-5-0).
 
 ## Inspect the current identity
 

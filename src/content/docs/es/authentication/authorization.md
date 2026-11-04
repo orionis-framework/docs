@@ -15,7 +15,7 @@ El modelo predeterminado `app.models.user.User` incorpora `Authenticatable` para
 
 `Authorizable` aporta `getAuthorizableType()` y `getAuthorizableId()`; las operaciones se realizan mediante `PermissionRegistrar`, no mediante métodos `assignRole()` del modelo.
 
-Las migraciones incluidas crean estas tablas:
+Desde **1.5.0**, el core define estas cinco tablas internas; se preparan con `auth:migrate`:
 
 | Tabla | Contenido |
 | --- | --- |
@@ -25,15 +25,17 @@ Las migraciones incluidas crean estas tablas:
 | `model_has_roles` | Roles asignados a una identidad. |
 | `role_has_permissions` | Permisos compartidos por un rol. |
 
-Ejecuta las migraciones pendientes sobre la base de datos configurada antes de utilizarlas. El comando directo y su equivalente local son:
+Configura la conexión SQL predeterminada y ejecuta una de estas alternativas antes de utilizarlas:
 
 ```bash
-orionis migrate
+orionis auth:migrate
 ```
 
 ```bash
-python -B reactor migrate
+python -B reactor auth:migrate
 ```
+
+El comando respeta el prefijo SQL, conserva registros existentes y prepara también tokens personales y recuperación de contraseñas. No necesita migraciones de aplicación para estas tablas ni escribe en su historial. La identidad y su migración siguen en la aplicación, al igual que los nombres de capacidades, sus asignaciones y las policies: el comando no inserta roles, permisos ni cuentas de administrador. En una base nueva, ejecuta `migrate`, `auth:migrate` y después `seed`; para actualizar un proyecto existente, [conserva sus migraciones aplicadas](/es/database/migrations#auth-storage-1-5-0).
 
 Las relaciones de identidad guardan `model_type` y `model_id`. El identificador debe corresponder a una identidad persistida y admitir un valor `int`, `str` o `UUID`. Por defecto, el tipo es la ruta Python de la clase; puedes fijarlo mediante `AUTHORIZABLE_TYPE` en tu modelo. Conserva ese valor cuando existan asignaciones: cambiarlo modifica la clave con la que se buscan sus relaciones.
 

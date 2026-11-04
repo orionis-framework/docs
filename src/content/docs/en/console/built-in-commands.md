@@ -37,7 +37,7 @@ Each link opens the complete options and examples for that command.
 | Command | Purpose |
 |---|---|
 | [`about`](/en/console/built-in-application#command-about) | Show installed framework metadata. |
-| [`auth:migrate`](/en/database/commands#auth-migrate) | Create missing personal access token storage. |
+| [`auth:migrate`](/en/database/commands#auth-migrate) | Create internal tables for roles, permissions, their relationships, personal access tokens, and password recovery. |
 | [`bootstrap:ai`](/en/console/built-in-bootstrap#command-bootstrap-ai) | Enable MCP server routes. |
 | [`bootstrap:api`](/en/console/built-in-bootstrap#command-bootstrap-api) | Enable API routing. |
 | [`bootstrap:config`](/en/console/built-in-bootstrap#command-bootstrap-config) | Restore missing official configuration files. |

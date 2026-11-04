@@ -105,6 +105,8 @@ python -B reactor migrate:status
 python -B reactor migrate
 ```
 
+If the application uses auth, also run `python -B reactor auth:migrate` before serving traffic or running seeders that depend on its tables. Since **1.5.0**, it prepares roles, permissions, their relationships, personal access tokens, and password recovery on the default connection. It preserves existing data and history; review the [auth storage upgrade guide](/en/database/migrations#auth-storage-1-5-0) and retain already-applied application migrations.
+
 `migrate` accepts `--database` for another connection; it has no `--force` flag. Do not run `migrate:fresh`, `db:wipe` or demonstration seeders as a routine release step. See [database commands](/en/database/commands).
 
 HTTP does not automatically start persistent queue workers or a CLI scheduler. If you use them, create separate services with the same code, configuration and key; follow [queues](/en/queues/workers) and [console and tasks](/en/console). Restart them when updating code too.

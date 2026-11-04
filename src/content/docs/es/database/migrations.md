@@ -15,7 +15,7 @@ Desde 1.3.0, `auth:migrate`, `cache:migrate`, `schedule:migrate` y `session:migr
 
 | Comando | Tablas configuradas | Conexión SQL |
 |---|---|---|
-| [`auth:migrate`](/es/database/commands#auth-migrate) | `AUTH_TOKEN_TABLE` (`personal_access_tokens`) | Conexión predeterminada de la aplicación. |
+| [`auth:migrate`](/es/database/commands#auth-migrate) | `AUTH_TOKEN_TABLE` (`personal_access_tokens`), `AUTH_PASSWORD_RESET_TABLE` (`password_reset_tokens`) y las cinco tablas de autorización. | Conexión predeterminada de la aplicación. |
 | [`cache:migrate`](/es/database/commands#cache-migrate) | `DB_CACHE_TABLE` (`cache`) y `DB_CACHE_LOCK_TABLE` (`cache_locks`) | `DB_CACHE_CONNECTION`. |
 | [`queue:migrate`](/es/database/commands#queue-migrate) | La tabla de cada cola SQL configurada, incluida `QUEUE_TABLE` (`jobs`), y `QUEUE_FAILED_TABLE` (`failed_jobs`) | La conexión SQL de cada cola, incluida `QUEUE_DB_CONNECTION`, y `QUEUE_FAILED_DB_CONNECTION` para fallos. |
 | [`schedule:migrate`](/es/database/commands#schedule-migrate) | `DB_TASK_TABLE` (`scheduler_tasks`) | `DB_TASK_CONNECTION`. |
@@ -29,13 +29,33 @@ python -B reactor auth:migrate
 
 Estos comandos solo aceptan `-h`/`--help`, **no `--database`**. Configura su destino antes de ejecutarlos. Pueden preparar SQL aunque el driver activo correspondiente use memoria, archivos, Redis o `sync`; cache y scheduler requieren que exista su configuración `stores.database`. No arrancan workers, ejecutan tareas programadas ni cambian el driver activo.
 
-Los nombres de tablas de tokens, cache, colas y sesiones respetan el prefijo de su conexión SQL. El scheduler utiliza el esquema e índices nativos de APScheduler y toma `DB_TASK_TABLE` directamente, sin aplicar ese prefijo. La conexión requiere los permisos DDL y las garantías del backend correspondientes, incluidas restricciones de unicidad efectivas.
+Los nombres de todas las tablas de autenticación, cache, colas y sesiones respetan el prefijo de su conexión SQL. El scheduler utiliza el esquema e índices nativos de APScheduler y toma `DB_TASK_TABLE` directamente, sin aplicar ese prefijo. La conexión requiere los permisos DDL y las garantías del backend correspondientes, incluidas restricciones de unicidad efectivas.
 
 Repetir un comando conserva las filas y tablas existentes. No ejecuta `DROP` ni `ALTER`, repara esquemas incompatibles ni traslada datos después de cambiar la configuración. Usa una migración de aplicación explícita para un cambio deliberado de esquema. La preparación correcta devuelve `0`; un fallo de almacenamiento o configuración reportado devuelve `1`.
 
+<a id="auth-storage-1-5-0"></a>
+
+### Autorización y recuperación desde 1.5.0
+
+`auth:migrate` prepara `permissions`, `roles`, `model_has_permissions`, `model_has_roles` y `role_has_permissions`, además de las tablas configuradas de tokens personales y recuperación de contraseñas. Los nombres de estas dos tablas configurables deben ser distintos entre sí y de las cinco tablas de autorización, sin distinguir mayúsculas. Configúralos antes de ejecutar el comando: una colisión se rechaza antes de crear almacenamiento.
+
+El core proporciona el esquema técnico. La identidad (`users`, su modelo y su migración), el dominio, los nombres de capacidades del negocio, sus asignaciones y las policies pertenecen a la aplicación. En una base nueva, ejecuta esta secuencia para que los seeders dispongan de todas sus tablas:
+
+```shell
+python -B reactor migrate
+python -B reactor auth:migrate
+python -B reactor seed
+```
+
+`auth:migrate` no crea usuarios ni inserta roles, permisos o cuentas de administrador. Tampoco ejecuta seeders. `migrate --seed` no prepara por sí solo el almacenamiento interno de auth; usa la secuencia anterior cuando un seeder dependa de él.
+
+La aplicación de referencia retira las migraciones `m0000000006_create_permissions_table.py`, `m0000000007_create_roles_table.py`, `m0000000008_create_model_has_permissions_table.py`, `m0000000009_create_model_has_roles_table.py`, `m0000000010_create_role_has_permissions_table.py` y `m0000000012_create_password_reset_tokens_table.py`, junto con sus schemas `_v1.py`. La migración de `users` y los seeders de negocio permanecen en la aplicación.
+
+En un proyecto existente, `auth:migrate` reutiliza las tablas existentes y conserva sus registros e historial. **Mantén los archivos de migraciones ya aplicadas y los schemas que importan** para que sus lotes registrados puedan revertirse. No borres historial, renumeres archivos ni ejecutes un reset para adoptar 1.5.0. Actualizar el paquete no elimina automáticamente los archivos de tu aplicación o skeleton. Si necesitas cambiar un esquema existente, hazlo mediante una migración explícita: el comando solo crea tablas faltantes.
+
 ### Proyectos existentes y limpieza de 1.3.0
 
-La aplicación de referencia del framework retiró cinco migraciones duplicadas: `m0000000001_create_scheduler_tasks_table.py`, `m0000000002_create_cache_table.py`, `m0000000003_create_cache_locks_table.py`, `m0000000004_create_sessions_table.py` y `m0000000011_create_personal_access_tokens_table.py`, junto a sus cinco schemas `_v1.py` correspondientes. Usuarios, permisos, roles, sus tablas de asociación y recuperación de contraseñas conservan sus migraciones de aplicación y números originales. La preparación de colas continúa mediante `queue:migrate`.
+La aplicación de referencia del framework retiró cinco migraciones duplicadas: `m0000000001_create_scheduler_tasks_table.py`, `m0000000002_create_cache_table.py`, `m0000000003_create_cache_locks_table.py`, `m0000000004_create_sessions_table.py` y `m0000000011_create_personal_access_tokens_table.py`, junto a sus cinco schemas `_v1.py` correspondientes. En 1.3.0 conservaba las migraciones de usuarios, permisos, roles, sus asociaciones y recuperación con sus números originales. La sección de [1.5.0](#auth-storage-1-5-0) describe el traslado posterior de autorización y recuperación al core. La preparación de colas continúa mediante `queue:migrate`.
 
 Esa limpieza de código no modifica bases de datos existentes ni su historial. Un proyecto o skeleton existente puede conservar esos archivos: mantén las migraciones ya aplicadas y sus schemas para que el rollback resuelva sus identidades. No renumeres los archivos restantes ni limpies el historial para adoptar estos comandos. El almacenamiento nuevo se prepara con los comandos anteriores; las tablas de negocio continúan utilizando `migrate`.
 

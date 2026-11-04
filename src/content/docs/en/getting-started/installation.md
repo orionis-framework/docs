@@ -293,24 +293,30 @@ For external services, replace the pending connection values and configure crede
 
 ### Migrations and initial data
 
-To prepare the schema—for example, SSR's authentication tables—run this from the project root:
+To prepare identity and business tables, run this from the project root:
 
 ```bash
 uv run python -B reactor migrate
 ```
 
-This command applies migrations without requesting seeders. If they have already completed successfully, you do not need to prepare them again to start the server. Blank, Slim API, and Slim MCP do not include initial migrations required to test their starting endpoints.
+This command applies migrations without requesting seeders. With Orionis **1.5.0**, if you use authentication—for example, in SSR—then prepare internal tables for roles, permissions, their relationships, personal access tokens, and recovery:
+
+```bash
+uv run python -B reactor auth:migrate
+```
+
+`auth:migrate` uses the default SQL connection and preserves existing records. A skeleton may retain older migrations for some of these tables; see [adopting core storage](/en/database/migrations#auth-storage-1-5-0) before removing applied files. Blank, Slim API, and Slim MCP do not include initial migrations required to test their starting endpoints.
 
 :::caution[The installer option also runs seeders]
-Accepting the wizard's migrations or passing `--migrate` runs `reactor migrate --seed`. Review the seeders before choosing that option: SSR includes administrative data with example credentials. To prepare only the schema, create the project with `--no-migrate` and run `reactor migrate` manually.
+Accepting the wizard's migrations or passing `--migrate` runs `reactor migrate --seed`. Review the seeders before choosing that option: SSR includes administrative data with example credentials. To control preparation with 1.5.0, create the project with `--no-migrate`, run `reactor migrate` manually and, if you use auth, run `reactor auth:migrate` before requesting seeders.
 :::
 
 With Redshift as the active connection, use `--no-migrate` and run schema migrations manually, without `--seed`: the framework rejects seeder execution on Redshift because it requires enforced unique constraints to record each execution only once.
 
-With a database that supports seeders, once you have reviewed and adapted the initial data and its credentials, you can request it explicitly:
+With a database that supports seeders, once you have prepared the tables above and reviewed and adapted the initial data and its credentials, you can request it explicitly:
 
 ```bash
-uv run python -B reactor migrate --seed
+uv run python -B reactor seed
 ```
 
 SSR's account verification and recovery flows also require mail delivery configuration. The stack does not include SMTP credentials; see [Mail](/en/mail).
