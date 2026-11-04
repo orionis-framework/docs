@@ -1,49 +1,59 @@
 ---
 title: "Installation and your first project"
-description: "Create an Orionis project with the official installer: prerequisites, wizard, options, stacks, manual installation, and first startup."
+description: "Create an Orionis application with the official installer: seven skeletons, interactive and automated setup, environment configuration, migrations, and startup."
 editUrl: true
 lastUpdated: false
 ---
 
-`orionis-installer` creates applications from the official Orionis Framework skeletons. The wizard lets you choose a stack, define project metadata, and select storage and database drivers. It then downloads the template, configures its files, and installs dependencies in a dedicated `.venv`, with a `uv.lock` file.
-
-The installer package is named **`orionis-installer`** and its executable is **`orionis`**. Each stack defines the application's Orionis dependency in its `pyproject.toml`; the installer preserves that constraint, and uv resolves compatible dependencies.
-
-## Prerequisites
-
-- **[uv](https://docs.astral.sh/uv/getting-started/installation/)** and **[Git](https://git-scm.com/downloads)** available on `PATH`. Git downloads the skeleton even if you choose `--no-git` to skip initializing the new repository.
-- **Python 3.14 or newer to run the installer.** For the application, the installer specifically locates and verifies **stable Python 3.14.x**. If missing, it attempts to obtain it through uv, respecting the configured download and connectivity policies. You do not need to activate a virtual environment to use the installer.
-- **An interactive terminal** to use the wizard. In scripts, CI, or terminals without TTY input and output, use `--no-interaction`.
-- **An existing, writable parent directory.** The destination directory must be new: it is rejected even if it already exists and is empty.
-- **Connectivity to GitHub and the package index**, plus Python download servers if that interpreter is not installed yet.
-
-The installer accounts for Windows, macOS, and Linux; its CI configuration includes all three systems. On Windows, uv and Git must resolve to native executables rather than `.cmd` or `.bat` wrappers. The creation and Reactor commands used here work across the three systems; file-copying differences are shown in the manual installation instructions.
-
-Visual Studio Code is optional. For the installer to open it at the end, its `code` launcher must be available on `PATH`. The stacks do not require Node.js, npm, or a frontend build for their initial startup.
-
-## Installation and execution
-
-### Run with uvx
-
-This invocation explicitly identifies the installer package and selects Python to run it:
+The official **`orionis-installer`** creates an application from your chosen skeleton, configures its environment, and installs its dependencies in a project-local `.venv`. It also generates an application key and a `uv.lock` file. Start the wizard from the directory where you want to create your project:
 
 ```bash
 uvx --python 3.14 --from orionis-installer orionis new blog
 ```
 
-The wizard creates `blog` inside the current directory. If you omit `blog`, it also asks for the project name. You can run `uvx --from orionis-installer orionis new` when uv already selects a compatible interpreter.
+This guide describes **installer 1.0.1** and the seven current skeletons for Orionis 1.5 and later within 1.x. Installer and framework versions are independent: each skeleton declares its Orionis requirement in `pyproject.toml`, which the installer preserves.
 
-View the general help, creation help, and executable identity with:
+The package is `orionis-installer`; its executable is `orionis`. Application commands in this guide use `uv run python -B reactor ...` from the generated project's root, so they run in that application's environment.
+
+## Prerequisites
+
+- Install **[uv](https://docs.astral.sh/uv/getting-started/installation/)** and **[Git](https://git-scm.com/downloads)** and make them available on `PATH`. Git downloads the skeleton even when you skip initializing the new project's repository.
+- The installer requires **Python 3.14 or newer**. Generated projects use **stable Python 3.14.x**. uv can obtain that interpreter if it is missing and your download policies allow it. You do not need to activate a virtual environment first.
+- Use an interactive terminal for the wizard, or pass `--no-interaction` in scripts and CI.
+- Choose a **new destination directory with an existing, writable parent**. An existing destination is rejected even when it is empty.
+- Allow access to GitHub, the package index, and Python download servers when an interpreter download is needed.
+
+Windows, macOS, and Linux are supported. On Windows, uv and Git must resolve to native executables. The skeletons do not require Node.js or a frontend build for their initial startup. Use your preferred editor; the installer does not launch one.
+
+## Installation and execution
+
+### Run with uvx
+
+`uvx` runs the installer in its own environment. Omit the name to let the wizard ask for it:
 
 ```bash
+uvx --python 3.14 --from orionis-installer orionis new
+```
+
+Check the command's identity and available options:
+
+```bash
+uvx --python 3.14 --from orionis-installer orionis --version
 uvx --python 3.14 --from orionis-installer orionis --help
 uvx --python 3.14 --from orionis-installer orionis new --help
-uvx --python 3.14 --from orionis-installer orionis --version
 ```
+
+If uv has cached an older installer, refresh it before creating another project:
+
+```bash
+uvx --refresh --python 3.14 --from orionis-installer orionis --version
+```
+
+For a repeatable installer version, use `--from "orionis-installer==1.0.1"`. This pins the installer, not the skeleton's Git revision or the application's dependency resolution. See [uv's tool guide](https://docs.astral.sh/uv/guides/tools/) for tool environments and version selection.
 
 ### Install as a uv tool
 
-If you prefer to have the command available in your terminal:
+To make the installer available as a persistent terminal command:
 
 ```bash
 uv tool install --python 3.14 orionis-installer
@@ -51,199 +61,204 @@ orionis --version
 orionis new blog
 ```
 
-Check that `orionis --version` identifies `orionis-installer`. The framework can also provide an executable named `orionis`; use the explicit `uvx --from orionis-installer` form to create projects and run Reactor commands from each application's root directory.
+Update an existing tool installation with:
+
+```bash
+uv tool upgrade orionis-installer
+```
+
+The framework also provides an executable named `orionis`. Check that `orionis --version` identifies **`orionis-installer`** before creating projects. The explicit `uvx --from orionis-installer` invocation avoids that ambiguity.
+
+## Available stacks
+
+All seven variants come from the [official skeleton repository](https://github.com/orionis-framework/skeleton). The installer downloads the exact branch shown below. **Blank** is the default.
+
+| Stack | `--stack` | Starting point | Branch |
+| --- | --- | --- | --- |
+| **Full application** | `master` | Full reference application with web authentication and an API example, plus extension points for console commands, WebSocket, and MCP. | [master](https://github.com/orionis-framework/skeleton/tree/master) |
+| **Blank** | `blank` | Foundation for building from scratch, with route files and application directories ready for your own code. No initial application tables or homepage. | [blank_1.x](https://github.com/orionis-framework/skeleton/tree/blank_1.x) |
+| **Server-rendered web** | `ssr` | Jinja2 web application with a welcome page, authentication, dashboard, profile, and user model. | [ssr_1.x](https://github.com/orionis-framework/skeleton/tree/ssr_1.x) |
+| **Slim API** | `slim_api` | HTTP API with a JSON controller and `/api/example` endpoint. | [slim_api_1.x](https://github.com/orionis-framework/skeleton/tree/slim_api_1.x) |
+| **Slim MCP** | `slim_mcp` | HTTP MCP server at `/mcp`, including an `echo` tool, `docs://example/guide` resource, and `greeting` prompt. | [slim_mcp_1.x](https://github.com/orionis-framework/skeleton/tree/slim_mcp_1.x) |
+| **Queue worker** | `slim_worker` | Background jobs, console commands, and scheduled tasks; its queue uses database storage by default. | [slim_worker_1.x](https://github.com/orionis-framework/skeleton/tree/slim_worker_1.x) |
+| **Realtime** | `slim_realtime` | WebSocket application with `/ws/echo` and the `/realtime/echo` hub. | [slim_realtime_1.x](https://github.com/orionis-framework/skeleton/tree/slim_realtime_1.x) |
+
+Master and Blank register web, API, console, WebSocket, and AI route files. SSR registers web and console; Slim API registers API; Slim MCP registers AI; Slim Realtime registers WebSocket; Slim Worker registers console. Use `/up` to check the HTTP variants. Slim Worker is intended for command-line processes; framework routes such as `/up` can still appear in its route inventory.
+
+The installer preserves the selected skeleton's configuration and resources. Installing all database or storage drivers does not change its routes or turn a slim variant into the full application.
 
 ## Installation process step by step
 
-The wizard is presented in English. Use the arrow keys to select options and Enter to accept them; Ctrl+C cancels the process. An option supplied on the command line skips its corresponding question.
+The wizard is in English. Use arrows or number keys to select an option, then Enter to accept it. Ctrl+C cancels. Supplied options skip their corresponding questions. The console adapts to narrow terminals and displays stages, states, and elapsed times. `--no-color` or the presence of `NO_COLOR` disables colors.
 
 ### 1. Check tools and Python
 
-Before asking about the project, the installer checks that uv and Git can execute and locates stable Python 3.14.x outside the application's environment. If a download is necessary, it announces it before trying. This stage does not download the stack yet.
+The installer checks uv and Git and locates stable Python 3.14.x. If necessary, it announces and attempts an interpreter download through uv. This can happen before you confirm project creation.
 
 ### 2. Define the application
 
-In the **Application** section, the wizard asks for the following, in order:
+The **Application** section asks for:
 
-1. **Stack:** Blank, SSR, Slim API, or Slim MCP. Blank is the default; [compare the stacks](#available-stacks) before choosing.
-2. **Name:** `orionis-app` by default; `new blog` already supplies this value.
-3. **Description:** `A modern application built with Orionis Framework.` by default.
-4. **Author name and email:** optional; you can leave them empty.
+1. **Stack**, with Blank selected by default.
+2. **Name**, defaulting to `orionis-app` unless supplied after `new`.
+3. **Description**, defaulting to `A modern application built with Orionis Framework.`
+4. Optional **author name** and **email**.
 
-The name accepts 1–100 ASCII characters: letters, digits, dots, hyphens, and underscores, with a letter or digit at both ends. It does not accept `..`, path separators, or reserved Windows names. Descriptions and author names support Unicode without control characters; email is validated if provided.
+Names accept 1–100 ASCII letters, digits, dots, hyphens, and underscores, starting and ending with a letter or digit. Traversal sequences, path separators, and reserved Windows names are rejected. Descriptions and author names support Unicode; email is validated when supplied.
 
-The wizard does not ask for a path. To choose another destination, supply `--path`: it represents the final project folder rather than its parent directory.
+Use `--path` to choose another destination. It specifies the final project folder, not its parent; the wizard does not ask for this path separately.
 
 ### 3. Select services
 
-In **Services**, first choose storage: local, Amazon S3, Azure Blob Storage, Google Cloud Storage, or all cloud drivers. If you select `all`, an additional question lets you choose the active disk, defaulting to `local`.
+Choose storage first: **local**, **S3**, **Azure Blob Storage**, **Google Cloud Storage**, or **all** drivers. Then choose **SQLite**, **MySQL**, **PostgreSQL**, **Oracle**, **SQL Server**, **Redshift**, or **all** database drivers.
 
-Next choose the database: SQLite, MySQL, PostgreSQL, Oracle, SQL Server, Amazon Redshift, or all drivers. SQLite is the default. With `all`, you also choose an active connection, defaulting to `sqlite`.
-
-Your selection determines which dependencies are installed and the values of `FILESYSTEM_DISK` and `DB_CONNECTION`. Selecting all drivers does not activate all services simultaneously. Credentials and external infrastructure are prepared separately.
+With `all`, the wizard also asks for one active disk or connection. The defaults are `local` and `sqlite`. Installing all drivers does not activate all providers simultaneously. The active services become `FILESYSTEM_DISK` and `DB_CONNECTION` in `.env`.
 
 ### 4. Review and confirm
 
-The installer validates the destination and displays the plan: name, absolute path, metadata, stack, repository, branch, Python, active drivers, and Orionis extras.
-
-The creation confirmation defaults to **Yes**. If you choose **No**, it exits with code `0` without downloading the skeleton. Before confirmation, the installer may already have downloaded Python during the prerequisite check.
+Review the name, destination, metadata, stack, repository, branch, Python target, active services, and extras. Confirmation defaults to **Yes**. Declining exits without downloading the skeleton or creating the project.
 
 ### 5. Download, configure, and verify
 
-After confirmation, the following actions run automatically:
+The installer downloads the selected branch, removes the skeleton's Git metadata, and prepares the application:
 
-1. Clone only the selected stack's branch into a temporary directory beside the destination, verify the branch and revision, and remove the downloaded skeleton's `.git`.
-2. Update the name, description, and author in `pyproject.toml`; merge the selected extras with the stack's existing extras while preserving its Orionis constraint, application version, and dependency groups. Keep `tool.uv.package = false` and write `.python-version` with the target Python.
-3. Copy `.env.example` to `.env`, preserve the example, and configure the application name, active disk, and active connection. The name `env.example` is also supported. For SQLite, prepare the database file's parent directory; the file is neither created nor truncated at this stage.
-4. Adjust `.gitignore` to exclude `.env`, `.venv`, SQLite files, and local runtime data while keeping `uv.lock` available for version control.
-5. Place the files at the final destination and run `uv sync --python 3.14` there. The `.venv` is created directly inside the project, along with `uv.lock`.
-6. Verify the interpreter, Orionis, installed extras and dependencies, lockfile, and effective configuration. Generate `APP_KEY` through the framework if missing; preserve an existing key.
+- Updates project metadata and selected Orionis extras while preserving the skeleton's framework requirement and dependency groups.
+- Creates `.env`, groups related variables, and removes `.env.example` and the legacy `env.example` after successful environment generation. `.env.reference` stays available.
+- Configures ignore rules for secrets, the virtual environment, SQLite files, and runtime data; keeps `uv.lock` available for version control.
+- Runs `uv sync --python 3.14` in the final destination, creating `.venv` there.
+- Verifies Python, the framework, dependencies, lockfile, and effective configuration; generates `APP_KEY` if missing.
 
-The installer preserves each stack's own files and routes. Creation does not start the application server.
+Creation does not start the server or worker. The application's environment is separate from the installer's environment.
 
 ### 6. Choose final operations
 
-Once creation finishes, the wizard offers these actions, in order:
-
-| Action | Proposed selection | Result when accepted |
+| Action | Default in the wizard | Effect |
 | --- | --- | --- |
-| Initialize Git | Yes | Run `git init` in the project, with no commit, remote, or push. |
-| Run migrations | No | Verify the connection and run `reactor migrate --seed` with the project's Python. This includes seeders; review [the migration considerations](#migrations-and-initial-data). |
-| Open Visual Studio Code | Yes | Open the folder in a new editor window. |
+| Initialize Git | Yes | Runs `git init`; creates no commit or remote. |
+| Prepare the database | No | Runs application migrations and framework storage commands required by the stack and services. **Does not run seeders.** |
 
-If you request migrations with an incomplete external database connection, interactive mode offers to configure it, defaulting to **No**. If you accept, it asks for the host, port, database name—or service for Oracle—username, and a masked password. It does not create the external server or database. Non-interactive mode does not request credentials, and that operation fails if details are missing.
+An incomplete external database connection can be configured interactively before migrations. The installer asks for host, port, database or Oracle service, username, and a masked password. It does not provision a database server. Without interaction, missing connection details cause the requested migration operation to fail.
 
-The final summary distinguishes creation, Git, migrations, and the editor, and lists warnings and commands to continue.
+The final summary reports creation, Git, migrations, runtime versions, warnings, and commands appropriate to your stack. Open the generated folder in your preferred editor.
 
 ## Available parameters and options
 
-The subcommand for creating an application is `new`. The name and all its options are optional. Interactive mode asks for omitted metadata and services and offers the final actions; other options use their defaults. With `--no-interaction`, the defaults in the table apply.
-
 ### Argument and options for new
 
-| Parameter | Purpose | Required | Default | Allowed values |
-| --- | --- | --- | --- | --- |
-| `NAME` | Application and folder name when `--path` is not provided. | No | `orionis-app` | A valid name following the rules above. |
-| `--stack` | Select the skeleton. | No | `blank` | `blank`, `ssr`, `slim_api`, `slim_mcp`; case-insensitive. |
-| `--path` | Choose the final project path. | No | Current directory plus `NAME` | A new path whose parent exists; spaces and Unicode are supported. |
-| `--description` | Set the project description. | No | `A modern application built with Orionis Framework.` | Text without control characters. |
-| `--author-name` | Define the author name. | No | No author | Text; an empty value omits the field. |
-| `--author-email` | Define the author email. | No | No email | A valid email address; an empty value omits the field. |
-| `--storage` | Select storage drivers. | No | `local` | `local`, `s3`, `azure`, `gcs`, `all`. |
-| `--default-storage` | Choose the active disk when installing all drivers. | No | `local` with `all`; otherwise, the selected disk | `local`, `s3`, `azure`, `gcs`. |
-| `--database` | Select database drivers. | No | `sqlite` | `sqlite`, `mysql`, `pgsql`, `oracle`, `sqlserver`, `redshift`, `all`. |
-| `--default-database` | Choose the active connection when installing all drivers. | No | `sqlite` with `all`; otherwise, the selected connection | `sqlite`, `mysql`, `pgsql`, `oracle`, `sqlserver`, `redshift`. |
-| `--git` / `--no-git` | Initialize Git or skip that action. | No | Prompt: Yes; without interaction: skip | Explicitly enable or skip. |
-| `--migrate` / `--no-migrate` | Run migrations and seeders or skip them. | No | Prompt: No; without interaction: skip | Explicitly enable or skip. |
-| `--open` / `--no-open` | Open VS Code or skip that action. | No | Prompt: Yes; without interaction: skip | Explicitly enable or skip. |
-| `--no-interaction` | Skip all questions and confirmation. | No | Disabled | Flag; final actions require their positive flags. |
-| `--no-color` | Disable colors. | No | Disabled, unless `NO_COLOR` is present | Flag; also accepted before `new`. |
-| `--verbose` | Display additional plan diagnostics. | No | Disabled | Flag; also accepted before `new`. |
-| `--help` | Display creation help and exit. | No | Disabled | Flag. |
+The following defaults apply with `--no-interaction`. Interactive mode requests omitted application and service settings.
 
-Write storage and database values in lowercase. `--default-storage` and `--default-database` never accept `all`; if you have not selected all drivers, they can only repeat the chosen driver. Use quotes for paths containing spaces.
+| Argument or option | Purpose and accepted values | Default |
+| --- | --- | --- |
+| `NAME` | Application name and folder name when `--path` is omitted. | `orionis-app` |
+| `--stack` | `master`, `blank`, `ssr`, `slim_api`, `slim_mcp`, `slim_worker`, `slim_realtime`; case-insensitive. | `blank` |
+| `--path` | Final destination; parent must exist. Quote paths containing spaces. | Current directory plus `NAME` |
+| `--description` | Project description. | `A modern application built with Orionis Framework.` |
+| `--author-name` | Optional author name. | Omitted |
+| `--author-email` | Optional valid email. | Omitted |
+| `--storage` | `local`, `s3`, `azure`, `gcs`, `all`. | `local` |
+| `--default-storage` | Active disk with `all`: `local`, `s3`, `azure`, `gcs`. | `local` with `all`; otherwise the selected disk |
+| `--database` | `sqlite`, `mysql`, `pgsql`, `oracle`, `sqlserver`, `redshift`, `all`. | `sqlite` |
+| `--default-database` | Active connection with `all`: any concrete database value above. | `sqlite` with `all`; otherwise the selected connection |
+| `--git` / `--no-git` | Initialize or skip Git. | Skipped without interaction; prompted with Yes otherwise |
+| `--migrate` / `--no-migrate` | Prepare required tables or skip preparation. No automatic seeders. | Skipped without interaction; prompted with No otherwise |
+| `--no-interaction` | Skip prompts and creation confirmation. | Disabled |
+| `--no-color` | Disable colors; also respects `NO_COLOR`, including an empty value. | Disabled |
+| `--verbose` | Show additional plan diagnostics. | Disabled |
+| `--help` | Show creation help and exit. | Disabled |
+
+Storage and database values are lowercase. A default driver cannot be `all`; without an aggregate selection, it must match the selected concrete driver.
 
 ### Global options
 
-| Parameter | Purpose | Required | Default | Allowed values |
-| --- | --- | --- | --- | --- |
-| `--help` | Display the general help and exit. | No | Disabled | Flag before `new`; after `new`, it displays creation help. |
-| `--version` | Display the installer's identity and version and exit. | No | Disabled | Flag only at the command root, before the subcommand. |
-| `--no-color` | Disable colors. | No | Disabled, unless `NO_COLOR` is present | Flag before or after `new`. |
-| `--verbose` | Display additional plan diagnostics. | No | Disabled | Flag before or after `new`. |
-
-The presence of `NO_COLOR`, even with an empty value, disables colors.
+`--help` and `--version` at the command root show general help and installer identity. `--no-color` and `--verbose` work before or after `new`. `new --help` shows creation-specific options.
 
 ### Non-interactive examples
 
-Create an API with local defaults and initialize its repository:
+Create a JSON API and initialize Git:
 
 ```bash
 uvx --python 3.14 --from orionis-installer orionis new service --stack slim_api --no-interaction --git
 ```
 
-Create an SSR application and leave migrations and the editor for later:
+Create an SSR application and prepare its application and authentication tables:
 
 ```bash
-uvx --python 3.14 --from orionis-installer orionis new portal --stack ssr --no-interaction --no-migrate --no-open
+uvx --python 3.14 --from orionis-installer orionis new portal --stack ssr --no-interaction --migrate
 ```
 
-Install all drivers and keep local storage and SQLite as the active services:
+Create a worker with its database queue tables:
 
 ```bash
-uvx --python 3.14 --from orionis-installer orionis new team --no-interaction --storage all --default-storage local --database all --default-database sqlite
+uvx --python 3.14 --from orionis-installer orionis new jobs --stack slim_worker --no-interaction --migrate
 ```
 
-Choose another destination and external services, with author metadata:
+Create an MCP or realtime application:
+
+```bash
+uvx --python 3.14 --from orionis-installer orionis new tools --stack slim_mcp --no-interaction
+uvx --python 3.14 --from orionis-installer orionis new live --stack slim_realtime --no-interaction
+```
+
+Install every driver in the full application while keeping local storage and SQLite active:
+
+```bash
+uvx --python 3.14 --from orionis-installer orionis new team --stack master --no-interaction --storage all --default-storage local --database all --default-database sqlite
+```
+
+Select external services and a custom destination:
 
 ```bash
 uvx --python 3.14 --from orionis-installer orionis new analytics --no-interaction --path "./Project with spaces" --description "Reporting service" --author-name "Jane Doe" --author-email jane@example.com --storage s3 --database redshift
 ```
 
-The last example installs the drivers, but you must configure the connection and storage before using those services. Without interaction, Git, migrations, and the editor are skipped when their positive flags are absent.
+The last command installs the drivers; configure the external services before using them. Non-interactive mode never requests credentials. Git and migrations are skipped unless their positive flags are supplied.
 
 ### Installed drivers and extras
 
-Extras are added to the stack's Orionis dependency while preserving those already present:
-
-| Selection | Added extra |
+| Selection | Extra added to the Orionis dependency |
 | --- | --- |
-| `local` storage or `sqlite` database | None. |
-| `s3`, `azure`, or `gcs` storage | The extra with the same name. |
-| `all` storage | `storage`. |
-| `mysql`, `pgsql`, `oracle`, `sqlserver`, or `redshift` database | The extra with the same name. |
-| `all` database | `database`. |
+| Local storage or SQLite | None |
+| `s3`, `azure`, or `gcs` | The extra with the same name |
+| Storage `all` | `storage` |
+| `mysql`, `pgsql`, `oracle`, `sqlserver`, or `redshift` | The extra with the same name |
+| Database `all` | `database` |
 
-For example, S3 and Redshift add `redshift,s3`; both `all` selections add `database,storage`. The installer does not add a `factories` extra: factory dependencies belong to the framework's core.
+Existing extras are preserved and duplicates removed. S3 plus Redshift adds `redshift,s3`; both `all` selections add `database,storage`. Factory support belongs to the framework's core dependencies, so no `factories` extra is added. SQL Server also requires its system ODBC driver.
 
-## Available stacks
+## Generated environment
 
-All four stacks use the [official skeleton repository](https://github.com/orionis-framework/skeleton), each on its own branch. The following links point to the corresponding branch; the installer downloads only the selected one and does not switch stacks if that download fails.
+After an installer-created project is ready, edit **`.env`** directly. Do not copy an example over it: the installer has already configured it and generated its key. **`.env.reference`** documents the complete set of available variables; it is retained unchanged, while `.env.example` and `env.example` are removed.
 
-| Official stack | `--stack` value | Purpose and components | Repository and branch |
-| --- | --- | --- | --- |
-| **Blank** | `blank` | Foundation for building from scratch: service configuration, provider, exception handler, lifespan, and web, API, console, WebSocket, and AI route files. It includes no controllers, models, views, or initial migrations. | [Skeleton / blank_1.x](https://github.com/orionis-framework/skeleton/tree/blank_1.x) |
-| **SSR** | `ssr` | Web application with server-side rendering through Jinja2, Bootstrap, and bundled CSS/JS. Includes a welcome page, authentication, dashboard, profile, user model, migrations, and administration views as a starting point. | [Skeleton / ssr_1.x](https://github.com/orionis-framework/skeleton/tree/ssr_1.x) |
-| **Slim API** | `slim_api` | Reduced foundation for APIs and WebSockets: example JSON controller, middleware, and API and WebSocket route registration. It does not include a web authentication interface; the WebSocket file is ready for you to add routes. | [Skeleton / slim_api_1.x](https://github.com/orionis-framework/skeleton/tree/slim_api_1.x) |
-| **Slim MCP** | `slim_mcp` | Foundation for Model Context Protocol servers: registers AI routes and an example HTTP MCP server. Its tool, resource, and prompt collections are empty so you can add your own. | [Skeleton / slim_mcp_1.x](https://github.com/orionis-framework/skeleton/tree/slim_mcp_1.x) |
+Database variables stay together in their database block, and storage variables stay in their storage block, separated from other groups by blank lines. Connection settings entered before migrations use the same grouping.
 
-Blank and SSR register all five route file types; Slim API registers only API and WebSocket, and Slim MCP only AI. All register `/up` as a health check. The Slim MCP server is exposed at `/mcp`; the template does not register a STDIO server. In SSR, the user and role administration views are starting points rather than a complete CRUD implementation.
+`APP_NAME` remains readable text. Names that Orionis could interpret as a number, boolean, or null use `str:` to retain their string type. These are alternative names for separate projects:
+
+```dotenv
+APP_NAME="blog"
+```
+
+```dotenv
+APP_NAME="str:123"
+```
+
+Quoted values use double quotes by default, or single quotes when they avoid escaping embedded double quotes. Escaping preserves the value. User-supplied literal connection values may use `base64:` to avoid dotenv interpolation; the [typed environment system](/en/environment/typed-configuration) decodes them. Base64 is not encryption: `.env` still contains secrets and must remain outside version control.
+
+Selecting cloud storage installs the SDK and sets the active disk. Add the provider settings you need from `.env.reference`; the installer does not fill in cloud credentials. External database selections also require reviewing connection values. For SQLite, the installer creates the configured path's parent directory without truncating an existing database.
+
+Cache, queue, session, mail, and other defaults come from the chosen skeleton and framework configuration. They differ across variants: Slim Worker uses a database queue, while Master and SSR use a synchronous queue and file-based sessions by default. Review `.env` and `config/` before enabling additional services.
 
 ### Obtain a stack manually
 
-You can clone your preferred branch directly. Run **one** of these alternatives from the parent directory:
-
-**Blank:**
-
-```bash
-git clone --branch blank_1.x --single-branch https://github.com/orionis-framework/skeleton.git blog
-cd blog
-```
-
-**SSR:**
+You can clone a branch from the [stack table](#available-stacks). For example, to obtain SSR:
 
 ```bash
 git clone --branch ssr_1.x --single-branch https://github.com/orionis-framework/skeleton.git portal
 cd portal
 ```
 
-**Slim API:**
+For a ZIP download, open the branch and choose **Code → Download ZIP**. A manual clone retains the skeleton's Git history and remote; a ZIP does not include them.
 
-```bash
-git clone --branch slim_api_1.x --single-branch https://github.com/orionis-framework/skeleton.git service
-cd service
-```
-
-**Slim MCP:**
-
-```bash
-git clone --branch slim_mcp_1.x --single-branch https://github.com/orionis-framework/skeleton.git tools
-cd tools
-```
-
-To download a ZIP, open the branch link in the table and use **Code → Download ZIP**. Extract its contents and change to the folder containing `pyproject.toml` and `reactor`.
-
-A manual download requires environment setup. In a new clone, copy the example according to your terminal:
+Only for a fresh manual checkout without `.env`, copy the example:
 
 ```bash
 # macOS / Linux
@@ -255,127 +270,111 @@ cp .env.example .env
 Copy-Item .env.example .env
 ```
 
-Review `APP_NAME` in `.env` and the metadata in `pyproject.toml`. Then run:
+Review `.env`, project metadata, and any extra drivers needed in `pyproject.toml`, then run:
 
 ```bash
 uv sync --python 3.14
-uv run python -c "from pathlib import Path; Path('database').mkdir(exist_ok=True)"
 uv run python -B reactor key:generate
 ```
 
-The `database` directory supports the example SQLite path, `database/database.sqlite`; some templates do not include it initially. The database creates the SQLite file when it is used. For SSR, prepare the schema before using authentication:
-
-```bash
-uv run python -B reactor migrate
-```
-
-Continue with [first startup](#first-steps-after-installation). A manual clone preserves the skeleton's history and remote; a ZIP does not include `.git`. The installer's metadata and driver selections and its checks are also not applied: configure `.env`, add any necessary extras to the Orionis dependency in `pyproject.toml` while preserving its constraint, and run `uv sync --python 3.14` again if you change dependencies.
+For SQLite, ensure the parent directory of `DB_DATABASE` exists if you change its path. Prepare the tables required by your stack using the commands below. Manual setup does not perform the installer's configuration, example cleanup, or verification automatically.
 
 ## First steps after installation
 
-### Review the project environment
-
-For a project created by the installer, enter its folder; if you used `--path`, use that path:
-
-```bash
-cd blog
-```
-
-The `.venv`, `uv.lock`, `.env`, and `APP_KEY` are already prepared when creation finishes successfully. Do not copy `.env.example` over `.env` again. If you need to install pending dependencies or synchronize manifest changes:
-
-```bash
-uv sync --python 3.14
-```
-
-Review `.env` and use `.env.reference` as a reference for the stack's additional options. Some values written by the installer use Orionis's `base64:` prefix to preserve their literal contents. The initial local settings are SQLite, local storage, a file cache, synchronous queues, and process-local memory sessions.
-
-For external services, replace the pending connection values and configure credentials, the bucket or container, and provider permissions. The installer writes `configure-me` as a placeholder database username, sets the driver's port, and does not provide a password. Oracle also requires a connection service, such as `DB_SERVICE_NAME`; SQL Server requires the system ODBC driver named by `DB_ODBC_DRIVER`. Continue with [Database and ORM](/en/database) and [Storage](/en/storage).
+Run all application commands from the generated project's root. `APP_KEY` is already generated by the installer, and environment activation is not required when using `uv run`.
 
 ### Migrations and initial data
 
-To prepare identity and business tables, run this from the project root:
+Accepting database preparation in the wizard or using `--migrate` runs **schema commands only**. It never invokes application seeders.
+
+| Stack or enabled service | Preparation performed by the installer |
+| --- | --- |
+| Master or SSR | `migrate`, then `auth:migrate` |
+| Blank, Slim API, or Slim MCP | `migrate`; initial application migration directories are empty |
+| Slim Worker | `migrate`, then `queue:migrate` with its default database queue |
+| Slim Realtime | Skipped unless application migrations or database-backed services are present |
+| `CACHE_STORE=database` | Also `cache:migrate` |
+| `QUEUE_CONNECTION=database` | Also `queue:migrate` |
+| `TASKS_STORE=database` | Also `schedule:migrate` |
+| `SESSION_DRIVER=database` | Also `session:migrate` |
+
+Application migrations belong to your project. Orionis owns the definitions of its internal authentication, cache, queue, scheduler, and session tables. Their commands create those tables while preserving existing records; duplicate application migrations are unnecessary. See [internal storage commands](/en/database/commands#internal-storage-commands).
+
+If you skipped preparation for Master or SSR, run:
 
 ```bash
 uv run python -B reactor migrate
-```
-
-This command applies migrations without requesting seeders. With Orionis **1.5.0**, if you use authentication—for example, in SSR—then prepare internal tables for roles, permissions, their relationships, personal access tokens, and recovery:
-
-```bash
 uv run python -B reactor auth:migrate
 ```
 
-`auth:migrate` uses the default SQL connection and preserves existing records. A skeleton may retain older migrations for some of these tables; see [adopting core storage](/en/database/migrations#auth-storage-1-5-0) before removing applied files. Blank, Slim API, and Slim MCP do not include initial migrations required to test their starting endpoints.
-
-:::caution[The installer option also runs seeders]
-Accepting the wizard's migrations or passing `--migrate` runs `reactor migrate --seed`. Review the seeders before choosing that option: SSR includes administrative data with example credentials. To control preparation with 1.5.0, create the project with `--no-migrate`, run `reactor migrate` manually and, if you use auth, run `reactor auth:migrate` before requesting seeders.
-:::
-
-With Redshift as the active connection, use `--no-migrate` and run schema migrations manually, without `--seed`: the framework rejects seeder execution on Redshift because it requires enforced unique constraints to record each execution only once.
-
-With a database that supports seeders, once you have prepared the tables above and reviewed and adapted the initial data and its credentials, you can request it explicitly:
+This creates application tables such as `users`, followed by the framework's roles, permissions, relationships, access-token, and password-recovery tables. It does not create an administrator account. For initial data, first review and adapt the application's seeders and example credentials, then request seeding explicitly:
 
 ```bash
 uv run python -B reactor seed
 ```
 
-SSR's account verification and recovery flows also require mail delivery configuration. The stack does not include SMTP credentials; see [Mail](/en/mail).
+Redshift does not support the framework's seeder execution; schema migration commands remain separate. Authentication email verification and recovery also require an appropriate [mail configuration](/en/mail).
 
 ### Start and check the application
 
-From the project root:
+For Master, SSR, Slim API, Slim MCP, or Slim Realtime:
 
 ```bash
 uv run python -B reactor serve
 ```
 
-The development server uses [http://127.0.0.1:8000](http://127.0.0.1:8000). Check [http://127.0.0.1:8000/up](http://127.0.0.1:8000/up), available in all four stacks. Additional entry points depend on the template:
+The server defaults to [http://127.0.0.1:8000](http://127.0.0.1:8000). Check `/up`, then use your stack's entry point:
 
-- **Blank:** add your routes; it does not initially register a page at `/`.
-- **SSR:** open `/` for the welcome page and prepare the tables before using registration and login.
-- **Slim API:** try `/api/example` for the included JSON endpoint.
-- **Slim MCP:** configure your MCP client for the `/mcp` endpoint; an ordinary browser visit is not equivalent to a protocol request. Follow [MCP servers](/en/mcp) to declare tools and connect clients.
+- **Master or SSR:** open `/`; prepare the tables before using authentication.
+- **Slim API:** request `/api/example`.
+- **Slim MCP:** open [Orionis Inspector](https://inspector.orionis-framework.com/) and connect to `http://127.0.0.1:8000/mcp`. Try the included tool, resource, and prompt. MCP requires protocol requests, not an ordinary browser visit to the endpoint; see [MCP servers and routes](/en/mcp/servers-and-routes).
+- **Slim Realtime:** connect a WebSocket client to `ws://127.0.0.1:8000/ws/echo`, or use an Orionis realtime client with `/realtime/echo`. See [Realtime](/en/realtime).
 
-Stop the server with Ctrl+C. If the port is occupied:
+For **Blank**, begin with `uv run python -B reactor list` and add your own routes. You can run `serve` and check `/up`, but no homepage is initially registered at `/`.
 
-```bash
-uv run python -B reactor serve --port 8001
-```
-
-Since 1.0.13, `--host` also selects the bind address. For example, to accept connections through the machine's network interfaces:
+For **Slim Worker**, prepare the queue if you skipped `--migrate`, then run the worker:
 
 ```bash
-uv run python -B reactor serve --host 0.0.0.0 --port 8001
+uv run python -B reactor migrate
+uv run python -B reactor queue:migrate
+uv run python -B reactor queue:work
 ```
 
-Open the machine's IP address or domain with the selected port. Use `--host 127.0.0.1` to listen only on the local machine. See the [`serve` options](/en/console/built-in-application#command-serve) and [CORS configuration for browser clients](/en/http/middleware#http-cors).
+Run scheduled tasks in a separate terminal with `uv run python -B reactor schedule:work` when needed. These processes do not require starting `serve`.
 
-To add your first routes and understand startup, continue with [Creating and starting an application](/en/getting-started/quick-start) and [Application lifecycle](/en/application/lifecycle).
+Stop foreground processes with Ctrl+C. To change the HTTP server's address or port:
+
+```bash
+uv run python -B reactor serve --host 127.0.0.1 --port 8001
+```
+
+See the [`serve` options](/en/console/built-in-application#command-serve) for other bind addresses, and [Application lifecycle](/en/application/lifecycle) to understand startup.
 
 ## Considerations and recovery
 
-- **Existing destinations:** `new` does not overwrite folders or offer `--force`. Use another path or continue configuring the project that already exists. Symbolic links, junctions, paths with `..`, and destinations inside an inherited uv workspace are also rejected.
-- **Python without downloads:** with `UV_PYTHON_DOWNLOADS=never` or `UV_OFFLINE` enabled, stable Python 3.14.x must already be available. uv's offline mode does not replace the skeleton download from GitHub.
-- **Isolated configuration:** the installer rejects a nonempty `UV_CONFIG_FILE`. It preserves supported uv network, certificate, and index settings, but does not indiscriminately inherit the calling process's virtual environment or application, database, or cloud variables. Configure services in the project's `.env`.
-- **Download or verification errors:** if the branch does not exist or the template does not meet requirements, installation stops; it does not switch stacks or ignore the incompatibility.
-- **Creation failures:** before placing the project at its destination, the owned temporary directory is cleaned up. After placement, files are preserved and diagnostics explain how to continue. A Git or editor failure does not remove the project, and other independent final operations may continue.
-- **Failed migrations:** review the connection and the actual database state before retrying. No automatic rollback or `migrate:fresh` runs.
+- **Existing destination:** choose a new path or continue in the existing project. The installer does not overwrite directories. It also rejects path redirections, traversal, and inherited uv workspaces.
+- **Older installer:** check `--version` and use `uvx --refresh` or `uv tool upgrade orionis-installer` if new stack values are unavailable.
+- **Python downloads disabled:** stable Python 3.14.x must already be available when your uv policy prevents downloads. Offline uv mode does not supply the GitHub skeleton.
+- **Service credentials:** edit `.env`; installation does not indiscriminately inherit database or cloud settings from the calling process. A custom nonempty `UV_CONFIG_FILE` is rejected; supported uv index, network, and certificate settings are retained.
+- **Temporary Windows file locks:** environment writes and project placement retry transient access and sharing violations. Persistent I/O errors still stop the operation; inspect the reported path and permissions before retrying.
+- **Creation failure:** before the destination is populated, owned temporary files are cleaned up. After placement, the project is preserved for recovery. Git or migration failures also preserve the application.
+- **Migration failure:** inspect the connection and database state before retrying. The installer does not run an automatic rollback or `migrate:fresh`.
 
-To recover a preserved project, first review its files and configuration, then run inside its folder:
+To recover a preserved project after resolving its reported problem, run inside its folder:
 
 ```bash
 uv sync --python 3.14
 uv run python -B reactor key:generate
 ```
 
-Key generation preserves an existing key; do not use `--force` as a recovery step. If stack files are missing or dependencies are incompatible, correct the cause before starting again. Configuration and cache issues are covered in [Typed configuration](/en/application/configuration) and [Directories and bootstrap caching](/en/application/paths-and-caching).
+Key generation preserves an existing key. Do not force key replacement as a recovery step. Then prepare pending tables and start the appropriate application process. See [configuration](/en/application/configuration) and [bootstrap caching](/en/application/paths-and-caching) for configuration issues.
 
 ### Exit codes
 
 | Code | Meaning |
 | --- | --- |
-| `0` | Creation and requested actions completed or were skipped; also used when confirmation is declined. Pending configuration warnings may remain. |
+| `0` | Requested operations completed or were skipped, or creation confirmation was declined. Configuration warnings may still need attention. |
 | `1` | Critical download, file, or dependency installation failure. |
-| `2` | Invalid arguments, missing prerequisites, or detected incompatibility. |
-| `3` | Project created, but a requested final operation failed: Git, migrations, or the editor. |
-| `130` | User cancellation or end of interactive input. |
+| `2` | Invalid arguments, missing prerequisites, or incompatible configuration. |
+| `3` | Project created, but a requested Git or migration operation failed. |
+| `130` | Cancellation or end of interactive input. |

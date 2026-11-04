@@ -49,13 +49,11 @@ Los servicios usarán rutas absolutas y un directorio de trabajo fijo. No depend
 
 ## 2. Instalar Python y las dependencias bloqueadas
 
-Instala uv en una ubicación explícita y guarda su Python administrado fuera del perfil personal. El componente actual requiere Python **3.14 o superior**; el ejemplo selecciona 3.14. El instalador y `uv python install` están documentados por [Astral](https://docs.astral.sh/uv/reference/installer/) y en su [guía de Python](https://docs.astral.sh/uv/guides/install-python/).
+Descarga el archivo de binarios para Windows x64 desde las [versiones oficiales de uv](https://docs.astral.sh/uv/getting-started/installation/#github-releases) y extrae `uv.exe` directamente en `C:\Tools\uv`. Guarda su Python administrado fuera del perfil personal. El componente actual requiere Python **3.14 o superior**; el ejemplo selecciona 3.14. Consulta la [guía de instalación de Python](https://docs.astral.sh/uv/guides/install-python/).
 
 ```powershell
-$env:UV_INSTALL_DIR = 'C:\Tools\uv'
-Invoke-RestMethod https://astral.sh/uv/install.ps1 | Invoke-Expression
-
 $uvExe = 'C:\Tools\uv\uv.exe'
+if (-not (Test-Path -LiteralPath $uvExe -PathType Leaf)) { throw 'Extrae primero uv.exe en C:\Tools\uv.' }
 $env:UV_PYTHON_INSTALL_DIR = 'C:\Apps\Orionis\python'
 & $uvExe python install 3.14
 

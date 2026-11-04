@@ -55,7 +55,7 @@ Las páginas de colaboradores comparten consulta, paginación y caché de GitHub
 
 ## Manual y referencia de API
 
-Este repositorio mantiene las guías de [docs.orionis-framework.com](https://docs.orionis-framework.com). La [referencia de API](https://api.orionis-framework.com/) se genera desde los docstrings NumPy del directorio `orionis/` en el repositorio `framework`. Para regenerarla, ejecutar `.\DOCS.ps1` desde la raíz de ese repositorio; la salida validada queda en su directorio `docs/`. Las advertencias de Pydoctor y los errores de documentación o enlaces locales deben corregirse en las fuentes antes de publicar. La compilación del manual no regenera ni despliega esa referencia.
+Este repositorio mantiene las guías de [docs.orionis-framework.com](https://docs.orionis-framework.com). La [referencia de API](https://api.orionis-framework.com/) se genera con Pydoctor desde los docstrings NumPy del directorio `orionis/` en el repositorio `framework`. Las advertencias de Pydoctor y los errores de documentación o enlaces locales deben corregirse en las fuentes antes de publicar. La compilación del manual no regenera ni despliega esa referencia.
 
 Las convenciones de 1.3.0 para métodos de clase (`camelCase`, `_camelCase` o `__camelCase`), funciones fuera de clases (`snake_case`) y docstrings se detallan en las guías de contribución en [español](https://docs.orionis-framework.com/es/contribute/guide) e [inglés](https://docs.orionis-framework.com/en/contribute/guide). Al cambiar una API, mantener coherentes sus firmas, ejemplos y explicaciones en ambos idiomas.
 

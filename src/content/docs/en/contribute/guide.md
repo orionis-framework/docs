@@ -226,13 +226,7 @@ class DatabaseClient:
         self.database = database
 ```
 
-With uv available, generate the API from the **framework repository root** in PowerShell:
-
-```powershell
-.\DOCS.ps1
-```
-
-The script runs Pydoctor using the project's documentation dependencies and writes the generated site to `docs/` only after validation succeeds. Pydoctor warnings, incomplete documentation, and broken local links block a successful build; correct their source docstrings and rerun the script. Do not edit the generated HTML. A local build does not publish the API site.
+The [API reference](https://api.orionis-framework.com/) is generated with Pydoctor from the framework's docstrings. Include the corresponding docstring updates when changing an API. Correct incomplete parameter descriptions, invalid NumPy sections, and broken documentation links in the source files; do not edit the generated HTML.
 
 ---
 

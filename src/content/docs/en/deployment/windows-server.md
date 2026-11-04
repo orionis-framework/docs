@@ -49,13 +49,11 @@ The services use absolute paths and a fixed working directory. They do not depen
 
 ## 2. Install Python and locked dependencies
 
-Install uv at an explicit location and keep its managed Python outside a personal profile. The current component requires Python **3.14 or later**; this example selects 3.14. See [Astral's installer](https://docs.astral.sh/uv/reference/installer/) and [Python installation guide](https://docs.astral.sh/uv/guides/install-python/).
+Download the Windows x64 binary archive from the [official uv releases](https://docs.astral.sh/uv/getting-started/installation/#github-releases) and extract `uv.exe` directly into `C:\Tools\uv`. Keep its managed Python outside a personal profile. The current component requires Python **3.14 or later**; this example selects 3.14. See the [Python installation guide](https://docs.astral.sh/uv/guides/install-python/).
 
 ```powershell
-$env:UV_INSTALL_DIR = 'C:\Tools\uv'
-Invoke-RestMethod https://astral.sh/uv/install.ps1 | Invoke-Expression
-
 $uvExe = 'C:\Tools\uv\uv.exe'
+if (-not (Test-Path -LiteralPath $uvExe -PathType Leaf)) { throw 'Extract uv.exe into C:\Tools\uv first.' }
 $env:UV_PYTHON_INSTALL_DIR = 'C:\Apps\Orionis\python'
 & $uvExe python install 3.14
 

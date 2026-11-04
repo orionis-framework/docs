@@ -127,7 +127,7 @@ La aplicación de referencia del framework elimina cinco migraciones redundantes
 
 Los métodos de clase utilizan `camelCase`, `_camelCase` o `__camelCase`; las funciones fuera de clases utilizan `snake_case`. Los métodos especiales de Python, como `__init__`, conservan sus nombres obligatorios. Al actualizar, revisa subclases propias, sobrescrituras y llamadas a métodos renombrados con la [referencia de la API](https://api.orionis-framework.com/) y la [convención de nombres](/es/contribute/guide#naming-conventions).
 
-Se corrigieron y completaron los docstrings del framework al estilo NumPy para Pydoctor. La referencia de la API se compila mediante `DOCS.ps1` en el repositorio del framework y se publica en [api.orionis-framework.com](https://api.orionis-framework.com/). La [guía de contribución](/es/contribute/guide#api-docstrings) explica el formato y la validación. En `tests/test_http_compare.py`, las **57 funciones y métodos** utilizan ahora docstrings NumPy con resúmenes imperativos y sin secciones `Examples`; esta última restricción corresponde a ese archivo de pruebas, no a todos los docstrings de la API.
+Se corrigieron y completaron los docstrings del framework al estilo NumPy para Pydoctor. La referencia de la API se genera desde los docstrings del framework y se publica en [api.orionis-framework.com](https://api.orionis-framework.com/). La [guía de contribución](/es/contribute/guide#api-docstrings) explica el formato y los requisitos de documentación. En `tests/test_http_compare.py`, las **57 funciones y métodos** utilizan ahora docstrings NumPy con resúmenes imperativos y sin secciones `Examples`; esta última restricción corresponde a ese archivo de pruebas, no a todos los docstrings de la API.
 
 <a id="http-benchmark-1-3-0"></a>
 
