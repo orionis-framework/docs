@@ -45,9 +45,9 @@ class ProductController:
 
 El controlador serializa cada modelo explícitamente. `get()` devuelve `Collection`, no una lista JSON; `first()` y `find()` pueden devolver `None`. Los métodos `firstOrFail()` y `findOrFail()` lanzan `ModelNotFoundException`; el [manejador de excepciones HTTP](/es/http/exceptions) determina la respuesta del endpoint.
 
-## Consultas al estilo de Eloquent
+## Consultas directamente desde el modelo
 
-Si vienes de [Eloquent](https://laravel.com/docs/12.x/eloquent), puedes comenzar directamente desde el modelo con `Product.where(...)`. En Orionis, escribe la cadena con puntos y espera el resultado dentro de una función `async`:
+Puedes comenzar una consulta directamente desde el modelo con `Product.where(...)`. Encadena los métodos con puntos y usa `await` dentro de una función `async` para ejecutar la consulta:
 
 ```python
 from app.models.product import Product
@@ -68,7 +68,7 @@ async def find_product(product_id: int):
 
 La primera función devuelve una colección de modelos `Product`; la segunda devuelve un modelo o `None`. Usa `findOrFail()` si la ausencia debe producir una excepción. Para una tabla como `sales.products`, configura el [esquema en el modelo](/es/orm/models-and-attributes#schema-table); la cadena de filtros sigue siendo la misma.
 
-El parecido de los nombres no implica que todos los métodos o argumentos de Laravel existan en Orionis. Selecciona columnas con `Product.select("id", "name").get()`, pagina con `paginate(page=1, per_page=20)` y carga relaciones con `withRelations("category")`. Usa callbacks Python síncronos para grupos, por ejemplo `.where(lambda q: q.where("stock", ">", 0).orWhere("reserved", 0))`. Consulta las firmas de esta documentación antes de trasladar una llamada.
+Selecciona columnas con `Product.select("id", "name").get()`, pagina con `paginate(page=1, per_page=20)` y carga relaciones con `withRelations("category")`. Usa callbacks Python síncronos para grupos, por ejemplo `.where(lambda q: q.where("stock", ">", 0).orWhere("reserved", 0))`. Consulta la firma documentada de cada método para conocer los argumentos admitidos.
 
 ## Métodos de clase, builder e instancia
 

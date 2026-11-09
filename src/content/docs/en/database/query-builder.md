@@ -13,7 +13,7 @@ Do not share a mutable builder across requests or tasks. The `DB` gateway itself
 
 ## Building and executing a query
 
-The chain follows the [Laravel Query Builder](https://laravel.com/docs/12.x/queries) style: table, selection, filters, ordering and a final operation. Orionis uses Python, dots between methods and `await` for execution:
+Build the query by chaining the table, selection, filters, ordering and a final operation. In Orionis, chain methods with dots and use `await` to execute asynchronous terminals:
 
 ```python
 from orionis.support.facades import DB

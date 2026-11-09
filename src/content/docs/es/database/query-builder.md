@@ -13,7 +13,7 @@ No compartas un builder mutable entre peticiones o tareas. El gateway `DB` sí e
 
 ## Construir y ejecutar una consulta
 
-La cadena sigue el estilo del [Query Builder de Laravel](https://laravel.com/docs/12.x/queries): tabla, selección, filtros, orden y operación final. En Orionis se escribe en Python, con puntos entre métodos y `await` al ejecutar:
+La consulta se construye encadenando la tabla, la selección, los filtros, el orden y una operación final. En Orionis, encadena los métodos con puntos y usa `await` para ejecutar los terminales asíncronos:
 
 ```python
 from orionis.support.facades import DB
