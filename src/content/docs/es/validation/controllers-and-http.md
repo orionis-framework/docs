@@ -118,13 +118,13 @@ La inyección utiliza exclusivamente el diccionario devuelto por `Request.data()
 
 Estos son los tipos de contenido reconocidos por `data()`; no reconoce automáticamente cualquier subtipo terminado en `+json`. Un array JSON superior no es el diccionario que exige este flujo.
 
-Los campos sin marcar conservan el comportamiento estricto del validador. En el ejemplo, `"age": "36"` falla porque es una cadena. Los campos de texto de un formulario también llegan como cadenas: declarar `age: int` no los convierte automáticamente a enteros. Desde 1.4.0, usa [`Coerce()`](/es/validation/declaring-schemas#field-coercion) para habilitar la conversión en los campos que acepten números textuales; no necesitas parsear manualmente el cuerpo.
+Los campos sin marcar conservan el comportamiento estricto del validador. En el ejemplo, `"age": "36"` falla porque es una cadena. Los campos de texto de un formulario también llegan como cadenas: declarar `age: int` no los convierte automáticamente a enteros. Usa [`Coerce()`](/es/validation/declaring-schemas#field-coercion) para habilitar la conversión en los campos que acepten números textuales; no necesitas parsear manualmente el cuerpo.
 
 <a id="form-field-coercion"></a>
 
 ### Convertir un campo numérico de formulario
 
-Desde 1.4.0, `Coerce()` permite habilitar la conversión en campos concretos del schema antes de ejecutar el controlador. Guarda este ejemplo independiente en `app/http/controllers/quantity_preview_controller.py`:
+`Coerce()` permite habilitar la conversión en campos concretos del schema antes de ejecutar el controlador. Guarda este ejemplo independiente en `app/http/controllers/quantity_preview_controller.py`:
 
 ```python
 from orionis.http.base import BaseController

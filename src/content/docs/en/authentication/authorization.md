@@ -15,7 +15,7 @@ The default `app.models.user.User` model includes `Authenticatable` for authenti
 
 `Authorizable` provides `getAuthorizableType()` and `getAuthorizableId()`. Operations use `PermissionRegistrar` rather than methods such as `assignRole()` on the model.
 
-Since **1.5.0**, the core defines these five internal tables; prepare them with `auth:migrate`:
+The core defines these five internal tables; prepare them with `auth:migrate`:
 
 | Table | Contents |
 | --- | --- |
@@ -35,7 +35,7 @@ orionis auth:migrate
 python -B reactor auth:migrate
 ```
 
-The command respects the SQL prefix, preserves existing records, and also prepares personal access tokens and password recovery. It needs no application migrations for these tables and writes no migration history. Identity and its migration remain in the application, as do capability names, assignments, and policies: the command does not insert roles, permissions, or administrator accounts. For a new database, run `migrate`, `auth:migrate`, then `seed`; when upgrading an existing project, [retain its applied migrations](/en/database/migrations#auth-storage-1-5-0).
+The command respects the SQL prefix, preserves existing records, and also prepares personal access tokens and password recovery. It needs no application migrations for these tables and writes no migration history. Identity and its migration remain in the application, as do capability names, assignments, and policies: the command does not insert roles, permissions, or administrator accounts. For a new database, run `migrate`, `auth:migrate`, then `seed`; when upgrading an existing project, [retain its applied migrations](/en/database/migrations#authentication-storage).
 
 Identity relationships store `model_type` and `model_id`. The identifier must belong to a persisted identity and support an `int`, `str`, or `UUID` value. By default, the type is the Python class path; you may set a stable value with `AUTHORIZABLE_TYPE` on the model. Keep that value once assignments exist: changing it changes the key used to find those relationships.
 

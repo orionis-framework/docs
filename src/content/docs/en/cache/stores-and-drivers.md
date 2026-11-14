@@ -11,7 +11,7 @@ A **store** is the repository selected through `manager.store("redis")`. Its **b
 
 | Store | Where data is shared | Uses and considerations |
 |---|---|---|
-| `file` | Processes accessing the same filesystem directory. | Requires no cache server. Adds I/O and coordination files; monotonic expirations are not durable persistence. |
+| `file` | Processes accessing the same filesystem directory. | Requires no cache server. Adds I/O and coordination files; epoch expirations survive process restarts and depend on the system clock. |
 | `memory` | Only consumers of the same backend instance. | Tests and ephemeral process-local data. Does not share results across workers or survive loss of the instance. |
 | `redis` | Clients of the same Redis database. | Shared cache across processes and servers. Requires an accessible service; lifecycle and capacity depend on its configuration. |
 | `memcached` | Clients of the same Memcached service. | Shared cache with server-managed temporary storage. Prefixes do not isolate clearing. |
@@ -78,11 +78,11 @@ The manager resolves relative paths from the application root. The backend norma
 
 Each JSON entry contains its value and expiration. The backend moves reads and writes to worker threads, uses striped file locks to coordinate access to the same directory, and publishes writes through unique temporary files and replacement. Increments coordinate the read and write under a file lock. These single-operation guarantees do not turn several calls into a transaction.
 
-Read errors or unreadable JSON are treated as a miss; expired entries are removed when read. Writes can propagate permission, serialization, and I/O errors. `clear()` deletes `.json` and `.tmp` files from that directory, rather than only the current prefix's keys. Reserve a dedicated directory for this backend.
+Read errors or unreadable JSON are observed through the application failure runtime and treated as a miss; missing files are ordinary cache misses. Non-object JSON, absent value fields, and nonnumeric expiry metadata also produce a miss. Expired entries are removed when read. Writes can propagate permission, serialization, and I/O errors. `clear()` deletes `.json` and `.tmp` files from that directory, rather than only the current prefix's keys. Reserve a dedicated directory for this backend.
 
 ### Expiration and persistence
 
-TTLs use `time.monotonic()`, in seconds. `ttl=None` means no expiration; `ttl=0` makes the entry immediately expired. The monotonic clock is not a calendar date and does not define a durable expiration that you can move between machines or system restarts. Treat this store as regenerable local cache.
+TTLs use Unix epoch seconds from `time.time()`. `ttl=None` means no expiration; `ttl=0` makes the entry immediately expired. Stored expiry timestamps remain meaningful across process and machine restarts, but depend on the system clock. Treat this store as regenerable local cache.
 
 There is no periodic cleanup worker or configured size limit. An expired entry can remain physically present until read or until you clear the store. The [public cache lock](/en/cache/locks) has a different scope: it coordinates the same event loop, directory, and key rather than all requests from separate processes.
 
@@ -151,7 +151,7 @@ Without `DB_CACHE_CONNECTION`, the store uses Orionis's default connection resol
 
 The first I/O operation lazily creates the entry and lock tables through the schema system. The connection must be able to create missing tables. Existing tables are retained rather than migrated to compatible structures. Names are logical names, so the Database connection's table prefix applies.
 
-Since 1.3.0, prepare both tables before the first request with either alternative:
+Prepare both tables before the first request with either alternative:
 
 ```shell
 orionis cache:migrate

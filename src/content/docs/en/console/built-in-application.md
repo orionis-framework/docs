@@ -223,7 +223,7 @@ Start the application's Granian HTTP server.
 | Argument or option | Type and presence | Effective value when omitted | Purpose |
 |---|---|---|---|
 | `--interface` / `-i` | str, optional | `rsgi` | Server HTTP interface. Choices: `rsgi`, `asgi`. |
-| `--host` | str, optional | `127.0.0.1` in development; `0.0.0.0` in production | Bind address; available since 1.0.13. |
+| `--host` | str, optional | `127.0.0.1` in development; `0.0.0.0` in production | Bind address. |
 | `--port` / `-p` | int, optional | `8000` | TCP port; integer. |
 | `--log` | Flag, optional | `False` | Enable server logging at info level. |
 | `--export` | Flag, optional | `False` | Print the resolved Granian command without starting it. |
@@ -251,18 +251,20 @@ Run application tests.
 |---|---|---|---|
 | `--verbosity` / `-v` | int, optional | `testing.verbosity` | Result verbosity: 0, 1 or 2. |
 | `--fail-fast` / `-f` | int, optional | `testing.fail_fast` | 1 stops at the first failure; 0 continues. |
-| `--start-dir` / `-s` | str, optional | `testing.start_dir` | Starting directory for test discovery. |
+| `--start-dir` / `-s` | str, optional | `testing.start_dir` | Discovery directory or explicit Python file. |
 | `--file-pattern` | str, optional | `testing.file_pattern` | Test filename pattern. |
 | `--method-pattern` | str, optional | `testing.method_pattern` | Test method-name pattern. |
 | `--panel` | Flag, optional | `True` | Enable/disable result panels. |
 | `--no-panel` | Flag, optional | `True` | Enable/disable result panels. |
 
-Omitted selection options are resolved through `config/testing.py`: `verbosity` (`2` in the base configuration), `fail_fast` (`False`), `start_dir` (`tests`), `file_pattern` (`test_*.py`) and `method_pattern` (`test*`). `--verbosity` / `-v` accepts `0`, `1` or `2` and rejects other integers. `--fail-fast` / `-f` takes an integer rather than acting as a flag: use `1` to stop at the first failure or `0` to continue. `--start-dir` / `-s`, `--file-pattern` and `--method-pattern` are strings. `--panel` keeps panels enabled; `--no-panel` disables them without taking a value. Return `1` if any result is failed or errored, otherwise `0`.
+Omitted selection options are resolved through `config/testing.py`: `verbosity` (`2` in the base configuration), `fail_fast` (`False`), `start_dir` (`tests`), `file_pattern` (`test_*.py`) and `method_pattern` (`test*`). `--verbosity` / `-v` accepts `0`, `1` or `2` and rejects other integers. `--fail-fast` / `-f` takes an integer rather than acting as a flag: use `1` to stop at the first failure or `0` to continue. `--start-dir` / `-s`, `--file-pattern` and `--method-pattern` are strings. `--panel` keeps panels enabled; `--no-panel` disables them without taking a value. Return `1` when no tests produce results or any result fails/errors; return `0` for nonempty results without failures/errors.
 
 ```shell
 orionis test --start-dir tests --file-pattern "test_*.py" --method-pattern "test*" --verbosity 2 --fail-fast 0 --no-panel
 python -B reactor test --start-dir tests --file-pattern "test_*.py" --method-pattern "test*" --verbosity 2 --fail-fast 0 --no-panel
 ```
+
+An explicit Python file, such as `--start-dir tests/unit/test_price.py`, bypasses the filename glob. Relative paths resolve from the application root and must exist inside it. The method glob directly selects names, including `check*` when intentionally using that prefix. Discovery errors propagate; an empty suite is not a passing check. See [test discovery and reports](/en/testing/results-and-reference).
 
 <a id="command-up"></a>
 

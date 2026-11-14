@@ -19,7 +19,7 @@ flowchart LR
 
 ## Inspeccionar un plan sin ejecutarlo
 
-Desde **1.2.0**, `Connection.toSql(plan, *, literal_binds=False) -> str` compila un `SelectPlan` de forma síncrona con el dialecto y el prefijo de tablas de la conexión. No crea un engine ni abre una conexión a la base de datos; tampoco ejecuta SQL ni cambia el plan. La tabla no necesita existir, por lo que este ejemplo funciona sin inicializar la aplicación:
+`Connection.toSql(plan, *, literal_binds=False) -> str` compila un `SelectPlan` de forma síncrona con el dialecto y el prefijo de tablas de la conexión. No crea un engine ni abre una conexión a la base de datos; tampoco ejecuta SQL ni cambia el plan. La tabla no necesita existir, por lo que este ejemplo funciona sin inicializar la aplicación:
 
 ```python
 from orionis.database import Connection

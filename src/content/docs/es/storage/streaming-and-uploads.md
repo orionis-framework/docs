@@ -69,7 +69,7 @@ Primero ejecuta `POST /reports/stock`; después descarga con `GET /reports/stock
 
 ### Leer solo una parte y liberar el iterador
 
-Usa un `chunk_size` entero positivo. No existe una validación uniforme de tamaños no positivos entre drivers. Si abandonas una lectura antes del final, cierra explícitamente el generador con `aclosing()`; un `break` no sustituye el cierre.
+Usa un `chunk_size` entero positivo, sin booleanos; los drivers incluidos rechazan valores inválidos con `ValueError`. Si interrumpes una lectura antes de agotar el iterador, ciérralo explícitamente con `aclosing()`; `break` no sustituye el cierre.
 
 ```python
 from contextlib import aclosing
@@ -106,7 +106,7 @@ Esta es la firma del constructor para adaptadores propios. Los drivers proporcio
 
 ### Recorrer un handle binario en bloques con buffer
 
-Desde **1.1.0**, `IStorageStream` y `AsyncStream` exponen `chunks(size: int = 65536, *, buffer_size: int = 1048576) -> AsyncIterator[bytes]`. Ambos tamaños deben ser enteros positivos sin booleanos; un valor inválido produce `ValueError`. El método comienza en la posición actual del handle y entrega bloques hasta EOF:
+`IStorageStream` y `AsyncStream` exponen `chunks(size: int = 65536, *, buffer_size: int = 1048576) -> AsyncIterator[bytes]`. Ambos tamaños deben ser enteros positivos sin booleanos; un valor inválido produce `ValueError`. El método comienza en la posición actual del handle y entrega bloques hasta EOF:
 
 ```python
 from orionis.support.facades import Storage
@@ -147,7 +147,7 @@ Estos límites de lectura no restringen el tamaño de objetos ya cargados en mem
 
 `await stream.close()` separa el handle del objeto, ejecuta `on_close` y después cierra el handle. Cerrar un stream aún no abierto o cerrarlo dos veces seguidas no hace nada. Si vuelves a leer/escribir después, la apertura lazy puede crear otro handle: no reutilices un stream cerrado como si tuviera un estado terminal, especialmente con `wb`, que volvería a truncar el archivo local.
 
-Si el callback falla, la excepción se propaga y la llamada posterior a `handle.close()` no se alcanza. El contrato no ofrece un mecanismo de rollback ni garantiza la liberación inmediata del buffer en ese fallo. Consulta [contextos, errores y cancelación](/es/storage/temporary-files-and-contexts).
+El handle se cierra en `finally`, incluso si falla el callback de persistencia. Un fallo de callback o cierre se propaga cuando no existe un error anterior. Durante una salida excepcional del contexto, los fallos de limpieza se observan mediante el sistema de fallos y se conserva la excepción original del bloque. Es limpieza de recursos, no rollback: los callbacks de cloud y memory aún pueden publicar bytes. Consulta [contextos, errores y cancelación](/es/storage/temporary-files-and-contexts).
 
 <a id="stream-context"></a>
 ### Contexto asíncrono
@@ -187,7 +187,7 @@ async def build_binary_report() -> dict[str, int | str]:
 
 Los modos de texto, `r+b`, `w+b`, `a+b`, `x` y otros valores no incluidos en la tabla generan `UnsupportedStorageOperationException`. Usa `rb+`, `wb+` y `ab+` con ese orden exacto.
 
-Local abre directamente el archivo y aplica los permisos de acceso del modo. Memory utiliza `BytesIO` y cloud un temporal binario: estos buffers no implementan la misma restricción de lectura/escritura que un archivo local. El modo decide cómo inicializar y persistir el buffer; utiliza solo las operaciones previstas por el modo para mantener la portabilidad. En append no rebobines para sobrescribir: local fuerza las escrituras al final, mientras los buffers remotos permiten cambiar la posición antes de su posterior carga completa.
+Local abre el archivo real; memory y cloud envuelven sus buffers para aplicar los mismos permisos del modo binario. `rb` rechaza escrituras, `wb`/`ab` rechazan lecturas y los modos `+` permiten ambas. En append, cada escritura se fuerza al final incluso después de un seek; una operación no permitida genera `io.UnsupportedOperation`. La publicación remota aún carga todo el buffer escribible al cerrar.
 
 ## Persistir archivos recibidos por HTTP
 

@@ -107,7 +107,7 @@ The lease uses the acquiring process's `time.time()`. Sharing the connection, ta
 
 `releaseLock(key: str, owner: str) -> None` deletes a row only while it still belongs to that owner. If a lease expired and another consumer acquired it, the first consumer's exit cannot remove the second reservation. The public object does not expose its token; do not transfer ownership through private attributes.
 
-Both backend primitives are asynchronous and sit behind the context; you do not need to call them when using `repository.lock()`. Update, release, or connection errors can propagate. During acquisition, an INSERT `QueryException` leads to an UPDATE attempt; when it changes no rows, acquisition can return `False` instead of exposing the original error. The implementation does not coordinate your business transaction with its lock row.
+Both backend primitives are asynchronous. After an INSERT `QueryException`, acquisition attempts an UPDATE of a row owned by the caller or already expired. If no row changes, it checks whether a competing row exists: contention returns `False`, while an absent row re-raises the insertion error. Update, release, and connection errors can propagate. The lock row does not coordinate your business transaction.
 
 <a id="lock-redlock"></a>
 ### Memory, Redis, and Memcached: RedLock behavior
@@ -158,7 +158,7 @@ class DocumentSummaryController:
         return {"files": len(files), "bytes": sum([await file.size() for file in files])}
 ```
 
-In this example's `file` store, `remember()` performs the second check with an internal sentinel, distinguishing stored `None` from an absent key. This behavior is not uniform: aiocache memory/Redis/Memcached backends replace a read `None` with the default and can run the resolver again. See [cached values](/en/cache/caching-values). The outer `get()` cannot make that distinction, although it does not affect this dictionary example. A synchronous resolver runs directly; use an asynchronous resolver for I/O or move blocking work to a worker thread.
+`remember()` distinguishes a cached `None` from a missing key in all configured Orionis stores, including the aiocache-backed stores. The outer `get()` cannot make that distinction, which is harmless for this dictionary example. A synchronous resolver runs directly; use an asynchronous resolver for I/O or move blocking work to a worker thread.
 
 ```mermaid
 flowchart TD
@@ -203,10 +203,10 @@ Inject the service into an action and supply your application resolver. `lock()`
 
 File uses `asyncio.wait_for()` when given a timeout: expiry before acquisition propagates `TimeoutError`. Database raises `TimeoutError` on detecting its deadline after a failed attempt. RedLock absorbs contention-wait expiry, but backend, validation, network, and client-operation timeout errors can still propagate.
 
-Cancelling a task waiting for a file lock stops its wait without releasing the holder's lock. Cancellation inside the block invokes context exit: file releases its `asyncio.Lock` without I/O; database and RedLock must await release operations. These are not uniformly protected from repeated cancellation or backend failures. Remote acquisition completing concurrently with cancelled entry can depend on lease expiry to become available again.
+Cancelling a task waiting for a file lock stops its wait without releasing the holder's lock. Context exit releases file ownership immediately and waits for database/RedLock release even during repeated cancellation. A cancelled database acquisition also attempts owner-checked release before propagating cancellation. Backend failures still limit successful release; remote leases remain the recovery boundary.
 
 Do not suppress `CancelledError` and continue as though acquisition succeeded. Use one context object per participant and avoid nested acquisition of the same key: these locks provide no task reentrancy. They do not depend on destructor-based release, and process exit does not necessarily execute `__aexit__()`.
 
-Release errors propagate and can replace the block error. A lease does not undo work, a lock does not prevent external code writing without participation, and no context here commits or rolls back database transactions. See the [API reference](/en/cache/api-reference) for cache operations.
+A release error propagates when the block completed normally. If the block already failed, the failure runtime observes the original error and cleanup failure while preserving the original exception. A lease does not undo work, a lock does not prevent external code writing without participation, and no context here commits or rolls back database transactions. See the [API reference](/en/cache/api-reference).
 
-For cache-miss coordination in 1.1.0, [`rememberOnce(..., lease=...)`](/en/cache/caching-values#repository-rememberonce) adds separate bounded admission and Redis owner-checked cleanup. Its Redis polling behavior does not change the existing `repository.lock()`/RedLock contract described above.
+For cache-miss coordination, [`rememberOnce(..., lease=...)`](/en/cache/caching-values#repository-rememberonce) adds separate bounded admission and Redis owner-checked cleanup. Its Redis polling behavior does not change the existing `repository.lock()`/RedLock contract described above.

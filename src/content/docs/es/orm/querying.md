@@ -104,7 +104,7 @@ Los valores se enlazan como parámetros. Los identificadores, operadores y fragm
 
 ## Inspeccionar SQL del modelo
 
-Desde **1.2.0**, `toSql(*, literal_binds=False) -> str` representa el SELECT actual de forma síncrona, con el dialecto y el prefijo de tablas de la conexión del modelo. Se llama sin `await`; no crea un engine ni abre una conexión a la base de datos, y tampoco ejecuta SQL. Requiere la aplicación inicializada o un `ConnectionResolver` configurado, pero la tabla no necesita existir.
+`toSql(*, literal_binds=False) -> str` representa el SELECT actual de forma síncrona, con el dialecto y el prefijo de tablas de la conexión del modelo. Se llama sin `await`; no crea un engine ni abre una conexión a la base de datos, y tampoco ejecuta SQL. Requiere la aplicación inicializada o un `ConnectionResolver` configurado, pero la tabla no necesita existir.
 
 ```python
 from app.models.product import Product
@@ -185,4 +185,4 @@ La primera función utiliza `fillable`, mutadores, estado y eventos de una insta
 
 Los errores de composición producen `InvalidQueryException`; una relación inexistente, `RelationNotFoundException`; un scope explícito no encontrado, `ScopeNotFoundException`; los fallos de SQL se propagan desde Database. Los tipos y reglas de cada operación están enlazados en las referencias anteriores. El [módulo de pruebas](/es/orm/testing) reúne fixtures y verificaciones de consultas, persistencia y relaciones.
 
-Para resultados grandes en 1.1.0, utiliza [`chunks()` de consultas](/es/orm/collections-and-pagination#query-chunks) con un `orderBy()` explícito y determinista. Entrega colecciones limitadas por lote sin cambiar `get()` ni dividir una colección ya materializada.
+Para resultados grandes, utiliza [`chunks()` de consultas](/es/orm/collections-and-pagination#query-chunks) con un `orderBy()` explícito y determinista. Entrega colecciones limitadas por lote sin cambiar `get()` ni dividir una colección ya materializada.

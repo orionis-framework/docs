@@ -108,6 +108,8 @@ assert unrestricted_ints.randomElement(elements=(7,)) == 7
 
 Exhausting possible values or backend attempts propagates `faker.exceptions.UniquenessException`. `clear()` permits earlier values again. `Factory.clearUnique()` clears the pool and returns the factory without reseeding the RNG or rewinding a Sequence. `excludeTypes()` returns a view allowing repeated results of selected types while sharing the pool for other results.
 
+A derived `unique` view initially shares seen-value history. Calling `clear()` on that derived view starts its own independent history; it does not promise to clear every other view.
+
 ## Optional values
 
 `fake.optional.provider(..., prob=0.5)` returns the provider result or `None`. `prob` is the probability of **generating the value**, not omitting it. The backend requires `0 < prob <= 1`; `prob=1` always generates and `prob=0` raises `ValueError`.

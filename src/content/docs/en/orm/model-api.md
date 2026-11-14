@@ -67,7 +67,7 @@ query = Article.query().where("published", True)
 toSql(*, literal_binds: bool = False) -> str
 ```
 
-Synchronous builder method, also delegated by the model class since **1.2.0**. `Article.toSql()` creates a fresh query; `query.toSql()` compiles the existing query's SELECT on a clone, including global scopes and soft-delete visibility. It preserves the original builder and executes no SQL. Uses the model connection's dialect and table prefix.
+Synchronous builder method, also delegated by the model class. `Article.toSql()` creates a fresh query; `query.toSql()` compiles the existing query's SELECT on a clone, including global scopes and soft-delete visibility. It preserves the original builder and executes no SQL. Uses the model connection's dialect and table prefix.
 
 ```python
 default_sql = Article.toSql()
@@ -511,7 +511,7 @@ original = article.getOriginal()
 def syncOriginal(self) -> Any
 ```
 
-Replaces the original snapshot with current values and returns the same instance, **without persistence** and without clearing `getChanges`. Advanced use: calling it before saving hides those changes from the next UPDATE.
+Copies current values into a new original snapshot and returns the same instance, without persistence or clearing `getChanges`. The snapshot is published only after every value copies successfully; a copy failure preserves the previous snapshot. Calling this before saving hides those changes from the next UPDATE.
 
 ```python
 snapshot_only = Article({"title": "Baseline"})
@@ -758,7 +758,7 @@ finally:
 
 There are no instance `refresh()`/`fresh()` methods or public `exists` property here. Query again to check existence, or use the write boolean and identity. Partial projection does not populate the rest of an entity: do not persist values you merely assumed were loaded. Instance update/delete targets the original PK directly without reapplying global scopes or version checks. There is no implicit optimistic locking. Discard or retrieve an object again after errors or rollback when it must reflect database state.
 
-A no-change `save()` still runs `saving`, `updating`, `updated`, `saved`, but sends no UPDATE. When SQL affects zero rows, after-events still execute even though the boolean is `False`. See [events](/en/orm/events).
+A no-change `save()` still runs `saving`, `updating`, `updated`, `saved`, but sends no UPDATE. When SQL affects zero rows, the boolean is `False` and successful after-events are not dispatched. See [events](/en/orm/events).
 
 <a id="orm-exceptions"></a>
 

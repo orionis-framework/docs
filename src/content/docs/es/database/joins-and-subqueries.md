@@ -7,7 +7,7 @@ lastUpdated: false
 
 Los joins relacionan fuentes SQL y devuelven filas de una consulta. Las [relaciones ORM](/es/orm/relationships) describen asociaciones entre modelos y su carga; son APIs distintas.
 
-Usa alias y nombres calificados para resolver columnas inequívocamente. Una subconsulta acepta un builder, `SelectPlan` o un callback síncrono que configura un builder nuevo. `selectSub`, `whereExists`, `whereIn`, `joinSub` y `union` reutilizan esta normalización. Los planes se incorporan por referencia; termina de configurarlos o clónalos antes de reutilizarlos.
+Usa alias y nombres calificados para resolver columnas inequívocamente. Una subconsulta acepta un builder, `SelectPlan` o un callback síncrono que configura un builder nuevo. `selectSub`, `whereExists`, `whereIn`, `joinSub` y `union` reutilizan esta normalización. Los `SelectPlan` sin modelo se incorporan por referencia. Los builders de modelos preparan scopes y visibilidad de eliminación lógica sobre un clon, conservando exclusiones explícitas. Termina de configurar los planes antes de reutilizarlos.
 
 ```python
 from orionis.support.facades import DB

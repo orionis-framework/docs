@@ -426,7 +426,7 @@ These operations modify the module object in memory for all its consumers. They 
 def setClass(self, class_name: str, cls: type) -> bool: ...
 ```
 
-`class_name: str` and `cls: type` are required. Require a class (`TypeError`) and a valid identifier that is not a keyword (`ValueError`). Assign or replace the alias and return `True`. Only the `classes` entry is invalidated; call `clearCache()` before reusing previously calculated visibility filters.
+Requires a class (`TypeError` otherwise) and a valid non-keyword identifier (`ValueError` otherwise). Assigns or replaces the module alias, clears all local cached categories and returns `True`.
 
 ```python
 plugin_type = reflected.getClass("CatalogPlugin")
@@ -443,7 +443,7 @@ assert reflected.getPublicClasses()["ExtraPlugin"] is plugin_type
 def removeClass(self, class_name: str) -> bool: ...
 ```
 
-`class_name` is required. Delete an existing class alias and return `True`. Names absent from `getClasses()` raise `ValueError`. Like `setClass`, only `classes` is invalidated; clear the cache to refresh other filters.
+Deletes an existing class alias, clears all local cached categories and returns `True`. Names absent from `getClasses()` raise `ValueError`.
 
 ```python
 assert reflected.removeClass("ExtraPlugin") is True
@@ -463,7 +463,7 @@ Result dictionaries are memoized and returned by reference. Do not modify them a
 def clearCache(self) -> None: ...
 ```
 
-With no arguments, remove all cached results and return `None`. This neither reloads the module through `importlib.reload` nor clears the `ModuleInspector` class cache.
+Removes all local cached results and returns `None`. This does not reload the module or clear Python's import cache.
 
 ```python
 assert reflected.clearCache() is None

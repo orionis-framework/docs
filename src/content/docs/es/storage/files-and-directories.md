@@ -166,6 +166,29 @@ class ReportArchive:
 
 Devuelve la clave relativa canónica sin I/O. Ejemplo: `key = report.path()`. Guarda el nombre del disco junto a esa clave si necesitas resolverlo después en un disco concreto.
 
+<a id="file-filesystem-paths"></a>
+
+### `absolutePath() -> str` y `relativePath() -> str`
+
+Estos métodos síncronos exponen ubicaciones del sistema de archivos en el driver local, incluidos los discos configurados `local` y `public`. No crean el archivo referenciado ni exigen que exista. `absolutePath()` devuelve una ruta absoluta con los separadores del sistema operativo. `relativePath()` devuelve una ruta desde `app.basePath` con separadores `/`; `path()` siempre conserva la clave relativa al disco.
+
+```python
+from orionis.support.facades import Storage
+
+
+def report_locations(report_id: int) -> dict[str, str]:
+    file = Storage.disk("local").file(f"reports/{report_id}.csv")
+    return {
+        "key": file.path(),
+        "absolute": file.absolutePath(),
+        "application_relative": file.relativePath(),
+    }
+```
+
+Si la raíz del disco es `<aplicación>/storage/app`, el resultado relativo del reporte 42 es `storage/app/reports/42.csv`. Una raíz externa a la aplicación puede producir segmentos `..`; ubicaciones en distintas unidades de Windows generan `StoragePathException`. La resolución local rechaza rutas o enlaces simbólicos que escapen de la raíz del disco.
+
+Memory, S3, Azure y GCS producen `UnsupportedStorageOperationException` con ambos métodos: una clave de objeto o URL no es una ruta de archivo local. Si construyes `LocalStorageDriver` directamente, pasa `base_path=Path(...)` para habilitar `relativePath()`; el manager suministra `app.basePath` automáticamente. Usa estas rutas en integraciones locales de confianza y guarda el disco junto con `path()` para referencias portables.
+
 <a id="file-read"></a>
 
 ### `async read() -> bytes`
@@ -492,7 +515,7 @@ Comprueba existencia según el backend. Ejemplo: `available = await reports.exis
 
 Lista referencias de archivos hijos directos, ordenadas por ruta. Ejemplo: `names = [item.path() for item in await reports.files()]`. Excluye archivos anidados y marcadores cloud de directorio. Los resultados son objetos, no cadenas ni bytes de contenido.
 
-Los listados locales también excluyen nombres terminados en `.tmp`, incluidos archivos creados por la aplicación con ese sufijo. El filtro se aplica asimismo a los listados recursivos; esos archivos se pueden acceder directamente mediante `file(path)`.
+Los listados locales solo excluyen nombres de staging interno terminados en `.<16 caracteres hexadecimales minúsculos>.tmp`. Los archivos de la aplicación como `report.tmp` siguen siendo visibles, incluso en los listados recursivos.
 
 <a id="directory-allfiles"></a>
 

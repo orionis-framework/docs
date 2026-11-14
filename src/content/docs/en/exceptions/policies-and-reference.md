@@ -5,236 +5,108 @@ editUrl: true
 lastUpdated: false
 ---
 
-`Catch` coordinates reporting and presentation of an exception that another component has already caught. The handler decides what to record and return; the transport determines where it intercepts failures. Registering a handler does not install a process-wide exception catcher.
+## Public API
 
-Start with [Registration and behavior](/en/exceptions), continue with [Customizing the handler](/en/exceptions/handling-exceptions), and see [Contexts and transports](/en/exceptions/contexts-and-transports) for differences between HTTP, CLI, MCP, connections, and background work.
+### Application handler contract
 
-<a id="failure-public-imports"></a>
+`IBaseExceptionHandler`, available from `orionis.failure.contracts.handler`, declares two abstract async methods:
 
-## Public imports
-
-```python
-from orionis.support.facades import Catch
-from orionis.failure.contracts import ICatch
-from orionis.failure.entities import Throwable
-from orionis.failure.enums import KernelContext
-```
-
-The first import is the facade. `from orionis.failure import Catch` gets the concrete service class, whose constructor requires an application. Extend policies using `BaseExceptionHandler` from `orionis.failure.base` or `IBaseExceptionHandler` from `orionis.failure.contracts.handler`; their methods are described in the [customization guide](/en/exceptions/handling-exceptions).
-
-<a id="catch-service"></a>
-
-## Catch and ICatch
-
-The `orionis.failure.catch.Catch` class implements `ICatch` and exposes this API:
-
-```python
-def __init__(self, app: IApplication) -> None:
-    ...
-
-async def exception(
-    self,
-    exception: BaseException,
-    request: Request | TransportAdapter | None = None,
-) -> Response | None:
-    ...
-```
-
-`ICatch.exception()` declares the same asynchronous signature. The constructor stores the application and prepares deferred handler resolution; it does not register another service or start the application.
-
-| Parameter | Type and default | Usage |
+| Method | Return | Responsibility |
 |---|---|---|
-| `app` | `IApplication`, required for direct construction. | Resolves the handler, scope, and method dependencies. |
-| `exception` | `BaseException`, required. | Original exception delivered to `report()` and the presentation method. |
-| `request` | `Request \| TransportAdapter \| None = None`. | Request delivered to `handleHTTP()`; the base handler requires a compatible request in HTTP. |
-| Result | `Response \| None`. | Return value of `handleHTTP()` or `handleCLI()`; `None` in the base CLI flow or when no known context matches. |
+| `handleFailure(exception, context)` | `FailureHandling \| None` | Receive the original exception and select deferred effects once per incident. |
+| `handleResult(value, context)` | `FailureHandling \| None` | Receive a declared failed outcome without manufacturing an exception. |
 
-Always use `await`, through either `ICatch` or the facade:
+`BaseExceptionHandler` implements both. Its `handleFailure` returns a plan preserving default logging and HTTP/CLI presentation; its `handleResult` returns `None`. The helper `toThrowable(exception)` stringifies arguments and retains the native traceback. `isExceptionIgnored(exception)` tests exact exception-class membership in `dont_catch` and rejects non-exceptions with `TypeError`.
 
-```python
-from orionis.failure.contracts import ICatch
-from orionis.http import Request, Response
+### `FailureHandling`
 
+Import from `orionis.failure.entities`. This mutable, incident-local plan is separate from immutable context and receipts.
 
-class ImportBoundary:
-    def __init__(self, catch: ICatch) -> None:
-        self.catch = catch
-
-    async def present(
-        self,
-        exception: Exception,
-        request: Request,
-    ) -> Response:
-        response = await self.catch.exception(exception, request=request)
-        if response is None:
-            raise RuntimeError("The exception policy did not return a response")
-        return response
-```
-
-This component can be resolved by the container from a controller or HTTP integration. It must run inside the existing HTTP scope. There is no need to wrap every controller action: the kernel already catches failures in its flow. A custom boundary is useful when you need to deliver an exception explicitly to the policy and use its response.
-
-The equivalent operation through the facade is:
-
-```python
-from orionis.http import Request, Response
-from orionis.support.facades import Catch
-
-
-async def present_failure(
-    exception: Exception,
-    request: Request,
-) -> Response | None:
-    return await Catch.exception(exception, request=request)
-```
-
-<a id="catch-dispatch"></a>
-
-## Reporting and presentation order
-
-```mermaid
-flowchart TD
-    A[Exception delivered to Catch] --> B[Resolve and retain the handler]
-    B --> C[Read scope and kernel]
-    C --> D[await app.call: report]
-    D --> E{KernelContext}
-    E -->|HTTP| F[await app.call: handleHTTP]
-    E -->|CONSOLE| G[await app.call: handleCLI]
-    E -->|Another non-null value| H[Return None]
-    F --> I[Return the handler result]
-    G --> I
-```
-
-Reporting must finish before presentation begins. Each method receives the original exception as the named `exception` argument; `handleHTTP()` also receives `request`. `app.call()` resolves other annotated dependencies, such as `ILogger` or `Console`.
-
-The `report()` result is discarded. Returning `None` from that method allows presentation to continue; raising an exception prevents it. `Catch` does not validate or convert handler return values: a `Response | None` annotation does not automatically generate a response.
-
-<a id="catch-context"></a>
-
-## Scope and KernelContext
-
-`Catch.exception()` calls `app.getCurrentScope()` and then `await scope.get("kernel")`. Initial handler resolution happens before these checks.
-
-| Context state | Behavior |
+| Member | Meaning |
 |---|---|
-| No scope exists. | Raises `RuntimeError("No active scope found for context retrieval.")`; does not report. |
-| `kernel` is `None`. | Raises `RuntimeError("No kernel found in the current scope for context retrieval.")`; does not report. |
-| `kernel is KernelContext.HTTP`. | Reports and executes `handleHTTP()`. |
-| `kernel is KernelContext.CONSOLE`. | Reports and executes `handleCLI()`. |
-| Another value distinct from `None`. | Reports and returns `None`. |
+| `logging` | Optional async callable with no arguments. The runtime owns execution. |
+| `presentation` | Optional async callable accepting keyword arguments `flow` and `request=None`. The protocol owner requests execution. |
+| `complete()` | Runs logging once; a successful logging callback marks `reported=True`. Without a callback it remains `False`. Repeated calls do not retry a failed callback. |
+| `present(*, flow, request=None)` | Runs presentation once and caches its result or failure. |
+| `reported`, `degraded` | Status of the plan's handling. Runtime receipts expose delivery status without retaining the plan or exception. |
 
-`KernelContext` is an `Enum` with exactly two members:
+The handler selects callbacks and returns the plan. Runtime reporting protection wraps completion; `complete()` is not an independent emergency reporter. Presentation is deferred until the execution owner has its live request. Keep plans out of singleton attributes and never retain them across independent incidents.
 
-```python
-from orionis.failure.enums import KernelContext
+### Context, receipt, and throwable
 
-http_context = KernelContext.HTTP
-console_context = KernelContext.CONSOLE
-assert KernelContext["HTTP"] is http_context
-assert http_context is not console_context
-```
+`FailureContext`, `FailureReceipt`, and `Throwable` are exported from `orionis.failure.entities`.
 
-Values are assigned with `auto()`. Integrations should use the members, rather than their numbers or the strings `"HTTP"` and `"CONSOLE"`: dispatch compares identity. There are no dedicated MCP, Realtime, WebSocket, or queue members. An HTTP marker does not require those protocols to call `handleHTTP()`.
+- `FailureContext` is immutable and contains flow, phase, operation, correlation/event identifiers, `expected`, `reporting_allowed`, and bounded scalar metadata. It does not retain transport objects. The runtime disables `reporting_allowed` when reporting resources begin closing.
+- `FailureReceipt` contains `event_id`, `delivered`, `reported`, `duplicate`, and `degraded`. Delivery does not imply logging: expected, ignored, or observation-only failures can be delivered without an ERROR record.
+- `Throwable` is frozen, keyword-only, and slotted, with `classtype`, `message`, `args`, and optional native `traceback`. The entity stores the supplied values without converting its tuple elements. `BaseExceptionHandler.toThrowable()` sets `message=str(exception)` and stringifies each argument. The entity does not serialize or format itself.
 
-Entry points create and close their scopes. Controllers do not need to manipulate them. See [Scopes and concurrency](/en/application/container/scopes-and-concurrency) to implement an integration that owns its own scope.
+### Catch, facade, and runtime helpers
 
-<a id="catch-provider"></a>
+`Catch` is exported by `orionis.failure`; `ICatch` by `orionis.failure.contracts`. Applications normally receive `ICatch` by injection or use `orionis.support.facades.Catch`. `CatchProvider` binds the singleton service and pins the facade.
 
-## Registration, caching, and injection
+`Catch.exception(exception, request=None)` reads the active scope's `kernel`, captures the incident, and asks its plan for HTTP/CLI presentation. Existing incident state is reused without a second application-hook call. `Catch.capture(exception, *, context)` requires no scope and requests no presentation.
 
-`CatchProvider` extends `ServiceProvider` and receives the application through its inherited constructor. It has two operations:
+An explicit `Catch.exception()` call can also handle an incident when the application is created but no failure runtime is active. It uses a standalone coordinator with the same handler and reporting safeguards. This requires an active scope containing `kernel`; it does not activate automatic observation of startup or arbitrary external work. The capture-only APIs still return `None` without an active runtime.
 
-| Signature | Effect |
+`capture`, `capture_result`, and `operation` are available from `orionis.failure.runtime`. Capture requires an active post-startup runtime. Owners explicitly notify failures and retain their response, retry, recovery, and propagation behavior. A custom result plan may log, but `capture_result` does not replace the original result or render automatically.
+
+When cleanup crosses a task boundary, an owner may pass the original receipt's
+`event_id` as `capture(..., parent_event_id=...)`. This preserves causal incident
+metadata without changing the secondary exception's Python cause or context.
+
+## Configuration and defaults
+
+There is no dedicated configuration file. Register the handler class through `app.withExceptionHandler(...)` before `create()`. The base HTTP policy reads `app.debug`:
+
+| Value | Unknown HTTP exception behavior |
 |---|---|
-| `register(self) -> None` | Runs `self.app.singleton(ICatch, Catch, alias="x-orionis-ICatch")`. |
-| `async boot(self) -> None` | Runs `await CatchFacade.pin()` to retain the resolved service on the facade. |
+| `False` | Sanitized status 500 with `Internal Server Error`. |
+| `True` | Detailed exception response with request path and method. |
 
-This is a native provider; you do not need to register it again to use `ICatch`. The singleton is shared within the application process. The facade exposes that registered service and preserves the asynchronous behavior of `exception()`.
+Known exceptions map to 401 authentication, 403 authorization, 404 route not found, 405 method not allowed, 413 payload too large, 415 unsupported media type, and 419 CSRF mismatch. HTTP mapping walks the MRO and therefore includes subclasses. Content negotiation uses `request.wantsJson()`.
 
-There are two different caches:
+`dont_catch` is a class-level `frozenset` of exact classes. Matching suppresses both default logging and presentation. Subclasses are not implicitly ignored. `context.expected=True` suppresses default ERROR logging while retaining presentation. `context.reporting_allowed=False` suppresses default logger use during final shutdown; custom logging callbacks must honor this flag.
 
-1. `Application.getExceptionHandler()` retains the resolved **class** and calls `build()` for each direct handler request; it returns an instance constructed through the container.
-2. `Catch` retains the **instance** obtained on first use. An `asyncio.Lock` prevents duplicate resolution when initial calls overlap. If resolution fails before assignment, a later call can try again.
+## Failure and lifecycle boundaries
 
-The retained instance does not store the current request or exception. Keep those in local variables: the same policy can handle concurrent failures. Constructor dependencies stay with the retained handler; avoid holding request-specific services there. Per-invocation dependencies can be received in methods called through the container.
+- Missing scope or `kernel` raises `RuntimeError` in `Catch.exception()`; use capture for observation without a scope.
+- Pass the live request or adapter for HTTP presentation. The base plan has no HTTP output without it.
+- The runtime protects hook execution and deferred logging with recursion checks, a cooperative timeout, and a bounded stderr fallback. Reporting failure can degrade delivery while allowing presentation.
+- Presentation requested through `Catch` uses the same cooperative timeout and reentry guard. A failed or internally cancelled presenter is diagnosed once on stderr and propagates the primary failure without replacing its cause. Genuine caller cancellation still propagates. Output that may have partially completed is never retried; subsequent calls reuse the failed plan.
+- Cancellation, `KeyboardInterrupt`, `SystemExit`, and `GeneratorExit` are not converted into server failures.
+- Before activation, capture returns `None`. `create()` alone does not activate the runtime, and failures before successful startup are outside the coverage guarantee.
+- External code that consumes exceptions must notify explicitly. Orionis installs no global Python exception hooks for arbitrary external execution.
+- A failed result must be explicitly declared by its execution owner; the runtime does not infer failure from every ordinary return value.
 
-<a id="catch-facade"></a>
+## Performance and concurrency
 
-### Facade API
+The application reuses one prepared handler. Operation context, deduplication, and handling plans isolate incident state; completed operations release retained references. Independent operations and retry attempts are not one global incident. Constructor dependencies and custom policy must be safe for the shared handler lifetime.
 
-`Catch.getFacadeAccessor() -> str` returns `"x-orionis-ICatch"`. The facade also inherits `async resolve(*args, **kwargs) -> object`, `async pin() -> None`, and `unpin() -> None`; these are resolution mechanisms, rather than additional error treatments. The provider pins automatically. `unpin()` does not remove the singleton or the handler instance already retained by that service.
+Incident records and identifiers are allocated on failure paths. Execution boundaries and supervised tasks still perform context and lifecycle work during successful execution; this is not a zero-overhead guarantee. Deferred logging and presentation avoid doing protocol work where the execution owner does not request it.
 
-Normal usage is `await Catch.exception(...)` or `ICatch` injection. To create custom facades or understand synchronous and asynchronous invocation, see [Facades](/en/application/container/facades).
+## Define a custom handler
 
-<a id="failure-throwable"></a>
+The application contract has two hooks. Implement both when extending `IBaseExceptionHandler` directly, or inherit the default behavior from `BaseExceptionHandler`.
 
-## Throwable: structured representation
+1. Define exception policy in `handleFailure(exception, context)` and failed-result policy into `handleResult(value, context)`.
+2. Start from `plan = await super().handleFailure(exception, context)` to retain native behavior. Return that plan; awaiting and discarding it loses the deferred effects.
+3. Replace logging or presentation by assigning async callbacks to the plan. Preserve the inherited presentation callback when other flows still need it. Use `context.reporting_allowed` when adding logging.
+4. Keep callback state local to the incident. Let the runtime complete logging and the protocol owner request presentation. Do not call capture again from either hook.
 
-`Throwable` is a dataclass with `frozen=True`, `kw_only=True`, and `slots=True`:
+Direct implementations of `IBaseExceptionHandler` must implement both abstract methods and may return `None` for observation without effects. The base `handleResult` returns `None`, so delegating overrides should return its result too.
 
-```python
-from orionis.failure.entities import Throwable
+Orionis requires Python 3.14+ and uses its HTTP, auth, logging, console, and container services without adding a separate third-party dependency for this module.
 
+## Module structure
 
-failure = Throwable(
-    classtype=ValueError,
-    message="Invalid quantity",
-    args=("Invalid quantity",),
-    traceback=None,
-)
-```
-
-| Field | Declared type | Requirement and default |
-|---|---|---|
-| `classtype` | `type`. | Required; exception class. |
-| `message` | `str`. | Required; failure message. |
-| `args` | `tuple`. | Required; arguments represented by the entity. |
-| `traceback` | `TracebackType \| None`. | Optional; `None`. |
-
-Construction requires keyword arguments. The entity stores the supplied values without runtime validation or normalization. Fields cannot be reassigned and instances have no `__dict__`; that immutability does not turn referenced objects into immutable copies.
-
-`BaseExceptionHandler.toThrowable()` performs the normalization used by the base policy: it converts `exception.args` to a tuple of strings, uses `("",)` when empty, takes the first item as `message`, and preserves the original class and traceback. The message may differ from `str(exception)` when the exception received multiple arguments.
-
-```python
-from orionis.foundation.contracts.application import IApplication
-from orionis.failure.entities import Throwable
-
-
-async def describe_failure(
-    app: IApplication,
-    exception: BaseException,
-) -> Throwable:
-    handler = await app.getExceptionHandler()
-    return handler.toThrowable(exception)
-```
-
-This helper is valid in a created application and can be called with container dependencies. It does not catch or report the failure. The entity has no JSON serialization method; a class and a native traceback are not directly a JSON payload either.
-
-<a id="failure-reporting-policy"></a>
-
-## Reporting, ignoring, and presenting
-
-Base reporting sends an `ERROR` record to the logger using the message `[%s] %s`, the class name, and the first argument converted to text. It calls `log.getLogger().error(..., exc_info=(type(exception), exception, throwable.traceback))`: the original exception preserves the traceback, chained exceptions, and notes, even when reported outside the `except` block. Effective emission depends on the level and channel configured in [Logs](/en/logging).
-
-The `dont_catch` policy uses **exact class matching**. Base `report()`, `handleCLI()`, and `handleHTTP()` all consult it; an ignored class produces `None` in the base HTTP flow. `Catch` does not turn that value into a fallback response. Known HTTP error mapping, in contrast, walks the exception's ancestors. See [Customizing the handler](/en/exceptions/handling-exceptions) for both policies and complete examples.
-
-To omit only a log record, override `report()` and retain presentation methods. Returning `None` from your `report()` does not automatically suppress the response. Avoid treating `dont_catch` as a logger-only filter.
-
-<a id="failure-secondary-errors"></a>
-
-## Policy failures and cancellations
-
-`Catch` does not add a second fallback handler: failures in resolution, `report()`, `handleCLI()`, or `handleHTTP()` propagate. If logging fails during reporting, presentation does not execute. Do not call `Catch.exception()` from those methods to handle their own failure: that reenters the same policy.
-
-An integration using only `app.call(handler, "report", ...)` can define its own protection against reporting failures. That belongs to the integration, as in MCP, and is not a `Catch` guarantee.
-
-The signature accepts `BaseException`, but does not capture exceptions itself. HTTP and CLI kernels normally intercept `Exception`; `asyncio.CancelledError`, `KeyboardInterrupt`, and `SystemExit` have different boundaries. The default console validates an `Exception` instance; accepting `BaseException` in the contract does not guarantee that it can present every subclass.
-
-Preserve cancellation propagation in custom treatments. An already transmitted response cannot be replaced retroactively by the handler's result either. Capture boundaries, protocol codes, and failures after response delivery are detailed in [Contexts and transports](/en/exceptions/contexts-and-transports).
-
-<a id="failure-policy-checks"></a>
-
-## Checking a policy
-
-Check reporting and presentation separately: an exactly ignored type and an unlisted subclass, unknown errors with debug enabled and disabled, domain error responses, logger failures, and concurrent first use of the service. Verify transport behavior as well as the `handleHTTP()` return value.
-
-A correct treatment must preserve a valid response wherever the caller requires one, avoid internal data in public responses, and respect work cancellation. The [HTTP guide](/en/http/exceptions) covers browser-visible diagnostics; the [customization guide](/en/exceptions/handling-exceptions) contains handler implementations.
+| Path | Responsibility |
+|---|---|
+| `catch.py` | Capture and presentation dispatch using the selected incident plan. |
+| `runtime.py` | Post-startup activation, protected completion, capture, supervision, and deduplication. |
+| `entities/context.py` | Immutable context and delivery receipt. |
+| `entities/handling.py` | Deferred logging and cached presentation for one incident. |
+| `base/handler.py` | Default policy selected through the two application hooks. |
+| `entities/throwable.py` | Structured exception record with native traceback. |
+| `enums/kernel_type.py` | `CONSOLE` and `HTTP` scope markers. |
+| `contracts/` | Catch and two-hook handler interfaces. |
+| `provider.py` | Singleton binding and facade pinning. |

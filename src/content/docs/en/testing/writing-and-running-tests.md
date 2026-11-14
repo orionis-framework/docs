@@ -104,7 +104,7 @@ It should run two passing methods. To select one:
 python -B reactor test --start-dir tests/unit --file-pattern "test_price.py" --method-pattern "testRejects*" --fail-fast 1
 ```
 
-`--method-pattern` filters the `test*` candidates found by the loader; it does not enable methods named `checkSomething`. `--fail-fast` takes an integer value; it is not a valueless switch. See all options, defaults and JSON output in [Results and configuration](/en/testing/results-and-reference).
+`--method-pattern` selects method names directly; `check*` can discover methods such as `checkSomething`. The default is `test*`. `--fail-fast` takes an integer value. You can select one file with `--start-dir tests/unit/test_price.py`; this bypasses the filename glob. See all options and results in [Results and configuration](/en/testing/results-and-reference).
 
 ## Organize tests
 

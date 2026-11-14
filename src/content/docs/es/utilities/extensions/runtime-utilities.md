@@ -42,7 +42,7 @@ Importa las fachadas desde `orionis.support.facades`:
 | `Crypt` | Cifrado y descifrado. |
 | `DateTime` | Utilidades autónomas de fecha, zona horaria, duración e intervalo. |
 | `DB` | Constructor de consultas de base de datos. |
-| [`Debug`](/es/utilities/helpers/debug) | Inspección de valores con `dump()` y `dd()`; disponible desde 1.0.12. |
+| [`Debug`](/es/utilities/helpers/debug) | Inspección de valores con `dump()` y `dd()`. |
 | `Hash` | Hash de contraseñas y valores. |
 | `Lang` | Traducción. |
 | `Log` | Registro de eventos de texto con filtros de severidad. |
@@ -64,7 +64,7 @@ Salvo `DateTime`, estas clases obtienen su destino del contenedor. Consulta la d
 ### Tipos y auxiliares
 
 - `Collection(items=None)`: selección, mapeo, agrupación, agregación, paginación, serialización y protocolos de lista fluidos.
-- `DotDict(mapping)`: acceso por clave y atributo; `export()` restaura diccionarios recursivamente y `copy()` copia mapeos anidados.
+- `DotDict(mapping)`: acceso por clave y atributo; `export()` restaura diccionarios recursivamente y `copy()` copia profundamente los contenidos mutables.
 - `StdClass(**kwargs)`: atributos dinámicos que rechazan nombres reservados o dunder; admite `fromDict`, `toDict`, `update` y `remove`.
 - `Stringable(value)`: envoltorio inmutable y fluido de texto con utilidades de formato, coincidencia, reemplazo, codificación, hash, análisis, truncado y validación.
 - `MISSING`: centinela falso cuya representación es `MISSING`.
@@ -116,6 +116,92 @@ async def completed_import() -> None:
     await Storage.disk("local").put("imports/customers.txt", b"done")
 ```
 
+
+
+## API de fechas y horas
+
+`DateTime` funciona sin contenedor. La aplicación configura su zona y locale durante el arranque; consúltalos con `getTimezone()` y `getLocale()`. Omitir `tz` usa esa zona, salvo `local()` (zona del sistema) y `naive()` (sin zona). Los límites de calendario conservan un `dt` explícito y usan `tz` solo al crear la fecha actual.
+
+`formatLocal()` convierte el instante antes de formatear y aplica el locale configurado. `isToday()` compara fechas locales. `diffInDays()` y `diffInHours()` devuelven diferencias absolutas truncadas de tiempo transcurrido; un día de calendario que cruza un cambio horario no necesariamente dura 24 horas. `fromFormat()` y `formatLocal()` usan tokens Pendulum; `Stringable.toDate()` usa tokens strptime de Python. Fechas, unidades, locales o zonas inválidas propagan sus errores de validación.
+
+```python
+from orionis.support.facades import DateTime
+
+instant = DateTime.parse("2026-10-06T12:30:00Z", tz="UTC")
+month_start = DateTime.startOfMonth(instant)
+deadline = DateTime.add(instant, days=2, hours=3)
+assert month_start.to_iso8601_string() == "2026-10-01T00:00:00Z"
+assert DateTime.diffInHours(instant, deadline) == 51
+assert DateTime.fromFormat("06/10/2026", "DD/MM/YYYY", tz="UTC").day == 6
+```
+
+| Firma | Resultado |
+| --- | --- |
+| `getTimezone() -> str` | Zona horaria configurada. |
+| `getLocale() -> str` | Locale configurado. |
+| `getZoneInfo() -> ZoneInfo` | ZoneInfo de la zona configurada. |
+| `now(tz: str \| None=None) -> pendulum.DateTime` | Instante actual en la zona elegida. |
+| `today(tz: str \| None=None) -> pendulum.DateTime` | Hoy a medianoche. |
+| `tomorrow(tz: str \| None=None) -> pendulum.DateTime` | Mañana a medianoche. |
+| `yesterday(tz: str \| None=None) -> pendulum.DateTime` | Ayer a medianoche. |
+| `parse(date_string: str, tz: str \| None=None, *, strict: bool=True) -> pendulum.DateTime` | Analiza texto y convierte a la zona elegida. |
+| `fromFormat(date_string: str, fmt: str, tz: str \| None=None, locale: str \| None=None) -> pendulum.DateTime` | Analiza con tokens de formato explícitos. |
+| `local(year: int, month: int=1, day: int=1, hour: int=0, minute: int=0, second: int=0, microsecond: int=0) -> pendulum.DateTime` | Construye en la zona local del sistema. |
+| `naive(year: int, month: int=1, day: int=1, hour: int=0, minute: int=0, second: int=0, microsecond: int=0) -> pendulum.DateTime` | Construye sin información de zona. |
+| `fromTimestamp(timestamp: float, tz: str \| None=None) -> pendulum.DateTime` | Convierte segundos Unix a una fecha. |
+| `fromDatetime(dt: stdlib_datetime \| pendulum.DateTime, tz: str \| None=None) -> pendulum.DateTime` | Convierte datetime estándar o Pendulum. |
+| `datetime(year: int, month: int=1, day: int=1, hour: int=0, minute: int=0, second: int=0, microsecond: int=0, tz: str \| None=None) -> pendulum.DateTime` | Construye en la zona elegida. |
+| `duration(*, days: float=0, seconds: float=0, microseconds: float=0, milliseconds: float=0, minutes: float=0, hours: float=0, weeks: float=0, years: float=0, months: float=0) -> pendulum.Duration` | Construye una duración. |
+| `interval(start: pendulum.DateTime, end: pendulum.DateTime, *, absolute: bool=False) -> pendulum.Interval` | Construye un intervalo entre fechas. |
+| `startOf(unit: str, dt: pendulum.DateTime \| None=None, tz: str \| None=None) -> pendulum.DateTime` | Inicio de la unidad indicada. |
+| `endOf(unit: str, dt: pendulum.DateTime \| None=None, tz: str \| None=None) -> pendulum.DateTime` | Final de la unidad indicada. |
+| `startOfDay(dt: pendulum.DateTime \| None=None, tz: str \| None=None) -> pendulum.DateTime` | Inicio de día. |
+| `endOfDay(dt: pendulum.DateTime \| None=None, tz: str \| None=None) -> pendulum.DateTime` | Final de día. |
+| `convertToLocal(dt: str \| stdlib_datetime \| pendulum.DateTime) -> pendulum.DateTime` | Convierte a la zona configurada de la aplicación. |
+| `formatLocal(dt: str \| stdlib_datetime \| pendulum.DateTime \| None=None, format_string: str='YYYY-MM-DD HH:mm:ss') -> str` | Formatea en la zona y locale configurados. |
+| `startOfWeek(dt: pendulum.DateTime \| None=None, tz: str \| None=None) -> pendulum.DateTime` | Inicio de semana. |
+| `endOfWeek(dt: pendulum.DateTime \| None=None, tz: str \| None=None) -> pendulum.DateTime` | Final de semana. |
+| `startOfMonth(dt: pendulum.DateTime \| None=None, tz: str \| None=None) -> pendulum.DateTime` | Inicio de mes. |
+| `endOfMonth(dt: pendulum.DateTime \| None=None, tz: str \| None=None) -> pendulum.DateTime` | Final de mes. |
+| `startOfYear(dt: pendulum.DateTime \| None=None, tz: str \| None=None) -> pendulum.DateTime` | Inicio de año. |
+| `endOfYear(dt: pendulum.DateTime \| None=None, tz: str \| None=None) -> pendulum.DateTime` | Final de año. |
+| `addDays(dt: pendulum.DateTime, days: int) -> pendulum.DateTime` | Suma de días. |
+| `addHours(dt: pendulum.DateTime, hours: int) -> pendulum.DateTime` | Suma de horas. |
+| `addMinutes(dt: pendulum.DateTime, minutes: int) -> pendulum.DateTime` | Suma de minutos. |
+| `diffInDays(dt1: pendulum.DateTime, dt2: pendulum.DateTime) -> int` | Diferencia absoluta truncada de días de 24 horas. |
+| `diffInHours(dt1: pendulum.DateTime, dt2: pendulum.DateTime) -> int` | Diferencia absoluta truncada de horas. |
+| `isWeekend(dt: pendulum.DateTime \| None=None) -> bool` | Comprueba sábado o domingo. |
+| `isToday(dt: pendulum.DateTime) -> bool` | Compara fechas en la zona configurada. |
+| `isFuture(dt: pendulum.DateTime) -> bool` | Comprueba si está en el futuro. |
+| `isPast(dt: pendulum.DateTime) -> bool` | Comprueba si está en el pasado. |
+| `isLeapYear(dt: pendulum.DateTime \| None=None) -> bool` | Comprueba si el año es bisiesto. |
+| `isBirthday(dt: pendulum.DateTime, other: pendulum.DateTime \| None=None) -> bool` | Compara mes y día. |
+| `closest(dt: pendulum.DateTime, *others: pendulum.DateTime) -> pendulum.DateTime` | Devuelve el candidato más próximo. |
+| `farthest(dt: pendulum.DateTime, *others: pendulum.DateTime) -> pendulum.DateTime` | Devuelve el candidato más lejano. |
+| `add(dt: pendulum.DateTime, *, years: int=0, months: int=0, weeks: int=0, days: int=0, hours: int=0, minutes: int=0, seconds: float=0, microseconds: int=0) -> pendulum.DateTime` | Suma unidades de calendario y tiempo. |
+| `subtract(dt: pendulum.DateTime, *, years: int=0, months: int=0, weeks: int=0, days: int=0, hours: int=0, minutes: int=0, seconds: float=0, microseconds: int=0) -> pendulum.DateTime` | Resta unidades de calendario y tiempo. |
+| `diff(dt1: pendulum.DateTime, dt2: pendulum.DateTime \| None=None, *, absolute: bool=True) -> pendulum.Interval` | Devuelve un intervalo entre fechas. |
+| `diffForHumans(dt: pendulum.DateTime, other: pendulum.DateTime \| None=None, *, absolute: bool=False, locale: str \| None=None) -> str` | Describe la diferencia en lenguaje humano. |
+| `next(dt: pendulum.DateTime, day_of_week: int \| None=None, *, keep_time: bool=False) -> pendulum.DateTime` | Siguiente día de semana seleccionado. |
+| `previous(dt: pendulum.DateTime, day_of_week: int \| None=None, *, keep_time: bool=False) -> pendulum.DateTime` | Anterior día de semana seleccionado. |
+| `average(dt1: pendulum.DateTime, dt2: pendulum.DateTime \| None=None) -> pendulum.DateTime` | Punto medio entre fechas. |
+| `firstOf(dt: pendulum.DateTime, unit: str, day_of_week: int \| None=None) -> pendulum.DateTime` | Primera fecha de la unidad, opcionalmente en un día de semana. |
+| `lastOf(dt: pendulum.DateTime, unit: str, day_of_week: int \| None=None) -> pendulum.DateTime` | Última fecha de la unidad, opcionalmente en un día de semana. |
+| `nthOf(dt: pendulum.DateTime, unit: str, nth: int, day_of_week: int) -> pendulum.DateTime` | Enésima ocurrencia de un día de semana en la unidad. |
+
+## Citas en consola
+
+`Inspire(quotes=None)` usa el catálogo integrado. Conserva por referencia una lista personalizada no vacía; sus entradas deben incluir `quote` y `author`. `random()` devuelve un mapa con la cita; `printQuote(console)` la imprime mediante la `Console` recibida y devuelve `None`. Si la lista retenida queda vacía, utiliza la cita de respaldo.
+
+```python
+from orionis.console import Console
+from orionis.support.inspirational.inspire import Inspire
+
+quotes = Inspire([{"quote": "Keep examples executable.", "author": "Documentation team"}])
+assert quotes.random()["author"] == "Documentation team"
+quotes.printQuote(Console())
+```
+
 ## Configuración
 
 Los destinos de las fachadas se configuran en sus módulos propietarios y se resuelven desde el contenedor Orionis actual. `DateTime` recibe la zona horaria y el idioma de la aplicación mediante su cargador interno durante el arranque; los argumentos `tz` explícitos sustituyen ese valor para operaciones individuales.
@@ -134,7 +220,7 @@ El paquete diferido de fachadas evita importar todos los subsistemas al arrancar
 - `DotDict.missing` devuelve `None`; usa comprobación de pertenencia cuando `None` sea un valor almacenado significativo.
 - `StdClass` rechaza nombres dunder y nombres que colisionan con su API de clase.
 - `Collection.chunk()` y `forPage()` rechazan tamaños no positivos; las operaciones con callbacks exigen objetos invocables.
-- `FreezeThaw` solo transforma diccionarios, listas, tuplas y proxies de mapeo. Los objetos almacenados dentro no se copian profundamente.
+- `FreezeThaw.freeze()` transforma diccionarios/listas/tuplas y conserva proxies existentes. Los ciclos solo de secuencias lanzan `ValueError`; otros objetos conservan su identidad.
 - `PerformanceCounter` impide leer antes de completar una medición y mezclar métodos de inicio/parada síncronos y asíncronos.
 - `Final` rechaza la herencia al crear la clase. `Singleton` ignora argumentos del constructor después de existir la primera instancia.
 - Zonas horarias inválidas y entradas de fecha incompatibles producen errores de validación de `DateTime`/`pendulum`.
@@ -144,7 +230,7 @@ El paquete diferido de fachadas evita importar todos los subsistemas al arrancar
 
 Las importaciones de fachadas y sus exportaciones raíz son diferidas y cacheadas. `BaseEntity` cachea metadatos normalizados de campos por clase de entidad. `ExceptionParser` analiza una vez y devuelve su diccionario cacheado en llamadas posteriores. `DateTime` cachea instancias de `ZoneInfo` hasta que cambia su zona horaria.
 
-`Singleton` protege la primera construcción con un `threading.Lock` por clase; su método asíncrono usa la misma sección crítica breve y no realiza E/S bloqueante. `FreezeThaw` usa recorrido iterativo para evitar límites de recursión. `Workers` cachea CPU y RAM total al importar el módulo, por lo que los cálculos posteriores usan aritmética entera de tiempo constante.
+`Singleton` serializa la primera construcción con un bloqueo por clase. Su acceso asíncrono usa el mismo constructor síncrono, por lo que debe ser breve. La construcción recursiva del mismo singleton lanza `RuntimeError`; una construcción fallida puede reintentarse. `FreezeThaw` recorre contenedores iterativamente. `Workers` cachea CPU y RAM total al importar.
 
 `Collection` y los auxiliares mutables no están sincronizados. No mutues una misma instancia de forma concurrente sin coordinación en la aplicación.
 
@@ -169,6 +255,6 @@ Estas utilidades requieren Python 3.14 o posterior. Los nombres públicos usan l
 
 ## Referencia y próximos pasos
 
-[__init__.py](https://github.com/orionis-framework/framework/blob/470229f78a5db61263ce887bcdd16bc98f9141db/orionis/support/facades/__init__.py) · [datetime.py](https://github.com/orionis-framework/framework/blob/470229f78a5db61263ce887bcdd16bc98f9141db/orionis/support/facades/datetime.py) · [counter.py](https://github.com/orionis-framework/framework/blob/470229f78a5db61263ce887bcdd16bc98f9141db/orionis/support/performance/counter.py) · [workers.py](https://github.com/orionis-framework/framework/blob/470229f78a5db61263ce887bcdd16bc98f9141db/orionis/support/system/workers.py)
+[__init__.py](https://github.com/orionis-framework/framework/blob/1e905f4f103d47c61789d877eba472a5bd97681b/orionis/support/facades/__init__.py) · [datetime.py](https://github.com/orionis-framework/framework/blob/1e905f4f103d47c61789d877eba472a5bd97681b/orionis/support/facades/datetime.py) · [counter.py](https://github.com/orionis-framework/framework/blob/1e905f4f103d47c61789d877eba472a5bd97681b/orionis/support/performance/counter.py) · [workers.py](https://github.com/orionis-framework/framework/blob/1e905f4f103d47c61789d877eba472a5bd97681b/orionis/support/system/workers.py)
 
 [Volver al índice del módulo](/es/utilities).

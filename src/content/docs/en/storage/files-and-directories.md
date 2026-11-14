@@ -166,6 +166,29 @@ class ReportArchive:
 
 Returns the canonical relative key without I/O. Example: `key = report.path()`. Persist the disk name with the key when a specific disk must be resolved later.
 
+<a id="file-filesystem-paths"></a>
+
+### `absolutePath() -> str` and `relativePath() -> str`
+
+These synchronous methods expose filesystem locations on the built-in local driver, including the configured `local` and `public` disks. They do not create the referenced file or require it to exist. `absolutePath()` returns an absolute path with operating-system separators. `relativePath()` returns a path from `app.basePath` using `/` separators; `path()` always remains the disk-relative storage key.
+
+```python
+from orionis.support.facades import Storage
+
+
+def report_locations(report_id: int) -> dict[str, str]:
+    file = Storage.disk("local").file(f"reports/{report_id}.csv")
+    return {
+        "key": file.path(),
+        "absolute": file.absolutePath(),
+        "application_relative": file.relativePath(),
+    }
+```
+
+With a disk root of `<application>/storage/app`, the relative result for report 42 is `storage/app/reports/42.csv`. A root outside the application can produce leading `..` segments; locations on different Windows drives raise `StoragePathException`. Local resolution rejects paths or symbolic links escaping the disk root.
+
+Memory, S3, Azure and GCS raise `UnsupportedStorageOperationException` for both methods: an object key or URL is not a local filesystem path. When constructing `LocalStorageDriver` yourself, pass `base_path=Path(...)` to enable `relativePath()`; the manager supplies `app.basePath` automatically. Use these paths for trusted local integrations, and store the disk name plus `path()` for portable references.
+
 <a id="file-read"></a>
 
 ### `async read() -> bytes`
@@ -492,7 +515,7 @@ Checks backend-specific existence. Example: `available = await reports.exists()`
 
 Lists sorted file references for direct children. Example: `names = [item.path() for item in await reports.files()]`. Excludes nested files and cloud directory markers. Results are objects, not strings or content bytes.
 
-Local listings also exclude filenames ending in `.tmp`, including application-created files with that suffix. This filter applies to recursive listings too; such a file can still be accessed directly through `file(path)`.
+Local listings exclude only internal staging names ending in `.<16 lowercase hexadecimal characters>.tmp`. Ordinary application files such as `report.tmp` remain visible, including in recursive listings.
 
 <a id="directory-allfiles"></a>
 

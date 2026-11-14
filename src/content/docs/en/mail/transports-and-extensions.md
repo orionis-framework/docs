@@ -61,7 +61,7 @@ There is no automatic retry. An exception or cancellation does not prove server 
 
 ## Send prepared SMTP batches
 
-Since **1.1.0**, `SmtpTransport.sendMany(messages, *, mailer, driver)` accepts an iterable of at most **100 `PreparedMail` objects** and returns `tuple[MailResult, ...]`. This is a transport API: `Mail`, `PendingMail` and `IMailTransport` do not gain a `sendMany()` method. Prepare each envelope and MIME through [`MailComposer.prepare()`](/en/mail/api-reference#composer-prepare) before submitting the batch.
+`SmtpTransport.sendMany(messages, *, mailer, driver)` accepts an iterable of at most **100 `PreparedMail` objects** and returns `tuple[MailResult, ...]`. This is a transport API: `Mail`, `PendingMail` and `IMailTransport` expose single-message delivery. Prepare each envelope and MIME through [`MailComposer.prepare()`](/en/mail/api-reference#composer-prepare) before submitting the batch.
 
 ```python
 from orionis.mail.entities.prepared import PreparedMail

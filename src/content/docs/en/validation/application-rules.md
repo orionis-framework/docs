@@ -13,7 +13,7 @@ Declare the schema as an HTTP action parameter: the container validates the requ
 
 ## Empty and non-empty values
 
-Since **1.4.0**, import `Empty` and `NoEmpty` from `orionis.schemas.rules` to require an empty or present value. They are exact opposites and share this definition:
+Import `Empty` and `NoEmpty` from `orionis.schemas.rules` to require an empty or present value. They are exact opposites and share this definition:
 
 | Value category | Empty when |
 | --- | --- |

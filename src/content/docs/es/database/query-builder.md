@@ -86,6 +86,8 @@ El significado del calificador depende del motor: en PostgreSQL representa un es
 
 Para filtrar, unir y escribir continúa con [condiciones](/es/database/query-filters), [joins](/es/database/joins-and-subqueries) y [escrituras](/es/database/query-writes).
 
+`exists()` conserva proyecciones explícitas, agrupación, `HAVING` y uniones. Las agregaciones sobre uniones operan sobre sus filas proyectadas; selecciona la columna objetivo en cada rama.
+
 ## Referencia por operación
 
 <a id="api-tosql"></a>
@@ -96,7 +98,7 @@ Para filtrar, unir y escribir continúa con [condiciones](/es/database/query-fil
 toSql(*, literal_binds: bool = False) -> str
 ```
 
-Disponible desde **1.2.0**. Compila el SELECT actual como una cadena para depuración. Es síncrono: se llama **sin `await`** sobre un builder de `DB.table()` o de modelos. No ejecuta SQL, no crea un engine ni abre una conexión a la base de datos. Los builders requieren una aplicación inicializada o un `ConnectionResolver` configurado para resolver la configuración de su conexión; la tabla no necesita existir.
+Compila el SELECT actual como una cadena para depuración. Es síncrono: se llama **sin `await`** sobre un builder de `DB.table()` o de modelos. No ejecuta SQL, no crea un engine ni abre una conexión a la base de datos. Los builders requieren una aplicación inicializada o un `ConnectionResolver` configurado para resolver la configuración de su conexión; la tabla no necesita existir.
 
 ```python
 from orionis.support.facades import DB

@@ -168,7 +168,7 @@ Utiliza códigos como `en`, `es`, `es-CO`, `pt_BR` o `zh-Hant`. El traductor adm
 
 `es-CO`, `es_CO` y `es-co` son claves de idioma diferentes para el traductor. Crea archivos y consulta códigos con la misma escritura. En sistemas de archivos que no distinguen mayúsculas, el acceso al disco puede resultar menos estricto, pero el framework no normaliza los nombres.
 
-`Lang.availableLocales()` devuelve una tupla ordenada con los nombres descubiertos en archivos raíz `.json` y directorios que contienen al menos un archivo `.json` directamente. El descubrimiento no analiza el contenido ni garantiza que sus nombres pasen la validación del traductor. Tampoco es una lista de idiomas instalados en Python ni una lista de mapas ya cargados en caché.
+`Lang.availableLocales()` devuelve una tupla ordenada de códigos válidos descubiertos en archivos `.json` de la raíz y directorios con al menos un `.json` directo. Omite nombres de idioma mal formados y fuentes resueltas fuera de la raíz; no analiza el contenido JSON. No representa los idiomas instalados en Python ni los mapas ya cargados en caché.
 
 ## Cómo se aplica el fallback
 
@@ -182,8 +182,47 @@ Seleccionar `locale=` en una consulta no cambia el idioma activo compartido. Uti
 
 ## Límites de caché de idiomas y archivos ausentes
 
-En **1.1.0**, `TranslationRepository(loader, *, max_locales=256, negative_ttl=30)` conserva hasta **256 mapas de idiomas por repositorio**, contando mapas poblados y vacíos. Las lecturas actualizan su uso reciente; al alcanzar la capacidad se expulsa el menos utilizado recientemente. Los resultados vacíos se vuelven a consultar después de **30 segundos** de forma predeterminada, evitando retener indefinidamente un idioma ausente que luego se añade.
+`TranslationRepository(loader, *, max_locales=256, negative_ttl=30)` conserva hasta **256 mapas de idiomas por repositorio**, contando mapas poblados y vacíos. Las lecturas actualizan su uso reciente; al alcanzar la capacidad se expulsa el menos utilizado recientemente. Los resultados vacíos se vuelven a consultar después de **30 segundos** de forma predeterminada, evitando retener indefinidamente un idioma ausente que luego se añade.
 
-`max_locales` debe ser un entero positivo sin booleanos. `negative_ttl` debe ser finito y no negativo; cero vuelve a consultar los resultados vacíos en la siguiente lectura. Son opciones del constructor del repositorio, no nuevas variables `APP_*`. Reemplaza su binding en un provider para utilizar otro límite.
+`max_locales` debe ser un entero positivo sin booleanos. `negative_ttl` debe ser finito y no negativo; cero reintenta los resultados vacíos en la siguiente lectura. Son opciones del constructor del repositorio, no variables `APP_*`. `LocalizationManager` construye directamente su loader y su repositorio: registrar por separado un binding de `ITranslationRepository` no configura ese manager. Construye un traductor explícito si necesitas otro presupuesto.
 
-Los mapas poblados no vigilan el filesystem y permanecen en caché hasta su expulsión o invalidación explícita. Siguen disponibles `forget()`, `flush()` y las APIs de recarga del traductor. La carga continúa siendo síncrona; precarga los idiomas necesarios durante el arranque si quieres evitar I/O de archivos en la primera petición. Los mapas cacheados se comparten dentro del repositorio, por lo que los consumidores no deben mutarlos.
+Los mapas poblados no vigilan el filesystem y permanecen cacheados hasta su expulsión o invalidación. Usa `forget()`, `flush()` o la API de recarga del traductor para actualizarlos. La carga es síncrona; precarga los idiomas necesarios al iniciar si quieres evitar I/O en la primera petición. Los mapas se comparten dentro del repositorio: no los mutes.
+
+## Integrar el loader y el repositorio
+
+`TranslationLoader(path: Path)` implementa `ITranslationLoader`. Su `load(locale)` síncrono devuelve un mapa aplanado de traducciones y `availableLocales()` devuelve códigos descubiertos ordenados. Cargar un idioma ausente devuelve un mapa vacío. Un código inválido genera `InvalidLocaleException`; JSON incorrecto genera `TranslationSyntaxException`; un archivo que desaparece durante la carga genera `TranslationFileNotFoundException`. Una fuente resuelta fuera de la raíz de idiomas genera `TranslationException`, incluidos enlaces simbólicos que escapan de ella.
+
+`validate_locale(locale: str) -> str`, de `orionis.localization.validators`, acepta segmentos alfanuméricos separados por un único `-` o `_` y conserva sus mayúsculas. Genera `InvalidLocaleException` ante tipos inválidos, espacios, rutas o segmentos vacíos; la validez sintáctica no prueba que el idioma exista. Estas excepciones derivan de `TranslationException`.
+
+Para un traductor independiente o un servicio propio, proporciona explícitamente el directorio de idiomas existente:
+
+```python
+from pathlib import Path
+from orionis.localization import TranslationLoader, TranslationRepository, Translator
+
+
+def build_translator(language_directory: Path) -> Translator:
+    loader = TranslationLoader(language_directory)
+    repository = TranslationRepository(loader, max_locales=32, negative_ttl=10)
+    return Translator(
+        locale="en",
+        fallback="en",
+        loader=loader,
+        repository=repository,
+    )
+```
+
+
+El traductor devuelto expone las mismas APIs `get()`, `has()`, `choice()` e invalidación que `Lang`. Construirlo no carga los archivos ni reemplaza el traductor compartido. `LocalizationProvider` registra `ILocalizationManager` como singleton, después enlaza el resultado de `LocalizationManager.translator()` como `ITranslator` y fija `Lang` durante boot. Una implementación global propia debe registrarse antes de ese paso de boot.
+
+`TranslationRepository` implementa `ITranslationRepository`; todos sus métodos son síncronos:
+
+| Método | Resultado |
+| --- | --- |
+| `get(locale: str) -> TranslationMap` | Carga o devuelve el mapa cacheado compartido y actualiza su posición LRU. |
+| `has(locale: str) -> bool` | Comprueba el idioma cacheado sin cargarlo; elimina una entrada vacía expirada. |
+| `forget(locale: str) -> bool` | Elimina la entrada y su expiración, indicando si existía. |
+| `flush() -> None` | Limpia todos los mapas y expiraciones. |
+| `loadedLocales() -> tuple[str, ...]` | Informa los códigos cacheados, excluyendo entradas vacías expiradas; no recorre el disco. |
+
+El repositorio serializa el acceso con un `RLock`; el manager publica un único traductor ante primeras resoluciones concurrentes. El idioma activo del traductor aún es estado compartido: utiliza `locale=` por llamada en peticiones concurrentes.

@@ -96,7 +96,7 @@ Para ejecutar un componente con dependencias, utiliza los mecanismos de [registr
 
 ## Cachés, mutaciones y fuente disponible
 
-Los wrappers cachean resultados en memoria del proceso. El resultado no se actualiza necesariamente cuando otro código modifica la clase, instancia, módulo o función: utiliza `clearCache()` según la referencia correspondiente o crea otro wrapper. Los métodos de mutación no invalidan todos los mismos grupos de caché; las páginas explican sus efectos reales.
+Los reflectores mantienen cachés locales. Sus métodos de mutación invalidan los metadatos afectados; limpia tras cambios externos al reflector. `clearCache()` de callable/clase/instancia también invalida firmas de dependencias y planes de invocación compartidos. Otros reflectores mantienen sus copias locales hasta limpiarlos. La carga usa la caché de imports Python y lee el atributo actual de la clase.
 
 La recuperación de fuente depende de que Python pueda acceder al archivo que define el objeto. Los ejemplos de análisis de código deben guardarse en archivos `.py` cuando usan `getSourceCode()`; una sesión interactiva o una función creada con `exec()` puede no tener fuente recuperable.
 

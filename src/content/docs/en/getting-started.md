@@ -33,7 +33,6 @@ Foundation also defines frozen configuration entities for every major subsystem,
 
 ## Module learning path
 
-- [Release notes: changes through 1.5.0](/en/getting-started/release-notes)
 - [API reference: classes, methods, and signatures](https://api.orionis-framework.com/)
 - [Application architecture and lifecycle](/en/getting-started/architecture-and-lifecycle)
 - [Application lifecycle and resource ownership](/en/application/lifecycle)

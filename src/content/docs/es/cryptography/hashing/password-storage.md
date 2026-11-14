@@ -329,7 +329,7 @@ Consulta [autenticación](/es/authentication) para la gestión de identidades y 
 
 ## Limitar el trabajo concurrente de contraseñas
 
-Desde **1.1.0**, Argon2 y bcrypt comparten **2 llamadas activas y 14 pendientes por proceso**. Los costos criptográficos no cambian. Agotar ese límite produce `WorkQueueFullError`; define una política de admisión o reintento apropiada para autenticación en lugar de reducir el costo del hash. El trabajo nativo conserva su plaza hasta terminar, aunque se cancele su consumidor.
+Argon2 y bcrypt comparten **2 llamadas activas y 14 pendientes por proceso**. Agotar ese límite produce `WorkQueueFullError`; define una política de admisión o reintento apropiada para autenticación en lugar de reducir el costo del hash. El trabajo nativo conserva su plaza hasta terminar, aunque se cancele su consumidor.
 
 Ambos constructores aceptan el argumento nombrado `executor: BoundedExecutor | None = None`. Para utilizar otro límite del host, comparte un ejecutor entre los drivers:
 

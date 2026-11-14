@@ -26,7 +26,7 @@ Se crean automáticamente los directorios padre y se escribe en UTF-8, agregando
 
 Las entidades de configuración exigen una cadena no vacía terminada en `.log`; los canales rotativos requieren además el marcador literal `{suffix}`. Colócalo en el **nombre del archivo**, como en los ejemplos: la limpieza examina únicamente el directorio del archivo que acaba de cerrarse. Separar los períodos en directorios mediante `{suffix}` no proporciona limpieza global de esos directorios.
 
-Utiliza rutas relativas a la raíz, especialmente con `stack`: su inicialización predeterminada concatena la raíz y la ruta configurada, mientras que la factory usada al cambiar de canal resuelve rutas mediante `Path`. Una ruta absoluta de `stack` no tiene un comportamiento uniforme entre ambos caminos.
+Las rutas relativas se resuelven desde la raíz de la aplicación; las absolutas conservan su ubicación en todos los canales incluidos, tanto al iniciar `stack` como al cambiar de canal.
 
 <a id="time-rotation"></a>
 
@@ -62,9 +62,9 @@ Con esa configuración, un registro del 23 de octubre escribe en `application_20
 
 La configuración expone `mb_size` —entero de 1 a 1000, predeterminado 10— y `files` —entero positivo, predeterminado 5—. La factory convierte `mb_size` a bytes mediante `mb_size * 1024 * 1024`, por lo que la unidad efectiva es MiB. El handler contabiliza los bytes del texto codificado y su salto de línea.
 
-Hay una consideración importante en la implementación actual: `ChunkedSuffixResolver.getSuffix()` produce un sufijo nuevo **en cada llamada**, con formato `YYYYMMDD_HHMMSS_contador`, y el handler lo consulta en cada emisión. Como un cambio de sufijo ya provoca rotación, **el canal integrado rota en cada registro emitido**, incluso cuando el archivo está muy por debajo de `mb_size`. El parámetro existe y llega al handler; no debe interpretarse como una garantía de que los registros se agrupen hasta alcanzar ese tamaño.
+`ChunkedSuffixResolver.getSuffix()` produce un sufijo con formato `YYYYMMDD_HHMMSS_contador`. El handler conserva el sufijo actual mientras el archivo está por debajo de `max_bytes` y solicita uno nuevo al alcanzar el umbral. Los registros consecutivos se acumulan así en el mismo archivo hasta la rotación por tamaño.
 
-Por ejemplo, tres mensajes consecutivos generan normalmente dos archivos cerrados `.log.gz` y un archivo activo `.log`, cada uno con un registro. El contador comienza en `0001` por instancia del resolver; el timestamp y el contador no son un identificador global entre procesos.
+Por ejemplo, tres mensajes pequeños consecutivos permanecen en un archivo activo `.log` mientras el tamaño acumulado esté por debajo del umbral. Un registro posterior provoca la rotación cuando ese tamaño ya alcanza el límite. El contador comienza en `0001` por instancia del resolver; el timestamp y el contador no son un identificador global entre procesos.
 
 ```dotenv
 LOG_CHANNEL=chunked
@@ -73,7 +73,7 @@ LOG_MB_SIZE=int:10
 LOG_FILES=int:5
 ```
 
-La compresión gzip se ejecuta al rotar, después de cerrar el archivo anterior. Si termina correctamente, se elimina el `.log` original. El archivo activo permanece sin comprimir; `close()` no lo comprime. Ante un `OSError` durante la compresión, se intenta eliminar el archivo comprimido incompleto.
+La compresión gzip se ejecuta al rotar, después de cerrar el archivo anterior. Primero prepara un archivo gzip completo en un temporal único y después reemplaza el destino, conservando un archivo comprimido existente si la compresión falla. Si termina correctamente, elimina el `.log` original. El archivo activo permanece sin comprimir; `close()` no lo comprime. Los errores de compresión y limpieza temporal se observan mediante el sistema de fallos.
 
 En el handler, la comprobación de tamaño ocurre **antes** de escribir el siguiente registro y usa el tamaño ya acumulado. No anticipa el tamaño del nuevo mensaje: una entrada puede superar el umbral. Tampoco es un límite máximo de espacio en disco.
 
@@ -97,7 +97,7 @@ En cada rotación, la limpieza sigue este orden:
 1. Busca archivos en el directorio del archivo que acaba de cerrarse.
 2. Selecciona los nombres que coinciden con el template, incluyendo la variante `.gz`.
 3. Los ordena por fecha de modificación (`mtime`), del más reciente al más antiguo.
-4. Elimina los que exceden `backup_count` y, cuando corresponde, su variante comprimida.
+4. Elimina cada archivo coincidente que excede `backup_count`; `.log` y `.log.gz` son entradas separadas, ordenadas de manera independiente.
 5. El handler abre después el nuevo archivo activo.
 
 ```mermaid
@@ -114,7 +114,7 @@ flowchart TD
 
 Después de esa secuencia puede haber hasta **`backup_count + 1` archivos**: los conservados durante la limpieza y el nuevo activo. Con `daily.retention_days=7`, esto no significa borrar cada registro exactamente a los siete días. Los períodos sin tráfico no generan archivos, y modificar `mtime` o compartir el patrón con otro proceso altera qué archivos se consideran más recientes.
 
-No se ejecuta limpieza al construir un handler sin archivo activo ni al cerrarlo. Los errores de inspección o borrado del sistema de archivos se suprimen; por tanto, la retención es un intento de limpieza y no una garantía estricta de espacio máximo. Las entidades rechazan retención cero; no la uses para desactivar la conservación.
+No se ejecuta limpieza al construir un handler sin archivo activo ni al cerrarlo. Los errores de inspección y borrado se observan mediante el sistema de fallos y se suprimen; la retención es un intento de limpieza, no una garantía estricta de espacio máximo. Las entidades rechazan retención cero: no la uses para deshabilitarla.
 
 <a id="logger-lifecycle"></a>
 
@@ -126,7 +126,7 @@ El servicio obtiene `app.config("logging")` al construirse y prepara el logger n
 
 `reloadConfiguration()` retira los handlers, vuelve a leer la configuración de la aplicación y reconstruye el canal predeterminado. No conserva un cambio de canal anterior ni recarga `.env` o los módulos Python de configuración. La inicialización y la recarga pueden levantar `RuntimeError`.
 
-`close()` retira y cierra los handlers, limpia sus referencias y suprime errores comunes de cierre. Es idempotente; no inutiliza permanentemente el servicio: un registro posterior puede inicializarlo otra vez. El destructor también intenta cerrar los recursos. Para una fase de apagado explícita, usa el hook de la aplicación:
+`close()` intenta cerrar todos los handlers antes de limpiar sus referencias. Observa y suprime `OSError`, `RuntimeError` y `ValueError` ordinarios de limpieza; los fallos de entrega en cola y las excepciones inesperadas se propagan después de limpiar. Es idempotente, pero no deshabilita permanentemente el servicio: un registro posterior puede inicializarlo otra vez. Para una integración que controla su propio apagado, utiliza cierre asíncrono:
 
 ```python
 # bootstrap/app.py: registrar antes de app.create().
@@ -134,8 +134,8 @@ from orionis.foundation.enums import Lifespan
 from orionis.logging.contracts.logger import ILogger
 
 
-def close_logs(logger: ILogger) -> None:
-    logger.close()
+async def close_logs(logger: ILogger) -> None:
+    await logger.aclose()
 
 
 app.on(Lifespan.SHUTDOWN, close_logs)
@@ -201,8 +201,8 @@ getNextRotationTime(current_time: datetime) -> datetime
 |---|---|---|
 | `HourlySuffixResolver` | `()` | Comienzo de la hora siguiente, con la zona del resolver. |
 | `DailySuffixResolver` | `(at_time: time | None = None)` | Próxima fecha/hora diaria configurada; si ya pasó, día siguiente. |
-| `WeeklySuffixResolver` | `(at_time: time | None = None)` | Lunes de la semana siguiente a esa hora. |
-| `MonthlySuffixResolver` | `(at_time: time | None = None)` | Primer día del mes siguiente a esa hora. |
+| `WeeklySuffixResolver` | `(at_time: time \| None = None)` | El próximo lunes a esa hora; hoy si es lunes y la hora aún no llegó, en otro caso la semana siguiente. |
+| `MonthlySuffixResolver` | `(at_time: time \| None = None)` | El próximo día primero a esa hora; hoy si es primero y la hora aún no llegó, en otro caso el mes siguiente. |
 | `ChunkedSuffixResolver` | `()` | `current_time + timedelta(hours=1)`, sin uso como disparador integrado. |
 
 En los tres constructores con `at_time`, `None` equivale a medianoche. Son APIs de extensión: el handler integrado consume `getSuffix()` y no programa la hora calculada por `getNextRotationTime()`.
@@ -250,7 +250,7 @@ Los atributos de configuración anteriores son accesibles en el handler, al igua
 
 ## Vaciar el logging pendiente durante el apagado
 
-`await logger.aclose()` está disponible en `ILogger` y `Logger` desde 1.1.0. Detiene la admisión a la cola, espera los registros aceptados, cierra sus handlers e informa los fallos del destino después de limpiar los recursos. `close()` sigue siendo síncrono; utiliza `aclose()` desde un event loop.
+`await logger.aclose()` está disponible en `ILogger` y `Logger`. Detiene la admisión a la cola, espera los registros aceptados, cierra sus handlers e informa los fallos del destino después de limpiar los recursos. `close()` sigue siendo síncrono; utiliza `aclose()` desde un event loop.
 
 ```python
 from orionis.logging.contracts.logger import ILogger

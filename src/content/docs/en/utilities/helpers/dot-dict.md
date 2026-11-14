@@ -116,7 +116,7 @@ except AttributeError as error:
 
 ## `get(self, key: str, default: object | None = None) -> object | None`
 
-Returns the stored value or `default` (`None` by default). An exact `dict` result is wrapped and stored under `key`. This also applies to a dictionary supplied as the default: reading an absent key with that default **inserts** the wrapped default. Other defaults do not insert an entry. Values are not coerced.
+Returns the stored value or the supplied default. A missing key returns its default unchanged and does not insert anything, even when that default is a dictionary. Existing exact `dict` values are wrapped as `DotDict` and stored back under the key.
 
 ```python
 from orionis.support.types import DotDict
@@ -126,9 +126,9 @@ assert data.get("config").debug is True
 assert data.get("absent") is None
 assert "absent" not in data
 fallback = data.get("created", {"port": 8000})
-assert isinstance(fallback, DotDict)
-assert data["created"] is fallback
-assert fallback.port == 8000
+assert type(fallback) is dict
+assert "created" not in data
+assert fallback["port"] == 8000
 ```
 
 <a id="dotdict-method-export"></a>
@@ -155,7 +155,7 @@ assert data.config.debug is True
 
 ## `copy(self) -> DotDict`
 
-Returns a new `DotDict`, recursively copying dictionary values into new `DotDict` objects. Despite the source docstring's term “deep copy”, this method shares non-dictionary values, including mutable lists. It neither mutates the source nor preserves shared dictionary identity. Dictionary cycles raise `RecursionError`. Use Python's `copy.deepcopy` when lists and other supported values must also be copied.
+Returns a deep copy using `copy.deepcopy`: nested mutable values, including lists, are independent of the source. Shared references and cycles are preserved within the copied graph. The result is a `DotDict`, and nested mappings are copied as `DotDict` values.
 
 ```python
 from orionis.support.types import DotDict
@@ -167,7 +167,8 @@ assert type(result["config"]) is DotDict
 result.config.debug = False
 assert data.config.debug is True
 result.rows.append(2)
-assert data.rows == [1, 2]
+assert data.rows == [1]
+assert result.rows == [1, 2]
 ```
 
 <a id="dotdict-method-clear"></a>
@@ -383,7 +384,7 @@ except TypeError:
 
 ## Python copy and serialization
 
-No `__copy__`, `__deepcopy__` or custom serialization hook is defined. Python's standard `copy.copy` uses the inherited reduction protocol and makes a shallow `DotDict`; `copy.deepcopy` recursively copies supported contents. Pickle round-trips preserve the `DotDict` type for ordinary serializable values. JSON accepts it as a dictionary and decoding returns a plain `dict`; JSON's normal restrictions on keys, values and cycles apply. `export()` is not JSON encoding.
+`copy.copy()` is shallow and shares nested contents. The custom `__deepcopy__` implementation recursively copies supported contents, retaining shared references and cycles. Pickle retains the `DotDict` type for serializable values. JSON accepts the mapping but decodes into plain dictionaries, with normal restrictions on values and cycles.
 
 ```python
 import copy

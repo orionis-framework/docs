@@ -99,3 +99,5 @@ async def teams_with_profiles():
 - Para confirmar el patrón, cuenta las invocaciones SELECT mediante un wrapper de conexión en tus pruebas o revisa el SQL observado por tu infraestructura. Compara la consulta con varios padres, no solo uno. Orionis no expone aquí un detector automático de N+1.
 
 Consulta [colecciones y paginación](/es/orm/collections-and-pagination) para cargar solo la página necesaria y [pruebas](/es/orm/factories) para verificar resultados y número de operaciones.
+
+La carga anticipada many-to-many conserva el orden de la consulta relacionada y no multiplica una fila por enlaces pivote duplicados. Define unicidad en la base de datos cuando tu aplicación no admita enlaces duplicados.

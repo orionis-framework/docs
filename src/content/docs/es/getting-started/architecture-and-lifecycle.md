@@ -293,7 +293,7 @@ app.on(Lifespan.STARTUP, warm_resources, runtime=Runtime.HTTP)
 
 Regístralo antes de que ocurra el evento. Los callbacks no se ejecutan por cada petición ni al llamar a `create()`.
 
-**Errores y cierre.** Un callback que falla interrumpe la iteración: no existe rollback ni garantía de ejecutar los restantes. En ASGI, un fallo de startup se comunica como `lifespan.startup.failed`; en RSGI se propaga desde la inicialización. Un fallo durante el cierre se comunica como `lifespan.shutdown.failed` en ASGI y se propaga desde el hook RSGI. En CLI, el startup queda fuera del `try/finally` del comando: si falla, no se ejecuta automáticamente shutdown. Tras un startup correcto, el comando sí tiene shutdown en `finally`, aunque falle su ejecución. Un cierre abrupto del proceso tampoco garantiza callbacks; cada recurso debe contemplar su propia limpieza.
+**Errores y cierre.** Un callback de startup fallido interrumpe el arranque sin revertir recursos ya abiertos. Shutdown intenta todos los callbacks después de fallos ordinarios y conserva el primer error. En ASGI, un fallo de startup se comunica como `lifespan.startup.failed`; en RSGI se propaga desde la inicialización. Un fallo durante el cierre se comunica como `lifespan.shutdown.failed` en ASGI y se propaga desde el hook RSGI. En CLI, el startup queda fuera del `try/finally` del comando: si falla, no se ejecuta automáticamente shutdown. Tras un startup correcto, el comando sí tiene shutdown en `finally`, aunque falle su ejecución. Un cierre abrupto del proceso tampoco garantiza callbacks; cada recurso debe contemplar su propia limpieza.
 
 ### Recuperar bootstrap/lifespan.py
 
@@ -340,7 +340,7 @@ Selecciona `AUTH_GUARD=session`, con alternativa `token`; `AUTH_MODEL=app.models
 
 ### `http.py`: políticas del servidor HTTP
 
-Agrupa límites de cuerpos y multipart, WebSocket, proxies, hosts, CORS, CSRF y limitación de peticiones. `HTTP_MAX_BODY_SIZE` permite 16 MiB y `HTTP_MAX_CONCURRENT_REQUESTS`, 128. `TRUSTED_PROXIES` comienza con `127.0.0.1`. Desde 1.0.15, CORS HTTP usa `["*"]` por defecto en `CORS_ALLOW_ORIGINS`, `CORS_ALLOW_METHODS` y `CORS_ALLOW_HEADERS`, correspondientes a `allow_origins`, `allow_methods` y `allow_headers`. Esto completa la apertura de orígenes iniciada en 1.0.13 para facilitar la depuración desde clientes web. Las cabeceras expuestas conservan `[]` y `allow_credentials=False`. Consulta [CORS HTTP](/es/http/middleware#cors-http) para ajustar estas opciones. La limitación de peticiones está desactivada y CSRF activado por defecto. `HTTP_MONITOR_DISCONNECTS=False` controla la supervisión adicional durante el manejador; esta variable la consume el archivo local, mientras el núcleo conserva `False` como valor constante.
+Agrupa límites de cuerpos y multipart, WebSocket, proxies, hosts, CORS, CSRF y limitación de peticiones. `HTTP_MAX_BODY_SIZE` permite 16 MiB y `HTTP_MAX_CONCURRENT_REQUESTS`, 128. `TRUSTED_PROXIES` comienza con `127.0.0.1`. CORS HTTP usa `["*"]` por defecto en `CORS_ALLOW_ORIGINS`, `CORS_ALLOW_METHODS` y `CORS_ALLOW_HEADERS`, correspondientes a `allow_origins`, `allow_methods` y `allow_headers`. Las cabeceras expuestas conservan `[]` y `allow_credentials=False`. Consulta [CORS HTTP](/es/http/middleware#cors-http) para ajustar estas opciones. La limitación de peticiones está desactivada y CSRF activado por defecto. `HTTP_MONITOR_DISCONNECTS=False` controla la supervisión adicional durante el manejador; esta variable la consume el archivo local, mientras el núcleo conserva `False` como valor constante.
 
 ### `logging.py`: archivos y rotación
 
@@ -354,7 +354,7 @@ Agrupa límites de cuerpos y multipart, WebSocket, proxies, hosts, CORS, CSRF y 
 
 `MCP_DEFAULT_PAGE_SIZE=50` y `MCP_MAX_PAGE_SIZE=100` controlan paginación. `MCP_MAX_REQUEST_SIZE` recurre a `HTTP_MAX_BODY_SIZE` y después a 1 MiB; la concurrencia recurre a `HTTP_MAX_CONCURRENT_REQUESTS` y después a 32. Son variables de entorno, no los valores efectivos de `http.py`. También limita suscripciones, búsqueda de herramientas y respuestas. Los servidores se registran en las rutas AI.
 
-Desde **1.0.16**, `allowed_origins` utiliza valores `list[str]` independientes. Si `CORS_ALLOW_ORIGINS` no está definida, el archivo editable `config/mcp.py` propone `["https://inspector.orionis-framework.com"]`; el núcleo `McpConfig` conserva `[]`. Un valor de entorno definido reemplaza el predeterminado editable, incluido `[]`, que rechaza cualquier `Origin` presente. Las peticiones sin esa cabecera superan la comprobación de origen. MCP exige orígenes HTTP(S) exactos, sin comodines, rutas ni barra final. Consulta [configuración MCP](/es/mcp/stdio-and-configuration#orígenes-http-permitidos) para actualizar una aplicación existente y distinguir esta política de CORS HTTP.
+`McpConfig.allowed_origins` guarda una `list[str]` independiente y su valor predeterminado es `[]`. Configura orígenes HTTP(S) exactos para clientes de navegador; no admite comodines, rutas ni barra final. Una lista vacía rechaza cualquier `Origin` presente; sin esa cabecera la petición supera la comprobación. CORS HTTP y la validación de origen MCP son políticas distintas. Consulta [configuración MCP](/es/mcp/stdio-and-configuration#orígenes-http-permitidos).
 
 ### `queue.py`: ejecución de trabajos
 

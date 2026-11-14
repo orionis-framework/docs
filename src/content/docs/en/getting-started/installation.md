@@ -11,7 +11,7 @@ The official **`orionis-installer`** creates an application from your chosen ske
 uvx --python 3.14 --from orionis-installer orionis new blog
 ```
 
-This guide describes **installer 1.0.1** and the seven current skeletons for Orionis 1.5 and later within 1.x. Installer and framework versions are independent: each skeleton declares its Orionis requirement in `pyproject.toml`, which the installer preserves.
+The installer creates an application from one of seven supported skeletons. Each skeleton declares its Orionis requirement in `pyproject.toml`; the installer preserves that requirement and resolves it into the project lockfile.
 
 The package is `orionis-installer`; its executable is `orionis`. Application commands in this guide use `uv run python -B reactor ...` from the generated project's root, so they run in that application's environment.
 
@@ -49,7 +49,7 @@ If uv has cached an older installer, refresh it before creating another project:
 uvx --refresh --python 3.14 --from orionis-installer orionis --version
 ```
 
-For a repeatable installer version, use `--from "orionis-installer==1.0.1"`. This pins the installer, not the skeleton's Git revision or the application's dependency resolution. See [uv's tool guide](https://docs.astral.sh/uv/guides/tools/) for tool environments and version selection.
+For reproducible installation automation, select a published installer version in uv and retain the generated project lockfile. Pinning the installer alone does not pin the skeleton commit. See [uv’s tool guide](https://docs.astral.sh/uv/guides/tools/) for tool environments and version selection.
 
 ### Install as a uv tool
 
@@ -123,7 +123,7 @@ Review the name, destination, metadata, stack, repository, branch, Python target
 The installer downloads the selected branch, removes the skeleton's Git metadata, and prepares the application:
 
 - Updates project metadata and selected Orionis extras while preserving the skeleton's framework requirement and dependency groups.
-- Creates `.env`, groups related variables, and removes `.env.example` and the legacy `env.example` after successful environment generation. `.env.reference` stays available.
+- Creates `.env`, groups related variables, and removes `.env.example` and `env.example` after successful environment generation. `.env.reference` stays available.
 - Configures ignore rules for secrets, the virtual environment, SQLite files, and runtime data; keeps `uv.lock` available for version control.
 - Runs `uv sync --python 3.14` in the final destination, creating `.venv` there.
 - Verifies Python, the framework, dependencies, lockfile, and effective configuration; generates `APP_KEY` if missing.

@@ -133,13 +133,19 @@ Open streams retain an admission slot until they finish. Limits and the in-memor
 
 | Field | Environment variable | Default |
 | --- | --- | --- |
-| `allowed_origins` | `CORS_ALLOW_ORIGINS` | In the editable `config/mcp.py` from 1.0.16: `["https://inspector.orionis-framework.com"]`. Core `McpConfig`: `[]`. |
+| `allowed_origins` | `CORS_ALLOW_ORIGINS` | `[]`; explicitly configure trusted browser origins. |
 
-Since **1.0.16**, `allowed_origins` is a `list[str]`, copied independently for each configuration instance. Tuple inputs remain supported and are converted to lists. The inspector default belongs only to the editable `BootstrapMcp` configuration; constructing `McpConfig` directly does not add that origin.
-
-To adopt this default in an existing application's `config/mcp.py`, import `field` from `dataclasses` and `Env` from `orionis.environment`, then update the field inside `BootstrapMcp`, keeping its other options:
+`allowed_origins` accepts a `list[str]` or tuple and owns an independent list for each configuration instance. To allow the inspector, use this complete configuration in `config/mcp.py`, preserving any other options in your existing `BootstrapMcp` class:
 
 ```python
+from dataclasses import dataclass, field
+
+from orionis.environment import Env
+from orionis.mcp import McpConfig
+
+
+@dataclass(frozen=True, kw_only=True)
+class BootstrapMcp(McpConfig):
     allowed_origins: list[str] = field(
         default_factory=lambda: Env.get(
             "CORS_ALLOW_ORIGINS", ["https://inspector.orionis-framework.com"],
@@ -147,7 +153,7 @@ To adopt this default in an existing application's `config/mcp.py`, import `fiel
     )
 ```
 
-Updating the package does not replace your editable configuration. `CORS_ALLOW_ORIGINS`, when defined, replaces this default rather than extending it, including when it is `[]`. To allow the inspector and another browser client, include both explicitly:
+This example explicitly chooses the inspector as its fallback; `McpConfig` itself does not add that origin. A defined `CORS_ALLOW_ORIGINS` replaces this fallback rather than extending it, including when it is `[]`. To allow the inspector and another browser client, include both:
 
 ```dotenv
 CORS_ALLOW_ORIGINS=["https://inspector.orionis-framework.com","https://agent.example.com"]

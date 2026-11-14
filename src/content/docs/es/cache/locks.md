@@ -107,7 +107,7 @@ El lease se calcula con `time.time()` del proceso que adquiere la fila. Comparti
 
 `releaseLock(key: str, owner: str) -> None` elimina únicamente una fila que todavía tiene ese propietario. Si el lease venció y otro consumidor la adquirió, la salida del primero no elimina la reserva del segundo. El objeto público no expone el token; no accedas a sus atributos privados para transferir propiedad.
 
-Estas dos primitivas del backend son async y están detrás del contexto; no es necesario llamarlas al utilizar `repository.lock()`. Los errores de actualización, liberación o conexión pueden propagarse. En adquisición, un `QueryException` del INSERT deriva en un intento de UPDATE; si este no cambia filas, la operación puede devolver `False` en vez de exponer el error inicial. La implementación no coordina tu transacción de negocio con la fila del lock.
+Ambas primitivas son asíncronas. Tras un INSERT con `QueryException`, la adquisición intenta actualizar una fila del mismo propietario o ya expirada. Si no cambia ninguna, comprueba si existe una fila competidora: la contención devuelve `False`, mientras que la ausencia vuelve a propagar el error de inserción. Los errores de actualización, liberación y conexión pueden propagarse. La fila de lock no coordina la transacción de negocio.
 
 <a id="lock-redlock"></a>
 ### Memory, Redis y Memcached: comportamiento RedLock
@@ -158,7 +158,7 @@ class DocumentSummaryController:
         return {"files": len(files), "bytes": sum([await file.size() for file in files])}
 ```
 
-En el store `file` de este ejemplo, el segundo chequeo lo realiza `remember()` con un sentinel interno y distingue un `None` almacenado de una clave ausente. Ese comportamiento no es uniforme: los backends aiocache memory/Redis/Memcached sustituyen un `None` leído por el default y pueden volver a ejecutar el resolver. Consulta [valores de caché](/es/cache/caching-values). La comprobación exterior con `get()` no ofrece esa distinción, aunque no afecta al diccionario de este ejemplo. Un resolver sync se ejecuta directamente; usa un resolver async para I/O o desplaza el trabajo bloqueante a un hilo.
+`remember()` distingue un `None` cacheado de una clave ausente en todos los stores configurados de Orionis, incluidos los que utilizan aiocache. La comprobación exterior con `get()` no ofrece esa distinción, lo que no afecta al diccionario de este ejemplo. Un resolver síncrono se ejecuta directamente; utiliza un resolver asíncrono para I/O o desplaza el trabajo bloqueante a un hilo.
 
 ```mermaid
 flowchart TD
@@ -203,10 +203,10 @@ Inyecta el servicio en una acción y suministra el resolver de tu aplicación. `
 
 File utiliza `asyncio.wait_for()` cuando se indicó un timeout: si vence antes de adquirir, propaga `TimeoutError`. Database lanza `TimeoutError` al detectar su plazo después de un intento fallido. RedLock absorbe el vencimiento de su espera por contención, pero errores del backend, validación, red o timeouts propios del cliente pueden propagarse igualmente.
 
-Si cancelas una tarea que espera un lock file, la espera termina sin liberar el lock de su propietario. Si la cancelación sucede dentro del bloque, `async with` ejecuta su salida: file libera su `asyncio.Lock` sin I/O; database y RedLock deben esperar operaciones de liberación. Esas operaciones no están protegidas de manera uniforme frente a cancelaciones repetidas o errores de backend. Una adquisición remota que complete al mismo tiempo que se cancela la entrada puede depender de que venza su lease para quedar disponible.
+Si cancelas una tarea que espera un lock file, la espera termina sin liberar el lock de su propietario. La salida del contexto libera file inmediatamente y espera la liberación database/RedLock incluso ante cancelaciones repetidas. Una adquisición database cancelada también intenta liberar por token de propietario antes de propagar la cancelación. Los errores del backend aún pueden impedir la liberación; el lease remoto permite recuperar la disponibilidad.
 
 No suprimas `CancelledError` para continuar como si hubieras adquirido. Usa un objeto de contexto por participante y evita adquisiciones anidadas de la misma clave: estos locks no proporcionan reentrada por tarea. No dependen de un destructor que libere automáticamente, ni la salida de un proceso ejecuta necesariamente `__aexit__()`.
 
-Si falla la liberación, su excepción se propaga y puede sustituir al error del bloque. Un lease no deshace trabajo ya realizado, un bloqueo no impide que código externo escriba sin participar y ningún contexto de esta API confirma o revierte transacciones de base de datos. Para las operaciones de caché disponibles consulta la [referencia de API](/es/cache/api-reference).
+Un error de liberación se propaga cuando el bloque terminó normalmente. Si el bloque ya falló, el sistema de fallos observa el error original y el fallo de limpieza y conserva la excepción original. Un lease no deshace trabajo, un bloqueo no impide escrituras externas sin participación y ningún contexto confirma ni revierte transacciones. Consulta la [referencia de API](/es/cache/api-reference).
 
-Para coordinar fallos de caché en 1.1.0, [`rememberOnce(..., lease=...)`](/es/cache/caching-values#repository-rememberonce) añade admisión limitada y limpieza Redis con comprobación del propietario. Su polling Redis no modifica el contrato de `repository.lock()`/RedLock descrito arriba.
+Para coordinar fallos de caché, [`rememberOnce(..., lease=...)`](/es/cache/caching-values#repository-rememberonce) añade admisión limitada y limpieza Redis con comprobación del propietario. Su polling Redis no modifica el contrato de `repository.lock()`/RedLock descrito arriba.

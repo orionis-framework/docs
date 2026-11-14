@@ -23,7 +23,7 @@ La API de Storage incluye contratos, implementaciones de drivers, configuración
 
 ## IStorageDriver
 
-Contrato de bajo nivel para integrar drivers. Cada método recibe una ruta relativa a la raíz y devuelve el resultado indicado en su firma; `File`, `Directory` y `Disk` ofrecen las referencias de aplicación y normalizan sus rutas. Los cinco drivers nativos implementan los 24 métodos siguientes. Sus `readStream` son generadores async y los defaults `_CHUNK_SIZE` de sus firmas equivalen a `65536`. `open()` devuelve concretamente `AsyncStream`, compatible con `IStorageStream`.
+Contrato de bajo nivel para integrar drivers. Cada método recibe una ruta relativa a la raíz y devuelve el resultado indicado en su firma; `File`, `Directory` y `Disk` ofrecen las referencias de aplicación y normalizan sus rutas. Los cinco drivers nativos implementan los métodos de contenido, metadatos y directorios siguientes. Sus `readStream` son generadores async y los defaults `_CHUNK_SIZE` de sus firmas equivalen a `65536`. `open()` devuelve concretamente `AsyncStream`, compatible con `IStorageStream`.
 
 Las expresiones de ejemplo muestran el equivalente de alto nivel en un método async de la aplicación, con `from orionis.support.facades import Storage`. `chunks` representa un `AsyncIterable[bytes]` del ejemplo de streaming; `destination` es una ruta local controlada por la aplicación. Los casos completos están en las guías enlazadas.
 
@@ -287,7 +287,7 @@ Equivalente de aplicación: `await file.download(destination)`.
 async hash(path: str, algorithm: str='sha256') -> str
 ```
 
-Calcula un digest hexadecimal con hashlib. Un algoritmo no admitido genera UnsupportedStorageOperationException; algoritmos que exigen una longitud, como SHAKE, pueden producir TypeError al finalizar. No confundas este método con FileInfo.checksum o etag.
+Calcula un digest hexadecimal con hashlib. Los algoritmos desconocidos y los de longitud variable, como SHAKE, generan `UnsupportedStorageOperationException` antes de leer el contenido. Usa un digest de longitud fija como `sha256` o `sha512`. No equivale a `FileInfo.checksum` o `etag`.
 
 Equivalente de aplicación: `await Storage.disk().file("reports/42.txt").hash("sha256")`.
 
@@ -315,13 +315,17 @@ Devuelve un IStorageStream lazy y binario; úsalo con async with. No es una tran
 
 Equivalente de aplicación: `Storage.disk().file("reports/42.txt").open("rb")`.
 
+### Rutas del sistema de archivos
+
+`absolutePath(path: str) -> str` y `relativePath(path: str) -> str` son métodos concretos síncronos de `IStorageDriver`. Su implementación predeterminada genera `UnsupportedStorageOperationException`; `LocalStorageDriver` los implementa. El argumento opcional `base_path` habilita rutas relativas a la aplicación; el manager lo suministra automáticamente. [IFile](/es/storage/files-and-directories#file-filesystem-paths).
+
 ## Constructores de drivers
 
 No son servicios para inyectar sin configuración. El manager los construye desde el disco; estos constructores son útiles para extensiones y pruebas aisladas.
 
 | Constructor | Argumentos |
 | --- | --- |
-| `LocalStorageDriver(root: Path, base_url: str \| None = None)` | Raíz física; URL opcional. La raíz relativa del manager se ancla a app.basePath. |
+| `LocalStorageDriver(root: Path, base_url: str \| None = None, *, base_path: Path \| None = None)` | Raíz física; URL opcional. La raíz relativa del manager se ancla a app.basePath. |
 | `MemoryStorageDriver(base_url: str \| None = None)` | URL opcional; datos por instancia en RAM. |
 | `S3StorageDriver(config: object)` | Entidad S3; campos en configuración. |
 | `AzureStorageDriver(config: object)` | Entidad Azure; campos en configuración. |
@@ -460,4 +464,16 @@ except MissingStorageDependencyException as error:
 
 Los módulos conservan aliases de compatibilidad: `normalizePath`, `normalizeFilePath`, `importDriverDependency`, `assertBinaryMode`, `resolveDownloadTarget`, `filterFiles` y `deriveDirectories`. Apuntan a las funciones snake_case correspondientes; los ejemplos nuevos utilizan sus nombres canónicos.
 
-Desde 1.1.0, `IStorageStream.chunks(size=65536, *, buffer_size=1048576)` retorna un iterador asíncrono de bytes. Consulta [iteración con buffer](/es/storage/streaming-and-uploads#stream-chunks) para validación, cierre y límites de lectura nativa.
+`IStorageStream.chunks(size=65536, *, buffer_size=1048576)` retorna un iterador asíncrono de bytes. Consulta [iteración con buffer](/es/storage/streaming-and-uploads#stream-chunks) para validación, cierre y límites de lectura nativa.
+
+## Lectores con buffer para extender drivers
+
+Los helpers asíncronos de `orionis.storage.buffering` permiten construir drivers:
+
+| Helper | Comportamiento |
+| --- | --- |
+| `read_chunks(opener, chunk_size, *, buffer_size=1048576)` | Iterador asíncrono de bytes sobre un handle binario síncrono; cierra el handle que posee. Los tamaños deben ser enteros positivos sin booleanos. |
+| `iterate_chunks(opener)` | Iterador asíncrono de bytes sobre un iterador SDK síncrono; agrupa hasta 16 bloques dentro del presupuesto de lectura y cierra el iterador si expone `close()`. Conserva bloques vacíos. |
+| `await spool_stream(stream, *, max_size)` | Consume bloques asíncronos en un `SpooledTemporaryFile`, rebobina y devuelve su handle binario. `max_size` debe ser entero positivo sin booleanos. El consumidor debe cerrar el resultado exitoso; los fallos cierran el spool. |
+
+Estos helpers esperan las operaciones nativas activas antes de propagar la cancelación. Una escritura cloud aún requiere timeouts del SDK y una política de recuperación de aplicación.

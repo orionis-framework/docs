@@ -231,6 +231,8 @@ class FindOrderTool(Tool[OrderLookupInput]):
 
 The call remains a JSON-RPC result, with `result.isError=true` and the message in `content`. Clients must check that field as well as an envelope-level `error`.
 
+A normalized tool result with `isError=True` is also observed through `handleResult("tool_error", context)` with `context.expected=True`, `flow="mcp"`, and `phase="result"`. It does not create an exception or run default error logging. Use the [application result hook](/en/exceptions/handling-exceptions) if you need metrics or another explicit effect for these business outcomes.
+
 Failed tool argument validation produces `isError=true` with `Invalid tool arguments`. Unexpected exceptions during tool execution are reported to the application's exception handler and presented as `Tool execution failed`. Unexpected resource or prompt exceptions produce JSON-RPC error `-32603`. Invalid protocol parameters, unknown methods and denied access follow their own error paths.
 
 ## Metadata and content annotations

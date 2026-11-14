@@ -19,7 +19,7 @@ cd portal
 uv run python -B reactor serve
 ```
 
-Esta guía describe el instalador **1.0.1**. Su paquete se llama **`orionis-installer`** y su ejecutable es **`orionis`**. El framework que utiliza cada aplicación es una dependencia distinta: su restricción está en el `pyproject.toml` del stack y se conserva durante la instalación.
+El instalador crea una aplicación desde uno de siete skeletons disponibles. Cada skeleton declara el requisito de Orionis en `pyproject.toml`; el instalador lo conserva y resuelve en el lockfile del proyecto.
 
 ## Requisitos previos
 
@@ -58,7 +58,7 @@ Si uvx reutiliza una versión anterior desde su caché, actualízala y comprueba
 uvx --refresh --python 3.14 --from orionis-installer orionis --version
 ```
 
-Para fijar la versión del instalador, utiliza `--from "orionis-installer==1.0.1"`. Esto no fija la revisión Git del esqueleto ni la resolución de dependencias de la aplicación. La [guía de herramientas de uv](https://docs.astral.sh/uv/guides/tools/) explica los entornos y la selección de versiones.
+Para automatizar instalaciones reproducibles, selecciona una versión publicada del instalador en uv y conserva el lockfile generado. Fijar el instalador no fija por sí solo el commit del skeleton. Consulta la [guía de herramientas de uv](https://docs.astral.sh/uv/guides/tools/).
 
 ### Instalar como herramienta de uv
 

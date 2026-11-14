@@ -69,6 +69,6 @@ assert FreezeThaw.thaw(frozen) == source
 
 ## Referencia y próximos pasos
 
-[base.py](https://github.com/orionis-framework/framework/blob/470229f78a5db61263ce887bcdd16bc98f9141db/orionis/support/entities/base.py) · [dot_dict.py](https://github.com/orionis-framework/framework/blob/470229f78a5db61263ce887bcdd16bc98f9141db/orionis/support/types/dot_dict.py) · [std.py](https://github.com/orionis-framework/framework/blob/470229f78a5db61263ce887bcdd16bc98f9141db/orionis/support/types/std.py) · [freezer.py](https://github.com/orionis-framework/framework/blob/470229f78a5db61263ce887bcdd16bc98f9141db/orionis/support/structures/freezer.py)
+[base.py](https://github.com/orionis-framework/framework/blob/1e905f4f103d47c61789d877eba472a5bd97681b/orionis/support/entities/base.py) · [dot_dict.py](https://github.com/orionis-framework/framework/blob/1e905f4f103d47c61789d877eba472a5bd97681b/orionis/support/types/dot_dict.py) · [std.py](https://github.com/orionis-framework/framework/blob/1e905f4f103d47c61789d877eba472a5bd97681b/orionis/support/types/std.py) · [freezer.py](https://github.com/orionis-framework/framework/blob/1e905f4f103d47c61789d877eba472a5bd97681b/orionis/support/structures/freezer.py)
 
 [Volver al índice del módulo](/es/utilities).

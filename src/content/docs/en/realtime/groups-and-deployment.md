@@ -135,6 +135,28 @@ class RoomRefresh:
 
 `Realtime.hub(HubClass)` and `manager.hub(HubClass)` provide the same selections but have no caller: `caller` and `others` need a connection context and raise errors outside one.
 
+## Inspect connected clients
+
+`IConnectionManager.connectionIds(HubClass)` and `groupIds(HubClass, name)` synchronously return tuples of ready, nonclosing connection IDs. They are snapshots in the current worker, not durable user lists. For an internal service using the chat hub:
+
+```python
+from app.realtime.hubs.chat_hub import ChatHub
+from orionis.realtime.contracts.manager import IConnectionManager
+
+
+class RoomPresence:
+    def __init__(self, manager: IConnectionManager) -> None:
+        self.manager = manager
+
+    def counts(self, room: str) -> dict[str, int]:
+        return {
+            "hub": len(self.manager.connectionIds(ChatHub)),
+            "room": len(self.manager.groupIds(ChatHub, room)),
+        }
+```
+
+With two ready tabs in the same room, both counters are `2`. Check application permissions before exposing these details through an endpoint. `get(connection_id, hub=None)` returns a ready connection or `None`; supplying the hub limits its namespace. `snapshot()` includes all owned connections, even provisional ones. The native `ConnectionManager` also exposes `connectionCount` and `groupCount` properties: the first includes provisional and closing connections; the second counts nonempty hub/group entries. Custom implementations of `IConnectionManager` need not provide those two convenience properties.
+
 ## What a broadcast result means
 
 `send(...)` returns `BroadcastResult` with two counters:

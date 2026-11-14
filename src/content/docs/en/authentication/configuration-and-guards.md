@@ -115,7 +115,7 @@ Session driver, cookie, encryption, and lifetime belong in `config/session.py`; 
 
 `expiration` accepts `None` or a positive integer; `None` allows tokens without automatic expiration. `secret_bytes` must be an integer from `32` to `128`. Credentials can be revoked independently of expiration. See [token authentication](/en/authentication/personal-access-tokens) for issuance, storage, and transmission.
 
-Run [`auth:migrate`](/en/database/commands#auth-migrate) to create the configured token table from the framework definition. Since **1.5.0**, it also prepares the five authorization tables and the configured password recovery table. It uses the default SQL connection and its prefix, preserves existing records, and accepts no `--database`. Identity and its migrations remain in the application; the command does not create users or insert roles, permissions, or assignments.
+Run [`auth:migrate`](/en/database/commands#auth-migrate) to create the configured token table from the framework definition. It also prepares the five authorization tables and the configured password recovery table. It uses the default SQL connection and its prefix, preserves existing records, and accepts no `--database`. Identity and its migrations remain in the application; the command does not create users or insert roles, permissions, or assignments.
 
 ### passwords: password recovery
 
@@ -127,7 +127,7 @@ Run [`auth:migrate`](/en/database/commands#auth-migrate) to create the configure
 
 Both limits must be positive integers. Recovery tokens are separate credentials from API Bearer tokens. [Account recovery and verification](/en/authentication/account-recovery) explains the broker and native routes.
 
-`auth:migrate` creates `auth.passwords.table` from the core schema. Its name and `auth.tokens.table` must differ from each other and from `permissions`, `roles`, `model_has_permissions`, `model_has_roles`, and `role_has_permissions`, ignoring case; a collision is rejected before tables are created. Changing a configured name does not relocate existing records. See the [auth storage upgrade guide](/en/database/migrations#auth-storage-1-5-0).
+`auth:migrate` creates `auth.passwords.table` from the core schema. Its name and `auth.tokens.table` must differ from each other and from `permissions`, `roles`, `model_has_permissions`, `model_has_roles`, and `role_has_permissions`, ignoring case; a collision is rejected before tables are created. Changing a configured name does not relocate existing records. See the [authentication storage setup](/en/database/migrations#authentication-storage).
 
 ### remember: optional persistent access
 

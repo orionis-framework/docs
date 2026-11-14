@@ -168,7 +168,7 @@ assert r.getClass() is ReportContract
 getClassName(self) -> str
 ```
 
-Returns the `__name__` captured when constructing the wrapper as `str`, rather than `__qualname__`. `clearCache()` does not capture it again.
+Returns the class `__name__` as `str`, without enclosing scopes. `clearCache()` refreshes it after a rename.
 
 ```python
 assert r.getClassName() == "ReportContract"
@@ -182,7 +182,7 @@ assert r.getClassName() == "ReportContract"
 getModuleName(self) -> str
 ```
 
-Returns the module name captured when constructing the wrapper as `str`. `clearCache()` does not capture it again.
+Returns the module name as `str`; `clearCache()` refreshes it after changing `__module__`.
 
 ```python
 assert r.getModuleName() == ReportContract.__module__
@@ -1059,9 +1059,9 @@ The last two methods delegate to [ReflectDependencies](/en/utilities/introspecti
 
 The first member getter performs the scan. Returned lists and dictionaries are the cached objects rather than defensive copies. Do not modify them to “edit” the class: that alters the cached view and may make queries inconsistent. Use mutation methods or copy returned results.
 
-`setAttribute()`, `removeAttribute()` and `removeMethod()` invalidate member classifications but can retain previously computed signatures and other results. Call `clearCache()` after changing signatures, annotations or metadata. Direct changes to the class are not detected automatically either.
+Mutation methods invalidate member classifications and signatures, refresh Python's abstract-method state and invalidate shared dependency signatures and invocation plans. Direct external changes require `clearCache()`.
 
-The class name, module name and private prefix are captured during construction and do not change after `clearCache()`. Construct another wrapper after changing `__name__` or `__module__`. The docstring is read directly on each call.
+Class and module names refresh on invalidation. The private-name prefix retains the original declaration name because Python does not remangle existing members after a class rename. The docstring is read directly.
 
 The following operators access **the wrapper cache**, rather than class attributes. Use custom keys distinct from internal keys (`attributes`, `methods`, etc.); overwriting or deleting internal keys can break scan consistency.
 
@@ -1135,7 +1135,7 @@ assert "app:note" not in r
 clearCache(self) -> None
 ```
 
-Returns `None`. Discards all data cached in this wrapper, including custom bracket keys. The next query recomputes reflection; this neither reverses class mutations nor empties the global dependency cache.
+Returns `None`, clears all local entries and refreshes identity metadata. It also invalidates shared dependency signatures and invocation plans. Other wrappers retain their own local caches. It does not undo mutations.
 
 ```python
 r["app:note"] = "cached"
@@ -1180,4 +1180,4 @@ Method getters do not separate abstract declarations from concrete implementatio
 
 A name returned by `getDunderMethods()` is not automatically valid for `hasMethod()`, `removeMethod()`, `getMethodSignature()` or `methodSignature()`: these operations use the non-dunder method list. Properties have their own APIs.
 
-Clearing this wrapper does not empty the shared `ReflectDependencies` caches after dynamic function changes. New functions are analyzed by identity, whereas editing annotations or defaults on the same function can leave earlier analysis cached; see [the dependency guide](/en/utilities/introspection/dependencies-and-discovery).
+Clear reflection caches after intentional changes to a function's signature, annotations or defaults. This invalidates shared analysis; existing wrappers must each clear their local snapshots before reuse. See [dependency reflection](/en/utilities/introspection/dependencies-and-discovery).

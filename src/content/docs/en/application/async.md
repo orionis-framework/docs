@@ -7,13 +7,13 @@ lastUpdated: false
 
 Loop centralizes loop creation, callable dispatch, and synchronous bridges. Start by deciding whether your code already runs inside an event loop: that determines which operation to use.
 
-Since Orionis 1.0.8, loop management uses the `asyncio` registration and `asyncio.Runner` for a predictable lifecycle on Python 3.14. When updating older code, `createTask()` is now synchronous, `runSync()` rejects calls from an active loop, and `KeyboardInterrupt` propagates to the caller.
+Loop management uses the `asyncio` registration and `asyncio.Runner` for a predictable lifecycle on Python 3.14. `createTask()` is synchronous, `runSync()` rejects calls from an active loop, and `KeyboardInterrupt` propagates to the caller.
 
 ## Requirements
 
 - Python 3.14 or newer, as declared by the project.
 - A normal Orionis installation. There is no `aio`-specific installation extra.
-- On non-Windows platforms, the project declares `uvloop>=0.22.1`; `Loop` uses it when importable. On Windows, `uvloop` is not required and Orionis tries `asyncio.ProactorEventLoop` instead.
+- On non-Windows platforms, the project declares `uvloop>=0.23.0`; `Loop` uses it when importable. On Windows, `uvloop` is not required and Orionis tries `asyncio.ProactorEventLoop` instead.
 - No application bootstrap, container binding, configuration file, or external service is required to use `Loop` directly.
 ## Quick start
 
@@ -57,7 +57,7 @@ Inside an async controller, use `await` directly. Both `run()` and `runSync()` r
 
 ### Resource ownership
 
-`getEventLoop()` reuses the running loop or the open loop registered with `asyncio` in that thread. If it creates a loop, the caller owns its cleanup. `eventLoopContext()` borrows an already registered loop without cancelling tasks or closing it; when no open loop exists, it creates and manages its own loop through `asyncio.Runner`. `Loop.run()` also manages an owned loop and restores the previous registration on exit. Retain every task and await or cancel its result; task creation does not provide persistence, retries, or a supervisor.
+`getEventLoop()` reuses the running loop or the open loop registered with `asyncio` in that thread. If it creates a loop, the caller owns its cleanup. `eventLoopContext()` borrows an already registered loop without cancelling tasks or closing it; when no open loop exists, it creates and manages its own loop through `asyncio.Runner`. `Loop.run()` also manages an owned loop and restores the previous registration on exit. Retain every task and await or cancel its result; task creation does not provide persistence or retries. Within an active Orionis failure operation, `Loop.createTask()` registers supervised work: failures are observed and the owning runtime drains the task during shutdown. Outside that context, it delegates to `asyncio.create_task()` without supervision.
 
 Use [queues](/en/queues) when work must survive a restart; an asyncio task is not persisted. For work attached to an HTTP response, see [background tasks](/en/queues/background-tasks/response-tasks).
 
@@ -73,7 +73,7 @@ Use [queues](/en/queues) when work must survive a restart; an asyncio task is no
 
 ### Synchronous coroutine bridge
 
-`Loop.runSync(coro)` delegates to `Loop.run` in the same thread and waits for the coroutine to finish. It requires that no loop is running in the calling thread; from async code, use `await`. This method no longer uses a shared executor.
+`Loop.runSync(coro)` delegates to `Loop.run` in the same thread and waits for the coroutine to finish. It requires that no loop is running in the calling thread; from async code, use `await`. This method uses no shared executor.
 
 ### Loop ownership and cleanup
 
@@ -289,10 +289,13 @@ Reports whether an event loop is actively running in the calling thread. A regis
 #### `createTask(coro, *, name=None)`
 
 ```text
-Loop.createTask(coro, name=None) -> asyncio.Task[T]
+Loop.createTask(coro, *, name=None) -> asyncio.Task[T]
 ```
 
 Creates the task on the current running loop and returns it immediately. The method is synchronous: retain the task and use `await task` to observe its result and exceptions. The optional name is forwarded to `asyncio.create_task`. Without a running loop it raises `RuntimeError`.
+
+
+When an Orionis failure operation is active, task creation uses its runtime supervision. This observes operational errors and participates in owned shutdown; it does not add durable storage or retries. See [failure boundaries](/en/exceptions/contexts-and-transports).
 
 #### `runSync(coro)`
 
@@ -315,4 +318,4 @@ Reserve `runSync` for synchronous APIs running without an active loop. Async cal
 
 [Index](/en/application/async) · [background](/en/queues/background-tasks) · [foundation](/en/getting-started)
 
-For explicit admission limits on synchronous work in 1.1.0, use [`BoundedExecutor` or `@threaded`](/en/utilities/helpers/concurrency). They expose overload and wait for running native work during cancellation. `Loop.execute()` retains the default-executor behavior documented here; adding an async wrapper alone does not apply the new bounded budget.
+For explicit admission limits on synchronous work, use [`BoundedExecutor` or `@threaded`](/en/utilities/helpers/concurrency). They expose overload and wait for running native work during cancellation. `Loop.execute()` retains the default-executor behavior documented here; adding an async wrapper alone does not apply a bounded budget.

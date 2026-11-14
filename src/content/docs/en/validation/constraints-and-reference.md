@@ -1210,7 +1210,7 @@ Invalid body (422):
 
 ## Empty and non-empty values
 
-Available since **1.4.0**. These rules share one emptiness definition and are exact opposites. The full [emptiness guide](/en/validation/application-rules#empty-and-no-empty) explains whitespace, numeric zeros, collections, uploads, missing fields, and coercion.
+These rules share one emptiness definition and are exact opposites. The full [emptiness guide](/en/validation/application-rules#empty-and-no-empty) explains whitespace, numeric zeros, collections, uploads, missing fields, and coercion.
 
 | Rule | Condition and types | Additional parameters | Example field | Failure code |
 | --- | --- | --- | --- | --- |

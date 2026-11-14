@@ -43,7 +43,7 @@ Tools whose schema declares `x-mcp-header` also require those arguments to be mi
 
 MCP checks a present `Origin` against the exact entries in `allowed_origins` and returns HTTP `403` if it does not match. Origins must contain only an HTTP(S) scheme, host, and optional port, without a path or trailing slash. There are no wildcards or implicit same-origin exceptions. An empty list rejects every present `Origin`; a request without that header passes the origin check.
 
-Since 1.0.16, the editable `config/mcp.py` supplies `["https://inspector.orionis-framework.com"]` when `CORS_ALLOW_ORIGINS` is unset; core `McpConfig` retains `[]` as its fallback. A defined environment value replaces the editable default, including an explicit `[]`. Browser clients also need the appropriate HTTP CORS response headers and a successful `OPTIONS` preflight: passing MCP's origin check alone does not configure those. See [browser testing](/en/mcp/testing#inspect-an-http-server-in-the-browser) and [MCP configuration](/en/mcp/stdio-and-configuration).
+Core `McpConfig` reads `CORS_ALLOW_ORIGINS` with `[]` as its fallback. Configure trusted browser origins explicitly, for example `["https://inspector.orionis-framework.com"]` to use the inspector. A defined environment value replaces the configured fallback, including an explicit `[]`. Browser clients also need the appropriate HTTP CORS response headers and a successful `OPTIONS` preflight: passing MCP's origin check alone does not configure those. See [browser testing](/en/mcp/testing#inspect-an-http-server-in-the-browser) and [MCP configuration](/en/mcp/stdio-and-configuration).
 
 ### First query with curl
 
@@ -296,7 +296,7 @@ Use a valid token issued by your application. Endpoint authentication and tool a
 | HTTP `405` | Use POST to the registered endpoint; GET and DELETE do not execute MCP operations. |
 | HTTP `406` | Explicitly include both `Accept` types without assigning `q=0`. |
 | HTTP `415` | Send one `Content-Type: application/json` header and a JSON body. |
-| HTTP `403` for an origin | A present `Origin` must exactly match `allowed_origins`. Check whether `CORS_ALLOW_ORIGINS` replaced the inspector default. An absent origin passes the check; `[]` rejects every present origin. |
+| HTTP `403` for an origin | A present `Origin` must exactly match `allowed_origins`. Check whether `CORS_ALLOW_ORIGINS` overrides your configured origins. An absent origin passes the check; `[]` rejects every present origin. |
 | Error `-32020` | A mirrored header is missing, duplicated, or disagrees with the body. Check version, method, and name/URI. |
 | Error `-32022` | Unsupported revision: inspect `error.data.supported`. |
 | Error `-32601` | An unknown method, such as `initialize` or `ping`. |

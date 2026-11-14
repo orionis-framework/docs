@@ -232,7 +232,7 @@ Dispatch takes `jobstore` from the underlying event's `alias` attribute. Lifecyc
 
 <a id="schedule-states"></a>
 
-`ScheduleStates` defines `STOPPED = "STOPPED"`, `RUNNING = "RUNNING"`, and `PAUSED = "PAUSED"`. `state()` returns the string. The wrapper updates its state at startup, pause, and resume; shutdown currently does not reset it to `STOPPED`. Synchronize shutdown with `await wait()` rather than polling for that state.
+`ScheduleStates` defines `STOPPED = "STOPPED"`, `RUNNING = "RUNNING"`, and `PAUSED = "PAUSED"`. `state()` returns the string. The wrapper updates its state at startup, pause, resume and shutdown. The shutdown event sets it to `STOPPED`. Use `await wait()` to await shutdown completion and receive any shutdown error.
 
 ## Exceptions and exit codes
 
@@ -250,12 +250,12 @@ flowchart TD
     D --> F
     E --> F
     F --> G{Listener raises Exception?}
-    G -->|Yes| H[Log.error and ICatch service]
+    G -->|Yes| H[Capture and shared failure policy]
     G -->|No| I[Callback completes]
 ```
 
 Reactor catches ordinary command exceptions, sends them to the [global handler](/en/exceptions), and normally returns `1`. The Orionis scheduler observes a **callable completing without an exception**, emitting `EXECUTED` with `retval=1`. Observe command failures by inspecting the code in `onTaskExecuted()` as well as implementing `onTaskError()`.
 
-When a listener raises `Exception`, Orionis logs the error and invokes `ICatch.exception()` asynchronously. If that handler also fails, Orionis logs the secondary error. This neither reruns the command nor rolls back its effects. Async listeners are tracked in a task set; shutdown waits for already-pending listeners before requesting scheduler closure. Callbacks are not persisted or replayed after restart.
+When a listener raises `Exception`, Orionis captures it in an isolated scheduler operation with phase `listener`. The active failure runtime applies the shared application policy; outside that runtime, the scheduler delegates to its injected Catch service. Reporting failure is contained by the corresponding reporting boundary. This neither reruns the command nor rolls back its effects. Async listeners are tracked in a task set; shutdown waits for already-pending listeners before requesting scheduler closure. Callbacks are not persisted or replayed after restart.
 
 `MISSED`, `MAX_INSTANCES`, `ERROR`, and nonzero returns do not create business retries. Dispatch [Queue jobs](/en/queues/failures-and-retries) from the command for persistent retry policies, and observe both components separately.

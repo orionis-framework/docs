@@ -28,7 +28,7 @@ class ArticleListController:
 
 ## Read database results in batches
 
-Since **1.1.0**, query builders expose `chunks(size: int = 1000) -> AsyncIterator[Collection]`. Consume it with `async for`; do not await the iterator itself. It works on model queries and `DB.table(...)`:
+Query builders expose `chunks(size: int = 1000) -> AsyncIterator[Collection]`. Consume it with `async for`; do not await the iterator itself. It works on model queries and `DB.table(...)`:
 
 ```python
 from orionis.support.facades import DB
@@ -224,7 +224,7 @@ text = page.toJson(indent=2, ensure_ascii=False)
 
 All examples operate in memory. `Article` and `Team` are defined in the model/relationship guides. Callbacks are synchronous: map/filter/each do not await coroutines.
 
-Mutators such as `merge`, `push`, `forget`, `put`, `sort`, `reverse`, `reject`, `transform`, `each` and `random(count>0)` change the same collection; contained models remain the same instances. They do not automatically persist SQL changes. New collections are shallow copies of their elements.
+Mutators such as `merge`, `push`, `forget`, `put`, `sort`, `reverse`, `reject`, `transform`, `each` and `random(count)` change the same collection. An explicit `random(0)` empties it. Contained models retain their identities; collection changes do not persist SQL. New collections share their elements.
 
 
 <a id="collection---init--"></a>
@@ -235,7 +235,7 @@ Mutators such as `merge`, `push`, `forget`, `put`, `sort`, `reverse`, `reject`, 
 def __init__(self, items: list[Any] | None=None) -> None
 ```
 
-Builds an in-memory collection; `items=None` makes it empty. A nonempty list is retained by reference: pass `.copy()` to isolate it. `ModelCollection` is the same type, not a persistence subclass.
+Builds an in-memory collection; `None` creates an empty list. Supplied lists or dictionaries, including empty ones, remain referenced; copy the data to isolate it. `ModelCollection` is the same type, not a persistence subclass.
 
 ```python
 values = Collection([1, 2, 3])
@@ -402,7 +402,7 @@ assert Collection([1, 2]).count() == 2
 ### `diff`
 
 ```text
-def diff(self, items: list[Any] | Collection) -> Collection
+def diff(self, items: list[Any] | ICollection) -> Collection
 ```
 
 New collection of items absent from the compared list/collection. Uses equality; handles unhashable values through sequential comparison.
@@ -560,7 +560,7 @@ assert Collection([1, 2]).map(lambda n: n * 3).all() == [3, 6]
 def mapInto(self, cls: type, method: str | None=None, **kwargs: object) -> Collection
 ```
 
-Maps through `cls(item)` or `cls.method(item, **kwargs)`; kwargs are passed only for a method. `cls` must be a type (`TypeError`); missing methods or per-item TypeError/AttributeError/ValueError become None. Does not persist models.
+Maps through `cls(item, **kwargs)` or `cls.method(item, **kwargs)`. `cls` must be a type. Missing methods or per-item `TypeError`, `AttributeError` or `ValueError` produce `None`. It does not persist models.
 
 ```python
 assert Collection(["1", "bad"]).mapInto(int).all() == [1, None]
@@ -571,10 +571,10 @@ assert Collection(["1", "bad"]).mapInto(int).all() == [1, None]
 ### `merge`
 
 ```text
-def merge(self, items: list[Any] | Collection) -> Collection
+def merge(self, items: list[Any] | ICollection) -> Collection
 ```
 
-Appends a list/Collection to the same object and returns self; no PK merge or deduplication. Unsupported types raise `TypeError`.
+Appends a list or any `ICollection` implementation to the same object and returns it. No primary-key merging or deduplication occurs. Unsupported types raise `TypeError`.
 
 ```python
 assert Collection([1]).merge([1, 2]).all() == [1, 1, 2]
@@ -631,7 +631,7 @@ assert Collection([2]).prepend(1).all() == [1, 2]
 def pull(self, key: int | str) -> object
 ```
 
-Reads then removes an index/key. Although it starts with `get`, removing an absent key subsequently raises IndexError/KeyError; check presence first.
+Returns and removes the selected value. Missing indices or keys return `None`.
 
 ```python
 values = Collection([1, 2])
@@ -674,7 +674,7 @@ assert Collection([1]).put(0, 2).all() == [2]
 def random(self, count: int | None=None) -> object | Collection | None
 ```
 
-Empty returns None. Omitted count or `0` returns one item using secrets.choice. Positive count replaces items with a sample and returns self; negative or oversized count raises ValueError. Do not use it for unique persisted identities.
+Empty collections return `None`. Omitted count or `None` selects one item without mutation. Explicit nonnegative counts replace items with a sample and return the same collection; `0` empties it. Negative or oversized counts raise `ValueError`.
 
 ```python
 sample = Collection([1, 2, 3]).random(2)
@@ -745,7 +745,7 @@ assert Collection([{"id": 1}]).serialize() == [{"id": 1}]
 def shift(self) -> object
 ```
 
-Removes index 0 through pull. Empty collections can raise IndexError; check isEmpty first.
+Removes and returns index zero through `pull()`. An empty collection returns `None`.
 
 ```python
 values = Collection([1, 2])
@@ -774,7 +774,7 @@ assert Collection([3, 1, 2]).sort().all() == [1, 2, 3]
 def sum(self, key: str | None=None) -> float
 ```
 
-In-memory sum, optionally by key; TypeError returns 0. An empty key extraction falls back to full items, so avoid missing keys.
+In-memory sum, optionally by a direct key or callback. `TypeError` during summation returns `0`. Missing keys are skipped; empty extraction returns `0` without falling back to original items.
 
 ```python
 assert Collection([{"points": 2}, {"points": 4}]).sum("points") == 6
@@ -884,7 +884,7 @@ assert Collection([{"id": 1}, {"id": 2}]).whereNotIn("id", [1]).count() == 1
 ### `zip`
 
 ```text
-def zip(self, items: list[Any] | Collection) -> Collection
+def zip(self, items: list[Any] | ICollection) -> Collection
 ```
 
 New collection of pairs up to the shorter length. Only list/Collection is accepted; other types raise TypeError.
@@ -930,4 +930,4 @@ assert rows[0].relationLoaded("players")
 
 Iterate with `for`, use `len`, compare collections/lists, read negative indices and slices (`rows[:10]` makes a new Collection), assign with `rows[0] = value` and delete with `del rows[0]`. Index/read/write/delete propagate underlying list/dict errors. Ordering comparisons use element lexicographic order, not PKs or SQL order. `hash(rows)` only works when every element is hashable; do not use a mutable collection as a key and subsequently change it.
 
-`groupBy` and `pluck(value, key)` can create dict-backed storage despite list constructor/type annotations; iteration produces keys. Use `.all()` for that mapping rather than treating it as a model list or queryset `serialize()` result.
+`groupBy` and keyed `pluck` create dictionary-backed collections, including `{}` for empty keyed results. Iteration yields keys. Read the mapping through `all()` rather than treating it as a model list.

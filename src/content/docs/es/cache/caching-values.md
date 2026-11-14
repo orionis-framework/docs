@@ -291,7 +291,7 @@ Una excepción del resolver se propaga antes de la escritura. Una excepción del
 
 ## Compartir fallos concurrentes con rememberOnce
 
-Disponible desde **1.1.0** en `Cache`, `ICacheManager` y los repositorios:
+Disponible en `Cache`, `ICacheManager` y los repositorios:
 
 ```text
 async rememberOnce(key: str, ttl: float | None, resolver: Callable,
@@ -344,16 +344,9 @@ class NavigationCache:
 
 ### Almacenar un resultado ausente de forma portable
 
-El tratamiento de un `None` almacenado cambia entre los backends nativos:
+Todos los stores configurados de Orionis conservan un `None` JSON como acierto de caché. `remember()`, `rememberOnce()` y `rememberForever()` lo reutilizan sin ejecutar otra vez el resolver. `pull()` devuelve `None` y elimina la entrada existente. `get()` devuelve `None` tanto para una ausencia como para un null guardado; `has()` comprueba la existencia en una operación separada.
 
-| Operación sobre una entrada vigente con `None` | file / database | memory / Redis / Memcached |
-| --- | --- | --- |
-| `get` | Devuelve `None`. | Devuelve `None`. |
-| `has` | `True`. | `True`. |
-| `remember` / `rememberForever` | Lo considera un acierto. | Ejecuta de nuevo el resolver porque la lectura de aiocache sustituye un `None` decodificado por su valor predeterminado. |
-| `pull` | Devuelve `None` y elimina la entrada. | Devuelve `None` sin eliminarla. |
-
-Utiliza un diccionario contenedor cuando debas recordar también la ausencia de un registro en cualquier store:
+En backends propios, conserva la diferencia entre datos ausentes y null serializado. Un sobre de aplicación también puede representar explícitamente el estado de búsqueda y otros metadatos:
 
 ```python
 from collections.abc import Awaitable, Callable
@@ -435,7 +428,7 @@ El repositorio utiliza `replace` del backend cuando existe. En otro caso, los ba
 async pull(key: str) -> Any
 ```
 
-Devuelve el valor almacenado o `None` si falta. Primero lee un acierto y después lo elimina; si falta, omite la eliminación. Son dos operaciones separadas. Varios lectores concurrentes pueden recibir el mismo valor y se puede eliminar el valor escrito por otro proceso entre ambos pasos. No utilices `pull` para reclamar trabajos en exclusiva ni para consumir pagos. La diferencia de `None` almacenado se describe arriba.
+Devuelve el valor almacenado o `None` si falta. Primero lee un acierto y después lo elimina; si falta, omite la eliminación. Son dos operaciones separadas. Varios lectores concurrentes pueden recibir el mismo valor y se puede eliminar el valor escrito por otro proceso entre ambos pasos. No utilices `pull` para reclamar trabajos en exclusiva ni para consumir pagos. Un `None` almacenado es un acierto y se elimina.
 
 ```python
 from orionis.support.facades import Cache

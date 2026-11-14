@@ -73,7 +73,7 @@ Run these checks with the service identity and working directory. `serve --expor
 python -B reactor serve --interface asgi --port 8000 --log
 ```
 
-You can also use `orionis serve --interface asgi --port 8000 --log`. Reactor accepts `--interface` (`rsgi` by default or `asgi`), `--host` (since 1.0.13), `--port` (8000), `--log` and `--export`. Add `--host 127.0.0.1` to bind to the local proxy. Set `--workers` and `--reload` when invoking Granian directly.
+You can also use `orionis serve --interface asgi --port 8000 --log`. Reactor accepts `--interface` (`rsgi` by default or `asgi`), `--host`, `--port` (8000), `--log` and `--export`. Add `--host 127.0.0.1` to bind to the local proxy. Set `--workers` and `--reload` when invoking Granian directly.
 
 | Decision | `serve` | Services in these guides |
 | --- | --- | --- |
@@ -105,7 +105,7 @@ python -B reactor migrate:status
 python -B reactor migrate
 ```
 
-If the application uses auth, also run `python -B reactor auth:migrate` before serving traffic or running seeders that depend on its tables. Since **1.5.0**, it prepares roles, permissions, their relationships, personal access tokens, and password recovery on the default connection. It preserves existing data and history; review the [auth storage upgrade guide](/en/database/migrations#auth-storage-1-5-0) and retain already-applied application migrations.
+If the application uses auth, also run `python -B reactor auth:migrate` before serving traffic or running seeders that depend on its tables. It prepares roles, permissions, their relationships, personal access tokens, and password recovery on the default connection. It preserves existing data and history; review the [authentication storage guide](/en/database/migrations#authentication-storage) and retain already-applied application migrations.
 
 `migrate` accepts `--database` for another connection; it has no `--force` flag. Do not run `migrate:fresh`, `db:wipe` or demonstration seeders as a routine release step. See [database commands](/en/database/commands).
 

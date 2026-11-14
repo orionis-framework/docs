@@ -81,7 +81,7 @@ sequenceDiagram
     R-->>C: Integer code or exit handling
 ```
 
-An integer returned by the handler is preserved, including nonzero values. Other successful return types normalize to `0`. The executor can print `DONE` and log successful execution even when the handler returns a nonzero code: that return is not itself an exception. Check the returned value.
+An integer returned by the handler is preserved, including nonzero values. Other successful return types normalize to `0`. A nonzero code selects `FAIL` feedback when timestamps are enabled and is delivered to `handleResult` as a failed result. It retains its original integer value and does not manufacture an exception. Successful zero outcomes select `DONE`. Check the returned value; the base failed-result hook does not add an ERROR log.
 
 <a id="reactor-hascommand"></a>
 
@@ -205,7 +205,7 @@ The `reports:build-one` command is defined in [the Storage example](/en/console/
 
 ## Exceptions, help and cancellation
 
-Within the normal `call()` flow, an `Exception` is logged through `ILogger`, its message receives `[Class.method]` context when known, and handling delegates to `ICatch.exception()`. When that handling completes successfully, Reactor returns `1`. Use the [global exception handler](/en/exceptions) to customize presentation and reporting; you do not need to repeat the same diagnostics around every command.
+Within the normal `call()` flow, an `Exception` is observed with the command or `[Class.method]` in operation metadata. Its original identity, arguments and traceback are preserved. `ICatch.exception()` requests CLI presentation from the same handling plan; logging and presentation use the shared failure policy. When that handling completes successfully, Reactor returns `1`. Use the [global exception handler](/en/exceptions) to customize presentation and reporting; you do not need to repeat the same diagnostics around every command.
 
 A command can also catch an error and return its own code. Reactor cannot recognize a failure silently swallowed by a handler returning `None`; see the individual behavior of [built-in commands](/en/console/built-in-commands).
 

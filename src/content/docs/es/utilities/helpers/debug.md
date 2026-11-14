@@ -5,7 +5,7 @@ editUrl: true
 lastUpdated: false
 ---
 
-Desde Orionis **1.0.12**, la fachada `Debug` permite inspeccionar uno o varios valores mediante el servicio de volcado integrado:
+La fachada `Debug` permite inspeccionar uno o varios valores mediante el servicio de volcado integrado:
 
 ```python
 from orionis.support.facades import Debug

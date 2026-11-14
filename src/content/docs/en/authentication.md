@@ -29,7 +29,7 @@ Remember-me extends session login through an optional persistent credential. Tok
 
 The usual model is `app.models.user.User` with the `Authenticatable` and `Authorizable` concerns. The session guide includes its complete definition, account creation, and password hashing with the `Hash` facade.
 
-Since **1.5.0**, the core provides tables for roles, permissions, their three relationships, personal access tokens, and password recovery. For a new database, run from the application root:
+The core provides tables for roles, permissions, their three relationships, personal access tokens, and password recovery. For a new database, run from the application root:
 
 ```bash
 python -B reactor migrate
@@ -37,7 +37,7 @@ python -B reactor auth:migrate
 python -B reactor seed
 ```
 
-`auth:migrate` uses the default SQL connection and its prefix, respects `AUTH_TOKEN_TABLE` and `AUTH_PASSWORD_RESET_TABLE`, and preserves existing records. The identity model, its migration, and business rules and seeders remain in the application. Preparing tables does not create users or grant privileges. For existing projects, see the [upgrade without rewriting history](/en/database/migrations#auth-storage-1-5-0).
+`auth:migrate` uses the default SQL connection and its prefix, respects `AUTH_TOKEN_TABLE` and `AUTH_PASSWORD_RESET_TABLE`, and preserves existing records. The identity model, its migration, and business rules and seeders remain in the application. Preparing tables does not create users or grant privileges. For existing projects, see the [authentication storage setup](/en/database/migrations#authentication-storage).
 
 ## Inspect the current identity
 

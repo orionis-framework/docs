@@ -339,3 +339,7 @@ This helper adds login/logout, registration, email verification and password rec
 Customize the login controller through `Route.auth(login_controller=LoginController)`; it must provide the `index`, `login` and `logout` actions used by the helper. This page's manual example uses `loginForm`, so it cannot be passed directly as that replacement.
 
 See the [built-in routes and screens](/en/authentication/account-recovery) and [authentication middleware](/en/authentication/middleware).
+
+### Identity contract accessors
+
+`Authenticatable` implements the model's identity accessors: `getAuthIdentifierName()` returns its primary-key attribute name, `getAuthIdentifier()` returns its value (or `None` when that attribute is unset), and `getAuthPassword()` returns the stored hash, or `""` when the attribute is absent or is not a string. These methods are synchronous. Set the class constant `AUTH_PASSWORD` when the hash uses a different model attribute; the default is `"password"`. Never include the result of `getAuthPassword()` in an HTTP response.

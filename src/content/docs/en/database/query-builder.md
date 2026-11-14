@@ -86,6 +86,8 @@ The qualifier's meaning depends on the engine: a schema in PostgreSQL, a databas
 
 Continue with [conditions](/en/database/query-filters), [joins](/en/database/joins-and-subqueries) and [writes](/en/database/query-writes).
 
+`exists()` retains explicit projections, grouping, `HAVING` and unions. Aggregates over unions operate on the union's projected rows; select the target column in every branch.
+
 ## Operation reference
 
 <a id="api-tosql"></a>
@@ -96,7 +98,7 @@ Continue with [conditions](/en/database/query-filters), [joins](/en/database/joi
 toSql(*, literal_binds: bool = False) -> str
 ```
 
-Available since **1.2.0**. Compiles the current SELECT into a string for debugging. This method is synchronous: call it **without `await`** on a `DB.table()` or model builder. It does not execute SQL, create an engine or open a database connection. Builders require a booted application or a configured `ConnectionResolver` to resolve their connection settings; the table does not need to exist.
+Compiles the current SELECT into a string for debugging. This method is synchronous: call it **without `await`** on a `DB.table()` or model builder. It does not execute SQL, create an engine or open a database connection. Builders require a booted application or a configured `ConnectionResolver` to resolve their connection settings; the table does not need to exist.
 
 ```python
 from orionis.support.facades import DB

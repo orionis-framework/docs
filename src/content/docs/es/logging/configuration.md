@@ -33,7 +33,7 @@ from orionis.foundation.config.logging import (
 
 ## Habilitar logging en segundo plano con capacidad limitada
 
-Desde **1.1.0**, `Logging.queue_capacity: int` limita los registros pendientes **por handler**. El valor predeterminado `0` conserva la entrega síncrona. Define un valor positivo en la configuración o mediante `Application(...).withConfigLogging(queue_capacity=1024)` antes de crear la aplicación:
+`Logging.queue_capacity: int` limita los registros pendientes **por handler**. El valor predeterminado `0` conserva la entrega síncrona. Define un valor positivo en la configuración o mediante `Application(...).withConfigLogging(queue_capacity=1024)` antes de crear la aplicación:
 
 ```dotenv
 LOG_QUEUE_CAPACITY=int:1024
@@ -103,7 +103,7 @@ daily_files = Daily(path="storage/logs/application_{suffix}.log")
 
 Usa rutas relativas a la raíz del proyecto para una configuración consistente. Los handlers crean los directorios padre al preparar su archivo, no durante la validación de `path`. La creación del directorio no implica que el proceso tenga permisos para escribir todos los archivos posteriores.
 
-Hay una diferencia concreta con rutas absolutas: los handlers rotativos y el handler `stack` creado mediante `switchChannel()` usan `Path(app_root) / path`, que conserva una ruta absoluta. La inicialización de `stack` como canal predeterminado concatena la raíz y `path` como texto; por ello **no interpreta de forma consistente una ruta absoluta**. Configura una ruta relativa en `stack`.
+Todos los canales incluidos conservan las rutas absolutas configuradas. Las relativas se anclan a la raíz de la aplicación, tanto en la inicialización de `stack` como al cambiar de canal. Elige una ubicación controlada por la aplicación y escribible por el proceso servidor.
 
 El directorio habitual es `storage/logs`, pero no se obtiene del disco predeterminado de `Storage`. El logger escribe directamente en el sistema de archivos mediante el `path` de su canal. Consulta [ubicación, nombres y concurrencia](/es/logging/rotation-and-lifecycle#log-files) para el alcance de estos archivos entre procesos.
 
@@ -126,7 +126,7 @@ Los campos numéricos no aceptan booleanos ni cadenas numéricas. Tipos incorrec
 
 **Los nombres `retention_hours`, `retention_days`, `retention_weeks` y `retention_months` no implementan una caducidad por edad.** La factory entrega su valor como `backup_count`: el handler cuenta archivos coincidentes, los ordena por modificación y limpia al rotar. No existe una tarea que elimine cada archivo al cumplir ese número de horas, días, semanas o meses.
 
-`Daily.at` se entrega al resolver y permite calcular su siguiente hora teórica; el handler integrado decide por cambio de sufijo de fecha, sin consultar ese cálculo. Tampoco presupongas que `Chunked.mb_size` agrupa mensajes hasta alcanzar el límite: su resolver cambia el sufijo en cada emisión y provoca rotaciones antes de ese umbral. Revisa los ejemplos y las consecuencias exactas en [rotación y retención](/es/logging/rotation-and-lifecycle#time-rotation) antes de elegir una política.
+`Daily.at` se entrega al resolver para calcular la próxima hora; el handler integrado rota por cambio del sufijo de fecha. `Chunked.mb_size` acumula registros hasta alcanzar el umbral y después rota antes de escribir el siguiente registro. Consulta [rotación y retención](/es/logging/rotation-and-lifecycle#time-rotation) para conocer los límites exactos.
 
 `Stack` no tiene campos de rotación ni retención. `Weekly` y `Monthly` no exponen un campo `at` en sus entidades, aunque la factory de bajo nivel pueda leer una clave con ese nombre de un diccionario.
 

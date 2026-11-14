@@ -159,7 +159,7 @@ reflected = ReflectionInstance(service)
 
 Estos métodos no requieren argumentos. Devuelven referencias o metadatos de la clase del objeto, no una copia del servicio.
 
-`getClassName()`, `getModuleName()` y `getModuleWithClassName()` utilizan los nombres capturados al construir el wrapper. Si después cambias `__name__` o `__module__` de la clase, `clearCache()` no actualiza esos campos; construye otro wrapper para obtener los nuevos nombres.
+`getClassName()`, `getModuleName()` y los nombres cualificados usan metadatos de identidad del reflector. `clearCache()` actualiza los nombres de clase y módulo después de renombrarlos externamente. Los miembros privados existentes conservan su prefijo original.
 
 <a id="reflectioninstance-method-getinstance"></a>
 
@@ -308,7 +308,7 @@ assert reflected.getSourceCode("missing") is None
 
 ## Atributos del objeto
 
-El recorrido usa `vars(instance)`: solo enumera entradas del `__dict__` de la instancia, sin incluir automáticamente variables de clase ni valores calculados de propiedades. Un objeto con `__slots__` y sin `__dict__` puede construirse, pero estos recorridos fallan con `TypeError`.
+Recorre atributos almacenados en `__dict__` y slots con valor de toda la jerarquía de clases, excluyendo valores invocables. No evalúa propiedades calculadas ni inventa valores para slots vacíos.
 
 Los diccionarios se almacenan y devuelven por referencia. Los prefijos son una clasificación de nombres de Python, no un control de acceso. Un privado propio como `_ReportService__secret` aparece como `__secret`; un privado heredado con otro prefijo puede clasificarse como protegido.
 
@@ -420,7 +420,7 @@ assert not reflected.hasAttribute("missing")
 def getAttribute(self, name: str, default: Any=None) -> Any: ...
 ```
 
-`name` es obligatorio; `default=None` se usa si no existe. Prioriza el diccionario cacheado y hace también una consulta `getattr`; esta consulta puede ejecutar descriptores. Para privados propios usa el nombre desmangleado. Las excepciones de un getter pueden propagarse.
+Devuelve un atributo almacenado en caché cuando existe; en otro caso llama a `getattr(instance, name, default)`, que puede evaluar descriptores. El valor predeterminado es `None`. Los privados usan sus nombres originales en el mapa en caché. Los errores de getter se propagan.
 
 ```python
 assert reflected.getAttribute("__secret") == "private"
@@ -771,7 +771,7 @@ assert not reflected.hasMethod("__init__")
 def getMethodSignature(self, name: str) -> inspect.Signature: ...
 ```
 
-Con `name` obligatorio devuelve `inspect.Signature` del miembro callable de la clase, con mangling para privados propios. Admite dunder como `__init__`, sin depender de `hasMethod()`. Un método de instancia conserva `self` en esa firma; un classmethod ya ligado a la clase no conserva `cls`. Lanza `AttributeError` si no es callable; los errores de inspección se propagan.
+Devuelve `inspect.Signature` de una redefinición de instancia si existe, o del callable de clase. Admite nombres privados originales. Una función de método de instancia de la clase conserva su receptor en esta firma; un callable ya ligado sigue la vinculación Python. Los mapas de dependencias aplican reglas separadas para quitar el receptor. Un miembro no invocable lanza `AttributeError`.
 
 ```python
 assert list(reflected.getMethodSignature("render").parameters) == ["self", "limit"]
@@ -787,7 +787,7 @@ assert list(reflected.getMethodSignature("__sign").parameters) == ["self"]
 def getMethodDocstring(self, name: str) -> str | None: ...
 ```
 
-Con `name` obligatorio devuelve el docstring del callable de la clase, o `None`. Admite privados propios y memoiza el resultado. Lanza `AttributeError` si el miembro no es callable o está ausente.
+Devuelve el docstring de una redefinición de instancia si existe, o del callable de clase, o `None`. Admite nombres privados y guarda resultados en caché. Los miembros ausentes o no invocables lanzan `AttributeError`.
 
 ```python
 assert reflected.getMethodDocstring("render") == "Render the report."
@@ -825,7 +825,7 @@ assert service.describe() == "Sales"
 def removeMethod(self, name: str) -> None: ...
 ```
 
-Con `name` obligatorio primero exige que `hasMethod()` sea verdadero y luego elimina el miembro de la clase, no de la instancia. Devuelve `None`; afecta a todas las instancias de esa clase. Lanza `AttributeError` si falta. No elimina métodos solo heredados desde una subclase. Utilízalo para métodos propios públicos o protegidos: un método privado normal no puede eliminarse mediante esta API, porque la comprobación y la eliminación no aplican las mismas reglas de mangling. Tanto `__secret` como `_Class__secret` producen `AttributeError` para ese caso.
+Requiere un método conocido y devuelve `None`. Elimina primero una redefinición de instancia; si no existe, elimina el método de la clase reflejada, afectando a sus demás instancias. Al quitar la redefinición reaparece el método de clase. Transforma correctamente los nombres privados originales. Un método ausente lanza `AttributeError`; eliminar en la clase no elimina una definición solo heredada.
 
 ```python
 assert reflected.removeMethod("temporary") is None

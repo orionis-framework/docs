@@ -36,7 +36,7 @@ Inherited `insert(values)` also targets the related table and returns `InsertRes
 async def create(self, attributes: dict[str, Any]) -> TRelated
 ```
 
-Only `hasOne`/`hasMany`: copies `attributes`, replaces the FK with the parent key and calls `Related.create`. The FK must also be fillable. Returns a model even when a listener vetoes `save`. An unsaved parent is not automatically persisted: save the parent first. Additional read filters are not copied into the payload.
+For `hasOne`/`hasMany`, copies attributes, sets the parent foreign key, constructs and saves the related model on the relation's selected connection. The foreign key must be fillable. It returns the model even when a save event vetoes persistence. Save the parent first; additional read filters are not copied into the payload.
 
 ```python
 async def recruit(team: Team):
@@ -247,7 +247,7 @@ async def featured_tags(team: Team):
 async def attach(self, ids: Any, attributes: dict[str, Any] | None=None) -> int
 ```
 
-Inserts links and returns the pivot row count. `ids` accepts an identity, model, iterable of either, or identity/model→extra-dict mapping. `attributes=None` supplies common extras when `ids` is not a mapping. Does not create models or check duplicates/persisted parent. Extras are merged after keys; never put linking keys in extras.
+Inserts pivot links and returns the inserted count. Accepts one identity, a model, iterables, or an identity/model-to-extra-attributes mapping. `attributes` supplies common extras for non-mapping input. Extras cannot override the parent or related identity chosen by `attach()`. It does not create models or deduplicate links; enforce pivot uniqueness in the database.
 
 ```python
 async def add_tag(team: Team, tag: Tag) -> int:

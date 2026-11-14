@@ -67,7 +67,7 @@ def fileImportsAny(file_path: Path, target_modules: set[str], *, allow_empty: bo
 
 El recorrido AST incluye imports dentro de funciones, condiciones y bloques `TYPE_CHECKING`: detectarlos no prueba que se ejecuten. No ejecuta imports dinámicos con `importlib` ni resuelve imports relativos al paquete; compara el texto del campo AST `module`.
 
-Devuelve `False` si el conjunto está vacío, la ruta no es un archivo, hay un error de sintaxis o el archivo no es UTF-8. Con un conjunto no vacío, `allow_empty=True` acepta un archivo vacío o compuesto únicamente por espacios; un archivo con solo comentarios no se considera vacío. Otros errores de lectura, como permisos, se propagan.
+Devuelve `False` para un conjunto objetivo vacío, ruta ausente/no archivo, errores de sintaxis o fuente no decodificable. Admite declaraciones de codificación Python y BOM UTF-8. Con módulos objetivo no vacíos, `allow_empty=True` acepta archivos solo con espacios; los comentarios no cuentan como vacío. Otros errores de lectura, como permisos, se propagan.
 
 ```python
 from pathlib import Path
@@ -101,11 +101,11 @@ Es un método de clase. Devuelve el objeto `type` encontrado, sin llamar a su co
 - `module_path` y `class_name`: nombres explícitos, ambos con valor predeterminado `None` en la firma. Para una carga válida proporciona ambos.
 - `metadata`, keyword-only, con claves `"module"` y `"class"`: se utiliza únicamente si ambos argumentos explícitos son `None`. Acepta un `dict` o un `MappingProxyType` no vacío. No completa automáticamente un argumento explícito que falte ni mezcla ambos formatos.
 
-Primero reutiliza la clase cacheada por `module_path.class_name`; luego consulta `sys.modules` y, si hace falta, importa el módulo. No exige que la clase se haya declarado allí: un alias importado también es válido.
+Consulta `sys.modules`, importa si hace falta y lee el atributo de clase actual. Los alias de clases importadas son válidos. No construye la clase.
 
 Un módulo desconocido genera `ImportError`; un nombre ausente, `AttributeError`; un valor que no sea clase, `TypeError`. La metadata incompleta o tipos incorrectos pueden producir los errores de las llamadas de importación o de `getattr`; no hay un validador adicional que convierta todos esos casos en una única excepción. Excepciones distintas de `ImportError` durante la importación se propagan.
 
-La caché de clases vive en memoria, es compartida por las llamadas y no tiene un método público de vaciado ni un límite configurado. No relee automáticamente una clase reemplazada posteriormente en el módulo. No está vinculada a `clearCache()` de los wrappers de reflexión.
+No conserva una caché de clases separada: reemplazar la clase en el módulo es visible en la siguiente llamada. Sigue aplicándose la caché de módulos Python; el método no recarga automáticamente archivos fuente.
 
 ```python
 from types import MappingProxyType
@@ -208,7 +208,7 @@ En un proyecto real, la raíz de la aplicación ya debe ser importable. Ordena e
 
 ## Acceso e inyección de dependencias
 
-`ModuleInspector` no necesita datos de construcción: usa métodos estáticos y de clase. Puede ser un parámetro concreto de un componente resuelto por el contenedor, pero crear otra instancia no aísla la caché de `loadClass`. El uso directo suele ser suficiente para operaciones de inicialización. No existe una interfaz `IModuleInspector` exportada ni un mecanismo de inyección de nombres de módulo.
+`ModuleInspector` no necesita datos de construcción: usa métodos estáticos y de clase. Puede ser un parámetro concreto de un componente resuelto por el contenedor, pero la caché de imports Python sigue siendo global al proceso. El uso directo suele ser suficiente para operaciones de inicialización. No existe una interfaz `IModuleInspector` exportada ni un mecanismo de inyección de nombres de módulo.
 
 ```python
 from orionis.introspection import ModuleInspector

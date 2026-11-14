@@ -26,7 +26,7 @@ Parent directories are created automatically. Records are appended using UTF-8. 
 
 Configuration entities require a nonempty string ending in `.log`; rotating channels also require the literal `{suffix}` placeholder. Put it in the **filename**, as shown here: cleanup only scans the directory of the file that has just been closed. Using `{suffix}` to split periods into separate directories does not provide cleanup across those directories.
 
-Use paths relative to the root, especially with `stack`: its default initialization concatenates the root and configured path, while the factory used when switching channels resolves paths through `Path`. An absolute `stack` path does not behave consistently across both paths.
+Relative paths resolve from the application root; absolute paths retain their location for every built-in channel, including initial `stack` setup and channel switching.
 
 <a id="time-rotation"></a>
 
@@ -62,9 +62,9 @@ With that configuration, a record on October 23 writes to `application_2026-10-2
 
 Configuration exposes `mb_size` —an integer from 1 to 1000, default 10— and `files` —a positive integer, default 5—. The factory converts `mb_size` to bytes using `mb_size * 1024 * 1024`, making the effective unit MiB. The handler counts the encoded text bytes and its line break.
 
-There is an important consideration in the current implementation: `ChunkedSuffixResolver.getSuffix()` produces a new suffix **on every call**, formatted as `YYYYMMDD_HHMMSS_counter`, and the handler requests one on every emission. Because changing the suffix already causes rotation, **the integrated channel rotates for every emitted record**, even when the file is far below `mb_size`. The parameter exists and reaches the handler; it does not guarantee that records accumulate until reaching that size.
+`ChunkedSuffixResolver.getSuffix()` produces a suffix formatted as `YYYYMMDD_HHMMSS_counter`. The handler keeps its current suffix while the file is below `max_bytes`, and requests a new one when the threshold has been reached. Consecutive records therefore accumulate in the same file until size-based rotation.
 
-For example, three consecutive messages normally produce two closed `.log.gz` files and one active `.log` file, each containing one record. The counter starts at `0001` for each resolver instance; timestamp and counter are not a global identifier across processes.
+For example, three small consecutive messages stay in one active `.log` file when their accumulated size remains below the threshold. A later record triggers rotation once the accumulated size reaches the threshold. The counter starts at `0001` for each resolver instance; timestamp and counter are not a global identifier across processes.
 
 ```dotenv
 LOG_CHANNEL=chunked
@@ -73,7 +73,7 @@ LOG_MB_SIZE=int:10
 LOG_FILES=int:5
 ```
 
-Gzip compression runs during rotation, after closing the previous file. On success, the original `.log` file is removed. The active file remains uncompressed; `close()` does not compress it. If compression encounters an `OSError`, it attempts to remove the incomplete compressed file.
+Gzip compression runs during rotation, after closing the previous file. It stages a complete gzip archive in a uniquely named temporary file before replacing the destination, preserving an existing archive if compression fails. On success, the original `.log` is removed. The active file remains uncompressed; `close()` does not compress it. Compression and temporary-file cleanup errors are observed through the failure runtime.
 
 The handler checks size **before** writing the next record, using the bytes already accumulated. It does not anticipate the next message's size: one entry can exceed the threshold. This is also not a maximum disk usage limit.
 
@@ -97,7 +97,7 @@ On every rotation, cleanup runs in this order:
 1. Find files in the directory of the file that has just been closed.
 2. Select names matching the template, including the `.gz` variant.
 3. Sort by modification time (`mtime`), newest first.
-4. Delete files beyond `backup_count` and, where applicable, their compressed variant.
+4. Delete each matched file beyond `backup_count`; `.log` and `.log.gz` are separate entries and are ranked independently.
 5. The handler then opens the new active file.
 
 ```mermaid
@@ -114,7 +114,7 @@ flowchart TD
 
 After this sequence there may be up to **`backup_count + 1` files**: those kept during cleanup plus the new active file. Setting `daily.retention_days=7` does not delete each record exactly seven days later. Periods without traffic generate no files, while changing `mtime` or sharing a pattern with another process affects which files count as newest.
 
-Cleanup does not run when constructing a handler with no active file or when closing it. Filesystem inspection and deletion errors are suppressed, so retention is an attempted cleanup rather than a strict maximum-space guarantee. Configuration entities reject zero retention; do not use it to disable keeping files.
+Cleanup does not run when constructing a handler with no active file or when closing it. Filesystem inspection and deletion errors are observed through the failure runtime and suppressed, so retention remains attempted cleanup rather than a strict maximum-space guarantee. Configuration entities reject zero retention; do not use it to disable keeping files.
 
 <a id="logger-lifecycle"></a>
 
@@ -126,7 +126,7 @@ The service reads `app.config("logging")` during construction and prepares the n
 
 `reloadConfiguration()` removes handlers, reads application configuration again, and rebuilds the default channel. It does not preserve a previous channel switch or reload `.env` or Python configuration modules. Initialization and reloading can raise `RuntimeError`.
 
-`close()` removes and closes handlers, clears their references, and suppresses common closing errors. It is idempotent; it does not permanently disable the service: a later record can initialize it again. The destructor also attempts to release resources. For an explicit shutdown phase, use an application hook:
+`close()` attempts every handler before clearing its references. It observes and suppresses ordinary `OSError`, `RuntimeError`, and `ValueError` from cleanup; queued delivery failures and unexpected exceptions propagate after cleanup. It is idempotent but does not permanently disable the service: a later record can initialize it again. For a custom integration that owns shutdown, use asynchronous closure:
 
 ```python
 # bootstrap/app.py: register before app.create().
@@ -134,8 +134,8 @@ from orionis.foundation.enums import Lifespan
 from orionis.logging.contracts.logger import ILogger
 
 
-def close_logs(logger: ILogger) -> None:
-    logger.close()
+async def close_logs(logger: ILogger) -> None:
+    await logger.aclose()
 
 
 app.on(Lifespan.SHUTDOWN, close_logs)
@@ -201,8 +201,8 @@ getNextRotationTime(current_time: datetime) -> datetime
 |---|---|---|
 | `HourlySuffixResolver` | `()` | Beginning of the following hour, using the resolver's timezone. |
 | `DailySuffixResolver` | `(at_time: time | None = None)` | Next configured daily date/time; the following day if it has passed. |
-| `WeeklySuffixResolver` | `(at_time: time | None = None)` | Monday of the following week at that time. |
-| `MonthlySuffixResolver` | `(at_time: time | None = None)` | First day of the following month at that time. |
+| `WeeklySuffixResolver` | `(at_time: time \| None = None)` | The upcoming Monday at that time; today if it is Monday before the configured time, otherwise next week. |
+| `MonthlySuffixResolver` | `(at_time: time \| None = None)` | The upcoming first day at that time; today if it is the first before that time, otherwise next month. |
 | `ChunkedSuffixResolver` | `()` | `current_time + timedelta(hours=1)`, unused as an integrated trigger. |
 
 For the three constructors with `at_time`, `None` means midnight. These are extension APIs: the integrated handler consumes `getSuffix()` and does not schedule the time calculated by `getNextRotationTime()`.
@@ -250,7 +250,7 @@ The configuration attributes above are accessible on the handler, as are `stream
 
 ## Drain queued logging on shutdown
 
-`await logger.aclose()` is available on `ILogger` and `Logger` in 1.1.0. It stops queue admission, waits for accepted records, closes owned handlers and reports background failures after cleanup. `close()` remains synchronous; use `aclose()` from an event loop.
+`await logger.aclose()` is available on `ILogger` and `Logger`. It stops queue admission, waits for accepted records, closes owned handlers and reports background failures after cleanup. `close()` remains synchronous; use `aclose()` from an event loop.
 
 ```python
 from orionis.logging.contracts.logger import ILogger

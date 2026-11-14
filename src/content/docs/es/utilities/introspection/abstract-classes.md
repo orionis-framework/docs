@@ -168,7 +168,7 @@ assert r.getClass() is ReportContract
 getClassName(self) -> str
 ```
 
-Devuelve el `__name__` capturado al construir el wrapper como `str`, no `__qualname__`. `clearCache()` no vuelve a capturarlo.
+Devuelve `__name__` como `str`, sin ámbitos contenedores. `clearCache()` lo actualiza después de renombrar.
 
 ```python
 assert r.getClassName() == "ReportContract"
@@ -182,7 +182,7 @@ assert r.getClassName() == "ReportContract"
 getModuleName(self) -> str
 ```
 
-Devuelve el nombre del módulo capturado al construir el wrapper como `str`. `clearCache()` no vuelve a capturarlo.
+Devuelve el nombre del módulo como `str`; `clearCache()` lo actualiza después de modificar `__module__`.
 
 ```python
 assert r.getModuleName() == ReportContract.__module__
@@ -1059,9 +1059,9 @@ Estos dos últimos métodos delegan en [ReflectDependencies](/es/utilities/intro
 
 El primer getter de miembros realiza el escaneo; las listas y diccionarios devueltos son los objetos almacenados, no copias defensivas. No los modifiques para «editar» la clase: eso altera la vista en caché y puede producir resultados incoherentes. Usa los métodos de modificación o crea una copia de la respuesta.
 
-`setAttribute()`, `removeAttribute()` y `removeMethod()` invalidan las clasificaciones de miembros, pero pueden conservar firmas y otros resultados calculados previamente. Tras cambiar firmas, anotaciones o metadatos, ejecuta `clearCache()`. Los cambios hechos directamente sobre la clase tampoco se detectan automáticamente.
+Los métodos de mutación invalidan clasificaciones y firmas de miembros, actualizan el estado de métodos abstractos de Python e invalidan firmas de dependencias y planes de invocación compartidos. Los cambios externos requieren `clearCache()`.
 
-El nombre de clase, el nombre de módulo y el prefijo privado se capturan en el constructor y no cambian con `clearCache()`. Si modificas `__name__` o `__module__`, crea otro wrapper. El docstring se lee directamente en cada llamada.
+Los nombres de clase y módulo se actualizan al invalidar. El prefijo privado conserva el nombre de declaración original, porque Python no vuelve a transformar los miembros al renombrar la clase. El docstring se lee directamente.
 
 Los operadores siguientes acceden a **la caché del wrapper**, no a los atributos de la clase. Usa claves propias que no coincidan con las internas (`attributes`, `methods`, etc.); sobrescribir o borrar claves internas puede romper la consistencia del escaneo.
 
@@ -1135,7 +1135,7 @@ assert "app:note" not in r
 clearCache(self) -> None
 ```
 
-Devuelve `None`. Descarta todos los datos almacenados en este wrapper, incluidas las claves añadidas con corchetes. La siguiente consulta vuelve a inspeccionar; no deshace cambios de la clase ni vacía la caché global de dependencias.
+Devuelve `None`, limpia todas las entradas locales y actualiza metadatos de identidad. También invalida firmas de dependencias y planes de invocación compartidos. Otros reflectores conservan sus cachés locales. No revierte las mutaciones.
 
 ```python
 r["app:note"] = "cached"
@@ -1180,4 +1180,4 @@ No hay separación entre métodos abstractos y concretos en los getters de méto
 
 Un nombre que `getDunderMethods()` devuelve no es válido automáticamente para `hasMethod()`, `removeMethod()`, `getMethodSignature()` ni `methodSignature()`: esas operaciones usan la lista de métodos no dunder. Las propiedades se consultan mediante sus APIs específicas.
 
-Si cambias funciones dinámicamente, limpiar este wrapper no vacía las cachés compartidas de `ReflectDependencies`. Las funciones nuevas se analizan por su identidad, pero modificar anotaciones o valores predeterminados de la misma función puede conservar un análisis anterior; revisa la [guía de dependencias](/es/utilities/introspection/dependencies-and-discovery).
+Limpia las cachés tras modificar intencionalmente firma, anotaciones o valores predeterminados. Esto invalida el análisis compartido; cada reflector existente debe limpiar sus resultados locales antes de reutilizarlos. Consulta [reflexión de dependencias](/es/utilities/introspection/dependencies-and-discovery).

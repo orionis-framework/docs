@@ -164,7 +164,7 @@ async def remove_projects() -> bool:
 
 ## Shared versioned definitions
 
-Generate the module with either command below. `name` is required; the `Schema` suffix is appended to the normalized filename when absent. `catalog/projects_v1` creates `database/schemas/catalog/projects_v1_schema.py`. Since 1.0.10, the stub declares a module constant named `TABLE` instead of a holder class:
+Generate the module with either command below. `name` is required; the `Schema` suffix is appended to the normalized filename when absent. `catalog/projects_v1` creates `database/schemas/catalog/projects_v1_schema.py`. the stub declares a module constant named `TABLE`:
 
 ```shell
 orionis make:database-schema projects_v1
@@ -220,7 +220,7 @@ Creation preserves an existing table using checkfirst=True and returns True; it 
 
 The code exposes no `Schema.table`, alter, rename, hasTable, or dropIfExists. [Alterations](/en/database/schema-alterations) require explicit backend SQL. See [all types](/en/database/column-types), [modifiers and keys](/en/database/schema-modifiers), and [`TableDefinition`](/en/orm/schema-and-type-reference) to complete a declaration.
 
-Declaring the same column name more than once causes `Schema` to retain the last definition; it neither creates two columns nor reports a duplicate. Declare each name once to avoid accidentally replacing options.
+Repeated column names raise `ValueError` before DDL executes. This includes collisions with generated timestamp columns. An empty `primaryKey()` also raises `ValueError`. A table-creation context rejects overlapping entries and consumes each successful declaration once.
 
 
 <a id="tablecreation-init"></a>

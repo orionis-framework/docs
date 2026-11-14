@@ -104,7 +104,7 @@ Debe ejecutar dos métodos aprobados. Para seleccionar uno:
 python -B reactor test --start-dir tests/unit --file-pattern "test_price.py" --method-pattern "testRejects*" --fail-fast 1
 ```
 
-`--method-pattern` filtra los candidatos `test*` encontrados por el loader; no habilita métodos llamados `checkSomething`. `--fail-fast` recibe un valor entero, no es un interruptor sin argumento. Consulta todas las opciones, sus valores predeterminados y la salida JSON en [Resultados y configuración](/es/testing/results-and-reference).
+`--method-pattern` selecciona directamente los nombres de método; `check*` descubre métodos como `checkSomething`. El valor predeterminado es `test*`. `--fail-fast` recibe un entero. Puedes seleccionar un archivo con `--start-dir tests/unit/test_price.py`; esto ignora el glob de archivos. Consulta las opciones y resultados en [Resultados y configuración](/es/testing/results-and-reference).
 
 ## Organizar las pruebas
 

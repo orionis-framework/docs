@@ -27,7 +27,7 @@ Los valores siguientes son los predeterminados de `config/session.py` cuando no 
 | `table` · `SESSION_DB_TABLE` | `"sessions"` | Tabla del driver `database`. |
 | `cache` · `SESSION_CACHE_STORE` | `None` | Store del driver `cache`; `None` usa el store de caché predeterminado. |
 
-Desde 1.3.0, [`session:migrate`](/es/database/commands#session-migrate) prepara la tabla SQL de sesiones configurada antes de recibir peticiones. Usa `SESSION_DB_CONNECTION` y `SESSION_DB_TABLE` aunque otro driver de sesiones esté activo, conserva las sesiones existentes y no admite `--database`.
+[`session:migrate`](/es/database/commands#session-migrate) prepara la tabla SQL de sesiones configurada antes de recibir peticiones. Usa `SESSION_DB_CONNECTION` y `SESSION_DB_TABLE` aunque otro driver de sesiones esté activo, conserva las sesiones existentes y no admite `--database`.
 
 Consulta [almacenes y concurrencia](/es/sessions/stores-and-concurrency) para elegir el driver y preparar sus dependencias.
 
@@ -163,3 +163,7 @@ La rotación de sesión por sí sola conserva el token CSRF existente, porque co
 - `HttpOnly` protege la lectura de la cookie desde scripts y no reemplaza la protección CSRF. La cookie de sesión y la cookie opcional `XSRF-TOKEN` tienen propósitos distintos.
 
 Si la sesión no se conserva entre peticiones, revisa el encabezado `Set-Cookie`, el envío posterior de la cookie, su dominio/ruta, `Secure` y el driver seleccionado. Si una petición WEB de escritura falla por CSRF, utiliza el token de la misma sesión. Los errores reales del backend se propagan; no se ocultan emitiendo una cookie que prometa datos que no se pudieron guardar.
+
+### Inspeccionar cambios pendientes del ciclo de vida
+
+`session.isNew`, `session.invalidated` y `session.wantsRegenerate` son propiedades booleanas síncronas. Distinguen una identidad aún no persistida con su identificador actual, una invalidación solicitada y una rotación de identificador solicitada. `regenerate()` e `invalidate()` programan trabajo de almacenamiento para el middleware; consultar estas propiedades no persiste nada. Utilízalas para integrar comportamiento propio de respuesta y deja el guardado y las cookies a la capa de sesión WEB.

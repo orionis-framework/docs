@@ -145,3 +145,5 @@ DDL can implicitly commit depending on the backend. A transaction-wrapped migrat
 ### Transaction
 
 `Transaction(connection: IConnection)` implements `ITransaction`. `async __aenter__() -> ITransaction` opens a level and returns `self`. `async __aexit__(exc_type: type[BaseException] | None, exc: BaseException | None, traceback: TracebackType | None) -> bool` commits or rolls back according to `exc_type` and always returns `False`. Exceptions are not suppressed. Use `async with connection.transaction()` rather than calling these special methods manually.
+
+When a body error is already escaping a transaction, rollback or connection-cleanup failures do not replace it. Secondary or late SQL failures are reported through the failure runtime with SQL and bindings redacted. Keep rollback in the transaction-owning task.

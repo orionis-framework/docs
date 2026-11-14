@@ -232,7 +232,7 @@ El despachador toma `jobstore` del atributo `alias` del evento subyacente. Los e
 
 <a id="schedule-states"></a>
 
-`ScheduleStates` define `STOPPED = "STOPPED"`, `RUNNING = "RUNNING"` y `PAUSED = "PAUSED"`. El método `state()` devuelve el texto. El wrapper establece el estado al iniciar, pausar y reanudar; actualmente el apagado no lo restablece a `STOPPED`. Utiliza `await wait()` para sincronizar una parada, no un bucle que espere ese estado.
+`ScheduleStates` define `STOPPED = "STOPPED"`, `RUNNING = "RUNNING"` y `PAUSED = "PAUSED"`. El método `state()` devuelve el texto. El wrapper actualiza el estado al iniciar, pausar, reanudar y cerrar. El evento de shutdown lo establece en `STOPPED`. Usa `await wait()` para esperar la finalización y propagar errores de cierre.
 
 ## Excepciones y códigos de salida
 
@@ -250,12 +250,12 @@ flowchart TD
     D --> F
     E --> F
     F --> G{Listener lanza Exception?}
-    G -->|Sí| H[Log.error y servicio ICatch]
+    G -->|Sí| H[Captura y política común de fallos]
     G -->|No| I[Termina el callback]
 ```
 
 Reactor captura las excepciones ordinarias del comando, las envía al [manejador global](/es/exceptions) y normalmente retorna `1`. El scheduler de Orionis observa ese retorno como **ejecución del callable sin excepción**, por lo que emite `EXECUTED` con `retval=1`. Para observar fallos de comando revisa el código en `onTaskExecuted()` además de implementar `onTaskError()`.
 
-Si un listener lanza `Exception`, Orionis registra el fallo y llama a `ICatch.exception()` de forma asíncrona. Si ese manejador también falla, registra ese segundo error. Esto no repite el comando ni revierte sus efectos. Los listeners async se mantienen en un conjunto de tareas y el apagado espera a los ya pendientes antes de solicitar el cierre del scheduler; no almacena ni reproduce sus callbacks después de reiniciar.
+Si un listener lanza `Exception`, Orionis lo captura en una operación aislada del scheduler con fase `listener`. El runtime de fallos activo aplica la política común de aplicación; fuera de él, se delega en el servicio Catch inyectado. Esto no reejecuta el comando ni revierte sus efectos. Los listeners async se registran como tareas y se esperan durante el cierre; los callbacks no se persisten ni reproducen tras reiniciar.
 
 `MISSED`, `MAX_INSTANCES`, `ERROR` y un retorno no cero no crean reintentos de negocio. Para trabajo con políticas de reintento persistentes, despacha [jobs de Queues](/es/queues/failures-and-retries) desde el comando y observa ambos componentes por separado.

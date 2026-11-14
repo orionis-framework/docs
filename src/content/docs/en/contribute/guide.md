@@ -119,7 +119,7 @@ Orionis follows its own style conventions, aligned with modern web frameworks. T
 
 ### Naming Convention
 
-Version 1.3.0 applies the following convention throughout the framework's `orionis/` and `tests/` directories, including asynchronous methods, static methods, class methods, and test methods:
+Apply the following convention throughout the framework's `orionis/` and `tests/` directories, including asynchronous methods, static methods, class methods, and test methods:
 
 | Element | Convention | Example |
 |---|---|---|
@@ -134,7 +134,7 @@ Functions defined inside another function or method also use `snake_case`. This 
 
 Keep Python protocol names such as `__init__`, `__call__`, and `__aenter__` unchanged. When an integration requires a particular callback name, implement the method in camelCase and expose the required name as an alias. Do not rename methods belonging to third-party libraries.
 
-When adapting an extension to 1.3.0, check the current [API reference](https://api.orionis-framework.com/) and update method definitions, calls, string-based lookups, and test doubles together. Run the naming check from the framework repository root:
+When developing an extension, check the current [API reference](https://api.orionis-framework.com/) and update method definitions, calls, string-based lookups, and test doubles together. Run the naming check from the framework repository root:
 
 ```bash
 uv run --group dev python -m unittest tests.test_naming_conventions

@@ -161,7 +161,7 @@ DB_CACHE_LOCK_TABLE=application_cache_locks
 
 Para una conexión específica, define `DB_CACHE_CONNECTION` con un nombre declarado en `config/database.py`. Entradas y locks utilizan esa misma conexión; no existe un campo `lock_connection`.
 
-Desde 1.3.0, [`cache:migrate`](/es/database/commands#cache-migrate) permite preparar ambas tablas SQL antes de usarlas. Lee esta configuración del store de base de datos aunque haya otro store activo, conserva los datos existentes y no admite `--database`.
+[`cache:migrate`](/es/database/commands#cache-migrate) permite preparar ambas tablas SQL antes de usarlas. Lee esta configuración del store de base de datos aunque haya otro store activo, conserva los datos existentes y no admite `--database`.
 
 Las tablas se crean de forma diferida en la primera operación de I/O, con protección para conservar las existentes. La conexión debe poder crear las que falten. El backend no modifica tablas incompatibles ya existentes: reserva nombres exclusivos con la estructura que describe [el driver database](/es/cache/stores-and-drivers#driver-database). Requiere claves únicas efectivas y rechaza conexiones como Amazon Redshift, que no ofrecen esa garantía.
 

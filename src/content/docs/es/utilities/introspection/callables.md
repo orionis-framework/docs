@@ -46,7 +46,7 @@ for invalid in (len, Action, action, 42):
 
 ## Identidad y documentación
 
-Todos estos métodos carecen de argumentos adicionales. El constructor captura el nombre, el módulo y el docstring; esos tres valores son una instantánea de construcción.
+El constructor captura nombre, módulo y docstring del callable. `clearCache()` actualiza los tres desde el destino y limpia la caché de metadatos.
 
 <a id="reflectioncallable-method-getcallable"></a>
 
@@ -174,7 +174,7 @@ El wrapper tiene una caché compartida entre sus cálculos y los valores guardad
 
 <a id="reflectioncallable-method-clearcache"></a>
 
-**`clearCache(self) -> None`** elimina todas las entradas, tanto calculadas como agregadas por la aplicación. Las lecturas diferidas se recalculan después; no modifica el objetivo, no renueva nombre/módulo/docstring capturados ni vacía las cachés LRU internas de `ReflectDependencies`.
+**`clearCache(self) -> None`** limpia entradas locales calculadas/personalizadas e invalida firmas de dependencias y planes de invocación compartidos. Las lecturas diferidas vuelven a calcularse sin modificar el destino. Actualiza el nombre, módulo y docstring desde el destino.
 
 ```python
 from orionis.introspection import ReflectionCallable
@@ -199,8 +199,8 @@ reflected["app.note"] = "reviewed"
 reflected.clearCache()
 assert "app.note" not in reflected
 assert reflected.getSignature() is not before
-assert reflected.getName() == "run"
-assert reflected.getDocstring() == "Original documentation."
+assert reflected.getName() == "renamed"
+assert reflected.getDocstring() == "Changed documentation."
 fresh = ReflectionCallable(run)
 assert fresh.getName() == "renamed"
 assert fresh.getDocstring() == "Changed documentation."

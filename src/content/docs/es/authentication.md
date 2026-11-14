@@ -29,7 +29,7 @@ La fachada `Auth` y los contratos del contenedor permiten acceder a ambos mecani
 
 El modelo habitual es `app.models.user.User`, con los concerns `Authenticatable` y `Authorizable`. La guía de sesiones muestra su definición completa, cómo crear una cuenta y cómo guardar su contraseña mediante la fachada `Hash`.
 
-Desde **1.5.0**, el core proporciona las tablas de roles, permisos, sus tres relaciones, tokens personales y recuperación de contraseñas. En una base nueva, ejecuta desde la raíz de la aplicación:
+El core proporciona las tablas de roles, permisos, sus tres relaciones, tokens personales y recuperación de contraseñas. En una base nueva, ejecuta desde la raíz de la aplicación:
 
 ```bash
 python -B reactor migrate
@@ -37,7 +37,7 @@ python -B reactor auth:migrate
 python -B reactor seed
 ```
 
-`auth:migrate` usa la conexión SQL predeterminada y su prefijo, respeta `AUTH_TOKEN_TABLE` y `AUTH_PASSWORD_RESET_TABLE` y conserva los registros existentes. El modelo de identidad, su migración y las reglas y seeders de negocio siguen en la aplicación. Preparar las tablas no crea usuarios ni concede privilegios. Para proyectos existentes, consulta la [actualización sin reescribir el historial](/es/database/migrations#auth-storage-1-5-0).
+`auth:migrate` usa la conexión SQL predeterminada y su prefijo, respeta `AUTH_TOKEN_TABLE` y `AUTH_PASSWORD_RESET_TABLE` y conserva los registros existentes. El modelo de identidad, su migración y las reglas y seeders de negocio siguen en la aplicación. Preparar las tablas no crea usuarios ni concede privilegios. Para proyectos existentes, consulta la [preparación del almacenamiento de autenticación](/es/database/migrations#authentication-storage).
 
 ## Consultar la identidad actual
 

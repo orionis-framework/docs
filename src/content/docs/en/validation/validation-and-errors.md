@@ -13,7 +13,7 @@ You do not need to catch the exception inside the action or call the validator m
 
 ## Combine coercion and empty-value rules
 
-Since **1.4.0**, [`Coerce()`](/en/validation/declaring-schemas#field-coercion) converts marked values before checking their declared types, constraints, and rules. [`Empty()` and `NoEmpty()`](/en/validation/application-rules#empty-and-no-empty) then inspect the validated value using the same definition of emptiness, with opposite acceptance conditions.
+[`Coerce()`](/en/validation/declaring-schemas#field-coercion) converts marked values before checking their declared types, constraints, and rules. [`Empty()` and `NoEmpty()`](/en/validation/application-rules#empty-and-no-empty) then inspect the validated value using the same definition of emptiness, with opposite acceptance conditions.
 
 This example accepts a textual quantity, requires a non-empty item name and collection, and reserves an optional field for empty values:
 
@@ -392,4 +392,4 @@ When logging or returning errors, use the fields and messages the client needs; 
 
 ## Bounded validation plans
 
-Since **1.1.0**, custom-rule plans use a process-local LRU with capacity for **1,024 schema types**. Eviction releases the cached plan and allows dynamically created types to be collected when no other references remain. Reusing an evicted type rebuilds its plan; validation is never skipped because the cache is full. Recursive child-plan preparation and concurrent compilation are guarded. Validation rules, structured errors and serialization behavior are unchanged.
+Custom-rule plans use a process-local LRU with capacity for **1,024 schema types**. Eviction releases the cached plan and allows dynamically created types to be collected when no other references remain. Reusing an evicted type rebuilds its plan; validation is never skipped because the cache is full. Recursive child-plan preparation and concurrent compilation are guarded.

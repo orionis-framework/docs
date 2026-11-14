@@ -449,9 +449,30 @@ Las búsquedas de cabeceras no distinguen mayúsculas. Utiliza nombres y valores
 
 Las clases especializadas conservan el Content-Type suministrado. `RedirectResponse` establece su propio Location. Los adaptadores también establecen `Server: Orionis ASGI` o `Orionis RSGI` durante la entrega.
 
-Desde 1.0.11, las clases incorporadas inicializan las cabeceras estándar con menos llamadas redundantes y mantienen cabeceras mutables independientes por respuesta. Se conserva la precedencia descrita para cada clase: por ejemplo, redirecciones y archivos establecen sus propios metadatos. Las subclases siguen ejecutando sus hooks de cabeceras durante la construcción; la serialización JSON y el consumo de streams conservan su comportamiento.
+Cada respuesta mantiene sus propias cabeceras mutables. Las redirecciones y los archivos establecen sus metadatos durante la construcción. JSON se serializa durante la construcción; los streams se consumen durante la entrega.
 
-Las [notas de rendimiento de 1.0.11](/es/getting-started/release-notes#v1-0-11) distinguen construcción de respuestas, recorrido Python por petición y transferencia. Las reducciones locales medidas no equivalen al mismo incremento en RPS.
+
+### Configuración fluida de respuestas
+
+Usa `withStatusCode()`, `withHeaders()` y `withBackground()` para ajustar una respuesta existente. Cada método devuelve esa misma respuesta, sin copiarla. Por ejemplo, registra este manejador en tu archivo de rutas API:
+
+```python
+from orionis.http import JSONResponse, response
+from orionis.support.facades import Route
+
+
+async def accepted_preview() -> JSONResponse:
+    return (
+        response.json({"accepted": True})
+        .withStatusCode(202)
+        .withHeaders({"X-Preview": "true"})
+    )
+
+
+Route.post("/responses/accepted", accepted_preview)
+```
+
+El resultado es JSON con estado `202` y `X-Preview: true`. `withStatusCode(status_code)` valida el rango 100–599; `RedirectResponse` lo restringe a 300–399. `withHeaders(mapping)` reemplaza los nombres enviados sin distinguir mayúsculas y conserva las otras cabeceras. `withBackground(task)` acepta `BackgroundTask` o `BackgroundTasks`; `None` retira la tarea. Consulta [tareas de respuesta](/es/queues/background-tasks/response-tasks) para la ejecución y los errores. Configura estos valores antes de devolver la respuesta.
 
 ## Cookies
 

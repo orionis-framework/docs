@@ -449,9 +449,30 @@ Header lookups are case-insensitive. Use text names and values compatible with t
 
 Specialized classes preserve the supplied Content-Type. `RedirectResponse` sets its own Location. Adapters also set `Server: Orionis ASGI` or `Orionis RSGI` during delivery.
 
-Since 1.0.11, built-in classes initialize standard headers with fewer redundant calls and keep mutable headers independent for each response. Each class retains its documented precedence: for example, redirects and files set their own metadata. Subclasses still execute their header hooks during construction; JSON serialization and stream consumption retain their behavior.
+Each response owns its mutable headers. Redirects and files set their metadata during construction. JSON is serialized during construction; streams are consumed during delivery.
 
-The [1.0.11 performance notes](/en/getting-started/release-notes#v1-0-11) distinguish response construction, the Python path per request, and transfer. Locally measured time reductions do not imply the same increase in RPS.
+
+### Fluent response configuration
+
+Use `withStatusCode()`, `withHeaders()`, and `withBackground()` to adjust an existing response. Each returns that same response; these operations do not copy it. For example, register this handler in your API routes file:
+
+```python
+from orionis.http import JSONResponse, response
+from orionis.support.facades import Route
+
+
+async def accepted_preview() -> JSONResponse:
+    return (
+        response.json({"accepted": True})
+        .withStatusCode(202)
+        .withHeaders({"X-Preview": "true"})
+    )
+
+
+Route.post("/responses/accepted", accepted_preview)
+```
+
+The result is JSON with status `202` and `X-Preview: true`. `withStatusCode(status_code)` validates the range 100–599; `RedirectResponse` restricts it to 300–399. `withHeaders(mapping)` replaces supplied header names case-insensitively and preserves unrelated headers. `withBackground(task)` accepts a `BackgroundTask` or `BackgroundTasks`; `None` clears it. See [response tasks](/en/queues/background-tasks/response-tasks) for execution and error handling. Set these values before returning the response.
 
 ## Cookies
 

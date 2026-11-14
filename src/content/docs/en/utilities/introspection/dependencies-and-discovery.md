@@ -166,7 +166,7 @@ methodSignature(self, method_name: str) -> Signature
 
 Retrieves the attribute with `getattr(target, method_name)` and inspects its signature. A missing name raises **`AttributeError`**, rather than a custom reflection exception. An uninspectable attribute raises `ValueError`; a non-string name may raise `TypeError` in `getattr`.
 
-Bound methods omit their first parameter according to Python binding, even if the receiver is not named `self`. Class methods and static methods preserve their explicit parameters. For an ordinary method accessed on the class, a receiver named something other than `self` or `cls` stays in the signature.
+Descriptor binding removes instance/class receivers regardless of their name, including an ordinary method inspected through its class. Static methods and ordinary functions retain explicit parameters named `self` or `cls`. Variadic `*args` and `**kwargs` are excluded from dependency maps.
 
 ```python
 from orionis.introspection import ReflectDependencies
@@ -188,7 +188,7 @@ class Actions:
 bound = ReflectDependencies(Actions()).methodSignature("handle")
 unbound = ReflectDependencies(Actions).methodSignature("handle")
 assert list(bound.ordered) == ["item", "limit"]
-assert list(unbound.ordered) == ["receiver", "item", "limit"]
+assert list(unbound.ordered) == ["item", "limit"]
 for target in (Actions, Actions()):
     reflection = ReflectDependencies(target)
     assert list(reflection.methodSignature("byClass").ordered) == ["page"]
@@ -202,7 +202,7 @@ for target in (Actions, Actions()):
 callableSignature(self) -> Signature
 ```
 
-Checks `callable(target)` and analyzes the call signature exposed by Python. Accepts functions, bound methods, classes and callable instances when their signatures can be inspected and the target can be used as a cache key. For a class, it inspects its call; this is not equivalent to explicitly reading `__init__` for every metaclass.
+Checks `callable(target)` and analyzes the Python call signature. Accepts functions, bound methods, classes and callable objects, including unhashable instances. For a class, the call signature need not be identical to inspecting its `__init__` under every metaclass.
 
 ```python
 from orionis.introspection import ReflectDependencies
@@ -217,7 +217,7 @@ assert signature.ordered["item_id"].type is int
 assert signature.ordered["timeout"].default == 5
 ```
 
-Raises `TypeError` for non-callable targets and for unhashable targets when accessing the cache. If `inspect.signature` cannot describe the signature, raises `ValueError` with the original cause. Inspecting `min`, for example, fails because it exposes no inspectable signature in this runtime. Decorators exposing `__wrapped__` and custom `__signature__` values follow `inspect.signature` behavior.
+Non-callable targets raise `TypeError`. Unhashable callable objects are inspected without the shared LRU cache. Uninspectable signatures raise `ValueError` with the original cause; `min` is one such builtin. `__wrapped__` and custom `__signature__` follow Python inspection behavior.
 
 ### Contract and caching
 
@@ -225,7 +225,7 @@ Raises `TypeError` for non-callable targets and for unhashable targets when acce
 
 Python signatures and dependency metadata use two **1,024-entry** LRU caches local to the process. Inspecting the same target returns the **same `Signature` object**, even across different wrapper instances. Bound methods use the underlying function and binding mode as the key; those cached methods do not retain their receivers.
 
-`ReflectDependencies` has no public `clearCache()`. Changing `__annotations__`, defaults or `__signature__` on the same function after inspection can leave stale metadata. For a different definition, use a new function object or restart the process. Inspection failures are not stored as successful results.
+`ReflectDependencies` has no public `clearCache()`. Calling `clearCache()` on a callable, class or instance reflection wrapper invalidates shared dependency signatures and invocation plans as well as that wrapper's local metadata. Other wrappers retain their local results until cleared. Clear after deliberate changes to annotations, defaults or signatures; inspection failures are not cached as successes.
 
 ```python
 from orionis.introspection import ReflectDependencies

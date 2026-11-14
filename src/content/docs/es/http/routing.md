@@ -199,7 +199,7 @@ El kernel atiende OPTIONS antes de construir el `Request` de una ruta y de ejecu
 
 Para un path registrado con GET y POST, `Allow` es `GET, HEAD, OPTIONS, POST`. En un path desconocido, OPTIONS devuelve `200` con `Allow` vacío; si hay fallback, anuncia `GET, HEAD, OPTIONS`. Las políticas previas del kernel todavía pueden responder antes.
 
-El **preflight CORS** es otro caso: un OPTIONS con `Origin` y `Access-Control-Request-Method` puede resolverse antes con `204` si el origen está permitido. Sus encabezados `Access-Control-Allow-*` proceden de la configuración CORS, no de la enumeración del router. Si tu cliente usa QUERY entre orígenes, inclúyelo expresamente en los métodos CORS permitidos; la expansión actual de `*` no lo incluye. Consulta [Middlewares y políticas HTTP](/es/http/middleware).
+El **preflight CORS** es otro caso: un OPTIONS con `Origin` y `Access-Control-Request-Method` puede resolverse antes con `204` si el origen está permitido. Sus encabezados `Access-Control-Allow-*` proceden de la configuración CORS, no de la enumeración del router. La expansión de métodos `*` incluye `QUERY`. Si utilizas una lista explícita, incluye `QUERY` cuando tu cliente lo envíe entre orígenes. Consulta [Middlewares y políticas HTTP](/es/http/middleware).
 
 ## Parámetros de ruta
 

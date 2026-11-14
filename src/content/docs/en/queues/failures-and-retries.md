@@ -264,7 +264,7 @@ class ValidateReportIdJob(BaseJob):
 
 There is no `failed()` job hook in `IJob`, `BaseJob`, or the worker pipeline. Implement an explicit decision in `handle` with `context.fail` or inspect the failed-job repository; do not rely on a callback from another framework.
 
-After a successful `release`, `delete`, or `fail`, stop executing that handler branch. The framework does not interrupt Python control flow for you. A later exception is logged, but a finished context keeps its completed transition; it does not get an additional automatic retry.
+After a successful `release`, `delete`, or `fail`, stop executing that handler branch. The framework does not interrupt Python control flow for you. A later exception is observed, but a finished context keeps its completed transition; it does not get an additional automatic retry.
 
 <a id="job-handle-exceptions"></a>
 
@@ -321,9 +321,15 @@ flowchart TD
 
 The worker checks reservation expiry before terminal recording; native deletion then checks ownership/fencing. Recording and queue deletion are separate operations, possibly in different stores. A competing reclaim or backend failure between them can leave the durable failure record and a queue job at the same time.
 
-Failures to release, resolve failure storage, record, or delete are logged by the normal worker. When it cannot finish safely, it retains an unacknowledged claim where possible for lease recovery. That recovery can repeat a job whose business effect already happened. Use business idempotency or reconciliation; queue acknowledgement is not an exactly-once transaction with an external system.
+The normal worker offers failures to release, resolve failure storage, record, or delete to the exception runtime. If no capture receipt is returned, it attempts fallback logging. When it cannot finish safely, it retains an unacknowledged claim where possible for lease recovery. That recovery can repeat a job whose business effect already happened. Use business idempotency or reconciliation; queue acknowledgement is not an exactly-once transaction with an external system.
 
 The `sync` driver calls `execute(..., raise_errors=True)`: it attempts one immediate execution, bypasses automatic retries, and propagates its original error. It may still need SQL failure storage for terminal recording. See [execution modes](/en/queues/execution-modes).
+
+### Central failure observation
+
+Each job attempt runs in an isolated `queue` operation with its job ID as correlation ID. Execution, reservation, retry recovery, terminal recording, and cancellation-release failures are offered to the [exception handler](/en/exceptions); recovered failures retain their original exception. A completed terminal recording also emits a result event with outcome `failed` and acknowledgement metadata. Reporting is distinct from the failed-job SQL repository and does not replace retry, fencing, or idempotency rules.
+
+If failure storage or release itself fails, that recovery error is observed separately while `raise_errors=True` preserves the original job error. Cancellation is still propagated after the worker attempts to release an unfinished reservation, including under repeated cancellation.
 
 <a id="command-failed"></a>
 
@@ -592,4 +598,4 @@ FailedJob(
 
 Payloads, messages, and tracebacks can contain business data or secrets. The repository does not sanitize them automatically or provide a failure notification hook. Limit access to inspection endpoints and apply your application's retention policy; forgetting an event removes its recovery evidence.
 
-There is no automatic pruning command in this API. Worker's ordinary exceptions are logged through the `orionis.queues.worker` logger; inspect those logs as well as durable records when failure storage itself is unavailable.
+There is no automatic pruning command in this API. The worker offers ordinary exceptions to the exception runtime; `orionis.queues.worker` provides fallback logging when capture returns no receipt. Inspect the configured exception handler and available logs as well as durable records when failure storage itself is unavailable.

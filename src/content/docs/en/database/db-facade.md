@@ -55,7 +55,7 @@ async def recent_notes():
     )
 ```
 
-To inspect SQL since **1.2.0**, call `toSql()` on the returned builder, synchronously and without executing it:
+To inspect SQL, call `toSql()` on the returned builder, synchronously and without executing it:
 
 ```python
 query = DB.table("products").where("active", True).limit(10)

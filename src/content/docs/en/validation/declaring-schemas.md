@@ -527,7 +527,7 @@ The first five do not check or transform values. `Message` customizes errors rat
 
 ## Convert marked fields with `Coerce()`
 
-Since **1.4.0**, import `Coerce` from `orionis.schemas.metadata` to convert a field to its declared type **before validating types, constraints, and rules**. The marker takes no arguments and works with `Field` or `Annotated`. Fields outside its scope remain strict; the validator still has no global `strict=False` option.
+Import `Coerce` from `orionis.schemas.metadata` to convert a field to its declared type **before validating types, constraints, and rules**. The marker takes no arguments and works with `Field` or `Annotated`. Fields outside its scope remain strict; the validator still has no global `strict=False` option.
 
 ```python
 from orionis.schemas import Schema
@@ -618,7 +618,7 @@ Coercion runs through validation, including schema injection, not through direct
 
 The `payload: UserSchema` parameter activates the HTTP flow: the container obtains `await request.data()`, awaits `Validator.validate(data, UserSchema)` and invokes the method only if validation succeeds. It does not automatically merge the body with the query string or route parameters.
 
-Conversion remains strict for the unmarked `age` field above: sending `"36"` produces a type error. Since 1.4.0, opt in to conversion with [`Coerce()`](#field-coercion) on the fields that need it; the validator method has no global `strict=False` option. Unknown fields are ignored by default; reject them by declaring the class as `class UserSchema(Schema, forbid_unknown_fields=True):`.
+Conversion remains strict for the unmarked `age` field above: sending `"36"` produces a type error. Opt in to conversion with [`Coerce()`](#field-coercion) on the fields that need it; the validator method has no global `strict=False` option. Unknown fields are ignored by default; reject them by declaring the class as `class UserSchema(Schema, forbid_unknown_fields=True):`.
 
 Constructing `UserSchema(name=..., email=..., age=...)` directly uses the `msgspec.Struct` constructor, which does not run coercion or these type, constraint and rule checks. Reserve direct construction for trusted data; use the injected parameter in an action to receive external input.
 

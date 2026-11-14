@@ -348,7 +348,7 @@ if schedule.isPaused():
 
 ### `isStopped() -> bool`
 
-Tests whether that state is `STOPPED`. Useful for inspecting an initial instance, but shutdown currently does not update the state; do not use it to wait for shutdown.
+Tests whether the state is `STOPPED`, including after the scheduler emits its shutdown event. Use `await wait()` to await completion and propagate shutdown errors.
 
 ```python
 if schedule.isStopped():
@@ -432,13 +432,13 @@ schedule.shutdown(wait=0)
 await schedule.wait()
 ```
 
-Call after successful startup, once per lifecycle. After the delay, already-pending listeners are awaited and scheduler closure is requested. Its asyncio executor can cancel active commands: internal `wait=True` does not guarantee completed effects or successful command results. The wrapper does not change state to `STOPPED` or reset its shutdown event for another lifecycle.
+Call after successful startup, once per lifecycle. After the delay, already-pending listeners are awaited and scheduler closure is requested. Its asyncio executor can cancel active commands: internal `wait=True` does not guarantee completed effects or successful command results. Shutdown drains backend work and pending listeners, then sets the state to `STOPPED` and clears running/paused task sets. A later `boot()` rebuilds the backend and clears shutdown state. Calling `boot()` while shutdown is still running raises `RuntimeError`. Repeated `shutdown()` calls share the existing shutdown task.
 
 <a id="schedule-wait"></a>
 
 ### `async wait() -> None`
 
-Waits for the internal event set after requesting scheduler closure. Without a `shutdown()` request it can wait indefinitely. It returns neither command results nor an error report.
+Waits for shutdown completion, including managed backend work and listeners. Without a shutdown request it can wait indefinitely. It returns `None` on success and re-raises a recorded shutdown failure, including cancellation. It does not return individual command results.
 
 ```python
 await schedule.wait()

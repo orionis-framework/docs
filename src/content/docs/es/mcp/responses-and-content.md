@@ -231,6 +231,8 @@ class FindOrderTool(Tool[OrderLookupInput]):
 
 La llamada sigue siendo un resultado JSON-RPC, con `result.isError=true` y el mensaje en `content`. El cliente debe comprobar ese campo además de la presencia de `error` en el sobre.
 
+Un resultado normalizado con `isError=True` también se observa mediante `handleResult("tool_error", context)`, con `context.expected=True`, `flow="mcp"` y `phase="result"`. No crea una excepción ni activa el registro de error predeterminado. Utiliza el [hook de resultados de aplicación](/es/exceptions/handling-exceptions) si necesitas métricas u otro efecto explícito para estos resultados de negocio.
+
 La validación fallida de argumentos de una herramienta produce `isError=true` con `Invalid tool arguments`. Una excepción inesperada durante su ejecución se reporta al manejador de excepciones de la aplicación y se presenta como `Tool execution failed`. En recursos y prompts, una excepción inesperada produce el error JSON-RPC `-32603`. Los parámetros de protocolo inválidos, los métodos desconocidos y el acceso denegado siguen sus propias rutas de error.
 
 ## Metadata y anotaciones de contenido

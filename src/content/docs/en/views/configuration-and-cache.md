@@ -141,7 +141,7 @@ Keep `autoescape=True` for HTML pages. It escapes inserted content while allowin
 
 The environment uses `jinja2.Undefined`: a missing variable may print as empty text, while other operations on it can fail. Pass explicit context and check pages with populated and empty data. Templates are trusted application code; this environment does not use the Jinja sandbox.
 
-A missing template raises `ViewTemplateNotFoundException`. Pending-render failures appear as `ViewRenderException`, preserving their cause. Check the requested name, search directories, and original exception before clearing caches. See [HTTP exceptions](/en/http/exceptions) for their presentation during a request.
+A missing template raises `ViewTemplateNotFoundException`; syntax or rendering failures become `ViewRenderException` with their original cause. A native `ViewRenderException` is not wrapped a second time. Template worker saturation retains `WorkQueueFullError`, rather than being converted to a template error. Check the template name, search paths, and cause before clearing caches. See [HTTP exceptions](/en/http/exceptions).
 
 To add filters, globals, tests, or tags, use a [view provider](/en/views/providers-and-extensions). The configuration above controls loading and caching; the provider extends the shared environment before requests are served.
 
@@ -149,7 +149,7 @@ To add filters, globals, tests, or tags, use a [view provider](/en/views/provide
 
 ## Prepare templates before serving requests
 
-In **1.1.0**, top-level template loading, compilation and auto-reload checks run in a dedicated pool with **2 workers and 64 pending calls per process**. With auto-reload disabled, an already cached template can be read directly. Rendering and asynchronous template globals stay on the calling event loop. Pool saturation raises `WorkQueueFullError`.
+Top-level template loading, compilation and auto-reload checks run in a dedicated pool with **2 workers and 64 pending calls per process**. With auto-reload disabled, an already cached template can be read directly. Rendering and asynchronous template globals stay on the calling event loop. Pool saturation raises `WorkQueueFullError`.
 
 `IViewEngine` exposes `async warmup(*templates: str) -> None`; `Jinja2Engine` implements it by loading known templates without rendering them or evaluating globals:
 

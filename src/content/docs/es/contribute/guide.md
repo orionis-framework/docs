@@ -119,7 +119,7 @@ Orionis sigue convenciones propias de estilo, alineadas con frameworks web moder
 
 ### Convención de nomenclatura
 
-La versión 1.3.0 aplica la siguiente convención en los directorios `orionis/` y `tests/` del framework, incluidos métodos asíncronos, estáticos, de clase y de pruebas:
+Aplica la siguiente convención en los directorios `orionis/` y `tests/` del framework, incluidos métodos asíncronos, estáticos, de clase y de pruebas:
 
 | Elemento | Convención | Ejemplo |
 |---|---|---|
@@ -134,7 +134,7 @@ Las funciones definidas dentro de otra función o método también usan `snake_c
 
 Conserva los nombres de los protocolos de Python, como `__init__`, `__call__` y `__aenter__`. Cuando una integración exige un nombre específico para un callback, implementa el método en camelCase y expón el nombre requerido mediante un alias. No renombres métodos de bibliotecas externas.
 
-Al adaptar una extensión a 1.3.0, consulta la [referencia de API](https://api.orionis-framework.com/) actual y actualiza conjuntamente definiciones, llamadas, búsquedas por nombre y dobles de prueba. Ejecuta la comprobación de nombres desde la raíz del repositorio del framework:
+Al desarrollar una extensión, consulta la [referencia de API](https://api.orionis-framework.com/) actual y actualiza conjuntamente definiciones, llamadas, búsquedas por nombre y dobles de prueba. Ejecuta la comprobación de nombres desde la raíz del repositorio del framework:
 
 ```bash
 uv run --group dev python -m unittest tests.test_naming_conventions

@@ -73,7 +73,7 @@ Ejecuta las comprobaciones con la identidad y el directorio del servicio. `serve
 python -B reactor serve --interface asgi --port 8000 --log
 ```
 
-También puedes usar `orionis serve --interface asgi --port 8000 --log`. Reactor admite `--interface` (`rsgi` por defecto o `asgi`), `--host` (desde 1.0.13), `--port` (8000), `--log` y `--export`. Para fijar la escucha al proxy local, añade `--host 127.0.0.1`. Las opciones `--workers` y `--reload` se configuran al invocar Granian directamente.
+También puedes usar `orionis serve --interface asgi --port 8000 --log`. Reactor admite `--interface` (`rsgi` por defecto o `asgi`), `--host`, `--port` (8000), `--log` y `--export`. Para fijar la escucha al proxy local, añade `--host 127.0.0.1`. Las opciones `--workers` y `--reload` se configuran al invocar Granian directamente.
 
 | Decisión | `serve` | Servicios de estas guías |
 | --- | --- | --- |
@@ -105,7 +105,7 @@ python -B reactor migrate:status
 python -B reactor migrate
 ```
 
-Si la aplicación utiliza auth, ejecuta también `python -B reactor auth:migrate` antes de iniciar tráfico o seeders que dependan de sus tablas. Desde **1.5.0**, prepara roles, permisos, sus relaciones, tokens personales y recuperación de contraseñas en la conexión predeterminada. Conserva datos e historial existentes; revisa la [actualización del almacenamiento de auth](/es/database/migrations#auth-storage-1-5-0) y mantén las migraciones de aplicación ya ejecutadas.
+Si la aplicación utiliza auth, ejecuta también `python -B reactor auth:migrate` antes de iniciar tráfico o seeders que dependan de sus tablas. Prepara roles, permisos, sus relaciones, tokens personales y recuperación de contraseñas en la conexión predeterminada. Conserva datos e historial existentes; revisa la [actualización del almacenamiento de auth](/es/database/migrations#authentication-storage) y mantén las migraciones de aplicación ya ejecutadas.
 
 `migrate` admite `--database` para otra conexión; no tiene un flag `--force`. No ejecutes `migrate:fresh`, `db:wipe` ni seeders de demostración como paso habitual de publicación. Consulta [comandos de base de datos](/es/database/commands).
 

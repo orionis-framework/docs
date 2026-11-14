@@ -16,7 +16,7 @@ There is no public `Storage.temporaryFile()`, `tempfile()`, or temporary context
 | Local `write()`/`writeStream()` | Sibling file named `<destination>.<16 hex>.tmp`. | Replaces the destination on completion; staging ceases to exist after replacement. |
 | Local `open()` | The destination file itself. | Its handle closes; the file and its changes remain. |
 | S3, Azure, or GCS `writeStream()` | `SpooledTemporaryFile`: memory first, then a system temporary file above 8 MiB. | The SDK receives the complete buffer, then `finally` attempts closure, including after upload failure. |
-| S3, Azure, or GCS `open()` | `SpooledTemporaryFile` with an 8 MiB threshold. | Writable modes upload all content on close; the buffer then closes if uploading succeeds. |
+| S3, Azure, or GCS `open()` | `SpooledTemporaryFile` with an 8 MiB threshold. | Writable modes upload all content on close; the buffer closes in `finally`, including after upload failure. |
 | Memory | Driver-held `bytes`; `bytearray` during `writeStream()` and `BytesIO` during `open()`. | Stream closure persists the buffer in the driver; the file remains until `delete()` or that instance/process is lost. |
 | HTTP multipart upload | `SpooledTemporaryFile` with a request-configured threshold. | Closes when the request finishes or earlier through `move()`; closing removes its physical temporary file if it spilled to disk. |
 
@@ -26,9 +26,9 @@ Python/operating-system configuration determines where `tempfile` temporaries li
 
 Local uses unique names so concurrent writers do not share staging. `write()` creates the temporary file, writes content, and replaces the destination; it removes staging if that sequence raises `OSError`. `writeStream()` writes each chunk into its temporary file and replaces the destination only after the producer finishes normally.
 
-If a `writeStream()` producer fails or is cancelled before completion, `finally` attempts to close and remove staging. Final replacement occurs after that block: a replacement failure does not have the same automatic cleanup and can leave a `.tmp`. Applying visibility can fail after publication. An exception alone therefore does not prove the destination remained unchanged.
+`writeStream()` attempts to remove its staging file in `finally`, including when the producer, publication, or visibility operation fails. Native operations finish before cancellation propagates and cleanup runs. A failure after publication does not roll back the destination, and an operating-system cleanup failure can still prevent removal.
 
-Local file listings omit names ending in `.tmp`, including staging left after an error. The API does not publish an operation to inspect or automatically purge those internal temporary files. Avoid this suffix for working files you need to discover with `files()`.
+Local file listings omit only internal names ending in `.<16 lowercase hexadecimal characters>.tmp`. Application files such as `report.tmp` are listed. There is no public staging inspection or automatic garbage collector after process termination.
 
 Replacement avoids publishing incomplete chunks when a write fails before commit; it is not a transaction with other operations or a durability guarantee against machine interruption. `open("wb")` does not use staging: it opens and truncates the destination directly on entry or first operation.
 
@@ -55,8 +55,8 @@ flowchart TD
     G -->|No| H["Close the handle"]
     G -->|Yes| I["Persist buffer on a worker"]
     I -->|Success| H
-    I -->|Failure| J["Propagate error; handle.close() is not reached"]
-    H --> K["Return control; block exception continues"]
+    I -->|Failure| H
+    H --> K["Preserve block error or propagate cleanup error"]
 ```
 
 `async with` calls `close()` when leaving the block, both successfully and after an exception. With memory/cloud, that exit can **publish previously written bytes even when application logic failed**. Local already modified the actual file. The context does not interpret the exception as a rollback request.
@@ -91,7 +91,7 @@ async def read_report_signature() -> bytes:
         await stream.close()
 ```
 
-The stream contains no locks: do not share one handle across concurrent reads, writes, or closure. Open a separate context for each independent consumer.
+`AsyncStream` serializes native reads, writes, seeks, opening, and closure with an asynchronous lock. A sequence of operations is not atomic, and chunk iteration releases that lock between reads. Use separate contexts for independent consumers rather than sharing a mutable file position.
 
 ## Create and remove a working file
 
@@ -134,7 +134,7 @@ async def inspect_temporary_export() -> dict[str, int | str]:
         return {"header": header.decode("utf-8"), "bytes": await file.size()}
 ```
 
-Returning the result first closes the handle, then removes the file. Do not return this `IFile` for later use: its context will already have ended. This pattern deletes the logical path chosen by your application; it does not know or purge internal `.tmp` names left by a driver commit failure.
+Returning the result first closes the handle, then removes the file. Do not return this `IFile` for later use: its context will already have ended. This pattern deletes the logical path chosen by your application; driver staging cleanup remains the driver's responsibility.
 
 ### Keep a temporary file throughout an HTTP download
 
@@ -174,14 +174,14 @@ For this small report, you could yield rows directly into `StreamingResponse`; a
 
 Distinguish the guarantees of each operation:
 
-- `AsyncStream` closure runs its persistence callback first. A failure propagates before `handle.close()`; a second `close()` does not retry that detached handle. Do not assume a failed remote write immediately closed its buffer.
-- Local, S3, and GCS include `finally` to close chunk readers. Exhausting or explicitly closing the generator allows that cleanup to run; use `aclosing()` when stopping early. Azure delegates to the SDK iterator without adding this explicit closure.
-- Drivers run blocking I/O with `asyncio.to_thread`. Task cancellation does not stop an operation already running on a worker or guarantee cancelling an SDK upload. A write can continue or finish after cancellation arrives.
-- `finally` blocks attempt resource release during cancellation, but Storage does not protect all cleanup from repeated cancellation or uniformly join all workers before releasing resources. The helper above makes no such guarantee either: another cancellation, cleanup failure, or process termination can leave pending work or a working file.
+- `AsyncStream` always attempts handle closure after its persistence callback. During exceptional context exit, secondary cleanup errors are observed and the original block error is preserved. No rollback is implied.
+- Local, S3, and GCS close their native chunk readers in `finally`; Azure closes its SDK iterator when it supplies `close()`. Exhaust or explicitly close the generator, using `aclosing()` for early exit.
+- Storage drains owned native I/O before propagating cancellation and releasing its buffers. Cancellation does not forcibly stop a thread or undo an SDK upload; a write may complete while cancellation is being handled. Configure finite SDK/network timeouts.
+- The application helper above still uses ordinary `finally` for deleting its working file. A cleanup error, repeated cancellation of that application code, or abrupt process termination can leave a working file; design restart recovery when needed.
 
 Keep each operation and its cleanup under the same task's control; await completion before reusing/deleting its files. If a service needs restart recovery, keep a record of its working files and implement a cleanup policy for paths owned by that service. Storage assigns no TTL and provides no automatic collector.
 
-I/O and SDK exceptions propagate. A close/delete error can replace the exception that originally triggered context exit; preserve that context in logs. The helper does not make multiple operations transactional or roll back a file already published at another path.
+I/O and SDK exceptions propagate. Native stream cleanup preserves an existing operation exception and reports secondary failures through the [exception system](/en/exceptions). The example helper's separate `delete()` may still fail and needs its own application policy. Neither stream cleanup nor the helper makes multiple operations transactional.
 
 ## HTTP upload lifetime
 

@@ -17,6 +17,8 @@ Los fragmentos de DDL se comprobaron compilando las definiciones de ejemplo con 
 
 Los fragmentos SQL siguientes proceden de una declaración de prueba independiente: sample, con length=80 para `String`/`Unicode`/VARCHAR/NVARCHAR, 2 para CHAR/NCHAR, 16 para BINARY, 64 para VARBINARY y precision=12/scale=2 en decimales. Las opciones restantes usan defaults, incluido timezone=False. Los ejemplos de uso pueden elegir valores distintos.
 
+`String`, `LargeBinary`, `Numeric` y `StrictDecimal` rechazan booleanos donde requieren longitud, precisión o escala entera. La precisión/escala numérica debe indicarse junta o dejar ambas en `None`.
+
 ## Parámetros compartidos
 
 | Parámetro | Efecto |

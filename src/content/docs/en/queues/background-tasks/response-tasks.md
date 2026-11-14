@@ -189,7 +189,7 @@ async def run_delivery() -> None:
         print(str(error))
 ```
 
-The task logs the failure, then the original `RuntimeError` remains available to the caller. In a collection, subsequent tasks are skipped.
+The task reports the failure through the central exception runtime with flow `background`, then re-raises the original `RuntimeError`. Without an active runtime it attempts `Log.error()` as a fallback; a broken fallback logger cannot replace the task error. In a collection, subsequent tasks are skipped.
 
 ## Configuration
 
@@ -199,13 +199,13 @@ The module consumes no Orionis configuration keys or environment variables. Exec
 
 `orionis.http.responses.Response` accepts a `BackgroundTask` in its `background` argument. ASGI and RSGI response adapters await `runBackground()` after buffered bodies, ordinary streams, files, empty responses, and HEAD framing are delivered. Orionis's registration and password-reset controllers use this mechanism to send mail outside the response's critical path.
 
-The module uses the `Log` facade for success and failure records. It has no service provider or container binding of its own.
+The module creates an isolated `background` operation for each callable and captures task and cleanup errors through the [exception system](/en/exceptions). Success messages use `Log.info()`; failure messages use `Log.error()` only when the central runtime is unavailable. It has no provider or container binding of its own.
 
 ## Errors and edge cases
 
 - Construction does not reject a non-callable; invoking it follows the synchronous path, logs the resulting `TypeError`, and re-raises it.
 - Exceptions are never swallowed. A failing collection item prevents every later item from running.
-- `asyncio.CancelledError` is a `BaseException`, not an `Exception`, so the logging handler does not intercept it.
+- `asyncio.CancelledError` propagates as control flow. For synchronous work, the task waits for the worker to finish before propagating cancellation and releases a returned awaitable that can no longer be consumed.
 - The callable style is classified once at construction. Replacing internals is unsupported.
 - Ordinary response-delivery failures or stream disconnect paths can prevent background work from running. Use `orionis.queues` for durable or retryable work.
 - A synchronous function returning an awaitable is supported: the function runs in the executor and the awaitable then runs on the event loop.
@@ -226,7 +226,7 @@ BackgroundTask(func: Callable, *args: object, **kwargs: object)
 
 The constructor stores the callable and arguments and classifies the callable once. It does not validate callability or execute work. Invoke an instance with `await task()` or `await task.run()`; both return `None`.
 
-On success the task logs an info message containing the callable name. On failure it logs an error and re-raises the original exception. A callable object without `__qualname__` is identified by its class name.
+On success the task logs an info message containing the callable name. A failure of that success log is captured and propagated. Task exceptions are captured and re-raised unchanged, even if fallback logging also fails. A callable object without `__qualname__` is identified by its class name.
 
 ### `BackgroundTasks`
 
@@ -260,3 +260,5 @@ The extension contract requires only `async run() -> None`. HTTP responses curre
 ---
 
 [Index](/en/queues/background-tasks) · [http](/en/http) · [queues](/en/queues) · [logging](/en/logging)
+
+`is_async_callable(func: object) -> bool`, from `orionis.background.task`, detects coroutine functions, partials, and callable objects with async `__call__`; a synchronous function returning an awaitable is classified as synchronous. The executor copies the current context variables into synchronous tasks.

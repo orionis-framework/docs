@@ -114,7 +114,7 @@ assert FreezeThaw.thaw(FreezeThaw.freeze({"pair": (1, 2)})) == {
 
 ## Grafos compartidos y ciclos al congelar
 
-`freeze()` recorre los objetos con una pila y convierte las copias de la caché en orden inverso al descubrimiento. Este orden funciona para árboles de contenedores, pero no representa un orden completo de dependencias para grafos compartidos arbitrarios. Algunas disposiciones compartidas pueden conservar una copia intermedia mutable; un ciclo también puede conservar diccionarios/listas intermedios mutables en lugar de apuntar a la raíz congelada final. No dependas de inmutabilidad recursiva completa ni de la conservación de todas las identidades compartidas para estas entradas. El ejemplo muestra un límite real de la implementación que depende del orden.
+`freeze()` conserva referencias compartidas y ciclos que pasan por diccionarios, incluidos ciclos mixtos de diccionario/lista. Un ciclo formado solo por listas y tuplas lanza `ValueError`: las tuplas inmutables no pueden representarlo. Los objetos `MappingProxyType` existentes permanecen sin cambios, incluidos sus valores mutables. `thaw()` conserva referencias y ciclos al crear contenedores mutables.
 
 ```python
 from orionis.support.structures.freezer import FreezeThaw
@@ -122,15 +122,14 @@ from orionis.support.structures.freezer import FreezeThaw
 shared = [1]
 source = {"outer": {"shared": shared}, "direct": shared}
 frozen = FreezeThaw.freeze(source)
-assert type(frozen["outer"]["shared"]) is list
+assert type(frozen["outer"]["shared"]) is tuple
 assert type(frozen["direct"]) is tuple
-assert frozen["outer"]["shared"] is not frozen["direct"]
+assert frozen["outer"]["shared"] is frozen["direct"]
 
 cycle = {}
 cycle["self"] = cycle
 frozen_cycle = FreezeThaw.freeze(cycle)
-assert type(frozen_cycle["self"]) is dict
-assert frozen_cycle["self"] is not frozen_cycle
+assert frozen_cycle["self"] is frozen_cycle
 ```
 
 <a id="freezethaw-protocol-serialization"></a>

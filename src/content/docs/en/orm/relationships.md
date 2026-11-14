@@ -203,3 +203,5 @@ def tags_by_owner(self):
 These are alternative methods to add to Team, Player and Team respectively. Referenced keys must exist, be loaded and have compatible types. Each relation uses the **related model's** connection; pivot operations use that same connection. Keep participating tables on a coherent connection; this does not implement distributed transactions.
 
 Continue with [queries and writes](/en/orm/relationship-operations) and [eager loading](/en/orm/eager-loading).
+
+If the related model has no explicit connection, relation and pivot queries inherit the parent model's read connection. An explicit related-model connection takes precedence, even when it names the application default. Related records created through `hasOne`/`hasMany` use the relation's selected connection.

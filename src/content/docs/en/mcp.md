@@ -10,7 +10,7 @@ lastUpdated: false
 Declare the classes, assemble them in a `Server`, and register their transports. Orionis handles the protocol; you do not need a JSON-RPC parser, an HTTP controller for each tool, or a STDIO loop.
 
 :::tip[Inspect your server in the browser]
-Open [Orionis MCP Inspector](https://inspector.orionis-framework.com/) to discover tools, resources, and prompts, validate schemas, inspect JSON-RPC requests, and export diagnostic reports. It connects directly to HTTP servers using stateless MCP `2026-07-28`. Since 1.0.16, the editable `config/mcp.py` defaults to allowing `https://inspector.orionis-framework.com` when `CORS_ALLOW_ORIGINS` is unset. Your endpoint must also permit browser requests through HTTP CORS. See [browser testing](/en/mcp/testing#inspect-an-http-server-in-the-browser) to configure both checks, including in existing applications.
+Open [Orionis MCP Inspector](https://inspector.orionis-framework.com/) to discover tools, resources, and prompts, validate schemas, inspect JSON-RPC requests, and export diagnostic reports. It connects directly to HTTP servers using stateless MCP `2026-07-28`. Explicitly allow `https://inspector.orionis-framework.com` in MCP configuration: core `McpConfig` uses an empty origin allowlist by default. Your endpoint must also permit browser requests through HTTP CORS. See [browser testing](/en/mcp/testing#inspect-an-http-server-in-the-browser) to configure both checks, including in existing applications.
 :::
 
 ## Choosing a component
@@ -26,7 +26,7 @@ A tool can modify data if you implement that operation. A resource provides cont
 
 ## Supported protocol revision
 
-Orionis supports **only MCP `2026-07-28`**: it is the value of `MCP_PROTOCOL_VERSION` and the sole entry in `SUPPORTED_VERSIONS` in `orionis/mcp/protocol/constants.py`. It is the [current revision published by MCP](https://modelcontextprotocol.io/docs/2026-07-28/learn/versioning).
+Orionis supports **only MCP `2026-07-28`**: it is the value of `MCP_PROTOCOL_VERSION` and the sole entry in `SUPPORTED_VERSIONS` in `orionis/mcp/protocol/constants.py`. See the [MCP protocol specification](https://modelcontextprotocol.io/docs/2026-07-28/learn/versioning).
 
 Requests are self-contained: they include the revision and client capabilities in `params._meta`. A client can call `server/discover` to learn about the server; there is no preceding `initialize` step or MCP session to retain. Earlier revisions, `initialize`, and `ping` are not implemented as core methods. Clients limited to earlier handshake protocols need support for this protocol before connecting.
 

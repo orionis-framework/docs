@@ -28,7 +28,7 @@ class ArticleListController:
 
 ## Leer resultados de base de datos por lotes
 
-Desde **1.1.0**, los constructores de consultas exponen `chunks(size: int = 1000) -> AsyncIterator[Collection]`. Consúmelo con `async for`; no apliques `await` al iterador. Funciona en consultas de modelos y en `DB.table(...)`:
+Los constructores de consultas exponen `chunks(size: int = 1000) -> AsyncIterator[Collection]`. Consúmelo con `async for`; no apliques `await` al iterador. Funciona en consultas de modelos y en `DB.table(...)`:
 
 ```python
 from orionis.support.facades import DB
@@ -224,7 +224,7 @@ text = page.toJson(indent=2, ensure_ascii=False)
 
 Todos los ejemplos son operaciones en memoria. `Article` y `Team` se definen en las guías de modelos/relaciones. Los callbacks son síncronos: map/filter/each no esperan corutinas.
 
-Operaciones mutadoras como `merge`, `push`, `forget`, `put`, `sort`, `reverse`, `reject`, `transform`, `each` y `random(count>0)` cambian la misma colección; si contiene modelos, estos también siguen siendo las mismas instancias. No guardan cambios SQL automáticamente. Las nuevas colecciones son copias superficiales de sus elementos.
+Mutadores como `merge`, `push`, `forget`, `put`, `sort`, `reverse`, `reject`, `transform`, `each` y `random(count)` cambian la misma colección. Un `random(0)` explícito la vacía. Los modelos conservan su identidad; los cambios de colección no persisten SQL. Las colecciones nuevas comparten elementos.
 
 
 <a id="collection---init--"></a>
@@ -235,7 +235,7 @@ Operaciones mutadoras como `merge`, `push`, `forget`, `put`, `sort`, `reverse`, 
 def __init__(self, items: list[Any] | None=None) -> None
 ```
 
-Construye colección en memoria; `items=None` crea vacía. Con una lista no vacía conserva la referencia: pasa `.copy()` si necesitas aislarla. `ModelCollection` es el mismo tipo, no una subclase con persistencia.
+Construye una colección en memoria; `None` crea una lista vacía. Conserva por referencia las listas o diccionarios recibidos, incluso vacíos; copia los datos para aislarlos. `ModelCollection` es el mismo tipo, no una subclase de persistencia.
 
 ```python
 values = Collection([1, 2, 3])
@@ -402,7 +402,7 @@ assert Collection([1, 2]).count() == 2
 ### `diff`
 
 ```text
-def diff(self, items: list[Any] | Collection) -> Collection
+def diff(self, items: list[Any] | ICollection) -> Collection
 ```
 
 Nueva colección de elementos que no están en lista/colección comparada. Usa igualdad; soporta elementos no hashables mediante comparación secuencial.
@@ -560,7 +560,7 @@ assert Collection([1, 2]).map(lambda n: n * 3).all() == [3, 6]
 def mapInto(self, cls: type, method: str | None=None, **kwargs: object) -> Collection
 ```
 
-Mapea con `cls(item)` o `cls.method(item, **kwargs)`; kwargs solo se pasan cuando hay método. `cls` debe ser tipo (`TypeError`); método ausente o TypeError/AttributeError/ValueError por elemento se convierten en None. No persiste modelos.
+Transforma mediante `cls(item, **kwargs)` o `cls.method(item, **kwargs)`. `cls` debe ser un tipo. Los métodos ausentes o errores por elemento `TypeError`, `AttributeError` o `ValueError` producen `None`. No persiste modelos.
 
 ```python
 assert Collection(["1", "bad"]).mapInto(int).all() == [1, None]
@@ -571,10 +571,10 @@ assert Collection(["1", "bad"]).mapInto(int).all() == [1, None]
 ### `merge`
 
 ```text
-def merge(self, items: list[Any] | Collection) -> Collection
+def merge(self, items: list[Any] | ICollection) -> Collection
 ```
 
-Añade lista/Collection al mismo objeto y devuelve self; no hace unión por PK ni deduplica. Tipo no admitido: `TypeError`.
+Agrega una lista o cualquier implementación de `ICollection` al mismo objeto y lo devuelve. No combina por clave primaria ni elimina duplicados. Los tipos no admitidos lanzan `TypeError`.
 
 ```python
 assert Collection([1]).merge([1, 2]).all() == [1, 1, 2]
@@ -631,7 +631,7 @@ assert Collection([2]).prepend(1).all() == [1, 2]
 def pull(self, key: int | str) -> object
 ```
 
-Obtiene y elimina un índice/clave. Aunque primero usa `get`, el borrado posterior de una clave ausente lanza IndexError/KeyError; comprueba existencia antes.
+Devuelve y elimina el valor seleccionado. Los índices o claves ausentes devuelven `None`.
 
 ```python
 values = Collection([1, 2])
@@ -674,7 +674,7 @@ assert Collection([1]).put(0, 2).all() == [2]
 def random(self, count: int | None=None) -> object | Collection | None
 ```
 
-Vacía devuelve None. Sin count o con `0`, devuelve un elemento usando secrets.choice. Count positivo reemplaza la lista por una muestra y retorna self; negativo o mayor que longitud produce ValueError. No lo utilices como fuente de identidades persistidas únicas.
+Las colecciones vacías devuelven `None`. Omitir count o pasar `None` selecciona un elemento sin modificar. Un conteo explícito no negativo sustituye los elementos por una muestra y devuelve la misma colección; `0` la vacía. Conteos negativos o excesivos lanzan `ValueError`.
 
 ```python
 sample = Collection([1, 2, 3]).random(2)
@@ -745,7 +745,7 @@ assert Collection([{"id": 1}]).serialize() == [{"id": 1}]
 def shift(self) -> object
 ```
 
-Extrae índice 0 usando pull. En colección vacía puede lanzar IndexError; comprueba isEmpty primero.
+Elimina y devuelve el índice cero mediante `pull()`. Una colección vacía devuelve `None`.
 
 ```python
 values = Collection([1, 2])
@@ -774,7 +774,7 @@ assert Collection([3, 1, 2]).sort().all() == [1, 2, 3]
 def sum(self, key: str | None=None) -> float
 ```
 
-Suma en memoria, opcionalmente por clave; ante TypeError devuelve 0. Si la extracción de una clave no produce valores usa los elementos completos como fallback, por eso evita claves ausentes.
+Suma en memoria, opcionalmente por clave directa o callback. Un `TypeError` durante la suma devuelve `0`. Omite claves ausentes; una extracción vacía devuelve `0` sin volver a los elementos originales.
 
 ```python
 assert Collection([{"points": 2}, {"points": 4}]).sum("points") == 6
@@ -884,7 +884,7 @@ assert Collection([{"id": 1}, {"id": 2}]).whereNotIn("id", [1]).count() == 1
 ### `zip`
 
 ```text
-def zip(self, items: list[Any] | Collection) -> Collection
+def zip(self, items: list[Any] | ICollection) -> Collection
 ```
 
 Colección nueva de pares hasta la longitud menor. Solo lista/Collection, otro tipo produce TypeError.
@@ -930,4 +930,4 @@ assert rows[0].relationLoaded("players")
 
 Puedes iterar con `for`, usar `len`, comparar colecciones/listas, leer índices negativos y slices (`rows[:10]` crea Collection nueva), asignar con `rows[0] = value` y borrar con `del rows[0]`. Indexación/asignación/borrado propagan errores de la lista/dict subyacente. Las comparaciones de orden usan orden lexicográfico de elementos, no PK ni orden SQL. `hash(rows)` solo funciona cuando todos los elementos son hashables; no uses una colección mutable como clave que después vas a modificar.
 
-`groupBy` y `pluck(value, key)` pueden producir un almacén dict pese a la anotación de constructor/lista; sus iteraciones son claves. Usa `.all()` para ese mapping y no lo trates como una lista de modelos ni como el resultado de `serialize()` de un queryset.
+`groupBy` y `pluck` indexado crean colecciones respaldadas por diccionario, incluido `{}` para resultados vacíos indexados. Iterar entrega claves. Lee el mapa mediante `all()` en vez de tratarlo como lista de modelos.

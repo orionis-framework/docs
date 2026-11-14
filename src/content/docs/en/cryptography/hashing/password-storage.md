@@ -329,7 +329,7 @@ See [authentication](/en/authentication) for identity management and [encryption
 
 ## Bound concurrent password work
 
-From **1.1.0**, Argon2 and bcrypt share **2 active and 14 pending calls per process**. Cryptographic costs are unchanged. Exhausting that budget raises `WorkQueueFullError`; define an admission or retry response appropriate for authentication instead of lowering the hashing cost. Running native work retains its slot until it finishes, even when its caller is cancelled.
+Argon2 and bcrypt share **2 active and 14 pending calls per process**. Exhausting that budget raises `WorkQueueFullError`; define an admission or retry response appropriate for authentication instead of lowering the hashing cost. Running native work retains its slot until it finishes, even when its caller is cancelled.
 
 Both constructors accept the keyword-only `executor: BoundedExecutor | None = None`. To use a different host budget, share one executor between drivers:
 

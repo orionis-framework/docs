@@ -39,7 +39,7 @@ from orionis.support.facades import Route
 Route.auth()
 ```
 
-Declare it once in web routes. Supply `login_controller`, `register_controller` or `forgot_password_controller` to replace individual controllers. Preserve methods expected by [the actual registration](https://github.com/orionis-framework/framework/blob/470229f78a5db61263ce887bcdd16bc98f9141db/orionis/http/routes/auth.py). Default registration/profile controllers depend on `app.models.user.User`, application views, hashing and mail; they are not a generic flow for every identity model. Check those contracts before enabling them. Read [account recovery](/en/authentication/account-recovery).
+Declare it once in web routes. Supply `login_controller`, `register_controller` or `forgot_password_controller` to replace individual controllers. Preserve methods expected by [the actual registration](https://github.com/orionis-framework/framework/blob/1e905f4f103d47c61789d877eba472a5bd97681b/orionis/http/routes/auth.py). Default registration/profile controllers depend on `app.models.user.User`, application views, hashing and mail; they are not a generic flow for every identity model. Check those contracts before enabling them. Read [account recovery](/en/authentication/account-recovery).
 
 ## Caches and file changes
 

@@ -89,7 +89,7 @@ El store utiliza esta estructura:
 
 La tabla se comprueba y se crea, si falta, en la primera operación del store. La conexión debe estar disponible y disponer de los permisos necesarios para esa creación cuando corresponda. Una tabla existente debe respetar la estructura esperada; el store no transforma un esquema incompatible.
 
-Desde 1.3.0, prepara la tabla SQL antes de recibir peticiones mediante [`session:migrate`](/es/database/commands#session-migrate):
+Prepara la tabla SQL antes de recibir peticiones mediante [`session:migrate`](/es/database/commands#session-migrate):
 
 ```bash
 orionis session:migrate

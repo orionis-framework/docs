@@ -47,7 +47,7 @@ These are read-only properties; do not call them with parentheses:
 | Property | Type | When it is true |
 |---|---|---|
 | `isCreated` | `bool` | `create()` finished, including configuration and service registration. |
-| `isBooted` | `bool` | Historical alias of the same creation state. It does not guarantee that async providers have finished. |
+| `isBooted` | `bool` | Alias of the same creation state. It does not guarantee that async providers have finished. |
 | `areProvidersBooted` | `bool` | The application was created and no eager async provider remains pending. It does not eagerly load deferred providers. |
 | `isHttpReady` | `bool` | Eager providers finished and both HTTP kernel handlers, ASGI and RSGI, were published. |
 | `startAt` | `int` | Construction timestamp in nanoseconds since Unix epoch; useful for calculating process duration. |
@@ -76,26 +76,31 @@ Register it like any [HTTP controller](/en/http/controllers). This example expos
 
 ## 3. Boot services without an HTTP server
 
-`async boot() -> Self` calls `create()` and awaits pending eager provider startup. It is useful in a component that needs application services without running a server or a complete command lifecycle.
+`async boot() -> Self` calls `create()`, awaits pending eager provider startup, prepares the shared exception handler and activates headless failure observation. Use it when your process owns application work without an HTTP server or a complete command lifecycle.
+
+Call this function from the asynchronous entry point that owns the existing application. The operation supplies context for failure capture; it does not catch exceptions automatically. Replace the inspection with your awaited application work.
 
 ```python
+from orionis.failure.runtime import capture, operation
 from orionis.foundation.contracts.application import IApplication
 
 
-class ImportCoordinator:
-    def __init__(self, app: IApplication) -> None:
-        self.app = app
-
-    async def prepare(self) -> bool:
-        await self.app.boot()
-        return self.app.areProvidersBooted
+async def inspect_application(app: IApplication) -> dict[str, bool]:
+    await app.boot()
+    try:
+        with operation(app, flow="worker", operation="inspect", isolated=True):
+            try:
+                return {"providers_ready": app.areProvidersBooted}
+            except Exception as error:
+                await capture(error, phase="execution")
+                raise
+    finally:
+        await app.aclose()
 ```
 
-Code that calls `prepare()` should do so within its own asynchronous context. Inside a normal controller or command, eager providers have already passed through the corresponding startup, so calling `boot()` is usually unnecessary.
+`boot()` does not run HTTP/CLI lifecycle callbacks, build kernels or start the scheduler. `aclose() -> None` releases headless runtime ownership; when it is the final owner, it cancels and drains supervised tasks before closing logging. It is safe to call when there is no active headless owner. Other runtime owners retain their resources. Close your own database clients, files and external resources explicitly; `aclose()` does not scan arbitrary container services or run `SHUTDOWN` callbacks.
 
-`boot()` does not fire `STARTUP`/`SHUTDOWN` callbacks, build kernels or start the scheduler. It does not provide automatic shutdown when the method returns. If your process opens additional resources, their owner must close them through their API or a `try/finally` block.
-
-Concurrent calls to `boot()` within the same event loop share a startup lock. Each pending provider is awaited in registration order and removed from the queue only after successful completion. If it fails or is cancelled, it remains pending and a later call can retry its `boot()`: design that initialization to tolerate a previous partial attempt.
+Concurrent provider startup uses an asynchronous lock. Pending eager providers run in registration order and leave the queue only after successful completion. A failed or cancelled provider remains pending and can be retried by a later boot; make its initialization tolerate partial execution.
 
 <a id="lifespan-events"></a>
 
@@ -234,7 +239,7 @@ flowchart TD
 
 CLI kernel boot happens before CLI startup. That kernel obtains Reactor; pending eager providers and startup callbacks are completed afterward. Reactor opens the command's isolated scope when executing it. Repeated `handleCommand()` calls reuse the kernel, while startup and shutdown events repeat.
 
-The shutdown `finally` begins after CLI startup finishes successfully. If kernel construction or a startup callback fails, that `finally` is not entered. When a command fails after execution begins, shutdown is still attempted; if a shutdown callback raises another exception, it can replace the previous exception or prevent the exit code from being returned.
+The shutdown `finally` begins after CLI startup finishes successfully. If kernel construction or a startup callback fails, that `finally` is not entered. When a command raises after execution begins, shutdown is still attempted. A secondary shutdown error is observed without replacing the original exception. If execution returned normally, a shutdown failure propagates instead of returning the command status. Each concurrent command keeps its own runtime ownership; logging resources close when the final owner finishes.
 
 To invoke a command from another component, normally use [Reactor](/en/console/reactor-and-injection). `Reactor.call()` executes the command within its scope; it does not replay the application callbacks of `handleCommand()`.
 
@@ -242,7 +247,7 @@ To invoke a command from another component, normally use [Reactor](/en/console/r
 
 ## 7. Failures, concurrency and resource ownership
 
-A failure while loading configuration, registering providers or running their boot propagates. A failed eager async provider remains pending; a failing callback stops the remaining callbacks for that event. Resources already opened by other callbacks are not automatically rolled back.
+A failure while loading configuration, registering providers or running their boot propagates. A failed eager async provider remains pending. A failing startup callback stops the remaining startup callbacks. Shutdown attempts every callback after ordinary failures and retains the first error for propagation. Resources already opened by other callbacks are not automatically rolled back.
 
 In ASGI, an ordinary startup/shutdown exception produces `lifespan.startup.failed` or `lifespan.shutdown.failed` and ends that lifespan loop. Cancellation is not converted into these ordinary-exception messages. In RSGI, hooks propagate the error to the server. Readiness states are published only when the relevant preparation finishes.
 

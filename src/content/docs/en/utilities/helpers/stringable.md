@@ -205,7 +205,7 @@ assert bool(Stringable("false")) is True
 
 **`toDate(format_str: str | None='%Y-%m-%d') -> datetime | None`**
 
-Parse with `datetime.strptime` using `%Y-%m-%d` by default, then attach `DateTime.getZoneInfo()` as `tzinfo` without converting the clock time. Return a timezone-aware standard `datetime`; no container is needed. Format mismatches raise `ValueError`. Despite the annotation and source comment, `None` is passed to `strptime` and raises `TypeError`; ISO auto-detection is not implemented.
+Parses with `datetime.strptime`, using `%Y-%m-%d` by default. Passing `None` uses `datetime.fromisoformat`. Naive values receive `DateTime.getZoneInfo()` without changing wall-clock fields; an explicit input offset is preserved. Returns a timezone-aware standard `datetime`. Invalid formats/values propagate errors.
 
 ```python
 from orionis.support.types import Stringable
@@ -536,7 +536,7 @@ assert Stringable("HTTPServer").kebab() == "httpserver"
 
 **`snake(delimiter: str='_') -> Stringable`**
 
-Like the ASCII boundary conversion in `kebab`, but use `delimiter` (default `_`) for camel boundaries, whitespace and hyphens. Edge trimming treats delimiter characters as a set. Existing separators are collapsed by a generated regex; multicharacter delimiters do not behave as a general token separator, and backslashes can be interpreted as replacement escapes. An empty delimiter raises `re.PatternError`; there is no dedicated argument validation, so other incompatible values propagate Python/regex errors.
+Converts ASCII lowercase/digit-to-uppercase boundaries, whitespace and hyphens using the literal delimiter, then lowercases. Repeated complete delimiters collapse; edge trimming treats delimiter characters as a set. An empty delimiter joins words without a separator. Other incompatible arguments propagate Python/regex errors.
 
 ```python
 from orionis.support.types import Stringable
@@ -574,7 +574,7 @@ assert Stringable("hello_world").pascal() == "HelloWorld"
 
 **`slug(separator: str='-', dictionary: dict[str, str] | None=None) -> Stringable`**
 
-Apply dictionary replacements first (default `{"@": "at"}`; passing `{}` disables it), normalize through `ascii`, remove punctuation except hyphens, replace whitespace/underscores with `separator`, lowercase and trim separator characters. Non-string separators or non-dict dictionaries raise `TypeError`; dictionary entries follow `str.replace` validation. An existing hyphen is not converted when using another separator. An empty separator raises `re.PatternError`; backslashes in separators can also be interpreted as replacement escapes.
+Applies dictionary substitutions (default `{"@": "at"}`), converts through `ascii`, removes punctuation except hyphens, replaces whitespace/underscores with the literal separator, lowercases and trims separator characters. Passing `{}` disables substitutions. An empty separator joins words. Existing hyphens remain when choosing another separator. Invalid separator/dictionary types raise `TypeError`.
 
 ```python
 from orionis.support.types import Stringable
@@ -815,7 +815,7 @@ assert Stringable("  hello\t\n world  ").squish() == "hello world"
 
 **`deduplicate(character: str=' ') -> Stringable`**
 
-Collapse consecutive occurrences of one character (space by default). Non-string or multicharacter input raises `ValueError`. The replacement uses `re.sub`, so a backslash character can raise a replacement-template error.
+Collapses consecutive copies of one literal character, including a backslash. The default is a space. A non-string or a string whose length is not one raises `ValueError`.
 
 ```python
 from orionis.support.types import Stringable
@@ -867,13 +867,13 @@ assert Stringable("hello").chopStart("x") == "hello"
 
 **`chopEnd(needle: str | list[str]) -> Stringable`**
 
-Remove the first matching suffix from the candidate string/iterable. Only one suffix is removed. An empty candidate currently empties the whole value because the implementation slices to `-0`; avoid it when trimming conditionally. Invalid input can raise `TypeError`.
+Removes the first matching suffix from a string or iterable of candidate strings. Only one suffix is removed; an empty candidate leaves the value unchanged. Invalid input can raise `TypeError`.
 
 ```python
 from orionis.support.types import Stringable
 
 assert Stringable("file.tar.gz").chopEnd([".gz", ".tar.gz"]) == "file.tar"
-assert Stringable("hello").chopEnd("") == ""
+assert Stringable("hello").chopEnd("") == "hello"
 ```
 
 <a id="stringable-method-wrap"></a>
@@ -1064,7 +1064,7 @@ assert Stringable("abcdef").wordWrap(3, "|", cut_long_words=True) == "abc|def"
 
 **`replace(search: str | Iterable[str], replace: str | Iterable[str], *, case_sensitive: bool=True) -> Stringable`**
 
-Replace search/replacement pairs sequentially, so later replacements see earlier results. Strings become one-item lists; iterables must have equal lengths because `zip(..., strict=True)` raises `ValueError` on mismatch. It does not broadcast one replacement across many searches. Invalid outer types raise `TypeError`. `case_sensitive=False` escapes the search and uses `re.IGNORECASE`; replacement backslashes still have regex-template meaning. There is no Python `str.replace(..., count)` argument.
+Applies equally sized search/replacement pairs sequentially; later pairs see earlier results. Strings become one-item lists. A length mismatch raises `ValueError`; replacements are not broadcast. Both case-sensitive and case-insensitive modes use literal replacement text, including backslashes. `case_sensitive=False` uses `re.IGNORECASE` for matching.
 
 ```python
 from orionis.support.types import Stringable
@@ -1077,7 +1077,7 @@ assert Stringable("Hello HELLO").replace("hello", "hi", case_sensitive=False) ==
 
 **`replaceArray(search: str, replace: list[str]) -> Stringable`**
 
-For each replacement, replace the first occurrence remaining in the current result. A shortage leaves later occurrences unchanged; surplus replacements are unused. Replacement text can itself introduce a match for the next step. Require a list containing only strings (`TypeError` otherwise); search errors follow Python string operations.
+Consumes matches from the original text in order, assigning one replacement to each. Inserted text is not searched again. A shortage leaves later matches unchanged and surplus values are unused. Search must be a string and replacements a list of strings; otherwise `TypeError` is raised.
 
 ```python
 from orionis.support.types import Stringable
@@ -1125,20 +1125,20 @@ assert Stringable("pre-name-pre").replaceStart("pre", "new") == "new-name-pre"
 
 **`replaceEnd(search: str, replace: str) -> Stringable`**
 
-Replace the literal search only when it is a suffix. Both arguments must be strings (`TypeError` otherwise). An empty search currently replaces the entire value, because the prefix slice ends at `-0`.
+Replaces a literal suffix. Both arguments must be strings or `TypeError` is raised. An empty search appends the replacement to the original value.
 
 ```python
 from orionis.support.types import Stringable
 
 assert Stringable("pre-name-pre").replaceEnd("pre", "new") == "pre-name-new"
-assert Stringable("abc").replaceEnd("", "X") == "X"
+assert Stringable("abc").replaceEnd("", "X") == "abcX"
 ```
 
 <a id="stringable-method-replacematches"></a>
 
 **`replaceMatches(pattern: str | list[str], replace: str | Callable, limit: int=-1) -> Stringable`**
 
-Apply one Python regex or a list sequentially. A string replacement supports backreferences; a callback receives a `re.Match` and must return `str`. `limit=-1` and 0 replace all, positive limits apply per pattern, and other negative values currently replace none. Wrong pattern/replacement/limit types raise `TypeError`; invalid regex or replacement templates propagate `re` errors.
+Applies a regex or list of regexes sequentially. String replacements support backreferences; callbacks receive `re.Match` and return strings. `limit=-1` replaces all, `0` leaves the original unchanged and positive limits apply per pattern. Values below `-1` raise `ValueError`. Invalid argument types raise `TypeError`; regex errors propagate.
 
 ```python
 from orionis.support.types import Stringable
@@ -1230,7 +1230,7 @@ assert Stringable("a1 b2").matchAll(r"\d") == ["1", "2"]
 
 **`isMatch(pattern: str | list[str]) -> bool`**
 
-Return whether any regex matches anywhere. Accept a string or iterable of strings and validate each element, then search each pattern. Invalid types raise `TypeError`; invalid patterns raise `re.PatternError`. Empty iterables return false. A one-shot generator is consumed during validation and currently yields false in the subsequent search.
+Checks whether any supplied regex matches anywhere. A string or iterable is accepted; iterables are materialized before validation, including generators. An empty iterable returns `False`. Invalid element types raise `TypeError`; invalid regex raises `re.PatternError`.
 
 ```python
 from orionis.support.types import Stringable
@@ -1256,7 +1256,7 @@ assert not Stringable("hello").test(r"^world$")
 
 **`isPattern(pattern: str | list[str], *, ignore_case: bool=False) -> bool`**
 
-Match the whole value against shell-style `fnmatch` patterns (`*`, `?`, `[abc]`), not regex. A list means any pattern; require a string or a nonempty list of strings and bool ignore_case (`TypeError`, or `ValueError` for an empty list). On Windows, `fnmatch.fnmatch` normalizes case even when `ignore_case=False`; `ignore_case=True` explicitly lowercases on every platform.
+Matches the entire value against shell-style patterns (`*`, `?`, `[abc]`). Accepts a string or nonempty list of strings; any matching pattern succeeds. Matching is case-sensitive on every platform unless `ignore_case=True`. Invalid types raise `TypeError`; an empty list raises `ValueError`.
 
 ```python
 from orionis.support.types import Stringable
@@ -1280,15 +1280,17 @@ assert Stringable("a,b,c").explode(",", 0) == ["a", "b", "c"]
 
 <a id="stringable-method-split"></a>
 
-**`split(pattern: str | int, limit: int=-1, flags: int=0) -> list[str]`**
+**`split(pattern: str | int | None=None, limit: int=-1, flags: int=0) -> list[str]`**
 
-An integer pattern creates fixed-size chunks (ignoring limit/flags for chunking); zero raises `ValueError` and a negative size produces `[]`. A string pattern invokes `re.split`; `limit=-1` or 0 means unlimited, while positive limit counts splits, not result pieces. Capture groups appear in the result. `flags` accepts integer regex flags. Wrong types propagate `TypeError`, limits below -1 raise `ValueError`, and bad regex raises `re.PatternError`. There is no no-argument whitespace overload.
+With no pattern or `None`, uses native whitespace splitting: `limit` is the maximum splits and `-1` is unlimited. A positive integer pattern creates all fixed-size chunks, regardless of `limit`; zero or negative chunk sizes raise `ValueError`. A string pattern uses `re.split`, with `-1` or `0` unlimited and positive values counting splits. Capturing groups appear in results. Pattern booleans and non-integer/boolean limits raise `TypeError`; limits below `-1` raise `ValueError`.
 
 ```python
 from orionis.support.types import Stringable
 
 import re
 assert Stringable("abcdefg").split(3) == ["abc", "def", "g"]
+assert Stringable("  a  b ").split() == ["a", "b"]
+assert Stringable("abcdef").split(2, 1) == ["ab", "cd", "ef"]
 assert Stringable("aXbxc").split("x", 1, re.IGNORECASE) == ["a", "bxc"]
 assert Stringable("a1b2").split(r"(\d)") == ["a", "1", "b", "2", ""]
 ```
@@ -1322,13 +1324,13 @@ assert Stringable("-12.3 and ٤").numbers() == "123٤"
 
 **`scan(format_str: str) -> list[str]`**
 
-Translate `%s` to a non-whitespace capture, `%d` to digits and `%f` to digit/dot characters, then run `re.findall` and take only the first match. Values remain strings, literal regex characters in the format are not escaped, and `%f` does not validate numeric syntax. With one capture, converting the matching string to list splits it into characters. Wrong format type raises `TypeError`; invalid generated regex propagates `re.PatternError`.
+Extracts the first match using `%s` for non-whitespace text, `%d` for signed integers and `%f` for signed decimals with optional exponent. Literal format characters are escaped. Captures remain strings; one capture is one list item. No match returns `[]`. A non-string format raises `TypeError`.
 
 ```python
 from orionis.support.types import Stringable
 
 assert Stringable("name=Ada age=37").scan("name=%s age=%d") == ["Ada", "37"]
-assert Stringable("123").scan("%d") == ["1", "2", "3"]
+assert Stringable("123").scan("%d") == ["123"]
 ```
 
 <a id="stringable-method-parsecallback"></a>
@@ -1577,13 +1579,13 @@ assert not Stringable("bad").isUuid()
 
 **`isUlid() -> bool`**
 
-Uppercase then check exactly 26 characters from the Crockford alphabet `0123456789ABCDEFGHJKMNPQRSTVWXYZ`. It accepts lowercase input and does not validate the leading-bit overflow or timestamp range of a canonical ULID. It does not generate identifiers.
+Checks an ASCII, 26-character Crockford Base32 value with a leading character from `0` to `7`, preventing 128-bit overflow. Lowercase input is accepted. It validates the representation, not uniqueness or the application meaning of its timestamp, and does not generate identifiers.
 
 ```python
 from orionis.support.types import Stringable
 
 assert Stringable("01arz3ndektsv4rrffq69g5fav").isUlid()
-assert Stringable("Z" * 26).isUlid()
+assert not Stringable("Z" * 26).isUlid()
 assert not Stringable("I" * 26).isUlid()
 ```
 
@@ -1619,7 +1621,7 @@ assert Stringable("folder/sub/report.txt").dirname(2) == str(Path("folder"))
 
 **`plural(count: int | list | Any=2, *, prepend_count: bool=False) -> Stringable`**
 
-Use a small English suffix algorithm, default count 2. Count can be int, float, or an object with `__len__`; only a count equal to 1 leaves the word unchanged. Other words gain `es` after s/sh/ch/x/z, consonant-y becomes ies, f/fe becomes ves, otherwise add s. `prepend_count=True` prefixes the effective count. Invalid count types or a non-bool prepend_count raise `TypeError`. Irregular nouns and linguistic exceptions are not implemented.
+Uses English pluralization rules and a catalog of irregular and uncountable words. Count accepts int, float, or a sized object; only an effective count of one keeps the singular. `prepend_count=True` prefixes that count. This is not a general multilingual inflector. Invalid count types or a non-bool flag raise `TypeError`.
 
 ```python
 from orionis.support.types import Stringable
@@ -1755,13 +1757,13 @@ assert isinstance(s.hash("sha256"), Stringable)
 
 **`stripTags(allowed_tags: str | None=None) -> Stringable`**
 
-With no truthy `allowed_tags`, remove substrings matching `<[^>]*>` and leave entities unchanged. Any truthy allowed_tags value instead performs only `html.unescape`, retaining every tag; there is no selective allowlist. This regex operation is not an HTML parser or sanitizer.
+Parses HTML, removes tags outside the allowlist and keeps their text. For example, `allowed_tags="<b><i>"` preserves those tags and their attributes. Without an allowlist, entity spellings remain unchanged; a nonempty allowlist decodes entities. Only a string or `None` is accepted. This does not sanitize HTML: retained attributes can be unsafe.
 
 ```python
 from orionis.support.types import Stringable
 
 assert Stringable("<b>x</b>&amp;").stripTags() == "x&amp;"
-assert Stringable("<i>x</i>&amp;").stripTags("<b>") == "<i>x</i>&"
+assert Stringable("<i>x</i>&amp;").stripTags("<b>") == "x&"
 ```
 
 <a id="stringable-method-tohtmlstring"></a>

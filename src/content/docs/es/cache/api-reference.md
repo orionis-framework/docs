@@ -56,7 +56,7 @@ Las firmas siguientes existen en ambas implementaciones. Son asíncronas y recib
 
 ### get(key: str, default: Any = None) → Any
 
-Devuelve el valor o `default` si la entrada falta o expiró. Un `None` guardado se conserva como valor presente. La expiración se limpia al leer; File usa reloj monotónico y Database reloj de pared. File trata errores de lectura/JSON como ausencia; Database propaga errores SQL y convierte un payload JSON inválido a `None`.
+Devuelve el valor o `default` si la entrada falta o expiró. Un `None` guardado se conserva como valor presente. La expiración se limpia al leer; File y Database usan segundos Unix epoch del reloj de pared. File trata errores de lectura/JSON como ausencia; Database propaga errores SQL y convierte un payload JSON inválido a `None`.
 
 <a id="backend-set"></a>
 
@@ -104,7 +104,7 @@ Escribe cada par secuencialmente con un TTL común y devuelve `True`. File reali
 
 ### add(key: str, value: Any, ttl: float | None = None) → bool
 
-Devuelve `True` si creó la entrada. Si ya existe una vigente lanza `ValueError`; el repositorio convierte ese error a `False`. File utiliza creación exclusiva y permite reintentar tras limpiar una entrada expirada. Database elimina primero una fila vencida e intenta insertar bajo la restricción única. Si falla el SQL y la clave no existe, propaga el error SQL.
+Devuelve `True` si creó la entrada. Si ya existe una vigente lanza `ValueError`; el repositorio convierte ese error a `False`. File comprueba la ausencia bajo un lock de archivo entre procesos, publica atómicamente una entrada preparada y permite reintentar tras limpiar una entrada expirada. Database elimina primero una fila vencida e intenta insertar bajo la restricción única. Si falla el SQL y la clave no existe, propaga el error SQL.
 
 <a id="backend-increment"></a>
 
@@ -226,6 +226,6 @@ Este método de clase retorna `ICacheManager`. Es el punto de enlace de la facha
 
 El manager no implementa un fallback automático a memoria si un servidor falla. Define explícitamente cómo debe responder tu aplicación si no puede leer, calcular o guardar una entrada; no captures indiscriminadamente errores del resolver como si fueran simples ausencias de caché.
 
-## Ejecución por lotes de File en 1.1.0
+## Ejecución por lotes de File
 
 `FileCacheBackend.multiGet()` y `multiSet()` ejecutan el lote completo mediante una invocación al worker. Conservan el orden de las claves, duplicados en lecturas, valores predeterminados, bloqueos por archivo y TTL por clave. Las escrituras siguen siendo secuenciales y sin rollback; la cancelación se detiene entre entradas después de completar la operación nativa en curso. El backend de base de datos conserva su ejecución secuencial. Estos métodos retornan listas o booleanos; `getMany()` del repositorio sigue retornando un diccionario.

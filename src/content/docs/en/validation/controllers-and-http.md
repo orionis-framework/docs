@@ -118,13 +118,13 @@ Injection uses only the dictionary returned by `Request.data()`. It does not aut
 
 These are the content types recognized by `data()`; it does not automatically recognize every subtype ending in `+json`. A top-level JSON array is not the dictionary this flow requires.
 
-Unmarked fields keep the validator's strict behavior. In this example, `"age": "36"` fails because it is a string. Text form fields also arrive as strings: declaring `age: int` does not automatically convert them to integers. Since 1.4.0, use [`Coerce()`](/en/validation/declaring-schemas#field-coercion) to opt in on fields that accept textual numbers; manual body parsing is not required.
+Unmarked fields keep the validator's strict behavior. In this example, `"age": "36"` fails because it is a string. Text form fields also arrive as strings: declaring `age: int` does not automatically convert them to integers. Use [`Coerce()`](/en/validation/declaring-schemas#field-coercion) to opt in on fields that accept textual numbers; manual body parsing is not required.
 
 <a id="form-field-coercion"></a>
 
 ### Convert a numeric form field
 
-Since 1.4.0, `Coerce()` lets the schema opt in to conversion for selected fields before the controller runs. Save this independent example in `app/http/controllers/quantity_preview_controller.py`:
+`Coerce()` lets the schema opt in to conversion for selected fields before the controller runs. Save this independent example in `app/http/controllers/quantity_preview_controller.py`:
 
 ```python
 from orionis.http.base import BaseController

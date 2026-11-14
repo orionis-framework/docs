@@ -11,9 +11,9 @@ lastUpdated: false
 
 <a id="collection-method-init"></a>
 
-### `Collection(items: list[Any] | None = None)` — `__init__`
+### `Collection(items: list[Any] | dict[Any, Any] | None = None)` — `__init__`
 
-El inicializador `__init__(self, items: list[Any] | None = None) -> None` crea una instancia con una lista vacía de atributos adicionales para serialización. `None`, un argumento omitido o cualquier entrada falsy se convierte en una lista vacía nueva. Una lista no vacía se conserva por referencia, sin copiarla ni validar sus elementos. La implementación también conserva otras entradas truthy sin modificarlas; esto no hace que todas las operaciones sean compatibles con su tipo. En particular, `pluck(value, key)` y `groupBy(key)` producen intencionalmente colecciones respaldadas por diccionarios. Lee esos resultados mediante `all()` o sus claves de diccionario; la iteración entrega claves y los métodos exclusivos de listas, como `push`, `sort`, `first`, los slices y `pop`, no sirven como operaciones generales de diccionario. Los resultados de diccionario vacíos se convierten en `[]` por la regla del constructor para entradas falsy.
+El constructor `Collection(items=None)` conserva por referencia las listas o diccionarios recibidos, incluso vacíos. Solo `None` crea una lista vacía nueva. Los resultados de diccionario de `pluck(value, key)` y `groupBy(key)` conservan ese tipo, incluido `{}`. Léelos con `all()` o por clave; la iteración entrega claves. Las operaciones exclusivas de listas no son operaciones generales de diccionario.
 
 ```python
 from orionis.support.types import Collection
@@ -26,9 +26,9 @@ assert products.all() is source
 total = products.where("active", True).sum("price")
 assert total == 8
 assert products.count() == 2
-assert Collection({}).all() == []
+assert Collection({}).all() == {}
 empty = []
-assert Collection(empty).all() is not empty
+assert Collection(empty).all() is empty
 selected = products.filter(lambda product: product["active"])
 assert selected is not products and selected[0] is source[0]
 ```
@@ -230,7 +230,7 @@ assert items.all() == [10, 2, 3]
 
 ### `mapInto(cls: type, method: str | None = None, **kwargs: object) -> Collection`
 
-**Nueva.** Sin un `method` truthy, invoca `cls(item)`; los `kwargs` suministrados se ignoran en esta forma de constructor. Con nombre de método, lo resuelve sobre la clase e invoca `method(item, **kwargs)`: usa un método estático/de clase adecuado, no un método de instancia ordinario que requiera `self`. Un `cls` que no sea un tipo produce `TypeError`. Un método inexistente genera un `None` por elemento. Los errores por elemento `TypeError`, `AttributeError` o `ValueError` también se convierten en `None`; otras excepciones se propagan.
+**Nueva.** Llama a `cls(item, **kwargs)` si no se indica método, o al método de clase/estático como `method(item, **kwargs)`. Si `cls` no es un tipo, lanza `TypeError`. Un método ausente produce un `None` por elemento. Los errores `TypeError`, `AttributeError` y `ValueError` de cada elemento se convierten en `None`; los demás se propagan.
 
 ```python
 from orionis.support.types import Collection
@@ -247,7 +247,8 @@ class Label:
     def tagged(cls, value):
         return cls.__name__ + ":" + str(value)
 
-assert Collection([1]).mapInto(Label, ignored=True)[0].value == "1"
+assert Collection([1]).mapInto(Label)[0].value == "1"
+assert Collection([1]).mapInto(Label, ignored=True).all() == [None]
 assert Collection([1, 2]).mapInto(Label, "format", prefix="#").all() == ["#1", "#2"]
 assert Collection([1]).mapInto(Label, "tagged").all() == ["Label:1"]
 assert Collection(["3", "bad"]).mapInto(int).all() == [3, None]
@@ -262,7 +263,7 @@ Los lectores de campos usados por `pluck`, `contains(path, value)`, `where`, `wh
 
 ### `pluck(value: str, key: str | None = None) -> Collection`
 
-**Nueva.** Con `key` omitido o falsy, devuelve una lista de valores extraídos que omite `None`, pero conserva otros valores falsy. Con `key` truthy, construye un diccionario indexado por ese campo: conserva valores y claves `None`, las claves duplicadas sobrescriben valores anteriores y las claves no hashables producen `TypeError`. El resultado puede quedar respaldado por un diccionario; un resultado vacío se convierte en `[]`.
+**Nueva.** Con `key` omitido o falsy, devuelve una lista de valores extraídos que omite `None`, pero conserva otros valores falsy. Con `key` truthy, construye un diccionario indexado por ese campo: conserva valores y claves `None`, las claves duplicadas sobrescriben valores anteriores y las claves no hashables producen `TypeError`. El resultado puede quedar respaldado por un diccionario; un resultado indexado vacío es `{}`.
 
 ```python
 from types import SimpleNamespace
@@ -389,9 +390,9 @@ assert flat[-1] is nested
 
 <a id="collection-method-zip"></a>
 
-### `zip(items: list[Any] | Collection) -> Collection`
+### `zip(items: list[Any] | ICollection) -> Collection`
 
-**Nueva.** Devuelve **listas** de dos elementos hasta la longitud de la entrada más corta. Otros tipos de entrada producen `TypeError`; admite una sola secuencia adicional, no una cantidad arbitraria de argumentos.
+**Nueva.** Forma listas de dos elementos hasta la longitud menor. Admite listas o cualquier implementación de `ICollection`; otros tipos lanzan `TypeError`. Recibe una sola secuencia adicional.
 
 ```python
 from orionis.support.types import Collection
@@ -407,7 +408,7 @@ assert Collection([1]).zip(Collection(["a"])).all() == [[1, "a"]]
 
 ### `groupBy(key: str) -> Collection`
 
-**Nueva instancia base de `Collection`.** Extrae y ordena las claves de agrupación y construye `{group_key: [original_items]}`. Los valores de clave deben ser ordenables entre sí y hashables; una ordenación incompatible o claves de diccionario no hashables producen `TypeError`. El orden dentro de cada grupo es estable. Admite un nombre/ruta de campo, no un callback. Los campos ausentes se convierten en `None`, lo que puede hacer fallar la ordenación junto con otros tipos de clave.
+**Nueva `Collection` base.** Construye `{clave: [elementos_originales]}` tras extraer y ordenar las claves de agrupación. Una entrada vacía produce `{}`. Las claves deben poder ordenarse entre sí y ser hashables; los valores incompatibles lanzan `TypeError`. El orden dentro de cada grupo es estable. Recibe un nombre/ruta de campo, no un callback. Los campos ausentes se convierten en `None`.
 
 <a id="collection-method-unique"></a>
 
@@ -417,7 +418,7 @@ assert Collection([1]).zip(Collection(["a"])).all() == [[1, "a"]]
 
 Sin clave truthy, devuelve una colección **nueva** mediante `list(set(items))` para elementos hashables, sin prometer orden. Los elementos no hashables conservan su primera aparición mediante deduplicación compatible con igualdad. Con una clave de texto o selector callable síncrono, las colecciones respaldadas por listas conservan el primer elemento de cada valor seleccionado, incluidas listas y diccionarios iguales; los campos ausentes cuentan como `None`. Una clave truthy en una colección respaldada por diccionario sigue retornando `self`; omitirla elimina duplicados entre las claves del diccionario.
 
-En **1.1.0**, las estructuras anidadas de tipos integrados utilizan índices estructurales cuando corresponde. Las entradas no hashables pequeñas, igualdad personalizada y ciclos mantienen una comparación por igualdad. Un selector con una identidad de negocio hashable evita comparaciones repetidas para objetos personalizados, por ejemplo `rows.unique(lambda item: item["id"])`. También se corrige el comportamiento anterior que retenía duplicados cuando el campo seleccionado no era hashable.
+Las estructuras anidadas de tipos integrados utilizan índices estructurales cuando corresponde. Las entradas no hashables pequeñas, igualdad personalizada y ciclos mantienen una comparación por igualdad. Un selector con una identidad de negocio hashable evita comparaciones repetidas para objetos personalizados, por ejemplo `rows.unique(lambda item: item["id"])`.
 
 ```python
 from orionis.support.types import Collection
@@ -427,7 +428,7 @@ assert rows.groupBy("team").all() == {
     "a": [{"team": "a", "id": 2}],
     "b": [{"team": "b", "id": 1}, {"team": "b", "id": 3}],
 }
-assert Collection().groupBy("team").all() == []
+assert Collection().groupBy("team").all() == {}
 assert sorted(Collection([2, 1, 2]).unique().all()) == [1, 2]
 assert Collection([[1], [1], [2]]).unique().all() == [[1], [2]]
 assert rows.unique("team").pluck("id").all() == [1, 2]
@@ -460,9 +461,9 @@ assert sorted(indexed.unique().all()) == ["a", "b"]
 
 <a id="collection-method-merge"></a>
 
-### `merge(items: list[Any] | Collection) -> Collection`
+### `merge(items: list[Any] | ICollection) -> Collection`
 
-**Misma instancia.** Extiende la lista actual mediante `+=`. Otros tipos de entrada producen `TypeError`. No combina diccionarios anidados ni sobrescribe claves de diccionario. Una `Collection` respaldada por diccionario supera la validación de tipo, pero al combinarla con una lista aporta sus claves.
+**Misma instancia.** Extiende la lista con `+=`. Admite listas o cualquier implementación de `ICollection`; otros tipos lanzan `TypeError`. Las colecciones respaldadas por diccionario aportan sus claves. No combina diccionarios anidados.
 
 ```python
 from orionis.support.types import Collection
@@ -494,13 +495,13 @@ Extrae y devuelve el último elemento de lista; una colección vacía devuelve `
 
 ### `pull(key: int | str) -> object`
 
-Lee con `get`, elimina con `forget` y devuelve el valor extraído. Un índice de lista o clave de diccionario ausente **produce una excepción** al eliminar, aunque antes `get` haya devuelto `None`. No tiene argumento de valor predeterminado.
+Lee y elimina el elemento seleccionado y devuelve su valor. Los índices o claves ausentes devuelven `None`; no tiene argumento de valor predeterminado.
 
 <a id="collection-method-shift"></a>
 
 ### `shift() -> object`
 
-Extrae y devuelve el primer elemento de lista mediante `pull(0)`. **Una lista vacía produce `IndexError`**; comprueba `isEmpty()` cuando sea necesario.
+Elimina y devuelve el primer elemento mediante `pull(0)`. Las colecciones vacías devuelven `None`.
 
 ```python
 from orionis.support.types import Collection
@@ -516,13 +517,8 @@ assert Collection([7, 8]).shift() == 7
 indexed = Collection({"a": 1, "b": 2})
 assert indexed.pull("a") == 1
 assert indexed.forget("b").all() == {}
-for operation in (lambda: Collection().shift(), lambda: Collection([1]).pull(9)):
-    try:
-        operation()
-    except IndexError:
-        pass
-    else:
-        raise AssertionError("Expected IndexError")
+assert Collection().shift() is None
+assert Collection([1]).pull(9) is None
 ```
 
 <a id="collection-method-reverse"></a>
@@ -553,7 +549,7 @@ assert rows.sort("v").all() == [{"v": 1}, {"v": 3}]
 
 ### `random(count: int | None = None) -> object | Collection | None`
 
-Una colección vacía devuelve `None` antes de validar `count`. Sin conteo, con `None` **o con cero**, devuelve un elemento aleatorio sin modificar la colección. Con un conteo positivo, muestrea posiciones sin reemplazo, sustituye la lista de respaldo y devuelve **la misma instancia**. Pueden aparecer valores duplicados si el origen ya los contiene. Un conteo negativo o superior a la longitud de una colección no vacía produce `ValueError`; los conteos positivos no enteros fallan en `random.sample` con `TypeError`. El orden resultante es aleatorio.
+Las colecciones vacías devuelven `None` antes de validar count. Si se omite o es `None`, devuelve un elemento sin modificar la colección. Un conteo explícito no negativo muestrea posiciones sin reemplazo, sustituye la lista interna y devuelve la misma colección; `0` la vacía. Puede haber valores repetidos si el origen los contiene. Los conteos negativos o mayores que la colección lanzan `ValueError`.
 
 ```python
 from orionis.support.types import Collection
@@ -561,11 +557,12 @@ from orionis.support.types import Collection
 items = Collection([1, 2, 3])
 assert items.random() in [1, 2, 3]
 assert items.random(None) in [1, 2, 3]
-assert items.random(0) in [1, 2, 3]
 assert items.count() == 3
 assert items.random(2) is items
 assert items.count() == 2
 assert len(set(items.all())) == 2
+assert items.random(0) is items
+assert items.all() == []
 assert Collection().random(-1) is None
 for count in (-1, 4):
     try:
@@ -578,7 +575,7 @@ for count in (-1, 4):
 
 ## Agregación y salida de texto
 
-`sum`, `avg`, `min` y `max` aceptan `key=None`, un nombre directo de atributo/clave de diccionario o, en ejecución, un `callback(item)`. A diferencia de la proyección, las claves de texto **no** recorren rutas con puntos. Los atributos de objeto tienen precedencia sobre las entradas de diccionario; los campos ausentes se omiten. Los resultados de callback solo se incluyen si son truthy, por lo que los ceros generados por callback se omiten; esto cambia el denominador de un promedio. Si no se extrae ningún valor, estos métodos vuelven a usar los elementos originales. Sus anotaciones no fuerzan conversión numérica; los resultados reales dependen de las operaciones de Python.
+`sum`, `avg`, `min` y `max` usan los elementos originales solo con `key=None`. Un atributo/clave textual directa (incluido `""`) o callback selecciona valores; no recorre rutas con puntos. Omite campos ausentes y devuelve `0` si no extrae valores, sin volver a los elementos originales. Los callbacks conservan el filtro de resultados truthy de la implementación. No convierte los valores a números.
 
 <a id="collection-method-sum"></a>
 

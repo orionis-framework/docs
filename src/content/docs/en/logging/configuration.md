@@ -33,7 +33,7 @@ from orionis.foundation.config.logging import (
 
 ## Enable bounded background logging
 
-Since **1.1.0**, `Logging.queue_capacity: int` controls the pending-record budget **per handler**. The default `0` retains synchronous delivery. Set a positive value in configuration or through `Application(...).withConfigLogging(queue_capacity=1024)` before creating the application:
+`Logging.queue_capacity: int` controls the pending-record budget **per handler**. The default `0` retains synchronous delivery. Set a positive value in configuration or through `Application(...).withConfigLogging(queue_capacity=1024)` before creating the application:
 
 ```dotenv
 LOG_QUEUE_CAPACITY=int:1024
@@ -103,7 +103,7 @@ daily_files = Daily(path="storage/logs/application_{suffix}.log")
 
 Use paths relative to the project root for consistent configuration. Handlers create parent directories when preparing their file, not during `path` validation. Creating a directory does not imply that the process can write every subsequent file.
 
-There is a concrete difference with absolute paths: rotating handlers and the `stack` handler created by `switchChannel()` use `Path(app_root) / path`, which preserves an absolute path. Initialization of `stack` as the default channel joins the root and `path` as text; it therefore **does not interpret absolute paths consistently**. Configure a relative path for `stack`.
+All built-in channels preserve absolute configured paths. Relative paths are anchored to the application root, including initial `stack` setup and later channel switches. Choose an application-controlled location writable by the serving process.
 
 The usual directory is `storage/logs`, but it does not come from the default `Storage` disk. The logger writes directly to the filesystem using its channel's `path`. See [locations, names and concurrency](/en/logging/rotation-and-lifecycle#log-files) for the scope of these files across processes.
 
@@ -126,7 +126,7 @@ Numeric fields reject booleans and numeric strings. Incorrect types raise `TypeE
 
 **The names `retention_hours`, `retention_days`, `retention_weeks` and `retention_months` do not implement expiration by age.** The factory passes their value as `backup_count`: the handler counts matching files, orders them by modification time and cleans them up during rotation. There is no task deleting each file once it reaches that number of hours, days, weeks or months.
 
-`Daily.at` is passed to the resolver and allows it to calculate a theoretical next rotation time; the built-in handler decides by date suffix changes without consulting that calculation. Do not assume that `Chunked.mb_size` groups messages until reaching the limit either: its resolver changes the suffix on every emission, causing rotations before that threshold. Review the exact examples and effects in [rotation and retention](/en/logging/rotation-and-lifecycle#time-rotation) before choosing a policy.
+`Daily.at` is passed to the resolver for its next-time calculation; the integrated handler instead rotates on a date-suffix change. `Chunked.mb_size` accumulates records until the size threshold is reached, then rotates before writing the next record. See [rotation and retention](/en/logging/rotation-and-lifecycle#time-rotation) for the exact boundaries.
 
 `Stack` has no rotation or retention fields. `Weekly` and `Monthly` do not expose an `at` field in their entities, although the low-level factory can read a dictionary key with that name.
 

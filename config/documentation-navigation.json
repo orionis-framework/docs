@@ -49,8 +49,7 @@
         "foundation-overview",
         "foundation-installation",
         "foundation-getting-started",
-        "foundation-architecture-and-lifecycle",
-        "foundation-release-notes"
+        "foundation-architecture-and-lifecycle"
       ],
       "groups": [
         {
@@ -72,8 +71,7 @@
           },
           "pageIds": [
             "foundation-getting-started",
-            "foundation-architecture-and-lifecycle",
-            "foundation-release-notes"
+            "foundation-architecture-and-lifecycle"
           ]
         }
       ]

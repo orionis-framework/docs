@@ -123,3 +123,5 @@ The builder applies global scopes once before execution; `toPlan()` alone does n
 Global registrations are copied from ancestors when a subclass is created. Later parent changes do not rebuild the child's copy. A relationship uses the **related model's** scopes rather than automatically inheriting the parent's tenant.
 
 `DB.table` does not apply model scopes. INSERTs and instance PK updates do not turn read scopes into ownership validation either. In multitenant applications, validate authorization and ownership before writing and consider SQL constraints. For request-dependent values, prefer `forTenant(tenant_id)` with validated data; do not replace a global callback with a captured tenant during every concurrent request.
+
+If a global scope raises, the builder discards its query-plan changes and retries scope preparation on a later execution. External effects inside the callback are not rolled back. Model subqueries used by `IN`, `EXISTS`, joins, projections or unions apply global scopes and soft-delete visibility on a clone, preserving explicit exclusions without mutating the source builder.

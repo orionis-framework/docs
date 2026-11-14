@@ -141,7 +141,7 @@ Mantén `autoescape=True` para páginas HTML. Escapa el contenido insertado, sin
 
 El entorno utiliza `jinja2.Undefined`: una variable ausente puede imprimirse vacía, mientras otras operaciones sobre ella sí pueden fallar. Pasa un contexto explícito y comprueba las páginas con datos completos y vacíos. Las plantillas son código confiable de tu aplicación; este entorno no utiliza el sandbox de Jinja.
 
-Una plantilla ausente produce `ViewTemplateNotFoundException`. Los errores del renderizado pendiente se presentan como `ViewRenderException`, conservando la causa. Revisa el nombre solicitado, los directorios de búsqueda y la excepción original antes de limpiar cachés. Consulta [excepciones HTTP](/es/http/exceptions) para entender su presentación durante una petición.
+Una plantilla ausente produce `ViewTemplateNotFoundException`; los errores de sintaxis o renderizado se convierten en `ViewRenderException` con su causa original. Un `ViewRenderException` nativo no se envuelve otra vez. La saturación de workers conserva `WorkQueueFullError`, sin convertirlo en un error de plantilla. Revisa el nombre, rutas y causa antes de limpiar cachés. Consulta [excepciones HTTP](/es/http/exceptions).
 
 Para añadir filtros, globals, tests o etiquetas, utiliza un [provider de vistas](/es/views/providers-and-extensions). La configuración anterior controla carga y caché; el provider amplía el entorno compartido antes de atender peticiones.
 
@@ -149,7 +149,7 @@ Para añadir filtros, globals, tests o etiquetas, utiliza un [provider de vistas
 
 ## Preparar plantillas antes de recibir peticiones
 
-En **1.1.0**, la carga, compilación y comprobación de recarga de plantillas de nivel superior se ejecutan en un pool dedicado de **2 workers y 64 llamadas pendientes por proceso**. Con recarga automática desactivada, una plantilla ya cacheada puede leerse directamente. El renderizado y los globals asíncronos permanecen en el event loop del consumidor. La saturación del pool produce `WorkQueueFullError`.
+La carga, compilación y comprobación de recarga de plantillas de nivel superior se ejecutan en un pool dedicado de **2 workers y 64 llamadas pendientes por proceso**. Con recarga automática desactivada, una plantilla ya cacheada puede leerse directamente. El renderizado y los globals asíncronos permanecen en el event loop del consumidor. La saturación del pool produce `WorkQueueFullError`.
 
 `IViewEngine` expone `async warmup(*templates: str) -> None`; `Jinja2Engine` lo implementa cargando las plantillas conocidas sin renderizarlas ni evaluar globals:
 

@@ -1210,7 +1210,7 @@ Cuerpo inválido (422):
 
 ## Valores vacíos y no vacíos
 
-Disponibles desde **1.4.0**. Estas reglas comparten una definición de vacío y son opuestas exactas. La [guía de valores vacíos](/es/validation/application-rules#empty-and-no-empty) detalla los espacios en blanco, ceros numéricos, colecciones, archivos subidos, campos ausentes y coerción.
+Estas reglas comparten una definición de vacío y son opuestas exactas. La [guía de valores vacíos](/es/validation/application-rules#empty-and-no-empty) detalla los espacios en blanco, ceros numéricos, colecciones, archivos subidos, campos ausentes y coerción.
 
 | Regla | Condición y tipos | Parámetros adicionales | Campo de ejemplo | Código de error |
 | --- | --- | --- | --- | --- |

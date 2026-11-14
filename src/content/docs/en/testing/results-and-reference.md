@@ -33,7 +33,7 @@ The command has no positional arguments. All these options are optional:
 | --- | --- |
 | `--verbosity N`, `-v N` | Integer `0`, `1`, or `2`. Overrides `testing.verbosity`; configured default: `2`. |
 | `--fail-fast N`, `-f N` | Integer: `1` stops at the first failure or error; `0` continues. Overrides `testing.fail_fast`, including with `0`. Configured default: `False`. |
-| `--start-dir PATH`, `-s PATH` | Discovery directory. Configured default: `tests`. |
+| `--start-dir PATH`, `-s PATH` | Discovery directory or Python file. Configured default: `tests`. |
 | `--file-pattern PATTERN` | Filename glob, initially `test_*.py`. |
 | `--method-pattern PATTERN` | Glob filtering discovered methods, initially `test*`. |
 | `--panel` | Enables the start and summary panels; the CLI default. |
@@ -55,13 +55,13 @@ python -B reactor test --fail-fast 0 --no-panel --verbosity 1
 
 ### Discovery and filters
 
-The engine walks the starting directory and its subdirectories, even without `__init__.py`. It converts matching files into module names and imports them through the `unittest` loader. Keep the conventional `test_*.py` filenames and `test...` methods.
+The engine walks the starting directory and subdirectories, even without `__init__.py`, in sorted order. An explicit `.py` file selects only that module and bypasses the filename glob. Files must be importable from the application root.
 
-Patterns are globs evaluated with `fnmatch`, such as `test_user*.py`, `testCreate*`, or `test*Permission*`; they are not regular expressions. Method filtering applies to candidates discovered by the loader: it does not turn arbitrarily named methods into tests. Case sensitivity follows the platform.
+Patterns are globs, such as `test_user*.py`, `testCreate*`, or `check*`, rather than regular expressions. The engine's loader uses the method glob directly, so `--method-pattern 'check*'` can select methods with that prefix. Use conventional `test...` names unless a custom prefix is intentional.
 
-A relative `start_dir` resolves from the process working directory. The application root determines module names and is added to the import path. Run from the project root and select its subdirectories, or provide an absolute path inside that project.
+A relative `start_dir` resolves from the application's root. The resolved path must exist within that root and must be a directory or a Python file. Missing paths and filesystem traversal errors propagate. A module already imported from another root raises `ImportError`; use separate processes for projects with overlapping module names.
 
-A missing directory or filters matching nothing produce an empty suite. The command returns `0` in that case; confirm that the summary contains the expected number of tests. Import failures represented by the loader remain errors even when the method filter does not match. Other exceptions during discovery, such as certain syntax errors, propagate and do not necessarily become a per-case result.
+Filters matching nothing produce an empty suite. The CLI reports that no tests ran and returns `1`; an empty execution is not a passing validation. Import failures represented by the loader remain errors even when the method filter does not match. Other discovery exceptions propagate and may prevent a per-case report.
 
 ## Testing configuration
 
@@ -146,7 +146,7 @@ python -B reactor test --verbosity 1 --no-panel
 | `ERRORED` | An exception other than an assertion failure occurred. |
 | `SKIPPED` | Skipped case or expected failure. |
 
-The CLI returns **`1` for any `FAILED` or `ERRORED` result, and `0` otherwise**, including an empty list. Preserve this code in continuous integration. Fail-fast stops subsequent cases after a failure, error, or unexpected success; it also applies to failing subtests. It is not a timeout and does not skip case cleanup.
+The CLI returns **`1` for an empty result list or any `FAILED` or `ERRORED` result**, and `0` for nonempty results without failures or errors. Skips remain `SKIPPED`, not passes. Preserve the code in continuous integration. Fail-fast stops subsequent cases after a failure, error, or unexpected success, including failing subtests; it does not skip case cleanup.
 
 A failing subtest exports its identity with `subTest()` parameters. Successful subtests do not generate separate entries. Totals count recorded outcomes and can differ from the method count when several subtests fail or additional lifecycle errors occur.
 
@@ -161,7 +161,7 @@ python -B reactor test --verbosity 1 --no-panel
 The engine creates the directory and writes a JSON list at:
 
 ```text
-storage/framework/cache/testing/<timestamp-in-seconds>.json
+storage/framework/cache/testing/<timestamp-in-seconds>-<uuid>.json
 ```
 
 Its actual base is `app.path("storage_framework")`; customizing that path changes the destination. **There is no `--json` option**: JSON is a file independent of console presentation. It is saved after the runner, including failed results or an empty list. An exception preventing discovery or the runner from completing can prevent that write; file-writing errors propagate.
@@ -208,7 +208,7 @@ Each entry corresponds to an immutable `TestResult`:
 
 The first four fields are required when constructing `TestResult`; the others accept `None`. The processor uses `[]` when it extracts no code. `toDict()` returns the representation used by the engine. An ordinary skip does not retain its reason in a separate field; an expected failure preserves diagnostics despite exporting `SKIPPED`.
 
-Filenames have one-second resolution: two executions in that second use the same path, and the last can overwrite the first. There is no automatic retention or filename selector. These files are reports; they do not prevent tests from running again. With compiled configuration, follow [application caching](/en/application/paths-and-caching) to update it.
+Filenames combine the timestamp with a unique identifier, so runs in the same second retain separate reports. There is no automatic retention or filename selector. These files do not prevent tests from running again. With compiled configuration, follow [application caching](/en/application/paths-and-caching) to update it.
 
 ## Engine and Test facade
 
@@ -280,6 +280,7 @@ TestRunner(
 | Callback | Orionis behavior |
 | --- | --- |
 | `startTest(test)` | Starts case timing. |
+| `stopTest(test)` | Clears active case timing. |
 | `addSuccess(test)` | Records and prints `PASSED`. |
 | `addFailure(test, err)` | Records `FAILED` with diagnostics. |
 | `addError(test, err)` | Records `ERRORED` with diagnostics. |
@@ -290,6 +291,6 @@ TestRunner(
 
 The runner calls `startTestRun()` and guarantees `stopTestRun()` through `finally` when that protocol is available. Ordinary case exceptions become results; an exception from the suite object itself can propagate. Processor storage is per-instance, and `getTestResults()` returns its list rather than a copy.
 
-Class preparation errors have a limitation: if `setUpClass()` fails before the first case starts, the processor has no timer yet and can raise `AttributeError` rather than produce an `ERRORED` result. Do not rely on receiving a complete JSON report in that scenario; retain the process exit code and output too. This does not prevent using `setUpClass()` for successful preparation.
+Class fixture errors and skips are recorded even before the first case starts. An outcome outside an active test has `execution_time=0`; it retains available exception diagnostics. Source locations come from the supplied traceback, including when recording happens after the exception handler has finished.
 
 Continue with [cases and decorators](/en/testing/cases-and-decorators), or return to [Tests](/en/testing).

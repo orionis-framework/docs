@@ -267,7 +267,7 @@ When changing registrations in an application with compiled configuration, revie
 
 ## HTTP CORS
 
-Since Orionis **1.0.15**, HTTP CORS uses these defaults:
+HTTP CORS uses these defaults:
 
 ```dotenv
 CORS_ALLOW_ORIGINS=["*"]
@@ -275,7 +275,7 @@ CORS_ALLOW_METHODS=["*"]
 CORS_ALLOW_HEADERS=["*"]
 ```
 
-These correspond to `allow_origins`, `allow_methods` and `allow_headers` in `Cors`. This completes the change started in **1.0.13**, which enabled wildcard origins, by extending it to methods and headers to handle `OPTIONS` preflight requests as well. It makes API testing easier with browser debugging tools such as Postman, EchoAPI or Hoppscotch without installing a desktop client. The endpoint must be reachable from the browser.
+These correspond to `allow_origins`, `allow_methods` and `allow_headers` in `Cors`. Wildcard methods include `DELETE`, `GET`, `HEAD`, `OPTIONS`, `PATCH`, `POST`, `PUT`, and `QUERY`. For wildcard headers, preflight responses reflect the requested header list when present.
 
 Empty lists for these three options are also normalized to `["*"]`. `expose_headers` retains `[]` and `allow_credentials` retains `False`. To restrict methods or headers, declare explicit values. For example, to permit `GET` and JSON `POST` requests with an `Authorization` header, add or adjust the `cors` field in your existing `BootstrapHTTP` class in `config/http.py`:
 
@@ -298,7 +298,100 @@ class BootstrapHTTP(HTTP):
 
 Keep the other fields in your existing configuration. CORS is an internal kernel layer; it does not require registration through `app.withMiddleware()`. For cross-origin cookies with credentials, configure explicit origins and `allow_credentials=True`: the framework rejects credentials combined with `allow_origins=["*"]`.
 
-These defaults belong to HTTP. [WebSocket](/en/realtime/websocket) and [MCP](/en/mcp/stdio-and-configuration#allowed-http-origins) keep their own origin policies. In 1.0.16, editable MCP configuration defaults to the inspector's origin when `CORS_ALLOW_ORIGINS` is unset, while core `McpConfig` defaults to `[]`. Setting the shared variable to `["*"]` replaces that MCP default and fails MCP configuration validation. For applications using MCP, provide explicit origins in the shared variable or configure each protocol separately in its editable configuration. Use [`serve --host`](/en/console/built-in-application#command-serve) to change the server's bind address.
+These defaults belong to HTTP. [WebSocket](/en/realtime/websocket) and [MCP](/en/mcp/stdio-and-configuration#allowed-http-origins) use their own origin policies. Core `McpConfig` defaults to `[]`; configure each trusted browser origin explicitly. Setting the shared `CORS_ALLOW_ORIGINS` variable to `["*"]` fails MCP configuration validation. For applications using MCP, provide explicit origins in the shared variable or configure each protocol separately. Use [`serve --host`](/en/console/built-in-application#command-serve) to change the server's bind address.
+
+## Built-in HTTP policies
+
+The `HTTP` entity groups `security`, `proxies`, `rate_limit`, `cors`, `csrf`, `body_limits`, and `websocket`. Configure those fields in `config/http.py`; the kernel installs their internal layers. For example, merge these fields into your existing `BootstrapHTTP` class, keeping any other application options:
+
+```python
+from dataclasses import dataclass, field
+
+from orionis.foundation.config.http import HTTP, HTTPRateLimit, HTTPSecurity
+
+
+@dataclass(frozen=True, kw_only=True)
+class BootstrapHTTP(HTTP):
+    security: HTTPSecurity | dict = field(
+        default_factory=lambda: HTTPSecurity(
+            allowed_hosts=["localhost", "127.0.0.1", "api.example.com"],
+        ),
+    )
+    rate_limit: HTTPRateLimit | dict = field(
+        default_factory=lambda: HTTPRateLimit(
+            rate_limit_enabled=True,
+            rate_limit_requests=60,
+            rate_limit_window_seconds=60,
+        ),
+    )
+    monitor_disconnects: bool = True
+```
+
+This example accepts the listed hosts and limits each resolved client IP to 60 accepted requests in a sliding 60-second window. These explicit values override the corresponding environment defaults. Restart workers after configuration changes and refresh [compiled bootstrap](/en/application/paths-and-caching) when used.
+
+### Host and proxy checks
+
+`security.allowed_hosts` reads `ALLOWED_HOSTS`, initially `[]`. The entity also adds a nonlocal hostname from `APP_URL` when configured. An empty resulting list or the literal `"*"` disables the host allowlist; header format and duplicate-Host checks still run. A list entry `"*.example.com"` matches both that domain and its subdomains. Rejected hosts or malformed headers produce `400`.
+
+`proxies.trusted_proxies` controls which peers may supply forwarding information. Configure it for the actual proxy network: the resolved client IP also identifies the rate-limit bucket. See [trusted reverse proxies](/en/deployment/reverse-proxies) for the full configuration.
+
+### Rate limits and storage
+
+The options below belong to `rate_limit` (`HTTPRateLimit`). Numeric budgets must be positive integers; the backend is exactly `"memory"` or `"redis"`.
+
+| Field | Environment variable | Default |
+| --- | --- | --- |
+| `rate_limit_enabled` | `RATE_LIMIT_ENABLED` | `False` |
+| `rate_limit_requests` | `RATE_LIMIT_REQUESTS` | `100` |
+| `rate_limit_window_seconds` | `RATE_LIMIT_WINDOW` | `60` seconds |
+| `rate_limit_store` | `RATE_LIMIT_STORE` | `"memory"` |
+| `rate_limit_max_keys` | `RATE_LIMIT_MAX_KEYS` | `10000` retained client buckets |
+| `rate_limit_max_events` | `RATE_LIMIT_MAX_EVENTS` | `100000` accepted timestamps |
+| `rate_limit_redis_prefix` | `RATE_LIMIT_REDIS_PREFIX` | `"orionis:http:rate-limit"` |
+| `rate_limit_redis_timeout_seconds` | `RATE_LIMIT_REDIS_TIMEOUT` | `1` second |
+
+`rate_limit_redis` accepts a `Redis` entity from `orionis.foundation.config.http` or a dictionary with `endpoint`, `port`, `db`, and `password`. Defaults read `REDIS_HOST="127.0.0.1"`, `REDIS_PORT=6379`, `REDIS_DB=0`, and `REDIS_PASSWORD=None`. These are the HTTP limiter's connection settings; configuring a cache or queue store does not switch this limiter to Redis.
+
+The memory backend belongs to the worker and rejects attempts when either the client's quota or its total storage capacity is exhausted. Redis coordinates workers using the same connection and prefix. Set an application-specific prefix when independent applications share Redis. No client IP means this layer skips the request.
+
+A rejected quota returns `429` with `Retry-After` equal to the configured window. A Redis connection or command failure returns `503` with `Retry-After: 1`; it does not fall back to an independent memory quota. This is a global IP policy, not an authenticated-user or per-route quota. CORS preflight and other earlier kernel responses can finish before the limiter.
+
+### CORS options
+
+Alongside the three allowlists shown above, `Cors` accepts:
+
+| Field | Environment variable | Default | Effect |
+| --- | --- | --- | --- |
+| `allow_origin_regex` | `CORS_ALLOW_ORIGIN_REGEX` | `None` | Full regular-expression match for an allowed origin. |
+| `expose_headers` | `CORS_EXPOSE_HEADERS` | `[]` | Response headers browser scripts may read. |
+| `allow_credentials` | `CORS_ALLOW_CREDENTIALS` | `False` | Emit the credentials response header. |
+| `max_age` | `CORS_MAX_AGE` | `600` | Preflight cache lifetime in seconds; `None` omits that header. |
+
+The allowlist variables are `CORS_ALLOW_ORIGINS`, `CORS_ALLOW_METHODS`, and `CORS_ALLOW_HEADERS`. A disallowed origin receives no allow-origin header; the CORS layer does not itself turn an ordinary HTTP request into an authorization error. Route authentication and authorization remain separate checks.
+
+### CSRF tokens for WEB requests
+
+The automatic WEB layer uses `csrf` (`HTTPCsrf`), with these defaults:
+
+| Field | Environment variable | Default |
+| --- | --- | --- |
+| `enabled` | `CSRF_ENABLED` | `True` |
+| `token_length` | `CSRF_TOKEN_LENGTH` | `32` random bytes; minimum `32` |
+| `session_key` | `CSRF_SESSION_KEY` | `"_csrf_token"` |
+| `xsrf_cookie` | `CSRF_XSRF_COOKIE` | `False` |
+| `cookie_name` | `CSRF_COOKIE_NAME` | `"XSRF-TOKEN"` |
+| `cookie_secure` | `CSRF_COOKIE_SECURE` | `False`; enabled automatically on HTTPS requests |
+| `cookie_same_site` | `CSRF_COOKIE_SAME_SITE` | `"lax"`; also accepts `"strict"` and `"none"` |
+| `cookie_path` | `CSRF_COOKIE_PATH` | `"/"` |
+| `cookie_domain` | `CSRF_COOKIE_DOMAIN` | `None` |
+
+`GET`, `HEAD`, `OPTIONS`, and `TRACE` do not compare a submitted token. Other WEB methods, including `QUERY`, must send the session token through `X-CSRF-Token`, then `X-XSRF-Token`, or a form's `_csrf` / `csrf_token` field. JSON bodies must use a header. Headers are checked before form parsing. A missing or mismatched token raises `CSRFTokenMismatchException` and normally produces `419`.
+
+Render `{% csrf %}` inside HTML forms, as shown in [sessions](/en/sessions). With `xsrf_cookie=True`, browser scripts can read the separate XSRF cookie and copy its token into `X-XSRF-Token`; the session cookie must accompany the request too. The XSRF cookie is intentionally not HttpOnly. Using `cookie_same_site="none"` with this cookie requires `cookie_secure=True` in configuration. Login replaces the token, logout clears the session, and session identifier regeneration alone preserves its data and token.
+
+### Client disconnection monitoring
+
+`HTTP.monitor_disconnects` defaults to `False` and has no built-in environment variable. Set it to `True` in the HTTP configuration, as in the example above, to monitor disconnection while ordinary HTTP handlers execute and cancel them proactively. The application snapshots it during `create()`. Server cancellation still propagates in either mode; SSE also owns its streaming disconnection handling. Release resources in `finally`, and do not assume that a disconnected client automatically cancels ordinary application work when monitoring is disabled.
 
 ## Assigning middleware to a route
 

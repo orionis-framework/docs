@@ -39,7 +39,7 @@ from orionis.support.facades import Route
 Route.auth()
 ```
 
-Solo declara una vez desde rutas web. Puedes pasar `login_controller`, `register_controller` y `forgot_password_controller` para reemplazar cada controlador. Conserva los métodos que espera [el registro real](https://github.com/orionis-framework/framework/blob/470229f78a5db61263ce887bcdd16bc98f9141db/orionis/http/routes/auth.py). Los controladores predeterminados de registro/perfil dependen del modelo `app.models.user.User`, vistas, hashing y correo de la aplicación; no son un flujo genérico para cualquier modelo. Comprueba esos contratos antes de activarlos. Consulta [recuperación de cuentas](/es/authentication/account-recovery).
+Solo declara una vez desde rutas web. Puedes pasar `login_controller`, `register_controller` y `forgot_password_controller` para reemplazar cada controlador. Conserva los métodos que espera [el registro real](https://github.com/orionis-framework/framework/blob/1e905f4f103d47c61789d877eba472a5bd97681b/orionis/http/routes/auth.py). Los controladores predeterminados de registro/perfil dependen del modelo `app.models.user.User`, vistas, hashing y correo de la aplicación; no son un flujo genérico para cualquier modelo. Comprueba esos contratos antes de activarlos. Consulta [recuperación de cuentas](/es/authentication/account-recovery).
 
 ## Cachés y cambios de archivos
 

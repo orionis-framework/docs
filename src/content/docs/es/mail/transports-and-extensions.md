@@ -61,7 +61,7 @@ No hay reintento automático. Una excepción o cancelación no demuestra que el 
 
 ## Enviar lotes SMTP preparados
 
-Desde **1.1.0**, `SmtpTransport.sendMany(messages, *, mailer, driver)` recibe un iterable de hasta **100 objetos `PreparedMail`** y retorna `tuple[MailResult, ...]`. Es una API del transporte: `Mail`, `PendingMail` e `IMailTransport` no incorporan `sendMany()`. Prepara cada sobre y su MIME mediante [`MailComposer.prepare()`](/es/mail/api-reference#composer-prepare) antes de enviar el lote.
+`SmtpTransport.sendMany(messages, *, mailer, driver)` recibe un iterable de hasta **100 objetos `PreparedMail`** y retorna `tuple[MailResult, ...]`. Es una API del transporte: `Mail`, `PendingMail` e `IMailTransport` no incorporan `sendMany()`. Prepara cada sobre y su MIME mediante [`MailComposer.prepare()`](/es/mail/api-reference#composer-prepare) antes de enviar el lote.
 
 ```python
 from orionis.mail.entities.prepared import PreparedMail

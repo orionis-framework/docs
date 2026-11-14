@@ -81,7 +81,7 @@ sequenceDiagram
     R-->>C: Código entero o tratamiento de salida
 ```
 
-Un entero devuelto por el handler se conserva, incluso si es distinto de cero. Otros retornos correctos se normalizan a `0`. El ejecutor puede imprimir `DONE` y escribir un log de ejecución correcta aunque el handler devuelva un código no cero: esa devolución no es por sí misma una excepción. Comprueba el valor retornado.
+Un entero devuelto por el handler se conserva, incluso si es distinto de cero. Otros retornos correctos se normalizan a `0`. Un código distinto de cero selecciona feedback `FAIL` si los timestamps están activos y se entrega a `handleResult` como resultado fallido. Conserva el entero original sin fabricar una excepción. Un resultado cero selecciona `DONE`. Comprueba el valor retornado: el hook base de resultados fallidos no añade un log ERROR.
 
 <a id="reactor-hascommand"></a>
 
@@ -205,7 +205,7 @@ El comando `reports:build-one` se define en [el ejemplo con Storage](/es/console
 
 ## Excepciones, ayuda y cancelación
 
-Dentro del flujo normal de `call()`, una `Exception` se registra en `ILogger`, se añade el contexto `[Clase.metodo]` al mensaje cuando se conoce, y se delega a `ICatch.exception()`. Si ese tratamiento termina correctamente, Reactor devuelve `1`. Utiliza el [handler global de excepciones](/es/exceptions) para personalizar presentación y reporte; no necesitas envolver cada comando con la misma lógica de diagnóstico.
+Dentro del flujo normal de `call()`, una `Exception` se observa con el comando o `[Class.method]` en los metadatos de operación. Conserva su identidad, argumentos y traceback originales. `ICatch.exception()` solicita presentación CLI al mismo plan de manejo; logging y presentación usan la política común de fallos. Si el manejo termina correctamente, Reactor devuelve `1`. Usa el [handler global](/es/exceptions) para personalizarlo.
 
 Un comando también puede capturar un error y devolver su propio código. Reactor no puede reconocer un fallo que el handler silenció terminando con `None`; consulta las particularidades de los [comandos incluidos](/es/console/built-in-commands).
 

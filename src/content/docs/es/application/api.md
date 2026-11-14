@@ -60,7 +60,7 @@ Todas son de solo lectura; se consultan sin paréntesis.
 | Propiedad y tipo | Resultado y alcance |
 |---|---|
 | `isCreated: bool` | `True` cuando termina `create()`. No significa que hayan terminado los boots async. |
-| `isBooted: bool` | Alias histórico de esa misma etapa de creación. |
+| `isBooted: bool` | Alias de esa misma etapa de creación. |
 | `areProvidersBooted: bool` | Creación terminada y ningún eager pendiente. No incluye proveedores deferred sin resolver. |
 | `isHttpReady: bool` | Eager completados y handlers ASGI/RSGI publicados. No comprueba sockets, base de datos ni salud de otros servicios. |
 | `startAt: int` | Timestamp Unix en nanosegundos tomado en la primera inicialización. |
@@ -148,7 +148,7 @@ async getExceptionHandler() -> IBaseExceptionHandler
 async getScheduler() -> IBaseScheduler
 ```
 
-`getMiddleware()` devuelve las clases globales, no la cadena ya ejecutándose. Los getters async requieren la aplicación creada. Importan y conservan la **clase** configurada, pero cada llamada utiliza `build()` para crear una instancia mediante DI; no garantizan la misma instancia repetida ni inician el scheduler.
+`getMiddleware()` devuelve las clases globales, no la cadena ejecutándose. Los getters async requieren una aplicación creada. `getExceptionHandler()` construye y conserva un handler compartido, coordina las resoluciones concurrentes y separa el scope de petición al resolver sus dependencias. Sus dependencias de constructor deben ser adecuadas para esa duración compartida. `getScheduler()` conserva la clase configurada pero construye una instancia mediante DI en cada llamada; no inicia el scheduler.
 
 ```python
 from orionis.foundation.contracts.application import IApplication
@@ -169,7 +169,7 @@ class BootstrapInspector:
 
 | Métodos | Referencia |
 |---|---|
-| `create()`, `boot()`, `on()`, `handleCommand()` | [Ciclo de vida](/es/application/lifecycle). |
+| `create()`, `boot()`, `aclose()`, `on()`, `handleCommand()` | [Ciclo de vida](/es/application/lifecycle). |
 | `__call__`, `__rsgi__`, `__rsgi_init__`, `__rsgi_del__` | [ASGI y RSGI](/es/application/server-entrypoints): puntos usados por el servidor. |
 | `compile()` y todos los `with...` | [Opciones de bootstrap](/es/application/bootstrap). |
 | `instance`, `transient`, `singleton`, `scoped`, `bound`, `make`, `build`, `invoke`, `call` | [Registro e invocación](/es/application/container/bindings-and-invocation): heredados de Container. |

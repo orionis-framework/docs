@@ -166,7 +166,7 @@ methodSignature(self, method_name: str) -> Signature
 
 Obtiene el atributo con `getattr(target, method_name)` y analiza su firma. Un nombre ausente provoca **`AttributeError`**, no una excepción de reflexión propia. Un atributo no inspeccionable provoca `ValueError`; un nombre que no sea texto puede provocar `TypeError` en `getattr`.
 
-Los métodos ligados excluyen su primer parámetro por la vinculación de Python, aunque el receptor no se llame `self`. Los `classmethod` y `staticmethod` conservan sus argumentos explícitos. En un método ordinario accedido desde la clase, un receptor con nombre distinto de `self` o `cls` permanece en la firma.
+La vinculación de descriptores elimina el receptor de instancia/clase independientemente de su nombre, también al inspeccionar un método ordinario mediante su clase. Los métodos estáticos y funciones conservan parámetros explícitos llamados `self` o `cls`. Los mapas de dependencias excluyen `*args` y `**kwargs`.
 
 ```python
 from orionis.introspection import ReflectDependencies
@@ -188,7 +188,7 @@ class Actions:
 bound = ReflectDependencies(Actions()).methodSignature("handle")
 unbound = ReflectDependencies(Actions).methodSignature("handle")
 assert list(bound.ordered) == ["item", "limit"]
-assert list(unbound.ordered) == ["receiver", "item", "limit"]
+assert list(unbound.ordered) == ["item", "limit"]
 for target in (Actions, Actions()):
     reflection = ReflectDependencies(target)
     assert list(reflection.methodSignature("byClass").ordered) == ["page"]
@@ -202,7 +202,7 @@ for target in (Actions, Actions()):
 callableSignature(self) -> Signature
 ```
 
-Comprueba `callable(target)` y analiza la firma de llamada que expone Python. Admite funciones, métodos ligados, clases o instancias invocables cuando su firma puede inspeccionarse y el objetivo puede usarse como clave de caché. Para una clase, inspecciona su llamada; no es una operación equivalente a leer explícitamente `__init__` en todas las metaclases.
+Comprueba `callable(target)` y analiza la firma Python de llamada. Admite funciones, métodos ligados, clases y objetos invocables, incluidas instancias no hashables. Para una clase, su firma de llamada no tiene por qué coincidir con inspeccionar `__init__` en todas las metaclases.
 
 ```python
 from orionis.introspection import ReflectDependencies
@@ -217,7 +217,7 @@ assert signature.ordered["item_id"].type is int
 assert signature.ordered["timeout"].default == 5
 ```
 
-Lanza `TypeError` para objetivos no callable y para objetivos no hashables al acceder a la caché. Si `inspect.signature` no puede describir la firma, lanza `ValueError` con la causa original. Inspeccionar `min`, por ejemplo, falla porque no expone una firma inspeccionable en este runtime. Los decoradores con `__wrapped__` y las firmas `__signature__` se interpretan según `inspect.signature`.
+Los destinos no invocables lanzan `TypeError`. Los objetos invocables no hashables se inspeccionan sin la caché LRU compartida. Las firmas no inspeccionables lanzan `ValueError` con la causa original; `min` es uno de esos builtins. `__wrapped__` y `__signature__` siguen el comportamiento de inspección Python.
 
 ### Contrato y caché
 
@@ -225,7 +225,7 @@ Lanza `TypeError` para objetivos no callable y para objetivos no hashables al ac
 
 Las firmas de Python y sus metadatos usan dos cachés LRU de **1.024 entradas** cada una, locales al proceso. Repetir un objetivo devuelve el **mismo objeto `Signature`**, también entre instancias del wrapper. Los métodos ligados usan como clave la función subyacente y el modo ligado; la caché de esos métodos no retiene sus receptores.
 
-No hay `clearCache()` público en `ReflectDependencies`. Modificar `__annotations__`, defaults o `__signature__` sobre la misma función después de inspeccionarla puede dejar metadatos obsoletos. Para una definición distinta usa un nuevo objeto función o reinicia el proceso. Los fallos de inspección no se almacenan como resultados correctos.
+`ReflectDependencies` no tiene `clearCache()` público. Llamar a `clearCache()` en un reflector de callable, clase o instancia invalida las firmas de dependencias y planes de invocación compartidos además de sus metadatos locales. Otros reflectores conservan sus resultados locales hasta limpiarlos. Limpia tras modificar deliberadamente anotaciones, valores predeterminados o firmas; los fallos de inspección no se guardan como éxitos.
 
 ```python
 from orionis.introspection import ReflectDependencies

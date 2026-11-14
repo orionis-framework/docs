@@ -7,13 +7,13 @@ lastUpdated: false
 
 Loop reúne la creación de loops, el despacho de callables y los puentes síncronos. Empieza por distinguir si tu código ya está dentro de un loop: esa decisión determina qué operación usar.
 
-Desde Orionis 1.0.8, la gestión del loop usa el registro de `asyncio` y `asyncio.Runner` para garantizar un ciclo de vida predecible en Python 3.14. Si actualizas código anterior, `createTask()` ahora es síncrono, `runSync()` rechaza las llamadas desde un loop activo y `KeyboardInterrupt` se propaga al llamador.
+la gestión del loop usa el registro de `asyncio` y `asyncio.Runner` para garantizar un ciclo de vida predecible en Python 3.14. `createTask()` es síncrono, `runSync()` rechaza las llamadas desde un loop activo y `KeyboardInterrupt` se propaga al llamador.
 
 ## Requisitos
 
 - Python 3.14 o posterior, según declara el proyecto.
 - Una instalación normal de Orionis. No existe un extra de instalación específico para `aio`.
-- En plataformas distintas de Windows, el proyecto declara `uvloop>=0.22.1`; `Loop` lo utiliza cuando se puede importar. En Windows, `uvloop` no es necesario y Orionis intenta usar `asyncio.ProactorEventLoop`.
+- En plataformas distintas de Windows, el proyecto declara `uvloop>=0.23.0`; `Loop` lo utiliza cuando se puede importar. En Windows, `uvloop` no es necesario y Orionis intenta usar `asyncio.ProactorEventLoop`.
 - No se requiere iniciar la aplicación, registrar un binding en el contenedor, preparar un archivo de configuración ni disponer de un servicio externo para usar `Loop` directamente.
 ## Inicio rápido
 
@@ -73,7 +73,7 @@ Usa [colas](/es/queues) cuando el trabajo deba sobrevivir a un reinicio; una tar
 
 ### Puente síncrono de corrutinas
 
-`Loop.runSync(coro)` delega en `Loop.run` en el mismo hilo y espera hasta que termina la corrutina. Requiere que no haya un loop activo en el hilo llamador; desde código async, usa `await`. Este método ya no utiliza un ejecutor compartido.
+`Loop.runSync(coro)` delega en `Loop.run` en el mismo hilo y espera hasta que termina la corrutina. Requiere que no haya un loop activo en el hilo llamador; desde código async, usa `await`. Este método no utiliza un ejecutor compartido.
 
 ### Propiedad y limpieza del loop
 
@@ -289,10 +289,13 @@ Indica si un event loop se está ejecutando activamente en el hilo que llama. Te
 #### `createTask(coro, *, name=None)`
 
 ```text
-Loop.createTask(coro, name=None) -> asyncio.Task[T]
+Loop.createTask(coro, *, name=None) -> asyncio.Task[T]
 ```
 
 Crea la tarea en el loop actual en ejecución y la devuelve inmediatamente. El método es síncrono: conserva la tarea y usa `await task` para observar su resultado y excepciones. El nombre opcional se reenvía a `asyncio.create_task`. Sin un loop activo, lanza `RuntimeError`.
+
+
+Si hay una operación de fallos de Orionis activa, la tarea usa la supervisión de ese runtime. Esto observa errores operativos y participa en su cierre; no añade persistencia ni reintentos. Consulta [los límites de observación](/es/exceptions/contexts-and-transports).
 
 #### `runSync(coro)`
 
@@ -315,4 +318,4 @@ Reserva `runSync` para APIs síncronas ejecutadas sin un loop activo. Quienes ll
 
 [Índice](/es/application/async) · [background](/es/queues/background-tasks) · [foundation](/es/getting-started)
 
-Para limitar explícitamente la admisión de trabajo síncrono en 1.1.0, utiliza [`BoundedExecutor` o `@threaded`](/es/utilities/helpers/concurrency). Exponen la saturación y esperan el trabajo nativo en ejecución durante la cancelación. `Loop.execute()` conserva el ejecutor predeterminado documentado aquí; añadir un wrapper async no aplica por sí solo el nuevo límite.
+Para limitar explícitamente la admisión de trabajo síncrono, utiliza [`BoundedExecutor` o `@threaded`](/es/utilities/helpers/concurrency). Exponen la saturación y esperan el trabajo nativo en ejecución durante la cancelación. `Loop.execute()` conserva el ejecutor predeterminado documentado aquí; añadir un wrapper async no aplica por sí solo el nuevo límite.

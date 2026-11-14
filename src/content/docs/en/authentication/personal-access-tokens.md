@@ -13,7 +13,7 @@ The usual workflow is to sign in to the application, issue a token through an au
 
 The model configured in `auth.identity.model` must implement `IAuthenticatable` and `IAuthorizable`. For an ORM model, use the `Authenticatable` and `Authorizable` mixins exported by `orionis.auth`; the default `User` model already includes them. A token stores both the owner's identifier and its type, derived from `getAuthorizableType()`.
 
-Since 1.3.0, prepare token storage with `auth:migrate` after configuring the default SQL connection and `auth.tokens.table` (`AUTH_TOKEN_TABLE`, default `personal_access_tokens`). Run either alternative from the project root:
+Prepare token storage with `auth:migrate` after configuring the default SQL connection and `auth.tokens.table` (`AUTH_TOKEN_TABLE`, default `personal_access_tokens`). Run either alternative from the project root:
 
 ```bash
 orionis auth:migrate
@@ -23,9 +23,9 @@ orionis auth:migrate
 python -B reactor auth:migrate
 ```
 
-Since **1.5.0**, the command also prepares roles, permissions, their three relationships, and password recovery. It creates missing tables from Orionis definitions, respecting the SQL prefix and the names configured in `auth.tokens.table` and `auth.passwords.table`. Both names must differ from each other and from authorization tables, ignoring case.
+The command also prepares roles, permissions, their three relationships, and password recovery. It creates missing tables from Orionis definitions, respecting the SQL prefix and the names configured in `auth.tokens.table` and `auth.passwords.table`. Both names must differ from each other and from authorization tables, ignoring case.
 
-It requires enforced unique constraints, accepts no `--database`, and preserves existing tokens when repeated. It neither imports application migrations nor records migration history. Changing the configured table does not transfer existing tokens or alter an incompatible schema. Users and their migration, business capabilities, and their seeders remain in the application; for a new database, run `migrate`, `auth:migrate`, then `seed`. See [internal storage and existing projects](/en/database/migrations#auth-storage-1-5-0).
+It requires enforced unique constraints, accepts no `--database`, and preserves existing tokens when repeated. It neither imports application migrations nor records migration history. Changing the configured table does not transfer existing tokens or alter an incompatible schema. Users and their migration, business capabilities, and their seeders remain in the application; for a new database, run `migrate`, `auth:migrate`, then `seed`. See [internal storage and existing projects](/en/database/migrations#authentication-storage).
 
 ## Issue a token from the browser
 
@@ -296,8 +296,8 @@ When disabling an account or changing its credentials outside the recovery flow,
 
 <a id="token-lookup-performance"></a>
 
-## Native token lookup in 1.1.0
+## Native token lookup
 
 The native token repository and model identity provider can retrieve the token and owner in one joined SELECT when they share a native connection, use supported integer/string owner keys and retain a simple scoped query. The guard still performs its final conditional `last_used_at` update after identity resolution, rechecking revocation and expiration. The eligible token/owner path uses two statements rather than three; eager relations may issue additional queries.
 
-Token metadata is validated before identity events. Global filters, hydration, retrieved events and eager relationships remain in effect; authentication decisions are not cached. Custom providers or repositories, separate connections, UUID keys and complex query shapes fall back to the existing path. No configuration switch or token migration is required to use the eligible native path.
+Token metadata is validated before identity events. Global filters, hydration, retrieved events and eager relationships remain in effect; authentication decisions are not cached. Custom providers or repositories, separate connections, UUID keys and complex query shapes use separate token and identity lookups.

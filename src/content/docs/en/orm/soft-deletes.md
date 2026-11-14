@@ -167,6 +167,6 @@ async def archive_tenant(tenant_id: int) -> int:
 
 Relationships query related models with their ordinary visibility. Include deleted rows through the related builder (`team.players().withTrashed()` if Player enables soft deletion), or define a direct variant for eager loading. Soft deleting a parent neither deletes children nor triggers SQL deletion cascades because it is UPDATE rather than DELETE.
 
-Instance events are `deleting → deleted` or `restoring → restored`. There are no separate “soft deleted” events or `saving/updating` emissions for these operations. Vetoes stop writes; exceptions propagate. Mass methods do not execute these listeners.
+Instance events are `deleting → deleted` or `restoring → restored`, with after-events only on success. Missing rows or vetoes return `False` without the success event. These operations do not emit separate soft-deletion events or `saving/updating`; bulk methods do not run instance listeners. Exceptions propagate.
 
 SQL UNIQUE constraints still see deleted rows: archiving does not free a unique email/name. Restoration can conflict with schema constraints. `trashed()` only reflects memory, not another writer's restore/purge. A physical deletion marks that instance unsaved; saving it afterwards may attempt a new INSERT. Filter permanent cleanup deliberately and use transactions when several related changes are involved.

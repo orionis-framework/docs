@@ -35,7 +35,7 @@ Esta ubicación sigue la convención del generador HTTP; no impide importar el m
 
 La inyección depende del adaptador. Una anotación en una llamada Python directa no lee datos ni activa validación. Tampoco implica que todos los componentes del marco busquen automáticamente una petición HTTP.
 
-Desde 1.4.0, los puntos de entrada que invocan el validador Schema de Orionis también aplican [`Coerce()`](/es/validation/declaring-schemas#field-coercion) antes de comprobar tipos, restricciones y reglas. [`Empty()` y `NoEmpty()`](/es/validation/application-rules#empty-and-no-empty) inspeccionan los valores resultantes. Esto no cambia qué puntos de entrada validan: construir o serializar una instancia por sí solo no activa la validación. Consulta el [ejemplo combinado y sus rutas de error](/es/validation/validation-and-errors#coercion-and-empty-rules).
+Los puntos de entrada que invocan el validador Schema de Orionis también aplican [`Coerce()`](/es/validation/declaring-schemas#field-coercion) antes de comprobar tipos, restricciones y reglas. [`Empty()` y `NoEmpty()`](/es/validation/application-rules#empty-and-no-empty) inspeccionan los valores resultantes. Esto no cambia qué puntos de entrada validan: construir o serializar una instancia por sí solo no activa la validación. Consulta el [ejemplo combinado y sus rutas de error](/es/validation/validation-and-errors#coercion-and-empty-rules).
 
 ## HTTP: funciones y controladores
 

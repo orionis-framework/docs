@@ -33,7 +33,7 @@ El comando no tiene argumentos posicionales. Todas estas opciones son opcionales
 | --- | --- |
 | `--verbosity N`, `-v N` | Entero `0`, `1` o `2`. Sobrescribe `testing.verbosity`; valor configurado predeterminado: `2`. |
 | `--fail-fast N`, `-f N` | Entero: `1` detiene ante el primer fallo o error; `0` continúa. Sobrescribe `testing.fail_fast`, incluso con `0`. Predeterminado configurado: `False`. |
-| `--start-dir RUTA`, `-s RUTA` | Directorio del descubrimiento. Predeterminado configurado: `tests`. |
+| `--start-dir RUTA`, `-s RUTA` | Directorio o archivo Python del descubrimiento. Predeterminado configurado: `tests`. |
 | `--file-pattern PATRÓN` | Glob de nombres de archivos, inicialmente `test_*.py`. |
 | `--method-pattern PATRÓN` | Glob para filtrar los métodos descubiertos, inicialmente `test*`. |
 | `--panel` | Activa los paneles de inicio y resumen; comportamiento predeterminado del CLI. |
@@ -55,13 +55,13 @@ python -B reactor test --fail-fast 0 --no-panel --verbosity 1
 
 ### Descubrimiento y filtros
 
-El motor recorre el directorio de inicio y sus subdirectorios, incluso sin `__init__.py`. Convierte los archivos coincidentes en nombres de módulo y los importa mediante el loader de `unittest`. Mantén los nombres convencionales `test_*.py` y métodos `test...`.
+El motor recorre el directorio de inicio y sus subdirectorios en orden, incluso sin `__init__.py`. Un archivo `.py` explícito selecciona solo ese módulo e ignora el glob de archivos. Los archivos deben poder importarse desde la raíz de la aplicación.
 
-Los patrones son globs mediante `fnmatch`, como `test_user*.py`, `testCreate*` o `test*Permission*`; no son expresiones regulares. El filtro de métodos se aplica a candidatos encontrados por el loader: no convierte métodos de nombre arbitrario en pruebas. La sensibilidad a mayúsculas sigue la plataforma.
+Los patrones son globs, como `test_user*.py`, `testCreate*` o `check*`, no expresiones regulares. El loader del motor utiliza directamente el glob de métodos: `--method-pattern 'check*'` permite seleccionar métodos con ese prefijo. Usa nombres convencionales `test...` salvo que necesites otro prefijo.
 
-`start_dir` relativo se resuelve desde el directorio de trabajo del proceso. La raíz de la aplicación forma los nombres de módulo y se añade a la ruta de importación. Ejecuta desde la raíz del proyecto y utiliza subdirectorios dentro de ella, o una ruta absoluta dentro de ese proyecto.
+`start_dir` relativo se resuelve desde la raíz de la aplicación. La ruta resuelta debe existir dentro de esa raíz y ser un directorio o archivo Python. Las rutas inexistentes y los errores del recorrido del sistema de archivos se propagan. Si el módulo ya se importó desde otra raíz, se lanza `ImportError`; usa procesos separados para proyectos con nombres de módulo coincidentes.
 
-Un directorio inexistente o filtros sin coincidencias producen una suite vacía. El comando devuelve `0` en ese caso; confirma en el resumen que se ejecutó la cantidad esperada. Los fallos de importación representados por el loader se conservan como errores aunque el filtro de métodos no coincida. Otras excepciones durante el descubrimiento, como ciertos errores de sintaxis, se propagan y no se convierten necesariamente en un resultado por caso.
+Los filtros sin coincidencias producen una suite vacía. El CLI informa que no se ejecutaron pruebas y devuelve `1`; una ejecución vacía no es una validación satisfactoria. Los fallos de importación representados por el loader se conservan como errores aunque el filtro de métodos no coincida. Otras excepciones de descubrimiento se propagan y pueden impedir un informe por caso.
 
 ## Configuración de las pruebas
 
@@ -146,7 +146,7 @@ python -B reactor test --verbosity 1 --no-panel
 | `ERRORED` | Excepción que no corresponde a un fallo de aserción. |
 | `SKIPPED` | Caso omitido o fallo marcado como esperado. |
 
-El CLI devuelve **`1` ante algún `FAILED` o `ERRORED`, y `0` en los demás casos**, incluida una lista vacía. Conserva ese código en integración continua. Fail-fast detiene los casos posteriores ante un fallo, un error o un éxito inesperado; también se respeta ante una subprueba fallida. No equivale a cancelar por tiempo ni a interrumpir la limpieza del caso.
+El CLI devuelve **`1` ante una lista vacía o cualquier resultado `FAILED` o `ERRORED`**, y `0` para resultados no vacíos sin fallos ni errores. Las omisiones siguen siendo `SKIPPED`, no aprobaciones. Conserva el código en integración continua. Fail-fast detiene los casos posteriores tras un fallo, error o éxito inesperado, incluidas las subpruebas fallidas; no omite la limpieza del caso.
 
 Una subprueba fallida exporta su identidad con los parámetros de `subTest()`. Las subpruebas satisfactorias no generan entradas individuales. Los totales cuentan resultados registrados y pueden diferir del número de métodos cuando existen varias subpruebas fallidas o errores adicionales de ciclo de vida.
 
@@ -161,7 +161,7 @@ python -B reactor test --verbosity 1 --no-panel
 El motor crea el directorio y escribe una lista JSON en:
 
 ```text
-storage/framework/cache/testing/<timestamp-en-segundos>.json
+storage/framework/cache/testing/<timestamp-en-segundos>-<uuid>.json
 ```
 
 La base real es `app.path("storage_framework")`; personalizar esa ruta cambia el destino. **No existe `--json`**: el JSON es un archivo independiente de la consola. Se guarda después del runner, también con resultados fallidos o una lista vacía. Una excepción que impida completar el descubrimiento o el runner puede impedir la escritura; los errores al escribir se propagan.
@@ -208,7 +208,7 @@ Cada entrada corresponde a un `TestResult` inmutable:
 
 Los cuatro primeros campos son obligatorios al construir `TestResult`; los restantes admiten `None`. El procesador utiliza `[]` cuando no extrae código. `toDict()` devuelve la representación usada por el motor. Un `skip` ordinario no almacena el motivo como campo separado; un fallo esperado conserva diagnósticos aunque se exporte como `SKIPPED`.
 
-Los nombres de archivo tienen resolución de un segundo: dos ejecuciones en ese segundo usan la misma ruta y la última puede reemplazar la anterior. No hay retención automática ni un selector del nombre. Estos archivos son informes; no evitan volver a ejecutar pruebas. Si utilizas configuración compilada, aplica el procedimiento de [caché de la aplicación](/es/application/paths-and-caching) para actualizarla.
+Los nombres combinan la marca de tiempo con un identificador único, por lo que las ejecuciones del mismo segundo conservan informes separados. No hay retención automática ni un selector del nombre. Estos archivos no impiden repetir las pruebas. Si utilizas configuración compilada, sigue [caché de la aplicación](/es/application/paths-and-caching) para actualizarla.
 
 ## Motor y fachada Test
 
@@ -280,6 +280,7 @@ TestRunner(
 | Callback | Comportamiento de Orionis |
 | --- | --- |
 | `startTest(test)` | Inicia la medición del caso. |
+| `stopTest(test)` | Finaliza la medición del caso activo. |
 | `addSuccess(test)` | Registra e imprime `PASSED`. |
 | `addFailure(test, err)` | Registra `FAILED` con diagnósticos. |
 | `addError(test, err)` | Registra `ERRORED` con diagnósticos. |
@@ -290,6 +291,6 @@ TestRunner(
 
 El runner llama a `startTestRun()` y garantiza `stopTestRun()` mediante `finally` cuando ese protocolo está disponible. Las excepciones normales de casos se procesan como resultados; una excepción del propio objeto suite puede propagarse. El almacenamiento del procesador es por instancia y `getTestResults()` devuelve su lista, no una copia.
 
-Existe una limitación en los errores de preparación de clase: si `setUpClass()` falla antes de que se inicie el primer caso, el procesador aún no tiene su temporizador y puede lanzar `AttributeError` en lugar de producir un resultado `ERRORED`. No dependas de recibir un informe JSON completo en ese escenario; conserva también el código y la salida del proceso. Esto no impide utilizar `setUpClass()` para una preparación satisfactoria.
+Los errores y omisiones de fixtures de clase se registran incluso antes de iniciar el primer caso. Un resultado fuera de una prueba activa tiene `execution_time=0` y conserva los diagnósticos disponibles. Las ubicaciones del código provienen del traceback recibido, incluso si se registra después de terminar el manejo de la excepción.
 
 Continúa con [casos y decoradores](/es/testing/cases-and-decorators) o vuelve a [Pruebas](/es/testing).

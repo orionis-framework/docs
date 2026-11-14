@@ -99,7 +99,7 @@ TASKS_REPLACE_EXISTING=True
 
 La conexión `sqlite` debe existir en [Database](/es/database/configuration). El store usa sus credenciales y opciones de motor, pero crea un **motor de conexión SQL síncrono propio**. No comparte la conexión async ni las transacciones de una petición. Si SQLite usa `:memory:`, ese engine tiene su propia base en memoria; no proporciona persistencia en disco ni comparte automáticamente los datos de otra conexión.
 
-Al arrancar, el store crea la tabla si no existe. Desde 1.3.0, puedes prepararla antes de iniciar el scheduler con una de estas alternativas:
+Al arrancar, el store crea la tabla si no existe. puedes prepararla antes de iniciar el scheduler con una de estas alternativas:
 
 ```shell
 orionis schedule:migrate

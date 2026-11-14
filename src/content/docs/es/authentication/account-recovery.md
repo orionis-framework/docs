@@ -13,7 +13,7 @@ Orionis incluye rutas, controladores, schemas y plantillas para estos recorridos
 
 Configura la conexión de base de datos, el modelo de identidad en `config/auth.py` y el servicio de [correo](/es/mail). La recuperación utiliza `email` y la contraseña del modelo configurado; el registro y la verificación predeterminados utilizan expresamente `app.models.user.User`.
 
-La tabla `users` y su migración pertenecen a la aplicación. Desde **1.5.0**, `auth:migrate` prepara la tabla de recuperación definida por el core mediante `auth.passwords.table` (`AUTH_PASSWORD_RESET_TABLE`, predeterminado `password_reset_tokens`), además de tokens personales y autorización. La recuperación guarda un registro por dirección de correo, con digest del token, identificador del usuario, huella de su contraseña y fecha de emisión.
+La tabla `users` y su migración pertenecen a la aplicación. `auth:migrate` prepara la tabla de recuperación definida por el core mediante `auth.passwords.table` (`AUTH_PASSWORD_RESET_TABLE`, predeterminado `password_reset_tokens`), además de tokens personales y autorización. La recuperación guarda un registro por dirección de correo, con digest del token, identificador del usuario, huella de su contraseña y fecha de emisión.
 
 En una base nueva, aplica las migraciones de aplicación y prepara el almacenamiento interno usando una de estas dos secuencias:
 
@@ -27,7 +27,7 @@ python -B reactor migrate
 python -B reactor auth:migrate
 ```
 
-`auth:migrate` usa la conexión SQL predeterminada y su prefijo, conserva los registros existentes y no modifica el historial de migraciones. Los nombres configurados de recuperación y tokens personales deben ser distintos entre sí y de las tablas de autorización, sin distinguir mayúsculas. Ejecuta los seeders de la aplicación después de preparar las tablas. Para bases existentes, consulta las [precauciones de actualización](/es/database/migrations#auth-storage-1-5-0). Registrar rutas no crea una cuenta ni configura la entrega de correo.
+`auth:migrate` usa la conexión SQL predeterminada y su prefijo, conserva los registros existentes y no modifica el historial de migraciones. Los nombres configurados de recuperación y tokens personales deben ser distintos entre sí y de las tablas de autorización, sin distinguir mayúsculas. Ejecuta los seeders de la aplicación después de preparar las tablas. Para bases existentes, consulta la [preparación del almacenamiento de autenticación](/es/database/migrations#authentication-storage). Registrar rutas no crea una cuenta ni configura la entrega de correo.
 
 ## Activar las páginas predeterminadas
 

@@ -167,6 +167,6 @@ async def archive_tenant(tenant_id: int) -> int:
 
 Las relaciones consultan el modelo relacionado con su visibilidad habitual. Para incluir eliminados utiliza su builder (`team.players().withTrashed()` si Player tiene soft deletes) o define una variante directa de relación para eager loading. Borrar lógicamente un padre no borra sus hijos ni dispara cascadas SQL porque es UPDATE, no DELETE.
 
-Los eventos de instancia son `deleting → deleted` o `restoring → restored`. No se emiten eventos separados para “soft deleted” ni `saving/updating` en estas operaciones. Un veto detiene la escritura; excepciones se propagan. Los métodos masivos no ejecutan estos listeners.
+Los eventos de instancia son `deleting → deleted` o `restoring → restored`, con eventos posteriores solo en caso de éxito. Las filas ausentes o vetos devuelven `False` sin evento de éxito. No emiten eventos separados de eliminación lógica ni `saving/updating`; los métodos masivos no ejecutan listeners por instancia. Las excepciones se propagan.
 
 Una restricción UNIQUE sigue viendo filas eliminadas: archivar no libera un correo/nombre único en SQL. Restaurar puede colisionar con restricciones según el esquema. `trashed()` solo refleja memoria y no comprueba si otro escritor ya restauró o purgó la fila. Un borrado físico marca esa instancia como no persistida; guardarla después puede intentar un INSERT nuevo. Para tareas de limpieza permanentes filtra deliberadamente y usa transacciones cuando haya varios cambios relacionados.

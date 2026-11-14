@@ -145,3 +145,5 @@ DDL puede producir commits implícitos según el motor. Una migración envuelta 
 ### Transaction
 
 `Transaction(connection: IConnection)` implementa `ITransaction`. `async __aenter__() -> ITransaction` abre un nivel y devuelve `self`. `async __aexit__(exc_type: type[BaseException] | None, exc: BaseException | None, traceback: TracebackType | None) -> bool` confirma o revierte según `exc_type` y devuelve siempre `False`. No suprime excepciones. Utiliza `async with connection.transaction()` en lugar de invocar manualmente estos métodos especiales.
+
+Si ya se propaga un error del cuerpo de la transacción, un fallo de rollback o limpieza no lo sustituye. Los fallos SQL secundarios o tardíos se reportan mediante el runtime de fallos con SQL y bindings ocultos. Mantén el rollback en la tarea propietaria de la transacción.

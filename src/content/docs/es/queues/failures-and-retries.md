@@ -264,7 +264,7 @@ class ValidateReportIdJob(BaseJob):
 
 No existe un hook `failed()` en `IJob`, `BaseJob` ni en el flujo del worker. Implementa la decisión explícita en `handle` con `context.fail` o inspecciona el repositorio de fallos; no dependas de un callback de otro framework.
 
-Después de un `release`, `delete` o `fail` exitoso, deja de ejecutar esa rama del handler. El framework no interrumpe por ti el flujo de Python. Una excepción posterior se registra, pero un contexto terminado conserva su transición y no recibe otro reintento automático.
+Después de un `release`, `delete` o `fail` exitoso, deja de ejecutar esa rama del handler. El framework no interrumpe por ti el flujo de Python. Una excepción posterior se observa, pero un contexto terminado conserva su transición y no recibe otro reintento automático.
 
 <a id="job-handle-exceptions"></a>
 
@@ -321,9 +321,15 @@ flowchart TD
 
 El worker comprueba la expiración antes de registrar el fallo; la eliminación nativa comprueba después la propiedad/fencing. Registrar y eliminar de la cola son operaciones separadas y pueden utilizar distintos almacenes. Una recuperación competidora o fallo intermedio del backend puede dejar simultáneamente el registro durable y el job.
 
-Los errores de liberación, resolución del repositorio, registro o eliminación se escriben en los logs del worker normal. Cuando no puede finalizar de forma segura, conserva el claim sin confirmar cuando es posible para recuperar tras expirar el lease. Esa recuperación puede repetir efectos de negocio ya realizados. Aplica idempotencia de negocio o reconciliación: la confirmación de cola no es una transacción de ejecución única con un sistema externo.
+El worker normal ofrece los errores de liberación, resolución del repositorio, registro o eliminación al runtime de excepciones. Si la captura no devuelve un recibo, intenta escribirlos en el log como alternativa. Cuando no puede finalizar de forma segura, conserva el claim sin confirmar cuando es posible para recuperar tras expirar el lease. Esa recuperación puede repetir efectos de negocio ya realizados. Aplica idempotencia de negocio o reconciliación: la confirmación de cola no es una transacción de ejecución única con un sistema externo.
 
 El driver `sync` utiliza `execute(..., raise_errors=True)`: intenta una ejecución inmediata, omite los reintentos automáticos y propaga el error original. Puede seguir necesitando SQL para registrar el fallo terminal. Consulta [modos de ejecución](/es/queues/execution-modes).
+
+### Observación central de fallos
+
+Cada intento se ejecuta en una operación aislada `queue` con el ID del job como correlación. Los fallos de ejecución, reserva, recuperación, registro terminal y liberación por cancelación se ofrecen al [handler de excepciones](/es/exceptions); los errores recuperados conservan su excepción original. Un registro terminal completado también emite un evento de resultado `failed` con metadatos de confirmación. Esa observación es independiente del repositorio SQL de fallos y no reemplaza reintentos, fencing ni idempotencia.
+
+Si falla el repositorio o la liberación, ese error de recuperación se observa por separado y `raise_errors=True` conserva el error original del job. La cancelación se propaga después de intentar liberar una reserva no terminada, incluso ante cancelaciones repetidas.
 
 <a id="command-failed"></a>
 
@@ -592,4 +598,4 @@ FailedJob(
 
 Los payloads, mensajes y tracebacks pueden contener datos de negocio o secretos. El repositorio no los sanea automáticamente ni proporciona un hook de notificación de fallos. Restringe el acceso a los endpoints de inspección y aplica tu política de retención; eliminar un evento también elimina su evidencia de recuperación.
 
-Esta API no tiene un comando de depuración automática de registros antiguos. Las excepciones ordinarias del worker se escriben con el logger `orionis.queues.worker`; inspecciona esos logs además de los registros durables cuando no esté disponible el propio almacenamiento de fallos.
+Esta API no tiene un comando de depuración automática de registros antiguos. El worker ofrece las excepciones ordinarias al runtime de excepciones; `orionis.queues.worker` sirve como log alternativo cuando la captura no devuelve un recibo. Inspecciona el handler de excepciones configurado y los logs disponibles además de los registros durables cuando no esté disponible el propio almacenamiento de fallos.

@@ -70,22 +70,6 @@
       }
     },
     {
-      "id": "foundation-release-notes",
-      "kind": "doc",
-      "title": {
-        "es": "Notas de versión",
-        "en": "Release notes"
-      },
-      "label": {
-        "en": "Release notes",
-        "es": "Notas de versión"
-      },
-      "slug": {
-        "es": "/es/getting-started/release-notes",
-        "en": "/en/getting-started/release-notes"
-      }
-    },
-    {
       "id": "http-overview",
       "kind": "doc",
       "title": {

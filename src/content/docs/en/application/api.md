@@ -60,7 +60,7 @@ All are read-only and accessed without parentheses.
 | Property and type | Result and scope |
 |---|---|
 | `isCreated: bool` | `True` when `create()` finishes. Does not mean async boot methods have finished. |
-| `isBooted: bool` | Historical alias for the same creation stage. |
+| `isBooted: bool` | Alias for the same creation stage. |
 | `areProvidersBooted: bool` | Creation finished and no eager provider pending. Does not include unresolved deferred providers. |
 | `isHttpReady: bool` | Eager providers completed and ASGI/RSGI handlers published. Does not check sockets, databases or other service health. |
 | `startAt: int` | Unix timestamp in nanoseconds recorded during first initialization. |
@@ -148,7 +148,7 @@ async getExceptionHandler() -> IBaseExceptionHandler
 async getScheduler() -> IBaseScheduler
 ```
 
-`getMiddleware()` returns global classes, not the running chain. Async getters require a created application. They import and retain the configured **class**, but each call uses `build()` to create an instance through DI; they do not guarantee reuse of the same instance or start the scheduler.
+`getMiddleware()` returns global classes, not the running chain. Async getters require a created application. `getExceptionHandler()` constructs and retains one shared handler, coordinates concurrent resolution, and detaches request scope while resolving its dependencies. Keep its constructor dependencies suitable for that shared lifetime. `getScheduler()` retains the configured class but builds an instance through DI on each call; it does not start the scheduler.
 
 ```python
 from orionis.foundation.contracts.application import IApplication
@@ -169,7 +169,7 @@ class BootstrapInspector:
 
 | Methods | Reference |
 |---|---|
-| `create()`, `boot()`, `on()`, `handleCommand()` | [Lifecycle](/en/application/lifecycle). |
+| `create()`, `boot()`, `aclose()`, `on()`, `handleCommand()` | [Lifecycle](/en/application/lifecycle). |
 | `__call__`, `__rsgi__`, `__rsgi_init__`, `__rsgi_del__` | [ASGI and RSGI](/en/application/server-entrypoints): entries used by the server. |
 | `compile()` and every `with...` method | [Bootstrap options](/en/application/bootstrap). |
 | `instance`, `transient`, `singleton`, `scoped`, `bound`, `make`, `build`, `invoke`, `call` | [Registration and invocation](/en/application/container/bindings-and-invocation): inherited from Container. |

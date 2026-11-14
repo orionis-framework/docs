@@ -97,7 +97,7 @@ FileBasedCache(
 
 Missing monitored paths are omitted. Matches are resolved to absolute paths, deduplicated, and sorted; the cache file itself is excluded. With both lists empty, the hash represents an empty set and application-code changes do not invalidate the artifact.
 
-`filename` is combined through `Path` without Storage's normalization or isolation. Use an application-controlled simple name: an absolute name can replace the base directory, and a name containing subdirectories requires preparing those parents. The constructor does not individually validate every monitored-path type. Use configured `Path` objects rather than client-provided names.
+`filename` must be a single nonempty string: empty names, `.`/`..`, directory separators, drive separators (`:`), and null bytes raise `ValueError`; non-string values raise `TypeError`. The directory is resolved at construction, so a later working-directory change does not relocate the artifact. Use configured `Path` objects for monitored sources.
 
 To include a specific configuration file alongside services, construct the artifact as follows:
 
@@ -127,7 +127,7 @@ def configured_artifact(app: IApplication) -> FileBasedCache:
 
 Reads and deserializes the file on every call. Returns its `__data__` dictionary when version and hash match; returns `None` for unusable/missing content, missing metadata, a version mismatch, or changed sources. A saved empty `{}` is valid: check `is not None`, as `ServiceIndex` does, instead of truthiness.
 
-Only the source fingerprint is memoized; the dictionary is not a live in-memory cache. Changing a result does not update the file: call `save()` to persist it. The `dict | None` annotation describes artifacts written by `save()`; `get()` does not thoroughly validate manually edited file shapes.
+Only the source fingerprint is memoized; the dictionary is not a live in-memory cache. Changing a result does not update the file: call `save()` to persist it. `get()` verifies that the outer value, metadata, and returned data have dictionary shapes; it does not validate the application-specific contents.
 
 <a id="artifact-save"></a>
 ### save(data: dict) -> tuple[int, str]
@@ -322,6 +322,6 @@ Reserved markers are `__type__` and `__value__`. A dictionary containing `__type
 
 Reconstructing types/enums can import named modules. Use the format only for application-controlled artifacts; do not deserialize HTTP bodies or client-writable files. There is no signature, encryption, or hash authenticating file content.
 
-`FileBasedCache.get()` and `save()` invoke the same deserializer. Truncated files, malformed metadata, unknown tags, or removed modules can propagate errors rather than always becoming misses. Decide whether damaged artifacts should fail compilation or be cleared and rebuilt, recording the original error first. Do not indiscriminately treat failures in your own compiler as invalid cached data.
+`FileBasedCache.get()` and `save()` invoke the same deserializer. A decoded envelope with malformed metadata or a non-dictionary payload is a cache miss; `save()` can replace it. Truncated JSON, unknown tags, or removed modules can still propagate decoding or reconstruction errors. Decide whether damaged artifacts should fail compilation or be cleared and rebuilt, recording the original error first. Do not treat failures in your own compiler as invalid cached data.
 
 Operations close their files on completion; `FileBasedCache` and `Serializer` require no `close()` and expose no file contexts. Reads/writes remain blocking: use `asyncio.to_thread` from asynchronous components when cost matters. Cancelling that await does not stop a worker write already underway; replacement can finish after cancellation. Unique staging avoids concurrent writers mixing in one temporary file, but guarantees neither durability after process interruption nor consistency of computation with other operations.

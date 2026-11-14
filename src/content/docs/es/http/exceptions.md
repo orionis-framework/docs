@@ -14,10 +14,12 @@ Esta página se centra en **peticiones y respuestas HTTP**. La [guía general de
 Durante el procesamiento de una petición, Orionis distingue entre respuestas especiales del flujo HTTP y errores que debe delegar al manejador de aplicación:
 
 1. Una capa puede resolver directamente el caso, como los errores de validación.
-2. Para los demás errores, el sistema de excepciones reporta el fallo y solicita al handler una respuesta HTTP.
+2. El runtime de fallos llama a `handleFailure(exception, context)` y aplica el `FailureHandling` devuelto. El handler nativo programa el registro de fallos inesperados cuando está permitido; el propietario HTTP solicita presentación solo cuando necesita una respuesta.
 3. El adaptador ASGI/RSGI entrega esa respuesta con su estado, cabeceras y cuerpo.
 
 En WEB, la capa de sesión también puede capturar errores de sus componentes siguientes y delegarlos mientras la sesión sigue disponible. Por ello, la conversión no ocurre exclusivamente en un único `except` al final del kernel.
+
+Los fallos esperados, como una entrada inválida, también pueden llegar a `handleFailure` con `context.expected=True` aunque una política específica elija su respuesta. Personaliza el [hook de fallos](/es/exceptions/handling-exceptions) para observarlos; el registro y la presentación HTTP son efectos separados.
 
 Una respuesta de error no siempre es un `500` ni muestra un traceback. Un fallo de autorización puede producir `403`; una ruta inexistente, `404`; y un schema inválido, `422` o una redirección según su contexto.
 

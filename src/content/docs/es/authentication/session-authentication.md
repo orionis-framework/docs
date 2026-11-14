@@ -339,3 +339,7 @@ Este helper añade login/logout, registro, verificación de correo y recuperaci�
 Puedes personalizar el controlador de acceso mediante `Route.auth(login_controller=LoginController)`; debe proporcionar las acciones `index`, `login` y `logout` que utiliza el helper. El ejemplo manual de esta página usa `loginForm` y por eso no se pasa directamente como sustituto.
 
 Consulta el [catálogo de rutas y pantallas integradas](/es/authentication/account-recovery) y los [middlewares de autenticación](/es/authentication/middleware).
+
+### Accesores del contrato de identidad
+
+`Authenticatable` implementa los accesores del modelo: `getAuthIdentifierName()` devuelve el nombre del atributo de clave primaria, `getAuthIdentifier()` devuelve su valor (o `None` si ese atributo no está definido) y `getAuthPassword()` devuelve el hash guardado, o `""` si el atributo está ausente o no es texto. Son métodos síncronos. Define la constante de clase `AUTH_PASSWORD` si el hash utiliza otro atributo; el predeterminado es `"password"`. No incluyas el resultado de `getAuthPassword()` en una respuesta HTTP.

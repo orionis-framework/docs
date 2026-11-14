@@ -141,3 +141,5 @@ async def run_example():
 **Errors:** `QueryException` on compilation/execution failure; the connection layer sanitizes messages and suppresses chained driver causes.
 
 [DB facade](/en/database/db-facade) · [ORM queries](/en/orm/querying) · [Testing scenario](/en/orm/testing)
+
+Insert plans targeting a declared schema reject unknown column names before writing, including unknown keys present only in later rows of a batch. They do not silently discard unrecognized values.

@@ -324,4 +324,4 @@ Service initialization does not guarantee every subsequent writing operation suc
 
 Resolution before application creation raises `RuntimeError`; container construction and resolution errors can also propagate. General dispatch behavior is explained in [synchronous and asynchronous facades](/en/application/container/facades#facade-dispatch).
 
-Use `await logger.aclose()` when closing from async code. Since 1.1.0, the application automatically drains configured queued logging after shutdown callbacks, even if a callback fails. Do not register an extra callback solely for that default behavior. Custom standalone loggers still require an owner to close them. See [queued logging shutdown](/en/logging/rotation-and-lifecycle#logging-async-close).
+Use `await logger.aclose()` when closing from async code. The application automatically drains configured queued logging after shutdown callbacks, even if a callback fails. Do not register an extra callback solely for that default behavior. Custom standalone loggers still require an owner to close them. See [queued logging shutdown](/en/logging/rotation-and-lifecycle#logging-async-close).

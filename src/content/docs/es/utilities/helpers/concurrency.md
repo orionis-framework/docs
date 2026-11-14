@@ -5,7 +5,7 @@ editUrl: true
 lastUpdated: false
 ---
 
-Desde **1.1.0**, `orionis.support.concurrency` ofrece ejecución en hilos con capacidad limitada para I/O síncrono. Estas utilidades funcionan sin contenedor; la inyección de dependencias está disponible cuando Orionis invoca el callable decorado.
+`orionis.support.concurrency` ofrece ejecución en hilos con capacidad limitada para I/O síncrono. Estas utilidades funcionan sin contenedor; la inyección de dependencias está disponible cuando Orionis invoca el callable decorado.
 
 ```python
 from orionis.support.concurrency import (

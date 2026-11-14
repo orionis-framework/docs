@@ -13,7 +13,7 @@ No necesitas capturar esa excepción dentro de la acción ni llamar manualmente 
 
 ## Combinar conversión previa y reglas de vacío
 
-Desde **1.4.0**, [`Coerce()`](/es/validation/declaring-schemas#field-coercion) convierte los valores marcados antes de comprobar sus tipos declarados, restricciones y reglas. [`Empty()` y `NoEmpty()`](/es/validation/application-rules#empty-and-no-empty) inspeccionan después el valor validado con la misma definición de vacío y condiciones de aceptación opuestas.
+[`Coerce()`](/es/validation/declaring-schemas#field-coercion) convierte los valores marcados antes de comprobar sus tipos declarados, restricciones y reglas. [`Empty()` y `NoEmpty()`](/es/validation/application-rules#empty-and-no-empty) inspeccionan después el valor validado con la misma definición de vacío y condiciones de aceptación opuestas.
 
 Este ejemplo admite una cantidad enviada como texto, exige un nombre y una colección no vacíos y reserva un campo opcional para valores vacíos:
 
@@ -392,4 +392,4 @@ Al registrar o devolver errores, utiliza los campos y mensajes necesarios para e
 
 ## Planes de validación limitados
 
-Desde **1.1.0**, los planes de reglas personalizadas utilizan una caché LRU local al proceso con capacidad para **1.024 tipos de schema**. La expulsión libera el plan cacheado y permite recolectar tipos creados dinámicamente cuando no quedan otras referencias. Reutilizar un tipo expulsado reconstruye su plan; llenar la caché nunca omite la validación. La preparación recursiva de planes hijos y la compilación concurrente están protegidas. No cambian las reglas, los errores estructurados ni la serialización.
+Los planes de reglas personalizadas utilizan una caché LRU local al proceso con capacidad para **1.024 tipos de schema**. La expulsión libera el plan cacheado y permite recolectar tipos creados dinámicamente cuando no quedan otras referencias. Reutilizar un tipo expulsado reconstruye su plan; llenar la caché nunca omite la validación. La preparación recursiva de planes hijos y la compilación concurrente están protegidas.

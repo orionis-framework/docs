@@ -280,3 +280,5 @@ Al persistir, dict/list en una columna que no es JSON/Pickle se convierten a tex
 Una clase base con `__abstract__ = True` aplaza metadatos y columnas a sus descendientes concretos. Las columnas se heredan y una declaración hija con el mismo nombre las reemplaza; los casts se fusionan y los comportamientos se descubren por MRO. Las demás opciones usan la resolución normal de clase. Un `table` explícito se hereda: sobrescríbelo si la subclase debe usar otra tabla. No se implementa persistencia polimórfica por discriminador ni creación de tablas por herencia.
 
 Consulta la [API de atributos y serialización](/es/orm/model-api) para `fill`, `getAttribute`, `only`, `exclude` y estado original.
+
+Un modelo hidratado mediante una conexión seleccionada conserva esa conexión exacta para escrituras posteriores de instancia. Las instancias nuevas usan la política de conexión del modelo. Puedes reutilizar una declaración inline entre atributos o modelos: la creación de clase copia la definición antes de asignar el nombre. Los `TableDefinition` explícitos siguen conteniendo builders mutables; mantén estables las definiciones compiladas.

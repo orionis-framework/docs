@@ -18,12 +18,12 @@ The public `MODEL_EVENTS: tuple[str, ...]` catalog in `orionis.orm.metaclass` co
 | `creating` | Before INSERT | Yes |
 | `created` | After INSERT and state synchronization | No |
 | `updating` | Before evaluating/writing existing instance differences | Yes |
-| `updated` | After UPDATE attempt or no-change path | No |
+| `updated` | After successful UPDATE or no-change path | No |
 | `saved` | After `created`/`updated` | No |
 | `deleting` | Before physical or soft deletion | Yes |
-| `deleted` | After deletion attempt | No |
+| `deleted` | After successful deletion | No |
 | `restoring` | Before clearing the deletion stamp | Yes |
-| `restored` | After restoration attempt | No |
+| `restored` | After successful restoration | No |
 
 ```mermaid
 flowchart TD
@@ -117,7 +117,7 @@ Register listeners once during startup, for example in a provider's `boot()`. Do
 
 ## Persistence, errors and transactions
 
-Saving an unchanged existing instance emits `saving → updating → updated → saved` without UPDATE. An UPDATE affecting zero rows returns `False`, yet still emits `updated` and `saved`. Post-deletion/restoration events likewise follow the attempt. Do not treat an after-event as independent proof of affected rows.
+Saving an unchanged existing instance emits `saving → updating → updated → saved` without UPDATE. An UPDATE matching no row returns `False` and does not emit `updated` or `saved`. Likewise, `deleted` and `restored` only follow successful writes. In-memory attributes may still contain the attempted changes: inspect the boolean and retrieve fresh data when needed.
 
 Listeners run within the call, with no automatic queue or `afterCommit` phase. `created` follows INSERT **before commit** of an outer transaction. An after-listener failure outside a transaction can leave the write persisted even while the action raises. Inside a transaction, propagate the error so the context can roll back; the Python object is not reverted.
 

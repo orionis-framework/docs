@@ -78,6 +78,6 @@ En los handlers rotativos, la comprobación sucede antes de escribir la línea; 
 | Usar todos los métodos, inyectar ILogger o registrar una excepción | [Escribir logs](/es/logging/writing-logs). |
 | Comprender sufijos, conservación, compresión, cierre y varios workers | [Rotación y ciclo de vida](/es/logging/rotation-and-lifecycle). |
 
-La retención limita **cantidades de archivos**, incluso cuando el ajuste se llama `retention_days` o `retention_hours`; no elimina un archivo al alcanzar una antigüedad exacta. La implementación de `chunked` genera un sufijo nuevo en cada registro y puede rotar sin alcanzar `mb_size`. Revisa [el comportamiento de las políticas](/es/logging/rotation-and-lifecycle) antes de elegirlas.
+La retención limita **cantidades de archivos**, incluso si el ajuste se llama `retention_days` o `retention_hours`; no elimina un archivo a una antigüedad exacta. El canal `chunked` acumula registros hasta alcanzar `mb_size` y rota antes del siguiente registro. Revisa [el comportamiento de las políticas](/es/logging/rotation-and-lifecycle) antes de elegirlas.
 
 El manejo y la presentación de excepciones se documentan en [Excepciones](/es/exceptions). Esa sección explica cuándo el handler reporta un error; aquí se explica cómo se escribe y conserva ese registro.

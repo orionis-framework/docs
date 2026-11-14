@@ -56,7 +56,7 @@ flowchart TD
 | `setUpClass` | `@classmethod def setUpClass(cls) -> None` | Synchronous preparation shared by the class. |
 | `tearDownClass` | `@classmethod def tearDownClass(cls) -> None` | Clean up that shared preparation synchronously. |
 
-All six hooks retain their `unittest` signatures and **do not receive automatic injection**. If `setUp` or `asyncSetUp` fails, the test method and its teardown do not run; registered cleanups are still attempted. After successful preparation, a test failure does not prevent teardown from being attempted. Errors in per-case hooks are recorded as test errors. Class hook failures before the first case have a specific processor limitation described in [results](/en/testing/results-and-reference).
+All six hooks retain their `unittest` signatures and **do not receive automatic injection**. If `setUp` or `asyncSetUp` fails, the test method and its teardown do not run; registered cleanups are still attempted. After successful preparation, a test failure does not prevent teardown from being attempted. Errors in per-case hooks are recorded as test errors. Class fixture failures and skips before the first case are also recorded; see [results](/en/testing/results-and-reference).
 
 The loop closes when the case finishes and cancels tasks still pending. This does not replace explicitly closing connections, streams or other resources.
 
@@ -229,9 +229,9 @@ Do not assume that an arbitrary decorator changing a signature preserves injecti
 
 ### `setMethodPattern(pattern: str) -> None`
 
-A class method that sets the glob deciding whether the selected method is wrapped with application invocation. It defaults to `test*` and belongs to the current context. The engine updates it through `setMethodPattern(...)`; use the [test configuration and execution options](/en/testing/writing-and-running-tests).
+A class method that sets the context-local glob deciding whether a selected method is wrapped with application invocation. The default is `test*`. The engine applies its own matcher only during discovery and restores the previous context afterward, including after errors.
 
-This does not change `unittest.TestLoader`'s discovery prefix: the command still loads methods beginning with `test`. Keep that prefix and use patterns such as `testCreate*` to select a subset. Lifecycle hooks and private methods are never wrapped.
+The engine uses a custom loader that selects methods matching its glob, including custom prefixes such as `check*`. Calling `TestCase.setMethodPattern()` alone does not configure an external `unittest.TestLoader`. Lifecycle hooks and private methods are never wrapped for injection.
 
 ### `await mcp(server, config=None, *, app=None) -> McpTestClient`
 

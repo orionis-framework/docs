@@ -104,7 +104,7 @@ Para obtener un servicio directamente utiliza `await self.app.make(ContratoOClas
 | Servicios scoped | Requieren un scope activo en el contexto que los resuelve. |
 | Bases de datos, archivos, colas y caché | Conservan los cambios salvo la limpieza que programe la prueba. |
 
-El motor ejecuta la suite síncrona en un executor. No propaga automáticamente a ese hilo el contexto del scope CLI; no dependas de él dentro del caso. Abre el scope en el propio método o fixture antes de resolver servicios scoped. El contenedor sí resuelve los constructores de los **servicios** que necesita el método; la instancia de `TestCase` la crea el loader de pruebas.
+El motor ejecuta la suite síncrona mediante `asyncio.to_thread()`, copiando las variables de contexto del llamador. Cada `TestCase` conserva su contexto y event loop, pero los objetos scoped heredados no se recrean automáticamente. Abre un scope explícito en el método para probar un ciclo de vida independiente; no compartas recursos ligados a un loop entre loops. El contenedor construye los **servicios** inyectados; el loader construye la instancia de `TestCase`.
 
 Una prueba de reglas puras no necesita sustituir la aplicación completa. Para integraciones utiliza datos exclusivos, almacenes destinados a pruebas y limpieza explícita. No hay rollback automático de base de datos por heredar de `TestCase`; la guía de [pruebas de Database y ORM](/es/orm/testing) explica sus mecanismos específicos.
 

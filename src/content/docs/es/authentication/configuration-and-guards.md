@@ -115,7 +115,7 @@ El driver, la cookie, el cifrado y la duración de la sesión pertenecen a `conf
 
 `expiration` admite `None` o un entero positivo; `None` permite tokens sin vencimiento automático. `secret_bytes` debe ser un entero entre `32` y `128`. Las credenciales pueden revocarse independientemente de su expiración. Emisión, almacenamiento y envío se explican en [autenticación con tokens](/es/authentication/personal-access-tokens).
 
-Ejecuta [`auth:migrate`](/es/database/commands#auth-migrate) para crear la tabla de tokens configurada desde la definición del framework. Desde **1.5.0**, prepara también las cinco tablas de autorización y la tabla configurada de recuperación de contraseñas. Usa la conexión SQL predeterminada y su prefijo, conserva registros existentes y no admite `--database`. La identidad y sus migraciones siguen en la aplicación; el comando no crea usuarios ni inserta roles, permisos o asignaciones.
+Ejecuta [`auth:migrate`](/es/database/commands#auth-migrate) para crear la tabla de tokens configurada desde la definición del framework. Prepara también las cinco tablas de autorización y la tabla configurada de recuperación de contraseñas. Usa la conexión SQL predeterminada y su prefijo, conserva registros existentes y no admite `--database`. La identidad y sus migraciones siguen en la aplicación; el comando no crea usuarios ni inserta roles, permisos o asignaciones.
 
 ### passwords: recuperación de contraseña
 
@@ -127,7 +127,7 @@ Ejecuta [`auth:migrate`](/es/database/commands#auth-migrate) para crear la tabla
 
 Los dos límites deben ser enteros positivos. El token de recuperación es una credencial diferente del token Bearer de API. El broker y las rutas nativas se explican en [recuperación y verificación](/es/authentication/account-recovery).
 
-`auth:migrate` crea `auth.passwords.table` desde el esquema del core. Su nombre y el de `auth.tokens.table` deben ser distintos entre sí y de `permissions`, `roles`, `model_has_permissions`, `model_has_roles` y `role_has_permissions`, sin distinguir mayúsculas; una colisión se rechaza antes de crear tablas. Cambiar el nombre configurado no traslada registros existentes. Consulta la [actualización del almacenamiento de auth](/es/database/migrations#auth-storage-1-5-0).
+`auth:migrate` crea `auth.passwords.table` desde el esquema del core. Su nombre y el de `auth.tokens.table` deben ser distintos entre sí y de `permissions`, `roles`, `model_has_permissions`, `model_has_roles` y `role_has_permissions`, sin distinguir mayúsculas; una colisión se rechaza antes de crear tablas. Cambiar el nombre configurado no traslada registros existentes. Consulta la [preparación del almacenamiento de autenticación](/es/database/migrations#authentication-storage).
 
 ### remember: acceso persistente opcional
 

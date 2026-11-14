@@ -59,7 +59,7 @@ Estos comandos utilizan las definiciones del framework y la configuración de se
 
 ### `auth:migrate`
 
-Desde **1.5.0**, crea las siete tablas internas de autenticación y autorización desde las definiciones del core, en la conexión SQL predeterminada y con su prefijo de tablas:
+Crea las siete tablas internas de autenticación y autorización desde las definiciones del core, en la conexión SQL predeterminada y con su prefijo de tablas:
 
 | Tablas | Nombre o configuración |
 | --- | --- |
@@ -76,7 +76,7 @@ orionis auth:migrate
 python -B reactor auth:migrate
 ```
 
-En una base nueva, ejecuta `migrate`, luego `auth:migrate` y finalmente `seed`. Para una aplicación existente, conserva las migraciones aplicadas y sus schemas; consulta la [actualización a 1.5.0](/es/database/migrations#auth-storage-1-5-0).
+En una base nueva, ejecuta `migrate`, luego `auth:migrate` y finalmente `seed`. Para una aplicación existente, conserva las migraciones aplicadas y sus schemas; consulta la [guía de almacenamiento de autenticación](/es/database/migrations#authentication-storage).
 
 <a id="cache-migrate"></a>
 
@@ -299,7 +299,7 @@ orionis make:database-schema products
 python -B reactor make:database-schema products
 ```
 
-Con las rutas predeterminadas genera `database/schemas/products_schema.py`. También admite subdirectorios, como `catalog/products`. Desde 1.0.10, el stub contiene una constante de módulo, sin clase contenedora:
+Con las rutas predeterminadas genera `database/schemas/products_schema.py`. También admite subdirectorios, como `catalog/products`. el stub contiene una constante de módulo, sin clase contenedora:
 
 ```python
 from typing import Final

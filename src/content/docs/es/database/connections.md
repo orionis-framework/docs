@@ -102,7 +102,7 @@ def example(manager: IConnectionManager):
 def getDefaultName(self) -> str:
 ```
 
-Devuelve el predeterminado del gestor. La construcción inicial normaliza ese nombre a minúsculas; no implica conexión física abierta.
+Devuelve el valor predeterminado configurado, conservando la coincidencia exacta y sus mayúsculas. Si no existe ese nombre registrado, el constructor intenta su forma minúscula. No abre una conexión física.
 
 ```python
 from orionis.database.contracts.connection_manager import IConnectionManager
@@ -150,7 +150,7 @@ def example(manager: IConnectionManager):
 async def disconnect(self, name: str | None = None) -> None:
 ```
 
-Con nombre elimina esa instancia cacheada y espera su cierre; nombre no cacheado no hace nada. `None` vacía la caché y cierra todas secuencialmente. La configuración permanece registrada. Un fallo de cierre se propaga. No lo ejecutes por petición.
+Un nombre elimina y cierra esa instancia en caché; si no está en caché, no hace nada. `None` vacía la caché e intenta cerrar todas las conexiones, aunque falle una anterior. La cancelación tiene prioridad; en otro caso propaga el primer fallo y reporta los secundarios centralmente. La configuración permanece registrada. Cierra durante el apagado o una reconfiguración controlada, no tras cada petición.
 
 ```python
 from orionis.database.contracts.connection_manager import IConnectionManager

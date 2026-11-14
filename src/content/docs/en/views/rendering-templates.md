@@ -186,7 +186,7 @@ Pass only the data a page needs and avoid naming variables after helpers such as
 
 ## Pending rendering and HTTP responses
 
-`View.make()` is synchronous: it prepares a `PendingView` without loading or checking the template yet. Awaiting it processes the template, creates an `HTMLResponse` with status `200`, and adds `X-Orionis-Render: SSR`.
+`View.make()` is synchronous: it prepares a `PendingView` without loading or checking the template yet. Awaiting it creates an `HTMLResponse` with the configured status (default `200`), headers, and background task. It adds `X-Orionis-Render: SSR` only when the initial headers do not already supply that header.
 
 ```python
 from orionis.http import HTMLResponse
@@ -207,7 +207,7 @@ async def private_profile() -> HTMLResponse:
 
 You can write `await pending.render()` instead of `await pending`; both return an `HTMLResponse`. Chained response methods are queued and applied after HTML generation. Use `setHeader()` to replace a header and `addHeader()` to append another value. Each method's real signature belongs to [HTTP responses](/en/http/responses).
 
-To set the status, modify the rendered response:
+Pass response options directly when preparing the view. Use `context` when a template itself needs a variable named `status_code`, `headers`, `background`, or `context`; ordinary keyword variables override matching entries in that mapping.
 
 ```python
 from orionis.http import HTMLResponse
@@ -215,17 +215,20 @@ from orionis.support.facades import View
 
 
 async def created_profile() -> HTMLResponse:
-    rendered = await View.make(
+    return await View.make(
         "users.profile",
+        status_code=201,
+        headers={"Cache-Control": "no-store"},
+        context={"status_code": "created"},
         title="Profile created",
         user={"id": 7, "name": "Ada", "active": True},
         skills=[],
     )
-    rendered.status_code = 201
-    return rendered
 ```
 
-`View.make(..., status_code=201)` **does not configure the HTTP status**: it introduces a template variable named `status_code`. A `headers` argument behaves the same way.
+`make(template, *, status_code=200, headers=None, background=None, context=None, **variables)` accepts `HTTPStatus | int`, a header mapping, and `BackgroundTask | None` for its response options. `context` must be a mapping or `None`, otherwise construction raises `TypeError`. Response-option validation and chained mutations happen when awaited.
+
+The fluent methods `withStatusCode(status_code)`, `withHeaders(headers)`, and `withBackground(background)` return the same pending view. They run after initial options, in call order; `withBackground(None)` clears a configured task. For example, `return await View.make("errors.denied").withStatusCode(403).withHeaders({"Cache-Control": "no-store"})` requires a `resources/views/errors/denied.html` template and returns HTTP 403. Use the same options with `response.view(...)`.
 
 Create a pending view per operation. Awaiting the same object twice renders again and replays its mutations; it does not cache a computed response. An action must return the response obtained with `await`, not an unawaited pending view or a bare `str`.
 
@@ -246,7 +249,7 @@ async def invalid_login() -> HTMLResponse:
         .withFlash("status", "Please review the form")
         .setHeader("Cache-Control", "no-store")
     )
-    rendered.status_code = 422
+    rendered.withStatusCode(422)
     return rendered
 ```
 

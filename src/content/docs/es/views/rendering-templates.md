@@ -186,7 +186,7 @@ Pasa solo los datos que la página necesita y evita usar como variables nombres 
 
 ## Renderizado pendiente y respuesta HTTP
 
-`View.make()` es síncrono: prepara un `PendingView` sin cargar ni validar todavía la plantilla. Al ejecutar `await`, Orionis procesa la plantilla, crea un `HTMLResponse` con estado `200` y añade `X-Orionis-Render: SSR`.
+`View.make()` es síncrono: prepara un `PendingView` sin cargar ni comprobar todavía la plantilla. Al esperarlo, crea una `HTMLResponse` con el estado configurado (`200` por defecto), los encabezados y la tarea en segundo plano. Solo añade `X-Orionis-Render: SSR` si los encabezados iniciales no lo incluyen.
 
 ```python
 from orionis.http import HTMLResponse
@@ -207,7 +207,7 @@ async def private_profile() -> HTMLResponse:
 
 Puedes escribir `await pending.render()` en lugar de `await pending`; ambos devuelven `HTMLResponse`. Los métodos de respuesta encadenados se ponen en cola y se aplican después de generar el HTML. Usa `setHeader()` para reemplazar un encabezado y `addHeader()` para añadir otro valor. La firma real de cada método corresponde a [respuestas HTTP](/es/http/responses).
 
-Para establecer el estado, modifica la respuesta ya renderizada:
+Pasa las opciones de respuesta al preparar la vista. Usa `context` si la plantilla necesita una variable llamada `status_code`, `headers`, `background` o `context`; las variables keyword normales sobrescriben las entradas correspondientes de ese mapping.
 
 ```python
 from orionis.http import HTMLResponse
@@ -215,17 +215,20 @@ from orionis.support.facades import View
 
 
 async def created_profile() -> HTMLResponse:
-    rendered = await View.make(
+    return await View.make(
         "users.profile",
+        status_code=201,
+        headers={"Cache-Control": "no-store"},
+        context={"status_code": "created"},
         title="Profile created",
         user={"id": 7, "name": "Ada", "active": True},
         skills=[],
     )
-    rendered.status_code = 201
-    return rendered
 ```
 
-`View.make(..., status_code=201)` **no configura el estado HTTP**: incorpora una variable de plantilla llamada `status_code`. Lo mismo ocurre con un argumento `headers`.
+`make(template, *, status_code=200, headers=None, background=None, context=None, **variables)` acepta `HTTPStatus | int`, un mapping de encabezados y `BackgroundTask | None` como opciones de respuesta. `context` debe ser un mapping o `None`; otro valor produce `TypeError` al construir. Las opciones de respuesta y las mutaciones encadenadas se validan al esperar el pendiente.
+
+Los métodos fluidos `withStatusCode(status_code)`, `withHeaders(headers)` y `withBackground(background)` devuelven el mismo pendiente. Se ejecutan después de las opciones iniciales y en orden de llamada; `withBackground(None)` elimina una tarea configurada. Por ejemplo, `return await View.make("errors.denied").withStatusCode(403).withHeaders({"Cache-Control": "no-store"})` necesita la plantilla `resources/views/errors/denied.html` y devuelve HTTP 403. `response.view(...)` acepta las mismas opciones.
 
 Crea un pendiente por operación. Esperar el mismo objeto dos veces vuelve a renderizarlo y reproduce sus mutaciones; no almacena una respuesta ya calculada. Una acción debe devolver la respuesta obtenida con `await`, no el pendiente sin esperar ni un `str` suelto.
 
@@ -246,7 +249,7 @@ async def invalid_login() -> HTMLResponse:
         .withFlash("status", "Please review the form")
         .setHeader("Cache-Control", "no-store")
     )
-    rendered.status_code = 422
+    rendered.withStatusCode(422)
     return rendered
 ```
 

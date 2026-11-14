@@ -59,7 +59,7 @@ These commands use framework-owned definitions and the application's service con
 
 ### `auth:migrate`
 
-Since **1.5.0**, creates all seven internal authentication and authorization tables from core definitions on the default SQL connection, including its table prefix:
+Creates all seven internal authentication and authorization tables from core definitions on the default SQL connection, including its table prefix:
 
 | Tables | Name or configuration |
 | --- | --- |
@@ -76,7 +76,7 @@ orionis auth:migrate
 python -B reactor auth:migrate
 ```
 
-For a new database, run `migrate`, then `auth:migrate`, and finally `seed`. For an existing application, retain applied migrations and their schemas; see the [1.5.0 upgrade guide](/en/database/migrations#auth-storage-1-5-0).
+For a new database, run `migrate`, then `auth:migrate`, and finally `seed`. For an existing application, retain applied migrations and their schemas; see the [authentication storage guide](/en/database/migrations#authentication-storage).
 
 <a id="cache-migrate"></a>
 
@@ -299,7 +299,7 @@ orionis make:database-schema products
 python -B reactor make:database-schema products
 ```
 
-With default paths it generates `database/schemas/products_schema.py`. Subdirectories such as `catalog/products` are also supported. Since 1.0.10, the stub contains a module constant without a holder class:
+With default paths it generates `database/schemas/products_schema.py`. Subdirectories such as `catalog/products` are also supported. the stub contains a module constant without a holder class:
 
 ```python
 from typing import Final

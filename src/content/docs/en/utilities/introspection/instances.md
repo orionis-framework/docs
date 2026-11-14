@@ -159,7 +159,7 @@ reflected = ReflectionInstance(service)
 
 These methods take no arguments. They return references or metadata for the object’s class, not a copy of the service.
 
-`getClassName()`, `getModuleName()` and `getModuleWithClassName()` use names captured when the wrapper is constructed. If you later change the class `__name__` or `__module__`, `clearCache()` does not refresh those fields; construct another wrapper to obtain the new names.
+`getClassName()`, `getModuleName()` and qualified names use the wrapper's identity metadata. `clearCache()` refreshes class and module names after external renaming. Existing private members retain their original mangling prefix.
 
 <a id="reflectioninstance-method-getinstance"></a>
 
@@ -308,7 +308,7 @@ assert reflected.getSourceCode("missing") is None
 
 ## Object attributes
 
-Scanning uses `vars(instance)`: it enumerates the instance `__dict__`, without automatically including class variables or computed property values. An object with `__slots__` and no `__dict__` can be constructed, but these scans raise `TypeError`.
+Scans stored instance attributes from `__dict__` and populated slots throughout the class hierarchy, excluding callable values. It does not evaluate computed properties or invent values for unpopulated slots.
 
 The dictionaries are cached and returned by reference. Prefixes classify Python names; they do not enforce access control. A private member such as `_ReportService__secret` appears as `__secret`; an inherited private member with another class prefix can be classified as protected.
 
@@ -420,7 +420,7 @@ assert not reflected.hasAttribute("missing")
 def getAttribute(self, name: str, default: Any=None) -> Any: ...
 ```
 
-`name` is required; `default=None` is used when absent. Prefer the cached dictionary and also evaluate a `getattr` lookup; that lookup can execute descriptors. Use unmangled names for own private entries. Getter exceptions can propagate.
+Returns a stored cached attribute when present; otherwise calls `getattr(instance, name, default)`, which can evaluate descriptors. The default is `None`. Private entries use their source-level names in the cached mapping. Getter exceptions propagate.
 
 ```python
 assert reflected.getAttribute("__secret") == "private"
@@ -771,7 +771,7 @@ assert not reflected.hasMethod("__init__")
 def getMethodSignature(self, name: str) -> inspect.Signature: ...
 ```
 
-With required `name`, return an `inspect.Signature` for a callable class member, mangling own private names. Dunder names such as `__init__` are supported independently of `hasMethod()`. An instance method retains `self` in this signature; a classmethod already bound to its class does not retain `cls`. Non-callables raise `AttributeError`; inspection errors propagate.
+Returns `inspect.Signature` for an instance override when present, otherwise the class callable. Source-level private names are supported. A class instance-method function retains its receiver in this raw signature; an already bound callable follows Python binding. Dependency maps apply their separate receiver-removal rules. Non-callables raise `AttributeError`.
 
 ```python
 assert list(reflected.getMethodSignature("render").parameters) == ["self", "limit"]
@@ -787,7 +787,7 @@ assert list(reflected.getMethodSignature("__sign").parameters) == ["self"]
 def getMethodDocstring(self, name: str) -> str | None: ...
 ```
 
-With required `name`, return the class callable docstring, or `None`. Own private names are supported and results are memoized. Missing or non-callable members raise `AttributeError`.
+Returns the docstring of an instance override when present, otherwise the class callable, or `None`. Private names are supported and results are memoized. Missing or non-callable members raise `AttributeError`.
 
 ```python
 assert reflected.getMethodDocstring("render") == "Render the report."
@@ -825,7 +825,7 @@ assert service.describe() == "Sales"
 def removeMethod(self, name: str) -> None: ...
 ```
 
-With required `name`, first require `hasMethod()` to be true, then delete the class member, not the instance member. Return `None`; this affects every instance of that class. Missing members raise `AttributeError`. It cannot remove a merely inherited method from a subclass. Use it for directly declared public or protected methods: ordinary private methods cannot be removed through this API because lookup and deletion do not apply the same mangling rules. Both `__secret` and `_Class__secret` raise `AttributeError` in that case.
+Requires a known method and returns `None`. Removes an instance override first; if absent, removes the method from the reflected class, affecting its other instances. Removing an override reveals the class method again. Source-level private names are mangled correctly. An absent method raises `AttributeError`; a class-level deletion cannot remove a merely inherited definition.
 
 ```python
 assert reflected.removeMethod("temporary") is None

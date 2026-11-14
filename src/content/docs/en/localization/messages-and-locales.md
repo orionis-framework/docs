@@ -168,7 +168,7 @@ Use codes such as `en`, `es`, `es-CO`, `pt_BR`, or `zh-Hant`. The translator acc
 
 `es-CO`, `es_CO`, and `es-co` are different locale keys for the translator. Create files and query codes with matching spelling. On case-insensitive filesystems, disk access may be less strict, but the framework does not normalize names.
 
-`Lang.availableLocales()` returns a sorted tuple of names discovered in root `.json` files and directories containing at least one `.json` file directly. Discovery does not parse their contents or guarantee that their names pass translator validation. It is neither a list of locales installed in Python nor a list of maps already loaded into the cache.
+`Lang.availableLocales()` returns a sorted tuple of valid locale codes discovered in root `.json` files and directories containing at least one `.json` file directly. Discovery skips malformed locale names and sources resolving outside the language root; it does not parse file contents. This is neither a list of locales installed in Python nor a list of maps already loaded into the cache.
 
 ## How fallback works
 
@@ -182,8 +182,47 @@ Selecting `locale=` for a query does not change the shared active locale. Use th
 
 ## Locale cache limits and missing files
 
-In **1.1.0**, `TranslationRepository(loader, *, max_locales=256, negative_ttl=30)` retains at most **256 locale maps per repository**, counting both populated and empty maps. Reads refresh recency; reaching capacity evicts the least recently used map. An empty result is retried after **30 seconds** by default, so adding a previously missing locale no longer requires indefinite negative caching.
+`TranslationRepository(loader, *, max_locales=256, negative_ttl=30)` retains at most **256 locale maps per repository**, counting both populated and empty maps. Reads refresh recency; reaching capacity evicts the least recently used map. An empty result is retried after **30 seconds** by default, so an absent locale can become available without restarting the application.
 
-`max_locales` must be a positive integer excluding booleans. `negative_ttl` must be finite and nonnegative; zero retries empty results on the next read. These are repository constructor options, not new `APP_*` environment settings. Replace the repository binding in a provider to use a custom budget.
+`max_locales` must be a positive integer excluding booleans. `negative_ttl` must be finite and nonnegative; zero retries empty results on the next read. These are repository constructor options, not `APP_*` environment settings. The native `LocalizationManager` constructs its loader and repository directly: registering a separate `ITranslationRepository` binding does not configure that manager. Construct a translator explicitly for a custom budget.
 
-Populated maps do not watch the filesystem and remain cached until eviction or explicit invalidation. Existing `forget()`, `flush()` and translator reload APIs remain available. Loading stays synchronous; preload required locales at startup when first-request file I/O is undesirable. Cached maps are shared within the repository, so consumers should not mutate them.
+Populated maps do not watch the filesystem and remain cached until eviction or explicit invalidation. Use `forget()`, `flush()`, or the translator reload API to refresh them. Loading stays synchronous; preload required locales at startup when first-request file I/O is undesirable. Cached maps are shared within the repository, so consumers should not mutate them.
+
+## Loader and repository integration
+
+`TranslationLoader(path: Path)` implements `ITranslationLoader`. Its synchronous `load(locale)` returns a flattened translation map, and `availableLocales()` returns sorted discovered locale codes. Loading a missing locale returns an empty map. Invalid codes raise `InvalidLocaleException`; malformed JSON raises `TranslationSyntaxException`; a file disappearing during loading raises `TranslationFileNotFoundException`. A resolved source outside the language root raises `TranslationException`, including symbolic links that escape that root.
+
+`validate_locale(locale: str) -> str`, from `orionis.localization.validators`, accepts alphanumeric segments separated by single `-` or `_` characters and preserves their case. It raises `InvalidLocaleException` for invalid types, whitespace, paths, or empty segments; syntactic validity does not prove a locale exists. These exceptions derive from `TranslationException`.
+
+For a standalone translator or custom service, provide the existing application language directory explicitly:
+
+```python
+from pathlib import Path
+from orionis.localization import TranslationLoader, TranslationRepository, Translator
+
+
+def build_translator(language_directory: Path) -> Translator:
+    loader = TranslationLoader(language_directory)
+    repository = TranslationRepository(loader, max_locales=32, negative_ttl=10)
+    return Translator(
+        locale="en",
+        fallback="en",
+        loader=loader,
+        repository=repository,
+    )
+```
+
+
+The returned translator uses the same `get()`, `has()`, `choice()`, and invalidation APIs as `Lang`. Construction does not load the files or replace the application's shared translator. `LocalizationProvider` registers `ILocalizationManager` as a singleton, then binds the result of `LocalizationManager.translator()` as `ITranslator` and pins `Lang` during boot. A custom application-wide implementation must be registered before that boot step.
+
+`TranslationRepository` implements `ITranslationRepository`; all its methods are synchronous:
+
+| Method | Result |
+| --- | --- |
+| `get(locale: str) -> TranslationMap` | Load or return the shared cached map; refresh its LRU position. |
+| `has(locale: str) -> bool` | Check the cached locale without loading; remove an expired empty entry. |
+| `forget(locale: str) -> bool` | Remove a cached entry and its expiry, returning whether it existed. |
+| `flush() -> None` | Clear every cached map and expiry. |
+| `loadedLocales() -> tuple[str, ...]` | Report currently cached locale codes, excluding expired empty entries; it does not scan the filesystem. |
+
+The repository serializes access with an `RLock`; the manager publishes one translator across concurrent first resolutions. The translator's active locale is still shared state: use per-call `locale=` for concurrent requests.

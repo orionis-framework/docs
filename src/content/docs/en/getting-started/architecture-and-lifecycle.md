@@ -293,7 +293,7 @@ app.on(Lifespan.STARTUP, warm_resources, runtime=Runtime.HTTP)
 
 Register it before the event occurs. Callbacks do not run per request or when calling `create()`.
 
-**Errors and shutdown.** A failing callback interrupts iteration: there is no rollback or guarantee that the remaining callbacks run. ASGI reports startup failure with `lifespan.startup.failed`; RSGI propagates the initialization error. A shutdown failure is reported as `lifespan.shutdown.failed` in ASGI and propagates from the RSGI hook. CLI startup occurs outside the command's `try/finally`: a startup failure does not automatically run shutdown. After successful startup, the command does have shutdown in `finally`, even when execution fails. Abrupt process termination cannot guarantee callbacks either; each resource must account for its own cleanup.
+**Errors and shutdown.** A failing startup callback interrupts startup without rolling back resources already opened. Shutdown attempts all callbacks after ordinary failures and preserves the first error. ASGI reports startup failure with `lifespan.startup.failed`; RSGI propagates the initialization error. A shutdown failure is reported as `lifespan.shutdown.failed` in ASGI and propagates from the RSGI hook. CLI startup occurs outside the command's `try/finally`: a startup failure does not automatically run shutdown. After successful startup, the command does have shutdown in `finally`, even when execution fails. Abrupt process termination cannot guarantee callbacks either; each resource must account for its own cleanup.
 
 ### Recovering bootstrap/lifespan.py
 
@@ -340,7 +340,7 @@ Selects `AUTH_GUARD=session`, with `token` as an alternative; `AUTH_MODEL=app.mo
 
 ### `http.py`: HTTP server policies
 
-Groups body and multipart limits, WebSockets, proxies, hosts, CORS, CSRF and rate limiting. `HTTP_MAX_BODY_SIZE` allows 16 MiB and `HTTP_MAX_CONCURRENT_REQUESTS` allows 128. `TRUSTED_PROXIES` starts with `127.0.0.1`. Since 1.0.15, HTTP CORS defaults to `["*"]` for `CORS_ALLOW_ORIGINS`, `CORS_ALLOW_METHODS` and `CORS_ALLOW_HEADERS`, corresponding to `allow_origins`, `allow_methods` and `allow_headers`. This completes the origin change introduced in 1.0.13 to make debugging from browser clients easier. Exposed headers retain `[]` and `allow_credentials=False`. See [HTTP CORS](/en/http/middleware#http-cors) to adjust these options. Rate limiting is disabled and CSRF enabled by default. `HTTP_MONITOR_DISCONNECTS=False` controls additional monitoring during handler execution; the local file reads this variable, while the core retains a constant `False` default.
+Groups body and multipart limits, WebSockets, proxies, hosts, CORS, CSRF and rate limiting. `HTTP_MAX_BODY_SIZE` allows 16 MiB and `HTTP_MAX_CONCURRENT_REQUESTS` allows 128. `TRUSTED_PROXIES` starts with `127.0.0.1`. HTTP CORS defaults to `["*"]` for `CORS_ALLOW_ORIGINS`, `CORS_ALLOW_METHODS` and `CORS_ALLOW_HEADERS`, corresponding to `allow_origins`, `allow_methods` and `allow_headers`. Exposed headers retain `[]` and `allow_credentials=False`. See [HTTP CORS](/en/http/middleware#http-cors) to adjust these options. Rate limiting is disabled and CSRF enabled by default. `HTTP_MONITOR_DISCONNECTS=False` controls additional monitoring during handler execution; the local file reads this variable, while the core retains a constant `False` default.
 
 ### `logging.py`: files and rotation
 
@@ -354,7 +354,7 @@ Groups body and multipart limits, WebSockets, proxies, hosts, CORS, CSRF and rat
 
 `MCP_DEFAULT_PAGE_SIZE=50` and `MCP_MAX_PAGE_SIZE=100` control pagination. `MCP_MAX_REQUEST_SIZE` falls back to `HTTP_MAX_BODY_SIZE`, then to 1 MiB; concurrency falls back to `HTTP_MAX_CONCURRENT_REQUESTS`, then to 32. These are environment variables, rather than effective `http.py` values. The configuration also limits subscriptions, tool search and responses. Servers are registered through AI routes.
 
-Since **1.0.16**, `allowed_origins` uses independent `list[str]` values. When `CORS_ALLOW_ORIGINS` is unset, editable `config/mcp.py` defaults to `["https://inspector.orionis-framework.com"]`; core `McpConfig` retains `[]`. A defined environment value replaces the editable default, including `[]`, which rejects every present `Origin`. Requests without that header pass the origin check. MCP requires exact HTTP(S) origins without wildcards, paths, or trailing slashes. See [MCP configuration](/en/mcp/stdio-and-configuration#allowed-http-origins) to update an existing application and distinguish this policy from HTTP CORS.
+`McpConfig.allowed_origins` stores an independent `list[str]` and defaults to `[]`. Configure exact HTTP(S) origins explicitly for browser clients; wildcards, paths and trailing slashes are invalid. An empty list rejects any present `Origin`, while requests without that header pass the origin check. HTTP CORS and MCP origin validation are separate policies. See [MCP configuration](/en/mcp/stdio-and-configuration#allowed-http-origins).
 
 ### `queue.py`: job execution
 
@@ -423,7 +423,7 @@ Its four folders separate persistence responsibilities:
 | Folder | Concept and SSR example |
 | --- | --- |
 | `factories/` | Generate model attributes for tests or example data. `UserFactory.definition()` prepares a name, email and active state; persistence requires another operation and mandatory fields such as an already hashed password. |
-| `migrations/` | Express schema changes: `up()` applies them and `down()` defines their reversal. SSR includes migrations for users, authorization, sessions and other services. |
+| `migrations/` | Express schema changes: `up()` applies them and `down()` defines their reversal. Keep identity and business tables in application migrations. Prepare framework-owned auth, cache, session, queue and scheduler tables with their internal storage commands. |
 | `schemas/` | Table definitions containing columns, types and constraints. For example, `USERS_V1` is a `TableDefinition` used by a migration. |
 | `seeders/` | Insert initial or example data. Request them explicitly with `migrate --seed`; review the administrator seeder and its credentials before running it. |
 

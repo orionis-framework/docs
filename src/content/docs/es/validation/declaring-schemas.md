@@ -527,7 +527,7 @@ Los cinco primeros no comprueban el valor ni lo transforman. `Message` personali
 
 ## Convertir campos marcados con `Coerce()`
 
-Desde **1.4.0**, importa `Coerce` desde `orionis.schemas.metadata` para convertir un campo a su tipo declarado **antes de validar tipos, restricciones y reglas**. El marcador no recibe argumentos y funciona con `Field` o `Annotated`. Los campos fuera de su alcance siguen siendo estrictos; el validador tampoco incorpora una opción global `strict=False`.
+Importa `Coerce` desde `orionis.schemas.metadata` para convertir un campo a su tipo declarado **antes de validar tipos, restricciones y reglas**. El marcador no recibe argumentos y funciona con `Field` o `Annotated`. Los campos fuera de su alcance siguen siendo estrictos; el validador tampoco incorpora una opción global `strict=False`.
 
 ```python
 from orionis.schemas import Schema
@@ -618,7 +618,7 @@ La conversión se ejecuta al validar, incluida la inyección de schemas, no al c
 
 El parámetro `payload: UserSchema` activa el flujo HTTP: el contenedor obtiene `await request.data()`, espera `Validator.validate(data, UserSchema)` e invoca el método únicamente si la validación tiene éxito. No combina automáticamente el cuerpo con la query string o los parámetros de ruta.
 
-La conversión sigue siendo estricta para el campo `age` sin marcar del ejemplo: enviar `"36"` produce un error de tipo. Desde 1.4.0, habilita la conversión con [`Coerce()`](#field-coercion) en los campos que la necesiten; el método del validador no admite una opción global `strict=False`. Los campos desconocidos se ignoran de forma predeterminada; puedes rechazarlos declarando la clase con `class UserSchema(Schema, forbid_unknown_fields=True):`.
+La conversión sigue siendo estricta para el campo `age` sin marcar del ejemplo: enviar `"36"` produce un error de tipo. Habilita la conversión con [`Coerce()`](#field-coercion) en los campos que la necesiten; el método del validador no admite una opción global `strict=False`. Los campos desconocidos se ignoran de forma predeterminada; puedes rechazarlos declarando la clase con `class UserSchema(Schema, forbid_unknown_fields=True):`.
 
 Construir `UserSchema(name=..., email=..., age=...)` directamente utiliza el constructor de `msgspec.Struct`, que no ejecuta la coerción ni estas comprobaciones de tipos, restricciones y reglas. Reserva esa construcción para datos confiables; en una acción usa el parámetro inyectado para recibir entradas externas.
 

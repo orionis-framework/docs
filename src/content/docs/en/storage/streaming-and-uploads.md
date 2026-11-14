@@ -69,7 +69,7 @@ First send `POST /reports/stock`, then download with `GET /reports/stock`. Check
 
 ### Read only part of a file and release the iterator
 
-Use a positive integer `chunk_size`. Drivers do not share uniform validation for nonpositive sizes. If you stop before exhausting a reader, explicitly close the generator with `aclosing()`; `break` does not replace closure.
+Use a positive integer `chunk_size`, excluding booleans; built-in drivers reject invalid values with `ValueError`. If you stop before exhausting a reader, explicitly close the generator with `aclosing()`; `break` does not replace closure.
 
 ```python
 from contextlib import aclosing
@@ -106,7 +106,7 @@ This is the constructor signature for custom adapters. Drivers supply both funct
 
 ### Iterate a binary handle in buffered chunks
 
-Since **1.1.0**, `IStorageStream` and `AsyncStream` expose `chunks(size: int = 65536, *, buffer_size: int = 1048576) -> AsyncIterator[bytes]`. Both sizes must be positive integers excluding booleans; invalid values raise `ValueError`. This method starts at the current handle position and yields byte chunks until EOF:
+`IStorageStream` and `AsyncStream` expose `chunks(size: int = 65536, *, buffer_size: int = 1048576) -> AsyncIterator[bytes]`. Both sizes must be positive integers excluding booleans; invalid values raise `ValueError`. This method starts at the current handle position and yields byte chunks until EOF:
 
 ```python
 from orionis.support.facades import Storage
@@ -147,7 +147,7 @@ These read budgets do not limit the size of objects already loaded into memory o
 
 `await stream.close()` detaches the handle, runs `on_close`, then closes the handle. Closing an unopened stream or closing it twice in succession does nothing. Reading/writing again can lazily open another handle: do not treat a closed stream as having terminal state, especially with `wb`, which would truncate the local file again.
 
-If the callback fails, its exception propagates and the subsequent `handle.close()` call is not reached. The contract provides no rollback mechanism and does not guarantee immediate buffer release on that failure. See [contexts, errors, and cancellation](/en/storage/temporary-files-and-contexts).
+The handle is closed in `finally`, including when its persistence callback fails. A callback or close failure propagates when no earlier operation failed. During exceptional context exit, cleanup failures are observed through the failure runtime and the original block exception is preserved. This is resource cleanup, not rollback: cloud and memory callbacks may still publish bytes. See [contexts, errors, and cancellation](/en/storage/temporary-files-and-contexts).
 
 <a id="stream-context"></a>
 ### Asynchronous context
@@ -187,7 +187,7 @@ async def build_binary_report() -> dict[str, int | str]:
 
 Text modes, `r+b`, `w+b`, `a+b`, `x`, and other values outside this table raise `UnsupportedStorageOperationException`. Use `rb+`, `wb+`, and `ab+` in precisely that order.
 
-Local opens the actual file and enforces the mode's access permissions. Memory uses `BytesIO` and cloud uses a temporary binary buffer: these do not enforce the same read/write restrictions as a local file. The mode controls buffer initialization and persistence; use only the operations intended for that mode to remain portable. Do not rewind an append stream to overwrite: local forces writes to the end, whereas remote buffers let you reposition before their later complete upload.
+Local opens the actual file; memory and cloud wrap their buffers to enforce the same binary mode permissions. `rb` rejects writes, `wb`/`ab` reject reads, and `+` modes permit both. Append modes force each write to the end even after a seek; unsupported operations raise `io.UnsupportedOperation`. Remote publication still uploads the complete writable buffer on close.
 
 ## Persist files received over HTTP
 

@@ -291,7 +291,7 @@ A resolver exception propagates before the write. A backend exception also propa
 
 ## Share concurrent misses with rememberOnce
 
-Available since **1.1.0** on `Cache`, `ICacheManager` and repositories:
+Available on `Cache`, `ICacheManager` and repositories:
 
 ```text
 async rememberOnce(key: str, ttl: float | None, resolver: Callable,
@@ -344,16 +344,9 @@ class NavigationCache:
 
 ### Cache a missing result portably
 
-The handling of a stored `None` differs between native backends:
+All configured Orionis stores preserve a cached JSON `None` as a cache hit. `remember()`, `rememberOnce()`, and `rememberForever()` reuse it without running the resolver again. `pull()` returns `None` and deletes the live entry. `get()` alone still returns `None` both for a miss and a stored null; `has()` checks existence in a separate operation.
 
-| Operation on a live entry containing `None` | file / database | memory / Redis / Memcached |
-| --- | --- | --- |
-| `get` | Returns `None`. | Returns `None`. |
-| `has` | `True`. | `True`. |
-| `remember` / `rememberForever` | Treats it as a hit. | Re-runs the resolver because the aiocache read substitutes its default for a decoded `None`. |
-| `pull` | Returns `None` and deletes the entry. | Returns `None` without deleting it. |
-
-Cache an envelope when a missing record must itself be remembered across all stores:
+For custom backends, preserve the distinction between missing data and serialized null. An application envelope can also carry explicit lookup status or other metadata:
 
 ```python
 from collections.abc import Awaitable, Callable
@@ -435,7 +428,7 @@ The repository uses a backend-provided `replace` when present. Otherwise, aiocac
 async pull(key: str) -> Any
 ```
 
-Returns the cached value, or `None` when absent. A hit is read first and then deleted; a miss skips deletion. The two steps are separate operations. Concurrent readers can receive the same value, and an intervening writer's value can be deleted. Do not use `pull` as an exclusive job claim or payment-consumption primitive. The stored-`None` difference is described above.
+Returns the cached value, or `None` when absent. A hit is read first and then deleted; a miss skips deletion. The two steps are separate operations. Concurrent readers can receive the same value, and an intervening writer's value can be deleted. Do not use `pull` as an exclusive job claim or payment-consumption primitive. A stored `None` is a hit and is deleted.
 
 ```python
 from orionis.support.facades import Cache

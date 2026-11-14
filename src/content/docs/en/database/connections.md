@@ -102,7 +102,7 @@ def example(manager: IConnectionManager):
 def getDefaultName(self) -> str:
 ```
 
-Returns the manager default. Initial construction lowercases this name; it does not imply an open physical connection.
+Returns the configured default, preserving an exact registered name and its case. If the configured name is absent, construction tries its lowercase spelling. This does not open a physical connection.
 
 ```python
 from orionis.database.contracts.connection_manager import IConnectionManager
@@ -150,7 +150,7 @@ def example(manager: IConnectionManager):
 async def disconnect(self, name: str | None = None) -> None:
 ```
 
-With a name removes and disposes that cached instance; an uncached name is a no-op. `None` clears the cache and disposes all instances sequentially. Settings remain registered. Disposal failures propagate. Do not call per request.
+A name removes and disposes that cached instance; an uncached name is a no-op. `None` clears the cache and attempts every cached connection, even if an earlier disposal fails. Cancellation takes precedence; otherwise the first failure propagates and secondary failures are reported centrally. Configuration remains registered. Dispose during shutdown or controlled reconfiguration, not after each request.
 
 ```python
 from orionis.database.contracts.connection_manager import IConnectionManager

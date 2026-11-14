@@ -166,7 +166,7 @@ assert r.getClass() is ReportService
 getClassName(self) -> str
 ```
 
-Returns the `__name__` captured when constructing the wrapper as `str`, rather than `__qualname__`. `clearCache()` does not capture it again.
+Returns the class `__name__` as `str`, without enclosing scopes. `clearCache()` refreshes it after a rename.
 
 ```python
 assert r.getClassName() == "ReportService"
@@ -1153,7 +1153,7 @@ The first member getter performs the scan. Returned lists and dictionaries are t
 
 `setAttribute()`, `removeAttribute()`, `setMethod()` and `removeMethod()` clear this wrapper’s entire cache. Changes made directly on the class or through another wrapper require `clearCache()` on every affected reflector.
 
-The class name and private prefix are captured during construction; `clearCache()` does not update them. `getModuleName()` and `getDocstring()` read the class directly. `getModuleWithClassName()` retains its result until the cache is cleared. Construct another wrapper after changing `__name__`.
+`clearCache()` refreshes the class name. The private prefix retains the original declaration name because Python does not remangle existing members. `getModuleName()` and `getDocstring()` read the class directly; cached qualified names refresh after invalidation.
 
 The following operators access **the wrapper cache**, rather than class attributes. Use custom keys distinct from internal keys (`attributes`, `methods`, etc.); overwriting or deleting internal keys can break scan consistency.
 
@@ -1227,7 +1227,7 @@ assert "app:note" not in r
 clearCache(self) -> None
 ```
 
-Returns `None`. Discards all data cached in this wrapper, including custom bracket keys. The next query recomputes reflection; this neither reverses class mutations nor empties the global dependency cache.
+Returns `None`, clears all local entries and refreshes identity metadata. It also invalidates shared dependency signatures and invocation plans. Other wrappers retain their own local caches. It does not undo mutations.
 
 ```python
 r["app:note"] = "cached"
@@ -1272,4 +1272,4 @@ For properties depending on an instance, create or receive that instance and use
 
 A name returned by `getDunderMethods()` is not automatically valid for `hasMethod()`, `removeMethod()`, `getMethodSignature()` or `methodSignature()`: these operations use the non-dunder method list. Properties have their own APIs.
 
-Clearing this wrapper does not empty the shared `ReflectDependencies` caches after dynamic function changes. New functions are analyzed by identity, whereas editing annotations or defaults on the same function can leave earlier analysis cached; see [the dependency guide](/en/utilities/introspection/dependencies-and-discovery).
+Clear reflection caches after intentional changes to a function's signature, annotations or defaults. This invalidates shared analysis; existing wrappers must each clear their local snapshots before reuse. See [dependency reflection](/en/utilities/introspection/dependencies-and-discovery).

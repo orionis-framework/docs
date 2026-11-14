@@ -56,7 +56,7 @@ The following signatures exist on both implementations. Methods are asynchronous
 
 ### get(key: str, default: Any = None) → Any
 
-Returns the value or `default` when absent or expired. A stored `None` remains a present value. Expiration is cleaned on read; File uses a monotonic clock and Database uses wall time. File treats read/JSON errors as a miss; Database propagates SQL errors and converts invalid stored JSON to `None`.
+Returns the value or `default` when absent or expired. A stored `None` remains a present value. Expiration is cleaned on read; File and Database use Unix epoch wall-clock time. File treats read/JSON errors as a miss; Database propagates SQL errors and converts invalid stored JSON to `None`.
 
 <a id="backend-set"></a>
 
@@ -104,7 +104,7 @@ Writes each pair sequentially with the common TTL and returns `True`. File perfo
 
 ### add(key: str, value: Any, ttl: float | None = None) → bool
 
-Returns `True` when creating an entry. Raises `ValueError` if a live entry exists; the repository converts that error to `False`. File uses exclusive creation and retries after evicting an expired entry. Database first removes an expired row and attempts insertion under its unique constraint. If SQL fails and the key does not exist, it propagates the SQL error.
+Returns `True` when creating an entry. Raises `ValueError` if a live entry exists; the repository converts that error to `False`. File checks absence under a cross-process file lock, atomically publishes a staged entry, and retries after evicting an expired entry. Database first removes an expired row and attempts insertion under its unique constraint. If SQL fails and the key does not exist, it propagates the SQL error.
 
 <a id="backend-increment"></a>
 
@@ -226,6 +226,6 @@ This class method returns `ICacheManager`. It links the facade to the container,
 
 The manager does not fall back automatically to memory if a server fails. Explicitly define how your application responds when it cannot read, compute or store an entry; do not indiscriminately catch resolver errors as if they were ordinary cache misses.
 
-## File batch execution in 1.1.0
+## File batch execution
 
 `FileCacheBackend.multiGet()` and `multiSet()` perform the complete batch within one worker invocation. They preserve key order, duplicates in batch reads, missing-value defaults, per-file locks and per-key TTL. Writes remain sequential without rollback; cancellation stops between entries after the current native operation completes. The database backend retains its existing sequential path. These backend methods return lists or booleans; repository `getMany()` still returns a dictionary.

@@ -104,7 +104,7 @@ Values are bound as parameters. Identifiers, operators and SQL fragments remain 
 
 ## Inspect model SQL
 
-Since **1.2.0**, `toSql(*, literal_binds=False) -> str` renders the current SELECT synchronously, using the model connection's dialect and table prefix. Call it without `await`; it does not create an engine, open a database connection or execute SQL. It needs the application initialized or `ConnectionResolver` configured, but the table need not exist.
+`toSql(*, literal_binds=False) -> str` renders the current SELECT synchronously, using the model connection's dialect and table prefix. Call it without `await`; it does not create an engine, open a database connection or execute SQL. It needs the application initialized or `ConnectionResolver` configured, but the table need not exist.
 
 ```python
 from app.models.product import Product
@@ -185,4 +185,4 @@ Builder `withRelations()`/`load()` help [avoid N+1](/en/orm/eager-loading). Do n
 
 Composition errors raise `InvalidQueryException`; unknown relationships raise `RelationNotFoundException`; explicitly requested missing scopes raise `ScopeNotFoundException`; SQL failures propagate from Database. Types and rules for each operation are linked in the references above. The [testing module](/en/orm/testing) provides fixtures and checks for queries, persistence and relationships.
 
-For large result sets in 1.1.0, use [query `chunks()`](/en/orm/collections-and-pagination#query-chunks) with an explicit deterministic `orderBy()`. It yields bounded collections without changing `get()` or splitting an already materialized collection.
+For large result sets, use [query `chunks()`](/en/orm/collections-and-pagination#query-chunks) with an explicit deterministic `orderBy()`. It yields bounded collections without changing `get()` or splitting an already materialized collection.

@@ -205,7 +205,7 @@ assert bool(Stringable("false")) is True
 
 **`toDate(format_str: str | None='%Y-%m-%d') -> datetime | None`**
 
-Analiza con `datetime.strptime`, usando `%Y-%m-%d` por defecto, y asigna `DateTime.getZoneInfo()` como `tzinfo` sin convertir la hora. Devuelve un `datetime` estándar con zona; no necesita contenedor. Un formato incompatible produce `ValueError`. Aunque la anotación y un comentario sugieren otra cosa, `None` llega a `strptime` y produce `TypeError`; no hay detección ISO automática.
+Analiza con `datetime.strptime`, usando `%Y-%m-%d` de forma predeterminada. Con `None` usa `datetime.fromisoformat`. Los valores sin zona reciben `DateTime.getZoneInfo()` sin cambiar la hora local; los offsets explícitos se conservan. Devuelve un `datetime` estándar con zona. Los formatos/valores inválidos propagan errores.
 
 ```python
 from orionis.support.types import Stringable
@@ -536,7 +536,7 @@ assert Stringable("HTTPServer").kebab() == "httpserver"
 
 **`snake(delimiter: str='_') -> Stringable`**
 
-Como la conversión de límites ASCII de `kebab`, pero usa `delimiter` (`_` por defecto) para límites camel, espacios y guiones. El recorte externo trata sus caracteres como conjunto. Una regex generada colapsa separadores; los delimitadores de varios caracteres no son separadores generales y las barras inversas pueden interpretarse como escapes de reemplazo. Un delimitador vacío produce `re.PatternError`; no hay validación específica de argumentos y otros valores incompatibles propagan errores Python/regex.
+Convierte límites de minúscula/dígito ASCII a mayúscula, espacios y guiones usando el delimitador literal; después pasa a minúsculas. Los delimitadores completos repetidos se compactan; al recortar bordes, sus caracteres se consideran un conjunto. Un delimitador vacío une sin separador. Otros argumentos incompatibles propagan errores Python/regex.
 
 ```python
 from orionis.support.types import Stringable
@@ -574,7 +574,7 @@ assert Stringable("hello_world").pascal() == "HelloWorld"
 
 **`slug(separator: str='-', dictionary: dict[str, str] | None=None) -> Stringable`**
 
-Aplica primero el diccionario (`{"@": "at"}` por defecto; `{}` lo desactiva), normaliza con `ascii`, elimina puntuación excepto guiones, reemplaza espacios/guiones bajos con `separator`, pasa a minúsculas y recorta sus caracteres. Un separador que no sea cadena o diccionario de tipo incorrecto produce `TypeError`; sus entradas siguen la validación de `str.replace`. Un guion existente no cambia al elegir otro separador. Un separador vacío produce `re.PatternError`; las barras inversas también pueden interpretarse como escapes de reemplazo.
+Aplica sustituciones del diccionario (predeterminado `{"@": "at"}`), convierte mediante `ascii`, elimina puntuación excepto guiones, sustituye espacios/guiones bajos por el separador literal, pasa a minúsculas y recorta caracteres del separador. `{}` desactiva las sustituciones. Un separador vacío une palabras. Los guiones existentes permanecen si eliges otro separador. Tipos inválidos de separador/diccionario lanzan `TypeError`.
 
 ```python
 from orionis.support.types import Stringable
@@ -815,7 +815,7 @@ assert Stringable("  hello\t\n world  ").squish() == "hello world"
 
 **`deduplicate(character: str=' ') -> Stringable`**
 
-Colapsa apariciones consecutivas de un solo carácter (espacio por defecto). Una entrada no cadena o de varios caracteres produce `ValueError`. El reemplazo usa `re.sub`, por lo que una barra inversa puede producir un error de plantilla de reemplazo.
+Compacta repeticiones consecutivas de un carácter literal, incluida una barra invertida. El predeterminado es un espacio. Un valor no textual o una longitud distinta de uno lanza `ValueError`.
 
 ```python
 from orionis.support.types import Stringable
@@ -867,13 +867,13 @@ assert Stringable("hello").chopStart("x") == "hello"
 
 **`chopEnd(needle: str | list[str]) -> Stringable`**
 
-Elimina el primer sufijo coincidente de una cadena o iterable de candidatos. Solo elimina uno. Un candidato vacío actualmente vacía todo el valor porque el código corta hasta `-0`; evítalo al recortar condicionalmente. Una entrada inválida puede producir `TypeError`.
+Elimina el primer sufijo coincidente de una cadena o iterable de cadenas candidatas. Solo elimina un sufijo; un candidato vacío conserva el valor. Las entradas inválidas pueden lanzar `TypeError`.
 
 ```python
 from orionis.support.types import Stringable
 
 assert Stringable("file.tar.gz").chopEnd([".gz", ".tar.gz"]) == "file.tar"
-assert Stringable("hello").chopEnd("") == ""
+assert Stringable("hello").chopEnd("") == "hello"
 ```
 
 <a id="stringable-method-wrap"></a>
@@ -1064,7 +1064,7 @@ assert Stringable("abcdef").wordWrap(3, "|", cut_long_words=True) == "abc|def"
 
 **`replace(search: str | Iterable[str], replace: str | Iterable[str], *, case_sensitive: bool=True) -> Stringable`**
 
-Reemplaza pares de búsqueda/reemplazo secuencialmente, por lo que cada paso ve resultados anteriores. Las cadenas se convierten en listas de un elemento; los iterables deben tener igual longitud porque `zip(..., strict=True)` produce `ValueError` si difieren. No distribuye un único reemplazo entre varias búsquedas. Tipos externos inválidos producen `TypeError`. `case_sensitive=False` escapa la búsqueda y usa `re.IGNORECASE`; las barras del reemplazo conservan significado de plantilla regex. No existe el argumento count de `str.replace`.
+Aplica pares de búsqueda/reemplazo de igual longitud de forma secuencial; los pares posteriores ven los resultados anteriores. Las cadenas se convierten en listas de un elemento. Las longitudes distintas lanzan `ValueError`; no se distribuye un reemplazo entre varias búsquedas. Ambos modos usan texto de reemplazo literal, incluidas barras invertidas. `case_sensitive=False` usa `re.IGNORECASE` para buscar.
 
 ```python
 from orionis.support.types import Stringable
@@ -1077,7 +1077,7 @@ assert Stringable("Hello HELLO").replace("hello", "hi", case_sensitive=False) ==
 
 **`replaceArray(search: str, replace: list[str]) -> Stringable`**
 
-Por cada reemplazo, sustituye la primera coincidencia que quede en el resultado actual. Si faltan reemplazos conserva coincidencias posteriores; si sobran no se usan. Un reemplazo puede introducir coincidencias para el paso siguiente. Exige lista con solo cadenas (`TypeError` en otro caso); los errores de búsqueda siguen las operaciones de Python.
+Consume las coincidencias del texto original en orden, asignando un reemplazo a cada una. No vuelve a buscar dentro del texto insertado. Si faltan valores, conserva las coincidencias restantes; si sobran, no los utiliza. La búsqueda debe ser textual y los reemplazos una lista de cadenas; en otro caso lanza `TypeError`.
 
 ```python
 from orionis.support.types import Stringable
@@ -1125,20 +1125,20 @@ assert Stringable("pre-name-pre").replaceStart("pre", "new") == "new-name-pre"
 
 **`replaceEnd(search: str, replace: str) -> Stringable`**
 
-Reemplaza la búsqueda literal solo si es un sufijo. Ambos argumentos deben ser cadenas (`TypeError` en otro caso). Una búsqueda vacía actualmente reemplaza todo el valor porque el corte del prefijo termina en `-0`.
+Sustituye un sufijo literal. Ambos argumentos deben ser cadenas; de lo contrario lanza `TypeError`. Una búsqueda vacía añade el reemplazo al valor original.
 
 ```python
 from orionis.support.types import Stringable
 
 assert Stringable("pre-name-pre").replaceEnd("pre", "new") == "pre-name-new"
-assert Stringable("abc").replaceEnd("", "X") == "X"
+assert Stringable("abc").replaceEnd("", "X") == "abcX"
 ```
 
 <a id="stringable-method-replacematches"></a>
 
 **`replaceMatches(pattern: str | list[str], replace: str | Callable, limit: int=-1) -> Stringable`**
 
-Aplica una regex Python o una lista secuencialmente. Un reemplazo de cadena admite referencias a grupos; un callback recibe `re.Match` y debe devolver `str`. `limit=-1` y 0 reemplazan todo, los positivos limitan cada patrón y otros negativos actualmente no reemplazan nada. Tipos incorrectos producen `TypeError`; regex o plantillas inválidas propagan errores de `re`.
+Aplica una regex o lista de regex de forma secuencial. Los reemplazos textuales admiten referencias a grupos; los callbacks reciben `re.Match` y devuelven cadenas. `limit=-1` reemplaza todo, `0` conserva el original y los positivos limitan cada patrón. Valores menores que `-1` lanzan `ValueError`. Los tipos inválidos lanzan `TypeError`; los errores regex se propagan.
 
 ```python
 from orionis.support.types import Stringable
@@ -1230,7 +1230,7 @@ assert Stringable("a1 b2").matchAll(r"\d") == ["1", "2"]
 
 **`isMatch(pattern: str | list[str]) -> bool`**
 
-Comprueba si alguna regex coincide en cualquier posición. Acepta cadena o iterable de cadenas, valida cada elemento y luego busca cada patrón. Tipos inválidos producen `TypeError` y patrones inválidos `re.PatternError`. Un iterable vacío devuelve falso. Un generador de un solo uso se consume al validarlo y actualmente devuelve falso en la búsqueda posterior.
+Comprueba si alguna regex coincide en cualquier posición. Admite una cadena o iterable; materializa los iterables antes de validarlos, incluidos generadores. Un iterable vacío devuelve `False`. Los tipos de elemento inválidos lanzan `TypeError`; una regex inválida lanza `re.PatternError`.
 
 ```python
 from orionis.support.types import Stringable
@@ -1256,7 +1256,7 @@ assert not Stringable("hello").test(r"^world$")
 
 **`isPattern(pattern: str | list[str], *, ignore_case: bool=False) -> bool`**
 
-Compara todo el valor con patrones shell de `fnmatch` (`*`, `?`, `[abc]`), no regex. Una lista significa algún patrón; exige una cadena o lista de cadenas no vacía y bool ignore_case (`TypeError`, o `ValueError` con lista vacía). En Windows, `fnmatch.fnmatch` normaliza mayúsculas incluso con `ignore_case=False`; `ignore_case=True` convierte explícitamente a minúsculas en cualquier plataforma.
+Compara el valor completo con patrones de shell (`*`, `?`, `[abc]`). Admite una cadena o lista no vacía de cadenas; basta una coincidencia. Distingue mayúsculas en todas las plataformas salvo con `ignore_case=True`. Los tipos inválidos lanzan `TypeError`; una lista vacía lanza `ValueError`.
 
 ```python
 from orionis.support.types import Stringable
@@ -1280,15 +1280,17 @@ assert Stringable("a,b,c").explode(",", 0) == ["a", "b", "c"]
 
 <a id="stringable-method-split"></a>
 
-**`split(pattern: str | int, limit: int=-1, flags: int=0) -> list[str]`**
+**`split(pattern: str | int | None=None, limit: int=-1, flags: int=0) -> list[str]`**
 
-Un patrón entero crea fragmentos de tamaño fijo (ignora limit/flags para dividir); cero produce `ValueError` y un tamaño negativo devuelve `[]`. Un patrón de cadena llama a `re.split`; `limit=-1` o 0 no limita y un positivo cuenta cortes, no partes finales. Los grupos capturados aparecen en el resultado. `flags` admite opciones regex enteras. Tipos incorrectos propagan `TypeError`, límites menores que -1 producen `ValueError` y regex inválidas `re.PatternError`. No existe la variante sin argumentos para espacios.
+Sin patrón o con `None`, usa la separación nativa por espacios: `limit` es el máximo de cortes y `-1` no limita. Un patrón entero positivo crea todos los fragmentos de tamaño fijo, independientemente de `limit`; tamaños cero o negativos lanzan `ValueError`. Un patrón textual usa `re.split`: `-1` o `0` no limita y un positivo cuenta cortes. Los grupos capturados aparecen en el resultado. Los patrones booleanos y límites no enteros/booleanos lanzan `TypeError`; los límites menores que `-1` lanzan `ValueError`.
 
 ```python
 from orionis.support.types import Stringable
 
 import re
 assert Stringable("abcdefg").split(3) == ["abc", "def", "g"]
+assert Stringable("  a  b ").split() == ["a", "b"]
+assert Stringable("abcdef").split(2, 1) == ["ab", "cd", "ef"]
 assert Stringable("aXbxc").split("x", 1, re.IGNORECASE) == ["a", "bxc"]
 assert Stringable("a1b2").split(r"(\d)") == ["a", "1", "b", "2", ""]
 ```
@@ -1322,13 +1324,13 @@ assert Stringable("-12.3 and ٤").numbers() == "123٤"
 
 **`scan(format_str: str) -> list[str]`**
 
-Traduce `%s` a captura sin espacios, `%d` a dígitos y `%f` a dígitos/puntos, ejecuta `re.findall` y toma solo la primera coincidencia. Conserva valores como cadenas, no escapa caracteres regex literales del formato y `%f` no valida sintaxis numérica. Con una captura, convertir la cadena coincidente a lista la separa en caracteres. Un formato de tipo incorrecto produce `TypeError`; regex generadas inválidas propagan `re.PatternError`.
+Extrae la primera coincidencia usando `%s` para texto sin espacios, `%d` para enteros con signo y `%f` para decimales con signo y exponente opcional. Escapa los caracteres literales del formato. Las capturas siguen siendo cadenas; una captura produce un elemento de lista. Sin coincidencia devuelve `[]`. Un formato no textual lanza `TypeError`.
 
 ```python
 from orionis.support.types import Stringable
 
 assert Stringable("name=Ada age=37").scan("name=%s age=%d") == ["Ada", "37"]
-assert Stringable("123").scan("%d") == ["1", "2", "3"]
+assert Stringable("123").scan("%d") == ["123"]
 ```
 
 <a id="stringable-method-parsecallback"></a>
@@ -1577,13 +1579,13 @@ assert not Stringable("bad").isUuid()
 
 **`isUlid() -> bool`**
 
-Convierte a mayúsculas y exige exactamente 26 caracteres del alfabeto Crockford `0123456789ABCDEFGHJKMNPQRSTVWXYZ`. Acepta minúsculas y no valida desbordamiento de bits iniciales ni rango de tiempo de un ULID canónico. No genera identificadores.
+Comprueba un valor ASCII de 26 caracteres Crockford Base32 cuyo primer carácter va de `0` a `7`, evitando desbordar 128 bits. Admite minúsculas. Valida la representación, no su unicidad ni el significado de la fecha para la aplicación; no genera identificadores.
 
 ```python
 from orionis.support.types import Stringable
 
 assert Stringable("01arz3ndektsv4rrffq69g5fav").isUlid()
-assert Stringable("Z" * 26).isUlid()
+assert not Stringable("Z" * 26).isUlid()
 assert not Stringable("I" * 26).isUlid()
 ```
 
@@ -1619,7 +1621,7 @@ assert Stringable("folder/sub/report.txt").dirname(2) == str(Path("folder"))
 
 **`plural(count: int | list | Any=2, *, prepend_count: bool=False) -> Stringable`**
 
-Aplica un pequeño algoritmo inglés de sufijos, con conteo 2 por defecto. Acepta int, float u objeto con `__len__`; solo un conteo igual a 1 conserva la palabra. En otros casos añade `es` después de s/sh/ch/x/z, cambia consonante-y por ies, f/fe por ves o añade s. `prepend_count=True` antepone el conteo efectivo. Tipos inválidos o prepend_count no bool producen `TypeError`. No implementa nombres irregulares ni excepciones lingüísticas.
+Usa reglas inglesas y un catálogo de palabras irregulares e incontables. El conteo acepta int, float u objeto con longitud; solo un conteo efectivo igual a uno conserva el singular. `prepend_count=True` antepone ese conteo. No es un flexionador multilingüe general. Tipos inválidos de conteo o un flag no booleano lanzan `TypeError`.
 
 ```python
 from orionis.support.types import Stringable
@@ -1755,13 +1757,13 @@ assert isinstance(s.hash("sha256"), Stringable)
 
 **`stripTags(allowed_tags: str | None=None) -> Stringable`**
 
-Sin `allowed_tags` verdadero, elimina subcadenas que coincidan con `<[^>]*>` y conserva entidades. Cualquier allowed_tags verdadero ejecuta solo `html.unescape` y conserva todas las etiquetas; no hay lista selectiva. La operación regex no es un analizador ni saneador HTML.
+Analiza HTML, elimina etiquetas fuera de la lista permitida y conserva su texto. Por ejemplo, `allowed_tags="<b><i>"` conserva esas etiquetas y sus atributos. Sin lista permitida, mantiene la escritura de las entidades; una lista no vacía las decodifica. Solo acepta una cadena o `None`. No sanitiza HTML: los atributos conservados pueden ser inseguros.
 
 ```python
 from orionis.support.types import Stringable
 
 assert Stringable("<b>x</b>&amp;").stripTags() == "x&amp;"
-assert Stringable("<i>x</i>&amp;").stripTags("<b>") == "<i>x</i>&"
+assert Stringable("<i>x</i>&amp;").stripTags("<b>") == "x&"
 ```
 
 <a id="stringable-method-tohtmlstring"></a>

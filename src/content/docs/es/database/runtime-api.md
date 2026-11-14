@@ -119,7 +119,7 @@ def supports_unique(connection: IConnection) -> bool:
 def toSql(self, plan: SelectPlan, *, literal_binds: bool = False) -> str:
 ```
 
-Disponible en `Connection` y su contrato `IConnection` desde **1.2.0**. Compila un plan SELECT de forma síncrona, sin `await`, ejecución de SQL ni cambios en el plan. Usa el dialecto y el prefijo de tablas configurados; si ya existe un engine reutiliza su dialecto y, en caso contrario, carga el dialecto configurado sin crear un engine ni abrir una conexión a la base de datos.
+Disponible en `Connection` y su contrato `IConnection`. Compila un plan SELECT de forma síncrona, sin `await`, ejecución de SQL ni cambios en el plan. Usa el dialecto y el prefijo de tablas configurados; si ya existe un engine reutiliza su dialecto y, en caso contrario, carga el dialecto configurado sin crear un engine ni abrir una conexión a la base de datos.
 
 ```python
 from orionis.database.contracts.connection import IConnection

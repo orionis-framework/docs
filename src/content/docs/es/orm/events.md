@@ -18,12 +18,12 @@ El catálogo público `MODEL_EVENTS: tuple[str, ...]`, definido en `orionis.orm.
 | `creating` | Antes del INSERT | Sí |
 | `created` | Después del INSERT y sincronización del estado | No |
 | `updating` | Antes de evaluar/escribir diferencias del modelo existente | Sí |
-| `updated` | Después del intento UPDATE o camino sin cambios | No |
+| `updated` | Después de UPDATE satisfactorio o camino sin cambios | No |
 | `saved` | Después de `created`/`updated` | No |
 | `deleting` | Antes de borrar físicamente o estampar borrado lógico | Sí |
-| `deleted` | Después del intento de borrado | No |
+| `deleted` | Después de borrado satisfactorio | No |
 | `restoring` | Antes de limpiar marca de borrado | Sí |
-| `restored` | Después del intento de restauración | No |
+| `restored` | Después de restauración satisfactoria | No |
 
 ```mermaid
 flowchart TD
@@ -117,7 +117,7 @@ Registra listeners una vez al arrancar, por ejemplo en el `boot()` de un provide
 
 ## Persistencia, errores y transacciones
 
-Un `save` de una instancia existente sin cambios dispara `saving → updating → updated → saved` sin UPDATE. Un UPDATE que afecte cero filas devuelve `False`, pero los eventos `updated` y `saved` igualmente se emiten. Lo mismo ocurre con los eventos posteriores de borrado/restauración tras el intento. No interpretes un evento posterior como prueba independiente de filas afectadas.
+Guardar una instancia existente sin cambios emite `saving → updating → updated → saved` sin UPDATE. Un UPDATE sin filas coincidentes devuelve `False` y no emite `updated` ni `saved`. Del mismo modo, `deleted` y `restored` solo siguen a escrituras satisfactorias. Los atributos en memoria pueden conservar los cambios intentados: comprueba el booleano y vuelve a consultar si necesitas datos actuales.
 
 Los listeners se ejecutan dentro de la llamada, sin colas automáticas ni fase `afterCommit`. `created` ocurre tras INSERT, **antes del commit** de una transacción exterior. Si un listener posterior falla fuera de una transacción, la escritura puede haber quedado persistida aunque la acción lance excepción. Dentro de una transacción, propaga la excepción para que el contexto pueda revertir; el objeto en memoria no se revierte.
 

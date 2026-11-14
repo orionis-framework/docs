@@ -5,7 +5,7 @@ editUrl: true
 lastUpdated: false
 ---
 
-Since **1.1.0**, `orionis.support.concurrency` provides bounded thread execution for synchronous I/O. These utilities work without an application container; dependency injection is available when Orionis invokes the decorated callable.
+`orionis.support.concurrency` provides bounded thread execution for synchronous I/O. These utilities work without an application container; dependency injection is available when Orionis invokes the decorated callable.
 
 ```python
 from orionis.support.concurrency import (

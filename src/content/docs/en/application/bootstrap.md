@@ -230,6 +230,6 @@ Rebuilds the entire registry: another partial call can reset other paths to thei
 <a id="bootstrap-create"></a>
 ## create(), boot() and execution
 
-`create() -> Self` completes configuration and registration. `await boot() -> Self` additionally awaits eager asynchronous initialization for integrations without a server; it does not execute hooks or kernels. [Entry points](/en/application/server-entrypoints) and [Application lifecycle](/en/application/lifecycle) cover HTTP and CLI startup/shutdown.
+`create() -> Self` completes configuration and registration. `await boot() -> Self` additionally awaits eager asynchronous initialization, prepares the shared handler and activates headless failure observation; it does not execute HTTP/CLI hooks or kernels. Pair headless ownership with `await app.aclose()` in `finally`. [Entry points](/en/application/server-entrypoints) and [Application lifecycle](/en/application/lifecycle) cover HTTP and CLI startup/shutdown.
 
 Default kernels come from native metadata. There is no `withKernel()` method or constructor protocol option: ASGI/RSGI is selected by the server.

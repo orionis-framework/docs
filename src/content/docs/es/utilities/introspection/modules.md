@@ -426,7 +426,7 @@ Estas operaciones modifican el objeto módulo en memoria para todos sus consumid
 def setClass(self, class_name: str, cls: type) -> bool: ...
 ```
 
-`class_name: str` y `cls: type` son obligatorios. Exige una clase (`TypeError`) y un identificador válido que no sea palabra reservada (`ValueError`). Asigna o reemplaza el alias y devuelve `True`. Solo invalida la entrada `classes`; llama a `clearCache()` antes de volver a consultar filtros de visibilidad ya calculados.
+Requiere una clase (en otro caso `TypeError`) y un identificador válido no reservado (en otro caso `ValueError`). Asigna o sustituye el alias del módulo, limpia todas las categorías locales en caché y devuelve `True`.
 
 ```python
 plugin_type = reflected.getClass("CatalogPlugin")
@@ -443,7 +443,7 @@ assert reflected.getPublicClasses()["ExtraPlugin"] is plugin_type
 def removeClass(self, class_name: str) -> bool: ...
 ```
 
-`class_name` es obligatorio. Elimina un alias de clase existente y devuelve `True`. Lanza `ValueError` si no está en `getClasses()`. Igual que `setClass`, solo invalida `classes`; vacía la caché para refrescar otros filtros.
+Elimina un alias de clase existente, limpia todas las categorías locales en caché y devuelve `True`. Los nombres ausentes de `getClasses()` lanzan `ValueError`.
 
 ```python
 assert reflected.removeClass("ExtraPlugin") is True
@@ -463,7 +463,7 @@ Los diccionarios de resultados se memoizan y se devuelven por referencia. No los
 def clearCache(self) -> None: ...
 ```
 
-Sin argumentos elimina todos los resultados cacheados y devuelve `None`. No recarga el módulo con `importlib.reload` ni vacía la caché de clases de `ModuleInspector`.
+Elimina todos los resultados locales en caché y devuelve `None`. No recarga el módulo ni limpia la caché de imports de Python.
 
 ```python
 assert reflected.clearCache() is None

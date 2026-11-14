@@ -101,7 +101,7 @@ Genera una definición de tabla reutilizable.
 |---|---|---|---|
 | `name` | str, obligatorio | — | Nombre del módulo; admite subdirectorios. |
 
-Usa `database_schema.stub` y añade el sufijo `Schema` al nombre del archivo. Desde 1.0.10 genera un módulo con `TABLE: Final[TableDefinition | None] = None`, sin clase contenedora. Sustituye `None` por la definición completa e importa `TABLE` desde una migración o desde la API de esquemas; crear el archivo no crea una tabla. Consulta [el stub y su uso](/es/database/schema#schema-generator).
+Usa `database_schema.stub` y añade el sufijo `Schema` al nombre del archivo. genera un módulo con `TABLE: Final[TableDefinition | None] = None`, sin clase contenedora. Sustituye `None` por la definición completa e importa `TABLE` desde una migración o desde la API de esquemas; crear el archivo no crea una tabla. Consulta [el stub y su uso](/es/database/schema#schema-generator).
 
 **Destino predeterminado:** `database/schemas`. Sufijo del archivo: `Schema`; constante exportada: `TABLE`.
 

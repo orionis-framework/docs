@@ -14,10 +14,12 @@ This page focuses on **HTTP requests and responses**. The [general exception gui
 While processing a request, Orionis distinguishes between special responses in the HTTP flow and errors it must delegate to the application handler:
 
 1. A layer can handle a case directly, such as validation errors.
-2. For other errors, the exception system reports the failure and asks the handler for an HTTP response.
+2. The failure runtime calls `handleFailure(exception, context)` and applies the returned `FailureHandling`. The native handler schedules logging for unexpected failures when reporting is allowed; the HTTP owner requests presentation only when it needs a response.
 3. The ASGI/RSGI adapter delivers that response with its status, headers, and body.
 
 In WEB, the session layer can also catch errors from its downstream components and delegate them while the session remains available. Conversion therefore does not happen exclusively in a single `except` at the end of the kernel.
+
+Expected failures such as invalid input can still reach `handleFailure` with `context.expected=True` even when a protocol-specific policy chooses their response. Customize the [failure hook](/en/exceptions/handling-exceptions) to observe them; logging and HTTP presentation are separate effects.
 
 An error response is not always a `500` and does not always show a traceback. An authorization failure can produce `403`; a missing route, `404`; and an invalid schema, `422` or a redirect depending on its context.
 

@@ -78,7 +78,7 @@ The connection must enforce unique constraints: `DatabaseQueueDriver` rejects a 
 
 ### Prepare tables: queue:migrate
 
-Since 1.0.10, run either alternative from the project root:
+Run either alternative from the project root:
 
 ```shell
 orionis queue:migrate
@@ -94,7 +94,7 @@ It respects each definition's SQL connection, logical table name, and configured
 
 The SQL user needs permission to create missing tables, and the backend must enforce unique constraints. Success prints `Queue tables migrated successfully.` and returns `0`. A caught `DatabaseException` or `QueueError` is displayed and returns `1`. The equivalent API is [`await Queue.migrate()`](/en/queues/manager-and-injection#manager-migrate).
 
-In 1.3.0 this existing command remains the preparation entry point for queues, alongside the new [token, cache, scheduler, and session commands](/en/database/migrations#framework-storage-tables).
+This command prepares queue storage; also see the [token, cache, scheduler, and session commands](/en/database/migrations#framework-storage-tables).
 
 <a id="schema-jobs"></a>
 
@@ -227,6 +227,6 @@ Import them from `orionis.queues.schema`. They are infrastructure helpers; norma
 
 ## Redis script-cache recovery
 
-In **1.1.0**, queue transitions first use `EVALSHA` with the script's digest. If the owning Redis node returns `NOSCRIPT`, the driver retries that transition once with `EVAL`, which executes and caches the same script. The next call returns to `EVALSHA`; Redis restarts and script-cache eviction do not require an application-wide loaded flag.
+Queue transitions first use `EVALSHA` with the script's digest. If the owning Redis node returns `NOSCRIPT`, the driver retries that transition once with `EVAL`, which executes and caches the same script. The next call returns to `EVALSHA`; Redis restarts and script-cache eviction do not require an application-wide loaded flag.
 
 This recovery applies only to `NOSCRIPT`, where Redis did not execute the missing script. Other transport failures are not converted into an unconditional replay by the driver; the Redis client's configured retry policy still applies. Queue keys, hash tags, reservation tokens and fencing behavior remain unchanged. The digest identifies cached Lua source and is not a security or authentication mechanism.

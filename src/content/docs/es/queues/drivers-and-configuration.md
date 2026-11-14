@@ -78,7 +78,7 @@ La conexión debe imponer restricciones únicas: `DatabaseQueueDriver` rechaza u
 
 ### Preparar las tablas: queue:migrate
 
-Desde 1.0.10, ejecuta desde la raíz del proyecto una de estas alternativas:
+Ejecuta desde la raíz del proyecto una de estas alternativas:
 
 ```shell
 orionis queue:migrate
@@ -94,7 +94,7 @@ Respeta la conexión SQL, el nombre lógico de tabla y el prefijo configurados p
 
 El usuario SQL necesita permisos para crear las tablas faltantes y el motor debe imponer restricciones únicas. Una ejecución correcta imprime `Queue tables migrated successfully.` y devuelve `0`. Un `DatabaseException` o `QueueError` capturado se muestra como error y devuelve `1`. La API equivalente es [`await Queue.migrate()`](/es/queues/manager-and-injection#manager-migrate).
 
-En 1.3.0 este comando existente sigue preparando las colas, junto a los nuevos [comandos de tokens, cache, scheduler y sesiones](/es/database/migrations#framework-storage-tables).
+Este comando prepara el almacenamiento de colas; consulta también los [comandos de tokens, cache, scheduler y sesiones](/es/database/migrations#framework-storage-tables).
 
 <a id="schema-jobs"></a>
 
@@ -227,6 +227,6 @@ Se importan desde `orionis.queues.schema`. Son herramientas de infraestructura; 
 
 ## Recuperación de la caché de scripts Redis
 
-En **1.1.0**, las transiciones de cola intentan primero `EVALSHA` con el digest del script. Si el nodo Redis responsable devuelve `NOSCRIPT`, el driver vuelve a intentar esa transición una vez con `EVAL`, que ejecuta y cachea el mismo script. La siguiente llamada utiliza de nuevo `EVALSHA`; los reinicios de Redis y la expulsión de scripts no requieren un indicador global de carga en la aplicación.
+Las transiciones de cola intentan primero `EVALSHA` con el digest del script. Si el nodo Redis responsable devuelve `NOSCRIPT`, el driver vuelve a intentar esa transición una vez con `EVAL`, que ejecuta y cachea el mismo script. La siguiente llamada utiliza de nuevo `EVALSHA`; los reinicios de Redis y la expulsión de scripts no requieren un indicador global de carga en la aplicación.
 
 Esta recuperación solo aplica a `NOSCRIPT`, cuando Redis no ejecutó el script ausente. El driver no convierte otros errores de transporte en una repetición incondicional; sigue aplicándose la política de reintentos configurada en el cliente Redis. No cambian las claves, hash tags, tokens de reserva ni comprobaciones de propiedad. El digest identifica código Lua cacheado; no es un mecanismo de seguridad ni autenticación.

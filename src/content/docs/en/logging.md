@@ -78,6 +78,6 @@ Rotating handlers check rotation before writing the line; there is no independen
 | Use every method, inject ILogger, or record an exception | [Writing logs](/en/logging/writing-logs). |
 | Understand suffixes, retention, compression, shutdown, and multiple workers | [Rotation and lifecycle](/en/logging/rotation-and-lifecycle). |
 
-Retention limits **file counts**, including settings named `retention_days` or `retention_hours`; it does not delete a file when it reaches an exact age. The `chunked` implementation generates a new suffix for every record and can rotate before reaching `mb_size`. Review [policy behavior](/en/logging/rotation-and-lifecycle) before choosing one.
+Retention limits **file counts**, including settings named `retention_days` or `retention_hours`; it does not delete a file at an exact age. The `chunked` channel accumulates records until `mb_size` is reached, then rotates before the next record. Review [policy behavior](/en/logging/rotation-and-lifecycle) before choosing one.
 
 Exception handling and presentation are documented in [Exceptions](/en/exceptions). That section explains when the handler reports an error; these guides explain how that record is written and retained.

@@ -65,7 +65,7 @@ During injection, the container uses the validator's single asynchronous entry p
 
 The process runs in this order:
 
-1. **Optional coercion.** Since **1.4.0**, [`Coerce()`](/en/validation/declaring-schemas#field-coercion) prepares marked values using their declared type, without changing the original payload.
+1. **Optional coercion.** [`Coerce()`](/en/validation/declaring-schemas#field-coercion) prepares marked values using their declared type, without changing the original payload.
 2. **Types and structural constraints.** `msgspec` converts data into the declared structure and checks types, required fields and constraints such as `MinLength`.
 3. **Rules.** Orionis awaits validation by each `Rule` instance, such as `Email()`, on converted values. All implement `async def enforce(...)`, including simple checks and checks awaiting I/O. Rules can inspect other fields and use external services. A synchronous `enforce` is rejected when its class is defined.
 
@@ -85,7 +85,7 @@ Types, constraints and documentation metadata have different purposes. For examp
 
 Without `Coerce()`, conversion preserves `msgspec`'s strict behavior: `"36"` is not a valid `int` for `age` in the example above. Certain types accept string representations, such as ISO dates and UUIDs, according to the declared type. Declare `Field[int, Coerce(), GreaterThanOrEqual(18)]` and import `Coerce` from `orionis.schemas.metadata` to opt in for that field. A marker on a parent schema or collection also enables descendant values; unrelated fields remain strict.
 
-Version **1.4.0** also adds [`Empty()` and `NoEmpty()`](/en/validation/application-rules#empty-and-no-empty), exact opposites for empty and present values. They cover `None`, blank strings, numeric zero, `False`, zero-length collections, and zero-byte uploads without modifying the value. They run after coercion: `"0"` is present as a string, while coerced numeric zero is empty. See the [integrated order example](/en/validation/validation-and-errors#coercion-and-empty-rules) for nested fields, payload preservation, custom messages, and error codes.
+Use [`Empty()` and `NoEmpty()`](/en/validation/application-rules#empty-and-no-empty), exact opposites for empty and present values. They cover `None`, blank strings, numeric zero, `False`, zero-length collections, and zero-byte uploads without modifying the value. They run after coercion: `"0"` is present as a string, while coerced numeric zero is empty. See the [integrated order example](/en/validation/validation-and-errors#coercion-and-empty-rules) for nested fields, payload preservation, custom messages, and error codes.
 
 Orionis collects each field's errors: failed constraints and rules returning `False`. If initial conversion fails, it inspects the fields to complete the diagnosis. An incompatible type or missing field prevents conditions that require its converted value from running; other fields and elements continue to be validated.
 

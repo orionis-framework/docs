@@ -133,13 +133,19 @@ Los streams abiertos conservan una plaza de admisión hasta terminar. Los límit
 
 | Campo | Variable de entorno | Predeterminado |
 | --- | --- | --- |
-| `allowed_origins` | `CORS_ALLOW_ORIGINS` | En el archivo editable `config/mcp.py` desde 1.0.16: `["https://inspector.orionis-framework.com"]`. Núcleo `McpConfig`: `[]`. |
+| `allowed_origins` | `CORS_ALLOW_ORIGINS` | `[]`; configura explícitamente los orígenes de navegador de confianza. |
 
-Desde **1.0.16**, `allowed_origins` es una `list[str]`, copiada de forma independiente para cada instancia de configuración. Se siguen aceptando tuplas de entrada, que se convierten en listas. El inspector es un valor predeterminado únicamente de la configuración editable `BootstrapMcp`; crear `McpConfig` directamente no añade ese origen.
-
-Para adoptar este valor en el `config/mcp.py` de una aplicación existente, importa `field` desde `dataclasses` y `Env` desde `orionis.environment`, y actualiza el campo dentro de `BootstrapMcp`, conservando sus demás opciones:
+`allowed_origins` acepta una `list[str]` o tupla y mantiene una lista independiente por instancia. Para permitir el inspector, utiliza esta configuración completa en `config/mcp.py`, conservando las demás opciones de tu clase `BootstrapMcp` existente:
 
 ```python
+from dataclasses import dataclass, field
+
+from orionis.environment import Env
+from orionis.mcp import McpConfig
+
+
+@dataclass(frozen=True, kw_only=True)
+class BootstrapMcp(McpConfig):
     allowed_origins: list[str] = field(
         default_factory=lambda: Env.get(
             "CORS_ALLOW_ORIGINS", ["https://inspector.orionis-framework.com"],
@@ -147,7 +153,7 @@ Para adoptar este valor en el `config/mcp.py` de una aplicación existente, impo
     )
 ```
 
-Actualizar el paquete no reemplaza tu configuración editable. Si defines `CORS_ALLOW_ORIGINS`, su valor sustituye este predeterminado en lugar de ampliarlo, incluso cuando es `[]`. Para permitir el inspector y otro cliente web, incluye ambos explícitamente:
+Este ejemplo elige explícitamente el inspector como respaldo; `McpConfig` por sí solo no añade ese origen. Si defines `CORS_ALLOW_ORIGINS`, su valor sustituye el respaldo en lugar de ampliarlo, incluso si es `[]`. Para permitir el inspector y otro cliente de navegador, incluye ambos:
 
 ```dotenv
 CORS_ALLOW_ORIGINS=["https://inspector.orionis-framework.com","https://agent.example.com"]

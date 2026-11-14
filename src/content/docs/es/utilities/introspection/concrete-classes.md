@@ -166,7 +166,7 @@ assert r.getClass() is ReportService
 getClassName(self) -> str
 ```
 
-Devuelve el `__name__` capturado al construir el wrapper como `str`, no `__qualname__`. `clearCache()` no vuelve a capturarlo.
+Devuelve `__name__` como `str`, sin ámbitos contenedores. `clearCache()` lo actualiza después de renombrar.
 
 ```python
 assert r.getClassName() == "ReportService"
@@ -1153,7 +1153,7 @@ El primer getter de miembros realiza el escaneo; las listas y diccionarios devue
 
 `setAttribute()`, `removeAttribute()`, `setMethod()` y `removeMethod()` limpian toda la caché de este wrapper. Los cambios hechos directamente sobre la clase o mediante otro wrapper requieren `clearCache()` en cada reflector afectado.
 
-El nombre de clase y el prefijo privado se capturan en el constructor; `clearCache()` no los actualiza. `getModuleName()` y `getDocstring()` leen directamente la clase. `getModuleWithClassName()` conserva su resultado hasta limpiar la caché. Si modificas `__name__`, crea otro wrapper.
+`clearCache()` actualiza el nombre de clase. El prefijo privado conserva el nombre original porque Python no vuelve a transformar los miembros existentes. `getModuleName()` y `getDocstring()` leen directamente la clase; los nombres cualificados en caché se actualizan al invalidar.
 
 Los operadores siguientes acceden a **la caché del wrapper**, no a los atributos de la clase. Usa claves propias que no coincidan con las internas (`attributes`, `methods`, etc.); sobrescribir o borrar claves internas puede romper la consistencia del escaneo.
 
@@ -1227,7 +1227,7 @@ assert "app:note" not in r
 clearCache(self) -> None
 ```
 
-Devuelve `None`. Descarta todos los datos almacenados en este wrapper, incluidas las claves añadidas con corchetes. La siguiente consulta vuelve a inspeccionar; no deshace cambios de la clase ni vacía la caché global de dependencias.
+Devuelve `None`, limpia todas las entradas locales y actualiza metadatos de identidad. También invalida firmas de dependencias y planes de invocación compartidos. Otros reflectores conservan sus cachés locales. No revierte las mutaciones.
 
 ```python
 r["app:note"] = "cached"
@@ -1272,4 +1272,4 @@ Para consultar propiedades que dependen de una instancia, crea o recibe esa inst
 
 Un nombre que `getDunderMethods()` devuelve no es válido automáticamente para `hasMethod()`, `removeMethod()`, `getMethodSignature()` ni `methodSignature()`: esas operaciones usan la lista de métodos no dunder. Las propiedades se consultan mediante sus APIs específicas.
 
-Si cambias funciones dinámicamente, limpiar este wrapper no vacía las cachés compartidas de `ReflectDependencies`. Las funciones nuevas se analizan por su identidad, pero modificar anotaciones o valores predeterminados de la misma función puede conservar un análisis anterior; revisa la [guía de dependencias](/es/utilities/introspection/dependencies-and-discovery).
+Limpia las cachés tras modificar intencionalmente firma, anotaciones o valores predeterminados. Esto invalida el análisis compartido; cada reflector existente debe limpiar sus resultados locales antes de reutilizarlos. Consulta [reflexión de dependencias](/es/utilities/introspection/dependencies-and-discovery).

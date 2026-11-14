@@ -116,7 +116,7 @@ except AttributeError as error:
 
 ## `get(self, key: str, default: object | None = None) -> object | None`
 
-Devuelve el valor almacenado o `default` (`None` por defecto). Si el resultado es un `dict` exacto, lo envuelve y lo guarda bajo `key`. Esto también se aplica a un diccionario usado como valor predeterminado: consultar una clave ausente con ese valor **inserta** el diccionario envuelto. Los demás valores predeterminados no insertan entradas. No hay conversión de los valores.
+Devuelve el valor almacenado o el predeterminado recibido. Una clave ausente devuelve ese valor sin modificarlo ni insertar nada, incluso si es un diccionario. Los valores existentes de tipo exacto `dict` se envuelven como `DotDict` y se guardan bajo su clave.
 
 ```python
 from orionis.support.types import DotDict
@@ -126,9 +126,9 @@ assert data.get("config").debug is True
 assert data.get("absent") is None
 assert "absent" not in data
 fallback = data.get("created", {"port": 8000})
-assert isinstance(fallback, DotDict)
-assert data["created"] is fallback
-assert fallback.port == 8000
+assert type(fallback) is dict
+assert "created" not in data
+assert fallback["port"] == 8000
 ```
 
 <a id="dotdict-method-export"></a>
@@ -155,7 +155,7 @@ assert data.config.debug is True
 
 ## `copy(self) -> DotDict`
 
-Devuelve un nuevo `DotDict` y copia recursivamente los valores de diccionario a nuevos objetos `DotDict`. Aunque el docstring lo denomina “copia profunda”, este método comparte los valores que no son diccionarios, incluidas las listas mutables. No modifica el origen ni conserva la identidad compartida de los diccionarios. Los ciclos entre diccionarios producen `RecursionError`. Usa `copy.deepcopy` de Python cuando también debas copiar listas y otros valores compatibles.
+Devuelve una copia profunda mediante `copy.deepcopy`: los valores mutables anidados, incluidas listas, son independientes del origen. Conserva referencias compartidas y ciclos dentro del grafo copiado. El resultado es `DotDict` y los mapas anidados se copian como valores `DotDict`.
 
 ```python
 from orionis.support.types import DotDict
@@ -167,7 +167,8 @@ assert type(result["config"]) is DotDict
 result.config.debug = False
 assert data.config.debug is True
 result.rows.append(2)
-assert data.rows == [1, 2]
+assert data.rows == [1]
+assert result.rows == [1, 2]
 ```
 
 <a id="dotdict-method-clear"></a>
@@ -383,7 +384,7 @@ except TypeError:
 
 ## Copia y serialización de Python
 
-No se define `__copy__`, `__deepcopy__` ni un hook de serialización personalizado. `copy.copy` de Python usa el protocolo de reducción heredado y crea un `DotDict` superficial; `copy.deepcopy` copia recursivamente el contenido compatible. Un recorrido de pickle conserva el tipo `DotDict` para valores serializables normales. JSON lo acepta como diccionario y su decodificación devuelve un `dict` estándar; se aplican las restricciones normales de JSON sobre claves, valores y ciclos. `export()` no codifica JSON.
+`copy.copy()` es superficial y comparte los contenidos anidados. La implementación de `__deepcopy__` copia recursivamente los contenidos compatibles y conserva referencias compartidas y ciclos. Pickle conserva el tipo `DotDict` para valores serializables. JSON admite el mapa, pero decodifica a diccionarios ordinarios, con sus restricciones habituales de valores y ciclos.
 
 ```python
 import copy

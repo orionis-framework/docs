@@ -280,3 +280,5 @@ On persistence, dict/list in non-JSON/Pickle columns are encoded as JSON text; U
 A base with `__abstract__ = True` defers columns and metadata to concrete descendants. Columns are inherited and replaced by same-named child declarations; casts are merged and behaviors follow the MRO. Other settings use normal class resolution. An explicit `table` is inherited: override it when a subclass needs another table. Discriminator-based polymorphic persistence and inheritance-based table creation are not implemented.
 
 See the [attribute and serialization API](/en/orm/model-api) for `fill`, `getAttribute`, `only`, `exclude` and original state.
+
+A model hydrated through a selected connection retains that exact connection for later instance writes. New instances use their model connection policy. Reusing one inline column declaration across attributes or models is safe: class creation copies the definition before assigning its column name. Explicit `TableDefinition` objects still contain mutable builders; keep compiled definitions stable.

@@ -203,3 +203,5 @@ def tags_by_owner(self):
 Son métodos alternativos para añadir a las clases del ejemplo, respectivamente Team, Player y Team. Las claves referenciadas deben existir, estar cargadas y tener tipos compatibles. Cada relación utiliza la conexión del **modelo relacionado**; las operaciones pivot usan esa misma conexión. Diseña las tablas involucradas en una conexión coherente; esto no ofrece una transacción distribuida entre bases.
 
 Continúa con [consultas y modificaciones](/es/orm/relationship-operations) y [carga anticipada](/es/orm/eager-loading).
+
+Si el modelo relacionado no define conexión explícita, las consultas de relación y pivote heredan la conexión de lectura del padre. Una conexión explícita del modelo relacionado prevalece, incluso si nombra el valor predeterminado de la aplicación. Los registros creados mediante `hasOne`/`hasMany` usan la conexión de la relación.

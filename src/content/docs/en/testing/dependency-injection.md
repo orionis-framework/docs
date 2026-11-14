@@ -104,7 +104,7 @@ To obtain a service directly, use `await self.app.make(ContractOrClass)`. If you
 | Scoped services | Require an active scope in the context resolving them. |
 | Databases, files, queues and cache | Retain changes unless your test arranges cleanup. |
 
-The engine runs the synchronous suite in an executor. It does not automatically propagate the CLI scope context to that thread; do not depend on it inside the case. Open the scope in the test method or fixture before resolving scoped services. The container does resolve constructors of **services** needed by the method; the test loader creates the `TestCase` instance.
+The engine runs the synchronous suite with `asyncio.to_thread()`, copying the caller's context variables. Each `TestCase` retains its own context and event loop, but inherited scoped objects are not automatically recreated. Open an explicit scope in the test method when testing an independent service lifetime; do not share loop-bound resources across loops. The container constructs injected **services**; the test loader constructs the `TestCase` instance.
 
 A pure-rule test does not need to replace the complete application. For integrations use exclusive data, stores intended for testing and explicit cleanup. Inheriting from `TestCase` does not automatically roll back a database; [Database and ORM testing](/en/orm/testing) explains the relevant mechanisms.
 

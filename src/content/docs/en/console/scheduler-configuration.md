@@ -99,7 +99,7 @@ TASKS_REPLACE_EXISTING=True
 
 The `sqlite` connection must exist in [Database configuration](/en/database/configuration). The store uses its credentials and engine options but creates a **separate synchronous SQL connection engine**. It does not share an async connection or request transaction. With SQLite `:memory:`, that engine has its own in-memory database; it is not durable storage and does not automatically share another connection's data.
 
-On startup, the store creates its table if necessary. Since 1.3.0, you can prepare it before starting the scheduler with either alternative:
+On startup, the store creates its table if necessary. you can prepare it before starting the scheduler with either alternative:
 
 ```shell
 orionis schedule:migrate

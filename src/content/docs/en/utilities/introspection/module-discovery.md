@@ -67,7 +67,7 @@ def fileImportsAny(file_path: Path, target_modules: set[str], *, allow_empty: bo
 
 The AST walk includes imports inside functions, conditions and `TYPE_CHECKING` blocks: finding them does not establish that they execute. Dynamic `importlib` calls are not inspected, and relative imports are not resolved against their package; the AST `module` text is compared.
 
-Return `False` for an empty target set, a path that is not a file, syntax errors, or non-UTF-8 source. With a nonempty target set, `allow_empty=True` accepts an empty or whitespace-only file; comments alone do not count as empty. Other read errors, such as permission errors, propagate.
+Returns `False` for an empty target set, a missing/non-file path, syntax errors or undecodable source. Python encoding cookies and UTF-8 BOMs are supported. With nonempty target modules, `allow_empty=True` accepts whitespace-only files; comments alone do not count. Other read errors, such as permission failures, propagate.
 
 ```python
 from pathlib import Path
@@ -101,11 +101,11 @@ This is a class method. Return the `type` object without calling its constructor
 - `module_path` and `class_name`: explicit names, each defaulting to `None` in the signature. Provide both for a valid load.
 - Keyword-only `metadata`, with `"module"` and `"class"` keys: used only when both explicit arguments are `None`. A nonempty `dict` or `MappingProxyType` is accepted. This does not fill in a missing explicit argument or combine the formats.
 
-First reuse a class cached by `module_path.class_name`; then consult `sys.modules` and import the module if needed. The class need not be declared there: an imported alias is also valid.
+Consults `sys.modules` and imports the module if needed, then reads its current class attribute. Imported class aliases are valid. It does not instantiate the class.
 
 An unknown module raises `ImportError`; an absent name raises `AttributeError`; a non-class value raises `TypeError`. Incomplete metadata or incorrect argument types can trigger import or `getattr` errors; there is no additional validator normalizing every case into one exception. Import-time exceptions other than `ImportError` propagate.
 
-The shared in-memory class cache has no public clearing method or configured size limit. It does not automatically reread a class later replaced in the module. It is independent of reflection wrappers’ `clearCache()`.
+There is no separate retained class cache: replacing the class in the module is visible on the next call. Python's module import cache still applies; the method does not automatically reload source files.
 
 ```python
 from types import MappingProxyType
@@ -208,7 +208,7 @@ In a real project, the application root must already be importable. Explicitly s
 
 ## Access and dependency injection
 
-`ModuleInspector` needs no construction data: its methods are static or class methods. It can be a concrete parameter of a container-resolved component, but creating another instance does not isolate the `loadClass` cache. Direct use is usually sufficient for initialization work. There is no exported `IModuleInspector` interface or mechanism for injecting module names.
+`ModuleInspector` needs no construction data: its methods are static or class methods. It can be a concrete parameter of a container-resolved component, but Python’s import cache remains process-wide. Direct use is usually sufficient for initialization work. There is no exported `IModuleInspector` interface or mechanism for injecting module names.
 
 ```python
 from orionis.introspection import ModuleInspector

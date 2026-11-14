@@ -11,7 +11,7 @@ Un **store** es el repositorio que seleccionas mediante `manager.store("redis")`
 
 | Store | Dónde se comparte | Cuándo utilizarlo y qué considerar |
 |---|---|---|
-| `file` | Procesos que acceden al mismo directorio del sistema de archivos. | No necesita un servidor de caché. Introduce I/O y archivos de coordinación; sus expiraciones monotónicas no son persistencia duradera. |
+| `file` | Procesos que acceden al mismo directorio del sistema de archivos. | No necesita un servidor de caché. Introduce I/O y archivos de coordinación; las expiraciones epoch sobreviven a reinicios del proceso y dependen del reloj del sistema. |
 | `memory` | Únicamente los usuarios de la misma instancia de backend. | Pruebas y datos efímeros de un proceso. No comparte resultados entre workers ni sobrevive a la pérdida de esa instancia. |
 | `redis` | Clientes de la misma base de datos Redis. | Caché compartida entre procesos y servidores. Requiere servicio accesible; el ciclo de vida y capacidad dependen de su configuración. |
 | `memcached` | Clientes del mismo servicio Memcached. | Caché compartida con almacenamiento temporal administrado por el servidor. No ofrece aislamiento de borrado por prefijo. |
@@ -78,11 +78,11 @@ El manager resuelve las rutas relativas desde la raíz de la aplicación. Al con
 
 Cada JSON contiene el valor y su expiración. El backend lee y escribe mediante threads, utiliza locks de archivo por franjas para coordinar accesos al mismo directorio y publica escrituras mediante temporales únicos y reemplazo. Los incrementos coordinan su lectura y escritura bajo el lock del archivo. Estas garantías de una operación no convierten varias llamadas en una transacción.
 
-Los errores de lectura o JSON ilegible se interpretan como ausencia; las entradas expiradas se eliminan al consultarlas. Las escrituras pueden propagar errores de permisos, serialización o I/O. `clear()` elimina los `.json` y `.tmp` del directorio, no solo las claves del prefijo actual. Reserva una carpeta exclusiva para este backend.
+Los errores de lectura o JSON ilegible se observan mediante el sistema de fallos de la aplicación y se interpretan como ausencia; un archivo inexistente es un fallo de caché normal. Un JSON que no sea un objeto, un campo de valor ausente o una expiración no numérica también producen ausencia. Las entradas expiradas se eliminan al consultarlas. Las escrituras pueden propagar errores de permisos, serialización o I/O. `clear()` elimina los `.json` y `.tmp` del directorio, no solo las claves del prefijo actual. Reserva una carpeta exclusiva para este backend.
 
 ### Expiración y persistencia
 
-Los TTL se almacenan usando `time.monotonic()`, en segundos. `ttl=None` no añade vencimiento; `ttl=0` deja la entrada inmediatamente expirada. El reloj monotónico no representa una fecha de calendario y no define una expiración duradera que puedas trasladar entre máquinas o reinicios del sistema. Utiliza este store como caché local regenerable.
+Los TTL utilizan segundos de época Unix mediante `time.time()`. `ttl=None` no añade vencimiento; `ttl=0` deja la entrada inmediatamente expirada. Las marcas de expiración conservan su significado entre reinicios del proceso y de la máquina, pero dependen del reloj del sistema. Utiliza este store como caché local regenerable.
 
 No hay un proceso de limpieza periódica ni un límite de tamaño configurado. Una entrada que expire puede permanecer físicamente hasta que se consulte o limpies el store. El [lock público de caché](/es/cache/locks) tiene otro alcance: coordina el mismo event loop, directorio y clave, no todas las solicitudes de procesos distintos.
 
@@ -151,7 +151,7 @@ Sin `DB_CACHE_CONNECTION`, el store utiliza la resolución predeterminada de con
 
 La primera operación de I/O crea de forma diferida las tablas de entradas y locks mediante el sistema de esquemas. La conexión debe tener permisos para crear las tablas que falten. Si existen, se conservan; no se migran estructuras incompatibles. Los nombres son lógicos y reciben el prefijo de tablas de la conexión Database.
 
-Desde 1.3.0, prepara ambas tablas antes de la primera petición con una de estas alternativas:
+Prepara ambas tablas antes de la primera petición con una de estas alternativas:
 
 ```shell
 orionis cache:migrate

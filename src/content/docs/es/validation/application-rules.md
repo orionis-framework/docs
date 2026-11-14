@@ -13,7 +13,7 @@ En una acción HTTP, declara el schema como parámetro: el contenedor valida el 
 
 ## Valores vacíos y no vacíos
 
-Desde **1.4.0**, importa `Empty` y `NoEmpty` desde `orionis.schemas.rules` para exigir un valor vacío o presente. Son opuestas exactas y comparten esta definición:
+Importa `Empty` y `NoEmpty` desde `orionis.schemas.rules` para exigir un valor vacío o presente. Son opuestas exactas y comparten esta definición:
 
 | Categoría del valor | Se considera vacío cuando |
 | --- | --- |

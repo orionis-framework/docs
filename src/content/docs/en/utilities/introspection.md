@@ -96,7 +96,7 @@ To execute a component with dependencies, use the application's [binding and inv
 
 ## Caches, mutations and source availability
 
-Wrappers cache results in process memory. Results do not necessarily update when other code changes a class, instance, module or function: use `clearCache()` as described in the relevant reference, or create another wrapper. Mutation methods do not all invalidate the same cache groups; their pages explain the actual effects.
+Wrappers cache results locally. Their mutation methods invalidate affected metadata; clear after changes made outside the wrapper. Callable/class/instance `clearCache()` also invalidates shared dependency signatures and invocation plans. Other wrappers keep their local snapshots until cleared. Module loading uses Python's import cache and reads the current class attribute.
 
 Source retrieval depends on Python being able to access the object's defining file. Save code analysis examples in `.py` files when using `getSourceCode()`; interactive sessions or functions created with `exec()` may have no retrievable source.
 

@@ -67,7 +67,7 @@ query = Article.query().where("published", True)
 toSql(*, literal_binds: bool = False) -> str
 ```
 
-Método síncrono del builder, también delegado por la clase del modelo desde **1.2.0**. `Article.toSql()` crea una consulta nueva; `query.toSql()` compila el SELECT de la consulta existente sobre un clon, incluidos los scopes globales y la visibilidad de eliminación lógica. Conserva el builder original y no ejecuta SQL. Usa el dialecto y el prefijo de tablas de la conexión del modelo.
+Método síncrono del builder, también delegado por la clase del modelo. `Article.toSql()` crea una consulta nueva; `query.toSql()` compila el SELECT de la consulta existente sobre un clon, incluidos los scopes globales y la visibilidad de eliminación lógica. Conserva el builder original y no ejecuta SQL. Usa el dialecto y el prefijo de tablas de la conexión del modelo.
 
 ```python
 default_sql = Article.toSql()
@@ -511,7 +511,7 @@ original = article.getOriginal()
 def syncOriginal(self) -> Any
 ```
 
-Convierte los valores actuales en el nuevo snapshot y retorna la misma instancia, **sin persistir** y sin limpiar `getChanges`. Es una operación avanzada: invocarla antes de guardar oculta esos cambios al próximo UPDATE.
+Copia los valores actuales en un nuevo estado original y devuelve la misma instancia, sin persistir ni vaciar `getChanges`. Publica el estado solo después de copiar todos los valores; si falla una copia, conserva el estado anterior. Llamarlo antes de guardar oculta esos cambios al siguiente UPDATE.
 
 ```python
 snapshot_only = Article({"title": "Baseline"})
@@ -758,7 +758,7 @@ finally:
 
 No existen aquí métodos de instancia `refresh()`/`fresh()` ni una propiedad pública `exists`. Para comprobar existencia consulta de nuevo o usa el booleano de escritura y la identidad. Una proyección parcial no rellena el resto de la entidad: no intentes guardar valores que asumiste cargados. Actualizar/borrar una instancia usa su PK original directamente, sin reintroducir scopes globales ni control de versión. No hay bloqueo optimista implícito. Tras errores o rollback, descarta o recupera de nuevo el objeto si necesitas reflejar el estado real.
 
-`save()` sin cambios sigue ejecutando eventos `saving`, `updating`, `updated`, `saved`, pero no UPDATE. Si SQL afecta cero filas, los eventos posteriores se ejecutan aunque el booleano sea `False`. Véase [eventos](/es/orm/events).
+Un `save()` sin cambios ejecuta `saving`, `updating`, `updated`, `saved`, pero no envía UPDATE. Si SQL afecta cero filas, devuelve `False` y no emite eventos posteriores de éxito. Consulta [eventos](/es/orm/events).
 
 <a id="orm-exceptions"></a>
 

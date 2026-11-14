@@ -56,7 +56,7 @@ flowchart TD
 | `setUpClass` | `@classmethod def setUpClass(cls) -> None` | Preparación síncrona compartida por la clase. |
 | `tearDownClass` | `@classmethod def tearDownClass(cls) -> None` | Limpieza síncrona de esa preparación. |
 
-Los seis hooks conservan sus firmas de `unittest` y **no reciben inyección automática**. Si `setUp` o `asyncSetUp` falla, no se ejecutan el método ni el teardown de esa prueba; sí se intentan sus cleanups registrados. Si la preparación termina, un fallo de la prueba no impide intentar el teardown. Los errores en hooks por caso se registran como errores de la prueba. Los fallos previos al primer caso en hooks de clase tienen una limitación específica del procesador, descrita en [resultados](/es/testing/results-and-reference).
+Los seis hooks conservan sus firmas de `unittest` y **no reciben inyección automática**. Si `setUp` o `asyncSetUp` falla, no se ejecutan el método ni el teardown de esa prueba; sí se intentan sus cleanups registrados. Si la preparación termina, un fallo de la prueba no impide intentar el teardown. Los errores en hooks por caso se registran como errores de la prueba. Los errores y omisiones de fixtures de clase se registran incluso antes del primer caso; consulta [resultados](/es/testing/results-and-reference).
 
 El loop se cierra al finalizar el caso y cancela las tareas que sigan pendientes. Esto no sustituye cerrar explícitamente conexiones, streams u otros recursos.
 
@@ -229,9 +229,9 @@ No asumas que un decorador arbitrario que cambia la firma mantiene la inyección
 
 ### `setMethodPattern(pattern: str) -> None`
 
-Método de clase que establece el patrón glob que decide qué método seleccionado debe envolverse con la invocación de la aplicación. Su predeterminado es `test*` y el valor pertenece al contexto actual. El motor lo actualiza mediante `setMethodPattern(...)`; úsalo desde la [configuración y ejecución de pruebas](/es/testing/writing-and-running-tests).
+Método de clase que establece el glob local al contexto para decidir si un método seleccionado se envuelve con la invocación de la aplicación. El valor predeterminado es `test*`. El motor aplica su propio patrón únicamente durante el descubrimiento y restaura después el contexto anterior, también ante errores.
 
-No modifica por sí solo el prefijo de descubrimiento de `unittest.TestLoader`: el comando sigue cargando métodos que empiezan por `test`. Mantén ese prefijo y usa patrones como `testCreate*` para seleccionar un subconjunto. Los hooks de ciclo de vida y los métodos privados nunca se envuelven.
+El motor utiliza un loader que selecciona los métodos coincidentes con su glob, incluidos prefijos como `check*`. Llamar solo a `TestCase.setMethodPattern()` no configura un `unittest.TestLoader` externo. Los hooks de ciclo de vida y métodos privados nunca se envuelven para inyección.
 
 ### `await mcp(server, config=None, *, app=None) -> McpTestClient`
 

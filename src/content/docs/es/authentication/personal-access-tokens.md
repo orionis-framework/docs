@@ -13,7 +13,7 @@ El recorrido habitual es: iniciar sesión en la aplicación, emitir un token des
 
 El modelo configurado en `auth.identity.model` debe implementar `IAuthenticatable` y `IAuthorizable`. En un modelo ORM se consigue con los mixins `Authenticatable` y `Authorizable` de `orionis.auth`; el modelo `User` predeterminado ya los incluye. El token conserva tanto el identificador como el tipo del propietario, derivado de `getAuthorizableType()`.
 
-Desde 1.3.0, prepara los tokens con `auth:migrate` después de configurar la conexión SQL predeterminada y `auth.tokens.table` (`AUTH_TOKEN_TABLE`, predeterminado `personal_access_tokens`). Ejecuta una de estas alternativas desde la raíz del proyecto:
+Prepara los tokens con `auth:migrate` después de configurar la conexión SQL predeterminada y `auth.tokens.table` (`AUTH_TOKEN_TABLE`, predeterminado `personal_access_tokens`). Ejecuta una de estas alternativas desde la raíz del proyecto:
 
 ```bash
 orionis auth:migrate
@@ -23,9 +23,9 @@ orionis auth:migrate
 python -B reactor auth:migrate
 ```
 
-Desde **1.5.0**, el comando prepara también roles, permisos, sus tres relaciones y recuperación de contraseñas. Crea las tablas faltantes desde las definiciones de Orionis, respetando el prefijo SQL y los nombres configurados en `auth.tokens.table` y `auth.passwords.table`. Ambos nombres deben ser distintos entre sí y de las tablas de autorización, sin distinguir mayúsculas.
+El comando prepara también roles, permisos, sus tres relaciones y recuperación de contraseñas. Crea las tablas faltantes desde las definiciones de Orionis, respetando el prefijo SQL y los nombres configurados en `auth.tokens.table` y `auth.passwords.table`. Ambos nombres deben ser distintos entre sí y de las tablas de autorización, sin distinguir mayúsculas.
 
-Exige restricciones de unicidad efectivas, no admite `--database` y conserva los tokens existentes al repetirlo. No importa migraciones de aplicación ni registra historial. Cambiar la tabla configurada no traslada tokens existentes ni modifica esquemas incompatibles. Los usuarios y su migración, las capacidades del negocio y sus seeders siguen en la aplicación; en una base nueva, ejecuta `migrate`, `auth:migrate` y después `seed`. Consulta [almacenamiento interno y proyectos existentes](/es/database/migrations#auth-storage-1-5-0).
+Exige restricciones de unicidad efectivas, no admite `--database` y conserva los tokens existentes al repetirlo. No importa migraciones de aplicación ni registra historial. Cambiar la tabla configurada no traslada tokens existentes ni modifica esquemas incompatibles. Los usuarios y su migración, las capacidades del negocio y sus seeders siguen en la aplicación; en una base nueva, ejecuta `migrate`, `auth:migrate` y después `seed`. Consulta [almacenamiento interno y proyectos existentes](/es/database/migrations#authentication-storage).
 
 ## Emitir un token desde el navegador
 
@@ -296,8 +296,8 @@ Al desactivar una cuenta o cambiar sus credenciales fuera del flujo de recuperac
 
 <a id="token-lookup-performance"></a>
 
-## Consulta nativa de tokens en 1.1.0
+## Consulta nativa de tokens
 
 El repositorio nativo de tokens y el provider de identidad basado en modelos pueden recuperar token y propietario mediante un SELECT con JOIN cuando comparten una conexión nativa, usan claves enteras o de texto admitidas y mantienen una consulta de scopes sencilla. El guard conserva la actualización condicional final de `last_used_at` después de resolver la identidad, comprobando de nuevo revocación y expiración. Esa ruta de token/propietario utiliza dos sentencias en lugar de tres; las relaciones anticipadas pueden ejecutar consultas adicionales.
 
-Los metadatos del token se validan antes de los eventos de identidad. Se mantienen filtros globales, hidratación, eventos `retrieved` y relaciones anticipadas; no se cachean decisiones de autenticación. Providers o repositorios personalizados, conexiones separadas, claves UUID y consultas complejas utilizan la ruta existente. No se requiere un ajuste de configuración ni migración de tokens para aprovechar la ruta nativa compatible.
+Los metadatos del token se validan antes de los eventos de identidad. Se mantienen filtros globales, hidratación, eventos `retrieved` y relaciones anticipadas; no se cachean decisiones de autenticación. Providers o repositorios personalizados, conexiones separadas, claves UUID y consultas complejas utilizan consultas separadas para el token y la identidad.

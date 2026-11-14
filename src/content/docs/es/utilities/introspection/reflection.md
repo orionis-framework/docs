@@ -125,7 +125,7 @@ assert not Reflection.isInstance(42)
 
 **`isConcreteClass(obj: Any) -> bool`** requiere una clase con `__init__` y descarta objetos reconocidos como builtin por `isBuiltIn`, abstractos, genéricos, subclases de `Protocol`, construcciones reconocidas por `isTypingConstruct` y clases con `ABC` entre sus bases **directas**.
 
-Este filtro es el comportamiento concreto de Orionis, no una prueba general de que una clase sea instanciable o de usuario. `int`, `typing.Any` y el propio `typing.Protocol` pueden devolver `True`: el detector builtin no clasifica clases y `isProtocol` excluye al propio `Protocol`.
+El filtro excluye clases builtin y construcciones de typing, como `int`, `typing.Any` y `typing.Protocol`. Es una clasificación del framework, no una garantía de poder construir la clase sin argumentos.
 
 <a id="reflection-method-isgeneric"></a>
 
@@ -137,7 +137,7 @@ Este filtro es el comportamiento concreto de Orionis, no una prueba general de q
 
 <a id="reflection-method-istypingconstruct"></a>
 
-**`isTypingConstruct(obj: Any) -> bool`** compara `type(obj).__name__` con una lista interna de nombres: `Any`, `Union`, `Optional`, `List`, `Dict`, `Set`, `Tuple`, `Callable`, `TypeVar`, `Generic`, `Protocol`, `Literal`, `Final`, `TypedDict`, `NewType`, `Deque`, `DefaultDict`, `Counter` y `ChainMap`. No reconoce exhaustivamente todos los objetos del módulo `typing`; `typing.Any` o `typing.Literal[1]` dan `False` con el runtime comprobado, mientras un `TypeVar` da `True`.
+**`isTypingConstruct(obj: object) -> bool`** reconoce objetos que no son funciones cuyo módulo propio o módulo del tipo es `typing`, incluidos `Any`, `Literal[...]` y `TypeVar`. Excluye funciones ordinarias.
 
 ```python
 from abc import ABC, abstractmethod
@@ -159,15 +159,15 @@ T = TypeVar("T")
 assert Reflection.isAbstract(Source)
 assert not Reflection.isAbstract(EmptyBase)
 assert not Reflection.isConcreteClass(EmptyBase)
-assert Reflection.isConcreteClass(int)
-assert Reflection.isConcreteClass(Any)
+assert not Reflection.isConcreteClass(int)
+assert not Reflection.isConcreteClass(Any)
 assert Reflection.isGeneric(list[int]) and Reflection.isGeneric(T)
 assert not Reflection.isGeneric(int)
 assert Reflection.isProtocol(Readable)
 assert not Reflection.isProtocol(Protocol)
 assert Reflection.isTypingConstruct(T)
-assert not Reflection.isTypingConstruct(Any)
-assert not Reflection.isTypingConstruct(Literal[1])
+assert Reflection.isTypingConstruct(Any)
+assert Reflection.isTypingConstruct(Literal[1])
 ```
 
 ## Coroutines, awaitables y generadores

@@ -48,6 +48,6 @@ assert Stringable("  Ada   Lovelace  ").squish().value() == "Ada Lovelace"
 
 ## Referencia y próximos pasos
 
-[collection.py](https://github.com/orionis-framework/framework/blob/470229f78a5db61263ce887bcdd16bc98f9141db/orionis/support/types/collection.py) · [stringable.py](https://github.com/orionis-framework/framework/blob/470229f78a5db61263ce887bcdd16bc98f9141db/orionis/support/types/stringable.py)
+[collection.py](https://github.com/orionis-framework/framework/blob/1e905f4f103d47c61789d877eba472a5bd97681b/orionis/support/types/collection.py) · [stringable.py](https://github.com/orionis-framework/framework/blob/1e905f4f103d47c61789d877eba472a5bd97681b/orionis/support/types/stringable.py)
 
 [Volver al índice del módulo](/es/utilities).

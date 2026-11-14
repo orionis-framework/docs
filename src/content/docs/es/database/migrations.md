@@ -11,7 +11,7 @@ Las migraciones son clases async que describen cambios físicos ordenados. up ap
 
 ## Preparar las tablas internas del framework
 
-Desde 1.3.0, `auth:migrate`, `cache:migrate`, `schedule:migrate` y `session:migrate` preparan el almacenamiento SQL interno junto al comando existente `queue:migrate`. Crean las tablas faltantes desde las definiciones incluidas en Orionis, de forma independiente de las migraciones de aplicación. No descubren archivos dentro de `database/` ni agregan registros al historial `migrations`.
+`auth:migrate`, `cache:migrate`, `schedule:migrate` y `session:migrate` preparan el almacenamiento SQL interno junto al comando existente `queue:migrate`. Crean las tablas faltantes desde las definiciones incluidas en Orionis, de forma independiente de las migraciones de aplicación. No descubren archivos dentro de `database/` ni agregan registros al historial `migrations`.
 
 | Comando | Tablas configuradas | Conexión SQL |
 |---|---|---|
@@ -33,9 +33,9 @@ Los nombres de todas las tablas de autenticación, cache, colas y sesiones respe
 
 Repetir un comando conserva las filas y tablas existentes. No ejecuta `DROP` ni `ALTER`, repara esquemas incompatibles ni traslada datos después de cambiar la configuración. Usa una migración de aplicación explícita para un cambio deliberado de esquema. La preparación correcta devuelve `0`; un fallo de almacenamiento o configuración reportado devuelve `1`.
 
-<a id="auth-storage-1-5-0"></a>
+<a id="authentication-storage"></a>
 
-### Autorización y recuperación desde 1.5.0
+### Almacenamiento de autenticación
 
 `auth:migrate` prepara `permissions`, `roles`, `model_has_permissions`, `model_has_roles` y `role_has_permissions`, además de las tablas configuradas de tokens personales y recuperación de contraseñas. Los nombres de estas dos tablas configurables deben ser distintos entre sí y de las cinco tablas de autorización, sin distinguir mayúsculas. Configúralos antes de ejecutar el comando: una colisión se rechaza antes de crear almacenamiento.
 
@@ -49,15 +49,7 @@ python -B reactor seed
 
 `auth:migrate` no crea usuarios ni inserta roles, permisos o cuentas de administrador. Tampoco ejecuta seeders. `migrate --seed` no prepara por sí solo el almacenamiento interno de auth; usa la secuencia anterior cuando un seeder dependa de él.
 
-La aplicación de referencia retira las migraciones `m0000000006_create_permissions_table.py`, `m0000000007_create_roles_table.py`, `m0000000008_create_model_has_permissions_table.py`, `m0000000009_create_model_has_roles_table.py`, `m0000000010_create_role_has_permissions_table.py` y `m0000000012_create_password_reset_tokens_table.py`, junto con sus schemas `_v1.py`. La migración de `users` y los seeders de negocio permanecen en la aplicación.
-
-En un proyecto existente, `auth:migrate` reutiliza las tablas existentes y conserva sus registros e historial. **Mantén los archivos de migraciones ya aplicadas y los schemas que importan** para que sus lotes registrados puedan revertirse. No borres historial, renumeres archivos ni ejecutes un reset para adoptar 1.5.0. Actualizar el paquete no elimina automáticamente los archivos de tu aplicación o skeleton. Si necesitas cambiar un esquema existente, hazlo mediante una migración explícita: el comando solo crea tablas faltantes.
-
-### Proyectos existentes y limpieza de 1.3.0
-
-La aplicación de referencia del framework retiró cinco migraciones duplicadas: `m0000000001_create_scheduler_tasks_table.py`, `m0000000002_create_cache_table.py`, `m0000000003_create_cache_locks_table.py`, `m0000000004_create_sessions_table.py` y `m0000000011_create_personal_access_tokens_table.py`, junto a sus cinco schemas `_v1.py` correspondientes. En 1.3.0 conservaba las migraciones de usuarios, permisos, roles, sus asociaciones y recuperación con sus números originales. La sección de [1.5.0](#auth-storage-1-5-0) describe el traslado posterior de autorización y recuperación al core. La preparación de colas continúa mediante `queue:migrate`.
-
-Esa limpieza de código no modifica bases de datos existentes ni su historial. Un proyecto o skeleton existente puede conservar esos archivos: mantén las migraciones ya aplicadas y sus schemas para que el rollback resuelva sus identidades. No renumeres los archivos restantes ni limpies el historial para adoptar estos comandos. El almacenamiento nuevo se prepara con los comandos anteriores; las tablas de negocio continúan utilizando `migrate`.
+Conserva las migraciones de aplicación ya ejecutadas y las definiciones de esquema que importan para poder revertir los lotes registrados. Los comandos de almacenamiento interno crean tablas faltantes; usa una migración de aplicación explícita para modificar una tabla existente.
 
 ## Generar una migración
 
@@ -366,3 +358,5 @@ MigrationEvents.started(name: str) -> None
 MigrationEvents.succeeded(name: str, elapsed: float) -> None
 MigrationEvents.failed(name: str, elapsed: float) -> None
 ```
+
+Los scopes de conexión de migración y seeder expiran cuando sale su propietario, incluidas copias heredadas por tareas hijas. El descubrimiento omite inicializadores de paquete, deduplica alias de la misma clase y propaga errores de recorrido del sistema de archivos. Mantén el trabajo dentro de la operación propietaria y espéralo antes de salir.

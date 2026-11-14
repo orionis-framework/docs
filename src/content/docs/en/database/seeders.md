@@ -7,7 +7,7 @@ lastUpdated: false
 
 A seeder describes initial or development data in a class with an async run method. `SeederRunner` discovers pending files and records execution in the seeders table. A recorded seeder does not run again on that connection; a factory generates models each time it is called and does not replace that history. Migrate referenced tables first.
 
-Since **1.5.0**, if a seeder creates roles, permissions, or their assignments, also prepare internal tables with [`auth:migrate`](/en/database/commands#auth-migrate). For a new database, run `python -B reactor migrate`, `python -B reactor auth:migrate`, then `python -B reactor seed`. `migrate --seed` does not prepare that storage by itself. Your seeders continue to define business data and privileges; the auth command only creates missing tables.
+If a seeder creates roles, permissions, or their assignments, also prepare internal tables with [`auth:migrate`](/en/database/commands#auth-migrate). For a new database, run `python -B reactor migrate`, `python -B reactor auth:migrate`, then `python -B reactor seed`. `migrate --seed` does not prepare that storage by itself. Your seeders continue to define business data and privileges; the auth command only creates missing tables.
 
 ## Creating a seeder
 
@@ -185,3 +185,5 @@ class InsertDefaultFlags(BaseCommand):
 ## Relationship with rollback and rebuilding
 
 Seeders have no down method or separate rollback command. When migrate:rollback/reset reverts every applied migration on a connection, seeders history is removed too. A partial reversal preserves it. migrate:fresh rebuilds both histories and then needs seed or migrate --seed to repopulate. Preserve data through carefully designed migrations rather than manual tracking edits.
+
+Filesystem discovery errors propagate instead of producing an empty pending list. When claiming a seeder fails, the runner checks whether another execution recorded it. If that recovery read also fails, the original claim error remains primary and the read failure is reported centrally.

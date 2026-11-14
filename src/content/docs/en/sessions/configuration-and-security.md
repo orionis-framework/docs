@@ -27,7 +27,7 @@ These are the defaults in `config/session.py` when no environment variable overr
 | `table` · `SESSION_DB_TABLE` | `"sessions"` | Table for the `database` driver. |
 | `cache` · `SESSION_CACHE_STORE` | `None` | Store for the `cache` driver; `None` uses the default cache store. |
 
-Since 1.3.0, [`session:migrate`](/en/database/commands#session-migrate) prepares the configured SQL session table before requests arrive. It uses `SESSION_DB_CONNECTION` and `SESSION_DB_TABLE` even if another session driver is active, preserves existing sessions, and accepts no `--database`.
+[`session:migrate`](/en/database/commands#session-migrate) prepares the configured SQL session table before requests arrive. It uses `SESSION_DB_CONNECTION` and `SESSION_DB_TABLE` even if another session driver is active, preserves existing sessions, and accepts no `--database`.
 
 See [stores and concurrency](/en/sessions/stores-and-concurrency) to select a driver and prepare its dependencies.
 
@@ -163,3 +163,7 @@ Session rotation alone retains the existing CSRF token because it keeps data. In
 - `HttpOnly` protects reading the cookie from scripts and does not replace CSRF protection. The session cookie and optional `XSRF-TOKEN` cookie serve different purposes.
 
 If a session is not retained across requests, inspect `Set-Cookie`, the cookie sent by the next request, its domain/path, `Secure` and the selected driver. If a state-changing WEB request fails CSRF validation, use a token from that same session. Actual backend errors propagate; they are not hidden by issuing a cookie promising data that could not be saved.
+
+### Inspect pending lifecycle changes
+
+`session.isNew`, `session.invalidated`, and `session.wantsRegenerate` are synchronous boolean properties. They distinguish an identity not yet persisted under its current identifier, a requested invalidation, and a requested identifier rotation. `regenerate()` and `invalidate()` schedule storage work for middleware; inspecting these flags does not persist anything. Use them when integrating custom response behavior, and let the normal WEB session layer own saving and cookie updates.

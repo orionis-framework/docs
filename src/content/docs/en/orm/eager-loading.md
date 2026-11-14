@@ -99,3 +99,5 @@ async def teams_with_profiles():
 - Confirm the pattern by counting SELECT calls with a connection wrapper in tests or examining SQL observed by your infrastructure. Compare several parents, not just one. No automatic N+1 detector is exposed here.
 
 See [collections and pagination](/en/orm/collections-and-pagination) to load only the needed page and [testing](/en/orm/factories) to verify results and operation counts.
+
+Many-to-many eager loading preserves the related query's result order and does not multiply a related row simply because duplicate pivot links exist. Define database uniqueness for links when duplicates are invalid in your application.

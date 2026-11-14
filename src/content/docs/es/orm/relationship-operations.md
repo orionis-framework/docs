@@ -36,7 +36,7 @@ El `insert(values)` heredado también apunta a la tabla relacionada y devuelve `
 async def create(self, attributes: dict[str, Any]) -> TRelated
 ```
 
-Solo `hasOne`/`hasMany`: copia `attributes`, sobrescribe la FK con la clave del padre y llama a `Related.create`. La FK también debe ser fillable. Devuelve modelo incluso si un listener veta `save`. Un padre sin clave no se guarda automáticamente: guarda primero el padre. Filtros adicionales de lectura no se copian al payload.
+En `hasOne`/`hasMany`, copia atributos, establece la clave foránea del padre, construye y guarda el modelo relacionado en la conexión seleccionada por la relación. La clave foránea debe ser fillable. Devuelve el modelo aunque un evento vete el guardado. Guarda antes el padre; los filtros de lectura adicionales no se copian al payload.
 
 ```python
 async def recruit(team: Team):
@@ -247,7 +247,7 @@ async def featured_tags(team: Team):
 async def attach(self, ids: Any, attributes: dict[str, Any] | None=None) -> int
 ```
 
-Inserta vínculos y devuelve número de filas pivot. `ids` acepta identidad, modelo, iterable de ambos o mapping identidad/modelo→dict extra. `attributes=None` aplica extras comunes cuando `ids` no es mapping. No crea modelos ni comprueba duplicados/padre persistido. Extras se mezclan después de claves; no incluyas claves de enlace en extras.
+Inserta enlaces pivote y devuelve el conteo insertado. Acepta una identidad, modelo, iterables o mapa de identidad/modelo a atributos adicionales. `attributes` aporta extras comunes cuando la entrada no es mapa. Los extras no pueden sobrescribir las identidades del padre o relacionado elegidas por `attach()`. No crea modelos ni elimina enlaces duplicados; impón la unicidad en la base de datos.
 
 ```python
 async def add_tag(team: Team, tag: Tag) -> int:

@@ -7,7 +7,7 @@ lastUpdated: false
 
 Un seeder describe datos iniciales o de desarrollo en una clase con run async. `SeederRunner` descubre los archivos pendientes y registra su ejecución en la tabla seeders. Un seeder registrado no se repite en esa conexión; una factory genera modelos cada vez que la invocas y no sustituye ese historial. Migra primero las tablas utilizadas.
 
-Desde **1.5.0**, si un seeder crea roles, permisos o sus asignaciones, prepara también las tablas internas con [`auth:migrate`](/es/database/commands#auth-migrate). Para una base nueva, ejecuta `python -B reactor migrate`, `python -B reactor auth:migrate` y luego `python -B reactor seed`. `migrate --seed` no prepara por sí solo ese almacenamiento. Los datos y privilegios del negocio siguen definidos por tus seeders; el comando de auth solo crea las tablas faltantes.
+Si un seeder crea roles, permisos o sus asignaciones, prepara también las tablas internas con [`auth:migrate`](/es/database/commands#auth-migrate). Para una base nueva, ejecuta `python -B reactor migrate`, `python -B reactor auth:migrate` y luego `python -B reactor seed`. `migrate --seed` no prepara por sí solo ese almacenamiento. Los datos y privilegios del negocio siguen definidos por tus seeders; el comando de auth solo crea las tablas faltantes.
 
 ## Crear un seeder
 
@@ -185,3 +185,5 @@ class InsertDefaultFlags(BaseCommand):
 ## Relación con rollback y reconstrucción
 
 Los seeders no tienen down ni un comando independiente de rollback. Cuando migrate:rollback/reset revierte todas las migraciones aplicadas de una conexión, elimina también el historial seeders. Una reversión parcial lo conserva. migrate:fresh reconstruye ambos historiales y luego requiere seed o migrate --seed para poblar. Conserva datos que deban sobrevivir mediante migraciones cuidadosamente diseñadas, no editando el historial manualmente.
+
+Los errores de descubrimiento del sistema de archivos se propagan en vez de producir una lista pendiente vacía. Si falla la reserva de un seeder, el runner comprueba si otra ejecución lo registró. Si también falla esa lectura de recuperación, el error de reserva permanece como principal y el de lectura se reporta centralmente.

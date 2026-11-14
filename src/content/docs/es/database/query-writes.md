@@ -141,3 +141,5 @@ async def run_example():
 **Errores:** `QueryException` si la compilación o ejecución falla; la capa de conexión sanea el mensaje y suprime la causa encadenada del driver.
 
 [Fachada DB](/es/database/db-facade) · [Consultas ORM](/es/orm/querying) · [Escenario de pruebas](/es/orm/testing)
+
+Los planes de inserción con esquema declarado rechazan nombres de columna desconocidos antes de escribir, incluso claves presentes solo en filas posteriores del lote. No descartan silenciosamente valores desconocidos.

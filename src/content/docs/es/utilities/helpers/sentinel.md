@@ -86,7 +86,7 @@ assert repr(another) == repr(MISSING)
 
 ## Copia y serialización de Python
 
-No se define `__copy__`, `__deepcopy__` ni una reducción personalizada de pickle. La copia superficial, la profunda y la reconstrucción mediante pickle crean cada una una instancia diferente: su resultado **no** es `MISSING` al comparar identidades. Evita copiar o guardar el marcador con pickle si el código posterior depende de `is MISSING`; conserva el objeto importado o codifica la ausencia explícitamente. JSON no lo serializa de forma predeterminada y produce `TypeError`.
+Las copias superficial y profunda y los ciclos de pickle conservan la identidad canónica de `MISSING` mediante sus métodos de copia y reducción. Puedes seguir comprobando `is MISSING` después. JSON no tiene representación integrada para este marcador y lanza `TypeError`; representa explícitamente la ausencia en ese límite.
 
 ```python
 import copy
@@ -99,7 +99,7 @@ for result in (
     copy.deepcopy(MISSING),
     pickle.loads(pickle.dumps(MISSING)),
 ):
-    assert result is not MISSING
+    assert result is MISSING
     assert repr(result) == "<MISSING>"
     assert bool(result) is False
 

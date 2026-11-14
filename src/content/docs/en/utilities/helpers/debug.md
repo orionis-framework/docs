@@ -5,7 +5,7 @@ editUrl: true
 lastUpdated: false
 ---
 
-Since Orionis **1.0.12**, the `Debug` facade provides access to the built-in dumper service to inspect one or more values:
+The `Debug` facade provides access to the built-in dumper service to inspect one or more values:
 
 ```python
 from orionis.support.facades import Debug

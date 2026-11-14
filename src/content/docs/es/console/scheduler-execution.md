@@ -348,7 +348,7 @@ if schedule.isPaused():
 
 ### `isStopped() -> bool`
 
-Comprueba si ese estado es `STOPPED`. Sirve para comprobar la instancia inicial, pero el apagado actual no actualiza ese estado: no lo uses para esperar una parada.
+Comprueba si el estado es `STOPPED`, incluido después del evento de shutdown. Usa `await wait()` para esperar el cierre y propagar errores de shutdown.
 
 ```python
 if schedule.isStopped():
@@ -432,13 +432,13 @@ schedule.shutdown(wait=0)
 await schedule.wait()
 ```
 
-Llámalo después de un arranque correcto y una sola vez por ciclo. Tras el retraso se esperan los listeners ya pendientes y se solicita el cierre del planificador. El ejecutor asyncio puede cancelar comandos aún activos: `wait=True` interno no garantiza que sus efectos hayan terminado ni que el comando haya retornado éxito. El wrapper no cambia su estado a `STOPPED` ni restablece automáticamente el evento de apagado para reutilizarlo como un ciclo nuevo.
+Llámalo después de un arranque correcto y una sola vez por ciclo. Tras el retraso se esperan los listeners ya pendientes y se solicita el cierre del planificador. El ejecutor asyncio puede cancelar comandos aún activos: `wait=True` interno no garantiza que sus efectos hayan terminado ni que el comando haya retornado éxito. El cierre espera trabajo del backend y listeners pendientes, establece `STOPPED` y limpia los conjuntos de tareas activas/pausadas. Un `boot()` posterior reconstruye el backend y limpia el estado de cierre. Llamar a `boot()` mientras el cierre continúa produce `RuntimeError`. Varias llamadas a `shutdown()` comparten la tarea de cierre existente.
 
 <a id="schedule-wait"></a>
 
 ### `async wait() -> None`
 
-Espera el evento interno que se activa después de solicitar el cierre del scheduler. Si nadie solicita `shutdown()`, puede esperar indefinidamente. No devuelve el resultado de los comandos ni un informe de sus errores.
+Espera la finalización del cierre, incluido el trabajo administrado del backend y los listeners. Sin una solicitud de cierre puede esperar indefinidamente. Devuelve `None` al terminar correctamente y vuelve a lanzar un fallo de cierre registrado, incluida la cancelación. No devuelve los resultados individuales de los comandos.
 
 ```python
 await schedule.wait()

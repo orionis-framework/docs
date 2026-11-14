@@ -68,7 +68,7 @@ orionis serve --interface rsgi
 python -B reactor serve --interface rsgi
 ```
 
-`--interface` has the `-i` alias and only accepts `asgi` or `rsgi`. `--port` has the `-p` alias. Since 1.0.13, `--host` selects the bind address. The other command-specific options are `--log` and `--export`. See their effects and platform differences in the [complete `serve` reference](/en/console/built-in-application#command-serve).
+`--interface` has the `-i` alias and only accepts `asgi` or `rsgi`. `--port` has the `-p` alias. `--host` selects the bind address. The other command-specific options are `--log` and `--export`. See their effects and platform differences in the [complete `serve` reference](/en/console/built-in-application#command-serve).
 
 `serve` prepares the Granian server and passes `app.entryPoint` as its target. When `--host` and `--port` are omitted, normal launching uses port `8000`, binds `127.0.0.1` in development and `0.0.0.0` in production. Explicit arguments override these values. Windows embedded debugger mode reads `app.host` and `app.port` when their arguments are omitted. Always open the address shown in the console.
 

@@ -755,4 +755,4 @@ Los cinco campos son obligatorios y exclusivamente por nombre. `sender` es la di
 
 Consulta la [referencia de API](/es/mail/api-reference) para los contratos y componentes y [contenido y vistas](/es/mail/content-and-views) para continuar con la declaración de cuerpos.
 
-Para mensajes ya compuestos, 1.1.0 también ofrece [lotes SMTP en la API del transporte](/es/mail/transports-and-extensions#smtp-batches). La fachada mantiene su API de envío individual.
+Para mensajes ya compuestos, utiliza [lotes SMTP en la API del transporte](/es/mail/transports-and-extensions#smtp-batches). La fachada mantiene su API de envío individual.

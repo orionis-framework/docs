@@ -97,7 +97,7 @@ FileBasedCache(
 
 Las rutas monitorizadas inexistentes se omiten. Las coincidencias se resuelven a rutas absolutas, se deduplican y ordenan; se excluye el propio archivo de caché. Si ambas listas están vacías, el hash representa un conjunto vacío y los cambios de tu código no invalidan el artefacto.
 
-`filename` se combina mediante `Path` sin la normalización ni el aislamiento de Storage. Utiliza un nombre simple controlado por tu aplicación: un nombre absoluto puede reemplazar el directorio base y un nombre con subdirectorios requiere preparar esos padres. El constructor no valida individualmente el tipo de cada ruta de las listas. Usa `Path` obtenidos de la configuración, no nombres aportados por clientes.
+`filename` debe ser un string no vacío con un único nombre de archivo: nombres vacíos, `.`/`..`, separadores de directorio, `:` y bytes nulos producen `ValueError`; un valor que no sea string produce `TypeError`. El directorio se resuelve al construir el objeto, de modo que cambiar después el directorio de trabajo no mueve el artefacto. Utiliza objetos `Path` configurados para las fuentes monitorizadas.
 
 Para añadir un archivo de configuración concreto además de los servicios, puedes construir el artefacto así:
 
@@ -127,7 +127,7 @@ def configured_artifact(app: IApplication) -> FileBasedCache:
 
 Lee y deserializa el archivo en cada llamada. Devuelve el diccionario de `__data__` cuando su versión y hash coinciden; devuelve `None` si no hay contenido utilizable, falta metadata, la versión es diferente o las fuentes cambiaron. Un diccionario vacío `{}` guardado es válido: comprueba `is not None`, como hace `ServiceIndex`, en lugar de usar su valor booleano.
 
-Solo la huella de fuentes se memoiza; el diccionario no se mantiene como una caché viva en memoria. Modificar el resultado no actualiza el archivo: debes llamar a `save()` para persistirlo. La anotación `dict | None` describe los artefactos escritos por `save()`; `get()` no valida exhaustivamente la forma de un archivo editado a mano.
+Solo la huella de fuentes se memoiza; el diccionario no se mantiene como una caché viva en memoria. Modificar el resultado no actualiza el archivo: llama a `save()`. `get()` comprueba que el valor exterior, los metadatos y los datos devueltos sean diccionarios; no valida el contenido específico de la aplicación.
 
 <a id="artifact-save"></a>
 ### save(data: dict) -> tuple[int, str]
@@ -322,6 +322,6 @@ Los marcadores reservados son `__type__` y `__value__`. Un diccionario que conte
 
 La reconstrucción de tipos/enums puede importar módulos por nombre. Utiliza este formato solo con artefactos de tu aplicación que estén bajo tu control; no deserialices cuerpos HTTP ni archivos modificables por clientes. No incluye firma, cifrado ni un hash que autentique el contenido.
 
-`FileBasedCache.get()` y `save()` llaman al mismo deserializador. Un archivo truncado, metadata con forma incorrecta, tag desconocido o módulo que ya no existe puede propagar errores; no se convierte siempre en un miss. Decide si un artefacto dañado debe hacer fallar tu compilación o si tu aplicación lo elimina con `clear()` y lo reconstruye, registrando primero el error. No captures indiscriminadamente todos los fallos de tu propio compilador como si fueran datos inválidos.
+`FileBasedCache.get()` y `save()` llaman al mismo deserializador. Un sobre decodificado con metadatos mal formados o datos que no sean un diccionario se trata como ausencia; `save()` puede reemplazarlo. Un JSON truncado, tags desconocidos o módulos eliminados aún pueden propagar errores de decodificación o reconstrucción. Decide si debes eliminar y reconstruir un artefacto dañado o detener la compilación, registrando primero el error original. No confundas fallos de tu compilador con datos de caché inválidos.
 
 Las operaciones cierran sus archivos al terminar; `FileBasedCache` y `Serializer` no requieren `close()` ni ofrecen contextos de archivo. Las lecturas/escrituras siguen siendo bloqueantes: usa `asyncio.to_thread` desde componentes async cuando el coste importe. Cancelar esa espera no detiene una escritura ya iniciada en el hilo, y el reemplazo puede completarse después de la cancelación. La publicación con temporal evita mezclar dos escrituras en el mismo staging; no garantiza durabilidad tras un corte del proceso ni consistencia del cálculo con otras operaciones.

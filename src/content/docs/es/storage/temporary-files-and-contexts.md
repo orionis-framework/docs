@@ -16,7 +16,7 @@ No existe una API pública `Storage.temporaryFile()`, `tempfile()` ni un context
 | Escritura local con `write()`/`writeStream()` | Archivo hermano con nombre `<destino>.<16 hex>.tmp`. | Se reemplaza el destino al terminar la escritura; el staging deja de existir después del reemplazo. |
 | `open()` local | El propio archivo de destino. | Se cierra su handle; el archivo y sus cambios permanecen. |
 | `writeStream()` de S3, Azure o GCS | `SpooledTemporaryFile`: primero memoria, después archivo temporal del sistema al superar 8 MiB. | El SDK recibe el buffer completo y después se intenta cerrar en `finally`, también si falla la carga. |
-| `open()` de S3, Azure o GCS | `SpooledTemporaryFile` con umbral de 8 MiB. | Los modos de escritura cargan el contenido completo al cerrar; después se cierra el buffer si la carga termina. |
+| `open()` de S3, Azure o GCS | `SpooledTemporaryFile` con umbral de 8 MiB. | Los modos de escritura cargan todo el contenido al cerrar; el buffer se cierra en `finally`, también si falla la carga. |
 | Memory | `bytes` almacenados por el driver; `bytearray` durante `writeStream()` y `BytesIO` durante `open()`. | Cerrar el stream persiste el buffer en el driver; el archivo permanece hasta `delete()` o hasta perder esa instancia/proceso. |
 | Upload multipart HTTP | `SpooledTemporaryFile` con umbral configurado para la petición. | Se cierra al finalizar la petición o antes mediante `move()`; cerrar elimina su temporal físico si había pasado a disco. |
 
@@ -26,9 +26,9 @@ Los temporales de `tempfile` se ubican según la configuración del sistema oper
 
 Local utiliza nombres únicos para que dos escritores no compartan su staging. `write()` crea el temporal, escribe y ejecuta un reemplazo del destino; elimina el temporal si esa secuencia produce un `OSError`. `writeStream()` escribe cada bloque en su temporal y solo reemplaza el destino cuando el productor termina normalmente.
 
-Si el productor de `writeStream()` falla o se cancela antes de completarse, el `finally` intenta cerrar y eliminar ese staging. El reemplazo final ocurre después de ese bloque: un fallo al reemplazar no tiene la misma limpieza automática y puede dejar un `.tmp`. Un fallo al aplicar visibilidad ocurre después de publicar. Por tanto, recibir una excepción no demuestra por sí solo que el destino siga intacto.
+`writeStream()` intenta eliminar el staging en `finally`, también cuando falla el productor, la publicación o la operación de visibilidad. Las operaciones nativas terminan antes de propagar la cancelación y ejecutar la limpieza. Un fallo posterior a publicar no revierte el destino, y un error de limpieza del sistema operativo aún puede impedir la eliminación.
 
-Los listados locales de archivos omiten los nombres que terminan en `.tmp`, incluido un staging que haya quedado después de un error. La API no publica una operación para inspeccionar o purgar automáticamente esos temporales internos. No utilices ese sufijo para archivos de trabajo que necesites descubrir con `files()`.
+Los listados locales solo omiten nombres internos terminados en `.<16 caracteres hexadecimales minúsculos>.tmp`. Los archivos de la aplicación como `report.tmp` se listan. No hay una operación pública para inspeccionar el staging ni un recolector automático tras terminar el proceso.
 
 El reemplazo evita publicar los bloques incompletos durante una escritura que falla antes del commit; no es una transacción con otras operaciones ni una garantía de durabilidad ante una interrupción del equipo. `open("wb")` no utiliza este staging: abre y trunca directamente el destino al entrar o realizar la primera operación.
 
@@ -55,8 +55,8 @@ flowchart TD
     G -->|No| H["Cierra el handle"]
     G -->|Sí| I["Persiste el buffer en hilo"]
     I -->|Éxito| H
-    I -->|Fallo| J["Propaga el error; no alcanza handle.close()"]
-    H --> K["Devuelve el control; la excepción del bloque continúa"]
+    I -->|Fallo| H
+    H --> K["Conserva el error del bloque o propaga el de limpieza"]
 ```
 
 `async with` llama a `close()` al abandonar el bloque, tanto con éxito como con una excepción. En memory/cloud esa salida puede **publicar los bytes ya escritos aunque tu lógica haya fallado**. En local ya se modificó directamente el archivo. El contexto no interpreta la excepción como una orden de rollback.
@@ -91,7 +91,7 @@ async def read_report_signature() -> bytes:
         await stream.close()
 ```
 
-El stream no incorpora locks: no compartas un mismo handle entre operaciones concurrentes de lectura, escritura o cierre. Si necesitas consumidores independientes, abre un contexto para cada uno.
+`AsyncStream` serializa lecturas, escrituras, seeks, apertura y cierre nativos con un lock asíncrono. Una secuencia de operaciones no es atómica y la iteración por bloques libera el lock entre lecturas. Usa contextos separados para consumidores independientes en lugar de compartir una posición de archivo mutable.
 
 ## Crear un archivo de trabajo y eliminarlo
 
@@ -134,7 +134,7 @@ async def inspect_temporary_export() -> dict[str, int | str]:
         return {"header": header.decode("utf-8"), "bytes": await file.size()}
 ```
 
-Al devolver el resultado, primero se cierra el handle y después se elimina el archivo. No devuelvas ese `IFile` para utilizarlo más tarde: su contexto ya habrá terminado. Este patrón elimina la ruta lógica elegida por tu aplicación; no conoce ni purga los nombres internos `.tmp` que pudiera dejar un fallo durante el commit del driver.
+Al devolver el resultado, primero se cierra el handle y después se elimina el archivo. No devuelvas ese `IFile` para usarlo más tarde: su contexto ya habrá terminado. Este patrón elimina la ruta lógica elegida por tu aplicación; la limpieza del staging corresponde al driver.
 
 ### Mantener el temporal durante una descarga HTTP
 
@@ -174,14 +174,14 @@ Para este informe pequeño podrías producir las filas directamente en `Streamin
 
 Distingue las garantías de cada operación:
 
-- El cierre de `AsyncStream` ejecuta primero su callback de persistencia. Si falla, se propaga la excepción antes de llegar a `handle.close()`; un segundo `close()` no reintenta ese handle ya separado. No afirmes que una escritura remota fallida cerró inmediatamente su buffer.
-- Local, S3 y GCS incluyen un `finally` para cerrar sus lectores por bloques. Agotar o cerrar explícitamente el generador permite ejecutar esa limpieza; utiliza `aclosing()` al abandonarlo antes del final. Azure delega en el iterador del SDK y no añade ese cierre explícito.
-- Los drivers ejecutan I/O bloqueante con `asyncio.to_thread`. Cancelar la tarea no detiene una operación que ya corre en el hilo ni garantiza cancelar una carga del SDK. Una escritura puede continuar o terminar después de recibirse la cancelación.
-- Los `finally` intentan liberar los recursos al propagarse una cancelación, pero Storage no protege toda su limpieza frente a cancelaciones repetidas ni espera de forma uniforme a todos los hilos antes de liberarlos. El helper anterior tampoco ofrece esa garantía: una nueva cancelación, un fallo de limpieza o terminar el proceso pueden dejar trabajo pendiente o un archivo de trabajo.
+- `AsyncStream` siempre intenta cerrar el handle después del callback de persistencia. Durante una salida excepcional, observa los fallos secundarios de limpieza y conserva el error original del bloque. Esto no implica rollback.
+- Local, S3 y GCS cierran los lectores nativos en `finally`; Azure cierra el iterador del SDK cuando dispone de `close()`. Agota o cierra explícitamente el generador; usa `aclosing()` si sales antes del final.
+- Storage espera el I/O nativo que posee antes de propagar la cancelación y liberar sus buffers. Cancelar no detiene forzosamente un hilo ni revierte una carga del SDK; una escritura puede completarse mientras se gestiona la cancelación. Configura timeouts finitos de SDK/red.
+- El helper de aplicación anterior aún utiliza un `finally` normal para eliminar su archivo de trabajo. Un fallo de limpieza, cancelaciones repetidas de ese código o terminar abruptamente el proceso pueden dejar un archivo; diseña recuperación al reiniciar si la necesitas.
 
 Mantén cada operación y su limpieza bajo el control de la misma tarea; espera su finalización antes de reutilizar/eliminar sus archivos. Si tu servicio necesita recuperación tras reinicios, conserva un registro de sus archivos de trabajo y aplica una política propia de limpieza de rutas que pertenezcan a ese servicio. Storage no les asigna un TTL ni proporciona un recolector automático.
 
-Las excepciones de I/O o del SDK se propagan. Un error durante el cierre o la eliminación puede sustituir la excepción que había iniciado la salida del contexto; conserva ese contexto en tus registros. El helper no convierte varias operaciones en una transacción ni revierte un archivo que ya fue publicado en otra ruta.
+Las excepciones de I/O o del SDK se propagan. La limpieza de streams nativos conserva una excepción de operación existente y observa los fallos secundarios mediante el [sistema de excepciones](/es/exceptions). El `delete()` independiente del helper aún puede fallar y requiere una política de aplicación. Ni la limpieza ni el helper hacen transaccionales varias operaciones.
 
 ## Vida útil del upload HTTP
 

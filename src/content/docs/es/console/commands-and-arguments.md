@@ -261,3 +261,19 @@ assert command.getArgument("limit") == 20
 ```
 
 Este ejemplo inspecciona estado y no llama al `handle()` sin implementar de la clase base. Para una ejecución normal no llames a `setArguments()` a mano: utiliza Reactor y una lista de tokens CLI.
+
+## Integrar un argumento con argparse
+
+`Argument.addToParser(parser: argparse.ArgumentParser) -> None` registra su definición validada en un parser existente. Reactor realiza este paso para clases y rutas de comandos. Úsalo cuando una integración sea propietaria de un parser independiente:
+
+```python
+import argparse
+from orionis.console import Argument
+
+parser = argparse.ArgumentParser(allow_abbrev=False)
+argument = Argument(name_or_flags="--limit", type_=int, default=10)
+argument.addToParser(parser)
+assert parser.parse_args(["--limit", "25"]).limit == 25
+```
+
+El parser convierte el texto en el entero `25`; esto no ejecuta un comando.

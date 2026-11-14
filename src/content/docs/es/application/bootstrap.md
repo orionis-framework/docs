@@ -230,6 +230,6 @@ Reconstruye el registro entero: otra llamada parcial puede devolver otros paths 
 <a id="bootstrap-create"></a>
 ## create(), boot() y ejecución
 
-`create() -> Self` completa configuración y registro. `await boot() -> Self` añade la espera de eager async para integraciones sin servidor; no ejecuta hooks ni kernels. Los [puntos de entrada](/es/application/server-entrypoints) y el [ciclo de vida](/es/application/lifecycle) explican startup/shutdown HTTP y CLI.
+`create() -> Self` completa configuración y registro. `await boot() -> Self` espera eager async, prepara el handler compartido y activa la observación de fallos sin servidor; no ejecuta hooks HTTP/CLI ni kernels. Completa esa propiedad con `await app.aclose()` en `finally`. Los [puntos de entrada](/es/application/server-entrypoints) y el [ciclo de vida](/es/application/lifecycle) explican startup/shutdown HTTP y CLI.
 
 Los kernels predeterminados provienen de metadatos nativos. No existe un método `withKernel()` ni una opción de protocolo en el constructor: ASGI/RSGI se seleccionan en el servidor.

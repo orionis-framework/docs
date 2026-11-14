@@ -65,7 +65,7 @@ Durante la inyección, el contenedor utiliza el único punto de entrada asíncro
 
 El proceso se ejecuta en este orden:
 
-1. **Conversión previa opcional.** Desde **1.4.0**, [`Coerce()`](/es/validation/declaring-schemas#field-coercion) prepara los valores marcados según su tipo declarado, sin modificar el payload original.
+1. **Conversión previa opcional.** [`Coerce()`](/es/validation/declaring-schemas#field-coercion) prepara los valores marcados según su tipo declarado, sin modificar el payload original.
 2. **Tipos y restricciones estructurales.** `msgspec` convierte los datos a la estructura declarada y comprueba tipos, campos obligatorios y restricciones como `MinLength`.
 3. **Reglas.** Orionis espera la validación de cada instancia de `Rule`, como `Email()`, sobre los valores convertidos. Todas implementan `async def enforce(...)`, tanto las comprobaciones sencillas como las que esperan I/O. Las reglas pueden inspeccionar otros campos y utilizar servicios externos. Un `enforce` síncrono se rechaza al definir la clase.
 
@@ -85,7 +85,7 @@ Los tipos, las restricciones y los metadatos documentales tienen funciones disti
 
 Sin `Coerce()`, la conversión conserva el comportamiento estricto de `msgspec`: `"36"` no es un `int` válido para `age` en el ejemplo anterior. Determinados tipos sí admiten representaciones de texto, como fechas ISO y UUID, según el tipo declarado. Declara `Field[int, Coerce(), GreaterThanOrEqual(18)]` e importa `Coerce` desde `orionis.schemas.metadata` para habilitarla en ese campo. Un marcador en un schema o una colección padre también habilita sus valores descendientes; los campos ajenos permanecen estrictos.
 
-La versión **1.4.0** también añade [`Empty()` y `NoEmpty()`](/es/validation/application-rules#empty-and-no-empty), reglas opuestas exactas para valores vacíos y presentes. Contemplan `None`, cadenas en blanco, cero numérico, `False`, colecciones de longitud cero y archivos subidos de cero bytes, sin modificar el valor. Se ejecutan después de la conversión: `"0"` está presente como string, mientras que el cero numérico convertido está vacío. Consulta el [ejemplo integrado de un pedido](/es/validation/validation-and-errors#coercion-and-empty-rules) para ver campos anidados, preservación del payload, mensajes personalizados y códigos de error.
+Utiliza [`Empty()` y `NoEmpty()`](/es/validation/application-rules#empty-and-no-empty), reglas opuestas exactas para valores vacíos y presentes. Contemplan `None`, cadenas en blanco, cero numérico, `False`, colecciones de longitud cero y archivos subidos de cero bytes, sin modificar el valor. Se ejecutan después de la conversión: `"0"` está presente como string, mientras que el cero numérico convertido está vacío. Consulta el [ejemplo integrado de un pedido](/es/validation/validation-and-errors#coercion-and-empty-rules) para ver campos anidados, preservación del payload, mensajes personalizados y códigos de error.
 
 Orionis acumula los errores de cada campo: restricciones incumplidas y reglas que devuelven `False`. Si falla la conversión inicial, inspecciona los campos para completar el diagnóstico. Un tipo incompatible o un campo ausente impide evaluar las condiciones que requieren su valor convertido; los demás campos y elementos siguen validándose.
 

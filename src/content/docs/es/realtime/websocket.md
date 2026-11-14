@@ -461,6 +461,8 @@ Este cliente no se reconecta automáticamente ni reenvía mensajes. Si añades r
 
 `receive()` entrega la desconexión como mensaje una vez; los métodos de lectura especializados la convierten en `WebSocketDisconnected`. Una operación posterior sobre una conexión cerrada también produce esa excepción.
 
+`WebSocketMessage.type` es un enum `WebSocketMessageType` (`TEXT`, `BYTES` o `DISCONNECT`). Usa `isText()`, `isBytes()` e `isDisconnect()` antes de acceder a `.text` o `.bytes`; el acceso al tipo incorrecto lanza `TypeError`. Los mensajes de desconexión exponen `code` y `reason`. Ambos enums y `WebSocketMessage` se exportan desde `orionis.http`; `socket.connectionState` utiliza `WebSocketState`.
+
 Para manejar varios tipos sin mezclar las lecturas, utiliza un solo consumidor:
 
 ```python

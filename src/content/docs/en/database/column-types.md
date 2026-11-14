@@ -17,6 +17,8 @@ DDL fragments were checked by compiling the example definitions using the instal
 
 SQL fragments below come from a separate probe declaration: sample, with length=80 for `String`/`Unicode`/VARCHAR/NVARCHAR, 2 for CHAR/NCHAR, 16 for BINARY, 64 for VARBINARY, and precision=12/scale=2 for decimals. Remaining options use defaults, including timezone=False. Usage examples may choose different values.
 
+`String`, `LargeBinary`, `Numeric` and `StrictDecimal` reject booleans where an integer length, precision or scale is required. Numeric precision/scale must be supplied together or both left as `None`.
+
 ## Shared parameters
 
 | Parameter | Effect |
