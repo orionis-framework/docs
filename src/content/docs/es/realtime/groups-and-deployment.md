@@ -56,7 +56,9 @@ function receiveAnnouncement(message) {
 
 El nombre del evento debe ser un identificador Python público de hasta 128 caracteres: `announcement` es válido; un nombre con puntos o `:` no lo es. Se admiten hasta 64 argumentos por evento, todos serializables por el codec de la conexión.
 
-`caller` y `client(id)` también admiten `await target.invoke("method", *args, timeout=...)` para esperar un resultado del navegador. Las selecciones múltiples no lo admiten porque no existe un resultado único que correlacionar. El [protocolo](/es/realtime/protocol-and-streaming) muestra ambas direcciones.
+Utiliza `await self.clients.caller.invoke("method", *args, timeout=5.0)` o selecciona una conexión con `self.clients.client(id)` para esperar el valor devuelto por su manejador. El resultado puede ser `None`. Una selección creada con `clients([id])` o con `group(name)` lanza `RuntimeError` al invocar un método, incluso cuando contiene exactamente una conexión.
+
+Puedes capturar `ConnectionError` si el cliente seleccionado deja de estar disponible y `TimeoutError` si el envío y la espera del resultado exceden el plazo en segundos. Con `timeout=None`, la conexión utiliza `REALTIME_CLIENT_RESULT_TIMEOUT`. Una respuesta de error del cliente lanza `orionis.realtime.errors.ClientInvocationError`. Consulta el [intercambio de servidor a cliente](/es/realtime/protocol-and-streaming).
 
 ## Incorporarse y salir de grupos
 
@@ -228,6 +230,14 @@ El `ConnectionManager` predeterminado solo conoce conexiones del proceso/worker 
 
 Para pruebas de chat con un solo registro utiliza el [comando de un worker](/es/realtime/chat#4-ejecutar-con-un-solo-worker). La selección habitual de `orionis serve` varía entre Windows y Unix; la documentación de una aplicación no debe asumir que todas las conexiones comparten proceso.
 
-Una afinidad de sesión puede mantener una conexión en su worker, pero no permite por sí misma difundir a conexiones de otros workers. Al implementar `IConnectionManager`, `register(connection)` registra la instancia de conexión y `unregister(connection)` elimina esa instancia y sus pertenencias a grupos. El gestor integrado ignora una instancia ausente o reemplazada durante la baja. El protocolo `RealtimeConnectionLike` requiere que los destinatarios implementen `await sendEncoded(data)` para tramas de texto o binarias. Para distribución necesitas un backplane propio y una implementación compatible de `IConnectionManager`, junto con las garantías de entrega que tu aplicación requiera. El framework no activa Redis pub/sub por configurar Redis en otro módulo.
+La afinidad de sesión puede mantener una conexión en su worker. La entrega entre workers requiere un canal compartido y una implementación compatible de `IConnectionManager`. El registro nativo usa la memoria del proceso incluso si otros servicios utilizan Redis.
+
+### Implementar un gestor de conexiones
+
+`register(connection)` registra una instancia de conexión. `unregister(connection)` elimina esa instancia y sus pertenencias a grupos. El gestor integrado ignora una instancia ausente o reemplazada durante la baja. Los destinatarios implementan el protocolo `RealtimeConnectionLike`, que incluye `await sendEncoded(data)` para tramas de texto o binarias.
+
+Cuando la aplicación llama a `await target.send(event, *args)`, el destino delega en `await manager.broadcast(hub, connection_ids, envelope)`. El contrato recibe la clase del hub, una tupla de identificadores de conexión y un mensaje de protocolo que los códecs de los clientes seleccionados puedan codificar. Devuelve un `BroadcastResult` con los contadores `sent` y `failed`. La codificación puede lanzar `TypeError` o `ValueError` antes de la entrega. La cancelación se propaga al llamador.
+
+El gestor nativo intenta una entrega por cada aparición de un identificador en la tupla y cuenta los identificadores no disponibles como fallos. Una tupla vacía devuelve cero en ambos contadores. El selector `clients(ids)` de la aplicación elimina los identificadores repetidos antes de llamar al gestor.
 
 El registro está pensado para el event loop de la aplicación; no es un contenedor global seguro para mutaciones desde hilos. Para producción configura HTTPS/`wss:`, soporte de upgrade en el proxy y plazos de infraestructura adecuados a conexiones largas; las opciones Realtime no configuran automáticamente ese proxy.

@@ -1,6 +1,6 @@
 ---
 title: "Tareas después de la respuesta"
-description: "Una tarea de background pertenece al mismo proceso y se ejecuta después de entregar la respuesta. Úsala para efectos secundarios cortos cuya pérdida sea aceptable; el módulo…"
+description: "Adjunta una tarea breve a una respuesta HTTP y decide cuándo enviarla a una cola persistente."
 editUrl: true
 lastUpdated: false
 ---
@@ -34,6 +34,6 @@ Invoca y devuelve `await acknowledge(message_id)` desde el flujo del controlador
 
 1. [Ejecutar acciones después de responder](/es/queues/background-tasks/response-tasks): requisitos, uso progresivo, configuración, integración, errores y referencia pública.
 
-`BackgroundTask` no tiene proveedor ni configuración propios. Su ejecución necesita el event loop activo y el logger de la aplicación; los requisitos adicionales dependen del callback.
+`BackgroundTask` no tiene proveedor ni configuración propios. Ejecuta la tarea con `await` en un bucle de eventos activo. Una aplicación iniciada proporciona el registro de ejecuciones y fallos.
 
 Relacionados: [http](/es/http) · [queues](/es/queues) · [logging](/es/logging)

@@ -45,7 +45,7 @@ Command(
 
 This is a mutable dataclass. `obj` references the class the container will construct, `method` selects the action, `signature` identifies it and `description` supplies help text. `timestamps` configures executor messages. `args` is a declarative list while the builder prepares the command, and a constructed parser after loader materialization.
 
-The builder returns this entity through `get()`; `Loader.get()` and `Loader.all()` expose materialized entities. Do not edit their fields to update a persistent registry: the cache stores a different metadata representation.
+To read a fluent command before registration, unpack `signature, metadata = builder.get()`. The second item is the command entity. `Loader.get()` and `Loader.all()` expose materialized entities. Do not edit their fields to update a persistent registry: the cache stores a different metadata representation.
 
 <a id="kernel-cli"></a>
 
@@ -100,7 +100,7 @@ get_core_commands_mapping() -> tuple[type, ...]
 CORE_COMMANDS: tuple
 ```
 
-In `orionis.console.core.commands`, the function returns the framework's 68 registered classes and `CORE_COMMANDS` retains the result for the loader. These are not command instances executed during catalog import. The [complete catalog](/en/console/built-in-commands) documents every signature, argument and option; finding another class in a source file does not make it a registered CLI command.
+In `orionis.console.core.commands`, the function returns the framework's 72 registered classes and `CORE_COMMANDS` retains the result for the loader. These are not command instances executed during catalog import. The [complete catalog](/en/console/built-in-commands) documents every signature, argument and option; finding another class in a source file does not make it a registered CLI command.
 
 <a id="stub-construction"></a>
 

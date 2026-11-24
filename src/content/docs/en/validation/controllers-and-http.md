@@ -245,7 +245,7 @@ Route.get("/stock", StockController)
 
 Place the block in your API route file, or separate the classes and import them before registration. `GET /stock` returns `{"quantity": 5}`. If you change the return value to `StockOutput(quantity=-1)`, construction succeeds but output validation rejects the quantity. A string such as `StockOutput(quantity="bad")` is also rejected by its type.
 
-Invalid output is an application failure: default handling produces **HTTP `500`**, rather than the `422` used for invalid input or a form redirect. The client response follows server error handling and its debug configuration; do not treat its details as the public input-error contract.
+Invalid output raises `ResponseValidationException` from `orionis.http.exceptions.response_validation`. The application’s exception handler can inspect the original `ValidationException` through `__cause__`. Default server error handling returns HTTP `500`, with details determined by the debug setting.
 
 If you return the same schema received as a parameter, its rules run for both input and output. Account for this when a rule queries external services. Keep these checks free of side effects and declare an output schema appropriate for the data you publish.
 

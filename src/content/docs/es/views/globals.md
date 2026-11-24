@@ -254,7 +254,7 @@ El flujo de guardado de entrada, errores y mensajes se muestra completo en [Rend
 
 ### trans(key, locale=None, **replace) y __(…)
 
-`trans` traduce una clave y sustituye placeholders `:name` con argumentos nombrados. `__` es exactamente el mismo callable registrado con otro nombre. Si no existe traducción, el traductor devuelve la clave, después de consultar el locale de fallback.
+`trans` traduce una clave y sustituye placeholders `:name` con argumentos nombrados. `__` es exactamente el mismo callable registrado con otro nombre. Si ni el idioma solicitado ni el de respaldo contienen el mensaje, el texto predeterminado es la clave. La aplicación puede proporcionar otro texto mediante `Lang.missing(handler)`. Los argumentos de la plantilla también sustituyen los marcadores de ese texto. Consulta la [guía de traducción](/es/localization/translating-content).
 
 Para un ejemplo reproducible, crea `resources/lang/en/messages.json`:
 

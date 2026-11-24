@@ -1,6 +1,6 @@
 ---
 title: "Health, errors and default routes"
-description: "The router registers favicon, robots.txt, sitemap.xml and the application's configured health path. DefaultResponses renders pages through IViewEngine, serves a closed set of…"
+description: "Read the health endpoint, publish a favicon, robots.txt and sitemap, and use the default error responses."
 editUrl: true
 lastUpdated: false
 ---
@@ -13,7 +13,17 @@ Health returns 200 normally and 503 during maintenance. `Accept: application/jso
 
 A service that injects `IDefaultResponses` can also call `await pages.favicon()`, `await pages.robotsTxt()` or `await pages.sitemapXml()`. Each returns a file response when a candidate exists, otherwise an HTTP error response.
 
-Override the GET favicon, robots and sitemap routes by declaring their paths in application routes. Public files use candidate selection with packaged fallbacks where available. A missing sitemap can return 404; business URL catalogs are not generated automatically.
+### Publish crawler files and a favicon
+
+Place these files in the application’s public storage directory (`storage/app/public` by default). The router exposes the following GET endpoints:
+
+| Endpoint | Application file, in lookup order | When absent |
+| --- | --- | --- |
+| `/favicon.ico` | `favicon.ico`, then `favicon.png`, then `favicon.svg` | Uses the packaged icon. |
+| `/robots.txt` | `robots.txt` | Uses the packaged robots file. |
+| `/sitemap.xml` | `sitemap.xml` | Returns HTTP 404. |
+
+To generate a sitemap from your application’s data, register a GET action at `/sitemap.xml`. An application GET route at any of these three paths replaces its default handler.
 
 ## Presenting an error from a service
 
@@ -41,7 +51,7 @@ from orionis.support.facades import Route
 Route.auth()
 ```
 
-Declare it once in web routes. Supply `login_controller`, `register_controller` or `forgot_password_controller` to replace individual controllers. Preserve methods expected by [the actual registration](https://github.com/orionis-framework/framework/blob/v1.9.0/orionis/http/routes/auth.py). Default registration/profile controllers depend on `app.models.user.User`, application views, hashing and mail; they are not a generic flow for every identity model. Check those contracts before enabling them. Read [account recovery](/en/authentication/account-recovery).
+Register the helper once in `routes/web.py`. To replace individual controllers, pass `login_controller`, `register_controller` or `forgot_password_controller`. The default registration flow uses `app.models.user.User`, application templates, hashing and mail delivery. See [the route names and expected actions](/en/authentication/account-recovery). The signed-in profile and password-change form require [separate web routes](/en/authentication/session-authentication#change-a-signed-in-users-password).
 
 ## Caches and file changes
 

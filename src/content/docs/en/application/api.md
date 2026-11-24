@@ -137,7 +137,7 @@ These methods require completed `create()`; otherwise they raise `RuntimeError`.
 
 - `isProduction()` retains whether `"prod"` appears in the text of `app.env` during creation. It is neither a dynamic check nor an exact comparison with one name.
 - `isDebug()` retains whether `app.debug is True` during creation. Changing runtime configuration does not recompute these flags.
-- `underMaintenance()` reads `storage/framework/maintenance`, with `app.maintenance` as fallback. `down` enables it and `up` disables it; unknown text uses the fallback. The result is cached for up to 100 ms in each worker. Read or decoding errors enable maintenance; this is not a distributed lock.
+- `underMaintenance()` reads the marker at `app.path("storage_framework") / "maintenance"`. The text `down` enables maintenance and `up` disables it. A missing marker or an unrecognized value falls back to `app.maintenance`, which reads `APP_MAINTENANCE` (default `False`) in the standard configuration. Read or decoding errors enable maintenance. Each worker caches the result for up to 100 ms.
 
 Use [up/down commands](/en/console/built-in-application) to manage the marker; cross-process scope depends on sharing that file.
 

@@ -124,9 +124,27 @@ When a command calls another through Reactor, the inner execution receives a sep
 
 ## Resolution precedence and nested scopes
 
-`make()` first checks an already-cached global singleton, then the current scope's instances, and finally the binding or automatic construction. Consequently:
+Use `app.instance()` inside a scope to supply a service for a single operation. `make()` checks the current scope first, including when the caller uses an alias. If the scope has no value for the contract, resolution continues with the global singleton cache, then the binding or automatic construction.
 
-- A scope-published instance can provide a contract not yet materialized globally, but does not replace an already-cached global singleton.
+The example uses the singleton and alias from [registering services](/en/application/container/bindings-and-invocation).
+
+```python
+from app.services.catalog import Catalog, ICatalog
+from orionis import IApplication
+
+
+async def use_local_catalog(app: IApplication) -> None:
+    shared = await app.make("catalog")
+    local = Catalog()
+    async with app.beginScope():
+        app.instance(ICatalog, local)
+        assert await app.make("catalog") is local
+        async with app.beginScope():
+            assert await app.make(ICatalog) is shared
+        assert await app.make(ICatalog) is local
+    assert await app.make("catalog") is shared
+```
+
 - An inner scope has its own dictionary and does not consult the outer dictionary. Global bindings and singletons remain available.
 - Exiting the inner scope restores the outer scope and its objects.
 - `transient()`, `singleton()`, and `scoped()` always modify global registrations, even when called inside a scope. `instance()` is the registration method that selects the active scope as its destination.

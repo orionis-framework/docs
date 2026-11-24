@@ -57,6 +57,18 @@ class WriteValuesCommand(BaseCommand):
         return 0
 ```
 
+## Inspeccionar valores en un comando
+
+Usa el método heredado `dump()` para imprimir valores durante la ejecución de un comando. Es síncrono y devuelve `None`. Por ejemplo, dentro de `ImportSummaryCommand.handle()`:
+
+```python
+self.dump({"created": 12, "skipped": 3}, max_depth=2)
+```
+
+Por defecto, el volcado muestra el tipo de cada valor (`show_types=True`), expande los valores anidados (`expand_all=True`) y el comando continúa. Usa `show_index=True` para numerar varios argumentos, `max_depth` para limitar la profundidad e `insert_line=True` para añadir espacio. Puedes indicar el origen mostrado con `module_path` y `line_number`. Cada valor se copia con `deepcopy`. Si un objeto no admite esa operación, pasa un resumen que puedas imprimir.
+
+Las demás opciones valen `False` por defecto. Con `force_exit=True` el proceso termina con código 1. Con `redirect_output=True` el volcado utiliza los flujos de salida originales del intérprete. La combinación de ambas opciones termina el proceso de inmediato. Para depurar durante una petición, consulta [Debug](/es/utilities/helpers/debug).
+
 <a id="console-success"></a>
 <a id="console-info"></a>
 <a id="console-warning"></a>

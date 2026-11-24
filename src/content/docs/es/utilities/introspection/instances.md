@@ -148,7 +148,7 @@ assert reflected.getInstance() is service
 ### `__init__`
 
 ```python
-def __init__(self, instance: Any) -> None: ...
+def __init__(self, instance: T) -> None: ...
 ```
 
 `instance` es obligatorio y debe ser un objeto, no una clase. Rechaza clases y objetos cuyo `instance.__class__.__module__` sea `builtins` o `abc` con `TypeError`; rechaza el módulo `__main__` con `ValueError`. No comprueba que el módulo indicado sea importable: una clase sintética con otro nombre de módulo también puede aceptarse. El ejemplo utiliza una clase definida en un archivo importable para poder recuperar su código fuente y evitar `__main__`. La construcción no realiza todavía los recorridos de atributos o métodos.
@@ -171,7 +171,7 @@ Estos métodos no requieren argumentos. Devuelven referencias o metadatos de la 
 def getInstance(self) -> T: ...
 ```
 
-Devuelve el mismo objeto reflejado (`Any`).
+Devuelve la instancia original con su tipo de entrada `T`.
 
 ```python
 assert reflected.getInstance() is service
@@ -478,7 +478,7 @@ assert not reflected.hasAttribute("region")
 
 ## Filtrar métodos
 
-El escaneo recorre `dir(type(instance))` con acceso estático a descriptores: incluye métodos heredados, distingue funciones de instancia, `classmethod` y `staticmethod`, y separa corrutinas mediante `inspect.iscoroutinefunction`. No invoca los métodos ni los getters de propiedades. Una función que devuelva un awaitable sin ser una función de corrutina sigue en el filtro sync.
+Los filtros incluyen miembros heredados y atributos invocables añadidos a la instancia. Si un atributo de instancia oculta un método del mismo nombre, el filtro utiliza el valor de la instancia. Lee los descriptores de clase sin ejecutar los getters de propiedades. Una función ordinaria que devuelve un awaitable pertenece al filtro síncrono.
 
 Los privados propios se devuelven como `__sign`, sin el prefijo de clase. `getMethods()` excluye dunder y combina las categorías; no constituye un orden de ejecución. Los filtros no reciben argumentos y devuelven listas cacheadas de nombres, no métodos ligados.
 
@@ -757,7 +757,7 @@ assert "__validAsync" in reflected.getPrivateStaticAsyncMethods()
 def hasMethod(self, name: str) -> bool: ...
 ```
 
-Comprueba si `name` está en el conjunto de métodos clasificados de la clase. No consulta callables añadidos solamente al objeto ni incluye dunder.
+Incluye los métodos añadidos al objeto con `setMethod()`. Consulta los métodos especiales como `__init__` en `getDunderMethods()`.
 
 ```python
 assert reflected.hasMethod("render")
@@ -803,14 +803,15 @@ assert reflected.getMethodDocstring("render") == "Render the report."
 def setMethod(self, name: str, method: Callable) -> bool: ...
 ```
 
-`name` y `method: Callable` son obligatorios. Valida el nombre como `setAttribute`, exige callable (`TypeError`), lo asigna al objeto y devuelve `True`, vaciando la caché. No lo liga automáticamente con `self` ni lo incorpora a los filtros de clase. Usa `types.MethodType` si la función requiere una instancia.
+La operación guarda el invocable en la instancia, renueva la caché de miembros y devuelve `True`. Un nombre que sea un identificador inválido o una palabra reservada de Python produce `AttributeError`. Un valor que no sea invocable produce `TypeError`. Usa `types.MethodType` cuando la función necesite recibir la instancia.
 
 ```python
 from types import MethodType
 
 assert reflected.setMethod("extra", lambda: "ready") is True
 assert service.extra() == "ready"
-assert not reflected.hasMethod("extra")
+assert reflected.hasMethod("extra")
+assert "extra" in reflected.getPublicSyncMethods()
 
 def describe(instance):
     return instance.title

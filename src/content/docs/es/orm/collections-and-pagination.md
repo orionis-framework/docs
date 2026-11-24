@@ -1,6 +1,6 @@
 ---
 title: "Colecciones y paginación"
-description: "Colecciones y paginación en Orionis Framework."
+description: "Paginar consultas de modelos, leer lotes ordenados y trabajar con colecciones de modelos hidratados."
 editUrl: true
 lastUpdated: false
 ---
@@ -19,9 +19,21 @@ from app.models.article import Article
 
 
 class ArticleListController:
-    async def __call__(self) -> JSONResponse:
-        page = await Article.where("published", True).orderBy("id").paginate(per_page=20)
+    async def __call__(self, number: int) -> JSONResponse:
+        if number < 1:
+            return JSONResponse({"error": "Page must be positive"}, status_code=400)
+        query = Article.where("published", True).orderBy("id")
+        page = await query.paginate(page=number, per_page=20)
         return JSONResponse(page.toDict())
+```
+
+Guarda el controlador en `app/http/controllers/article_list_controller.py` y regístralo en tu archivo de rutas. Una petición a `/articles/page/2` consulta los siguientes 20 artículos publicados.
+
+```python
+from app.http.controllers.article_list_controller import ArticleListController
+from orionis.support.facades import Route
+
+Route.get("/articles/page/{number:int}", ArticleListController)
 ```
 
 <a id="query-chunks"></a>
@@ -50,7 +62,7 @@ Ejecuta el ejemplo en una aplicación arrancada con una tabla `articles`. Para l
 - Utiliza paginación LIMIT/OFFSET, no un cursor del servidor. Las inserciones o eliminaciones simultáneas pueden desplazar filas; usa una transacción con el aislamiento adecuado cuando necesites una vista consistente.
 - La consulta libera su cursor antes de entregar el lote. Una transacción del consumidor mantiene su conexión. Cierra el iterador con `contextlib.aclosing()` si terminas antes de agotarlo.
 
-Guardar todos los lotes en una lista elimina la ventaja de memoria. Las relaciones pueden consumir memoria adicional al número de filas. `get()` sigue materializando su resultado, mientras que [`Collection.chunk()`](#collection-chunk) solo divide datos ya cargados en memoria.
+Guardar todos los lotes en una lista elimina la ventaja de memoria. Las relaciones pueden consumir memoria adicional al número de filas. `get()` sigue materializando su resultado, mientras que [`Collection.chunk()`](/es/utilities/helpers/collection#collection-method-chunk) solo divide datos ya cargados en memoria.
 
 ## Paginación de consultas
 
@@ -60,10 +72,10 @@ Guardar todos los lotes en una lista elimina la ventaja de memoria. Las relacion
 ### `paginate`
 
 ```text
-async def paginate(self, page: int=1, per_page: int=_DEFAULT_PER_PAGE) -> Paginator
+async def paginate(self, page: int = 1, per_page: int = 15) -> Paginator[TModel]
 ```
 
-Terminal async con `page=1`, `per_page=15` (`_DEFAULT_PER_PAGE` en fuente): exige enteros positivos sin bool, o `InvalidQueryException`. Aplica OFFSET/LIMIT al builder, ejecuta COUNT y recuperación y devuelve `Paginator`. Dentro de transacción ejecuta ambas consultas secuencialmente en la conexión transaccional; fuera las ejecuta con gather usando conexiones del pool. No garantiza snapshot consistente entre ambas fuera de una transacción.
+Terminal async con `page=1`, `per_page=15`: exige enteros positivos sin bool, o `InvalidQueryException`. Aplica OFFSET/LIMIT al builder, ejecuta COUNT y recuperación y devuelve `Paginator`. Dentro de transacción ejecuta ambas consultas secuencialmente en la conexión transaccional; fuera las ejecuta con gather usando conexiones del pool. No garantiza snapshot consistente entre ambas fuera de una transacción.
 
 ```python
 async def article_page(page_number: int = 1):
@@ -83,7 +95,7 @@ Los ejemplos de propiedades suponen `page = Paginator(Collection([{"id": 1}]), t
 ### `__init__`
 
 ```text
-def __init__(self, items: Collection, total: int, page: int, per_page: int) -> None
+def __init__(self, items: Collection[TItem], total: int, page: int, per_page: int) -> None
 ```
 
 Envuelve `Collection` sin consultar SQL. `page` y `per_page` deben ser int positivos, excluyendo bool (`ValueError`). `total` se convierte a int y se limita a cero mínimo. No ajusta una página superior a lastPage.
@@ -99,7 +111,7 @@ page = Paginator(Collection([{"id": 1}]), total=11, page=1, per_page=10)
 ### `items`
 
 ```text
-def items(self) -> Collection
+page.items: Collection[TItem]
 ```
 
 Propiedad de solo lectura: la misma Collection de la página; sus métodos mutadores sí pueden modificarla.
@@ -113,7 +125,7 @@ items = page.items
 ### `total`
 
 ```text
-def total(self) -> int
+page.total: int
 ```
 
 Propiedad int: filas totales del recuento, no longitud de la página.
@@ -127,7 +139,7 @@ assert page.total == 11
 ### `page`
 
 ```text
-def page(self) -> int
+page.page: int
 ```
 
 Propiedad int: página actual, empezando por 1.
@@ -141,7 +153,7 @@ assert page.page == 1
 ### `perPage`
 
 ```text
-def perPage(self) -> int
+page.perPage: int
 ```
 
 Propiedad int: tamaño configurado, aunque la última página contenga menos filas.
@@ -155,7 +167,7 @@ assert page.perPage == 10
 ### `lastPage`
 
 ```text
-def lastPage(self) -> int
+page.lastPage: int
 ```
 
 Propiedad int: ceil(total/perPage), al menos 1 incluso con total=0.
@@ -169,7 +181,7 @@ assert page.lastPage == 2
 ### `hasNext`
 
 ```text
-def hasNext(self) -> bool
+page.hasNext: bool
 ```
 
 Propiedad bool: page*perPage < total. No crea enlaces ni consulta otra página.
@@ -183,7 +195,7 @@ assert page.hasNext is True
 ### `hasPrevious`
 
 ```text
-def hasPrevious(self) -> bool
+page.hasPrevious: bool
 ```
 
 Propiedad bool: page > 1, incluso si esa página actual está fuera de rango.
@@ -220,714 +232,38 @@ Serializa toDict con json.dumps y default=str salvo override en kwargs. Retorna 
 text = page.toJson(indent=2, ensure_ascii=False)
 ```
 
-## API completa de Collection utilizada por ORM
+<a id="api-completa-de-collection-utilizada-por-orm"></a>
 
-Todos los ejemplos son operaciones en memoria. `Article` y `Team` se definen en las guías de modelos/relaciones. Los callbacks son síncronos: map/filter/each no esperan corutinas.
+## Trabajar con modelos hidratados
 
-Mutadores como `merge`, `push`, `forget`, `put`, `sort`, `reverse`, `reject`, `transform`, `each` y `random(count)` cambian la misma colección. Un `random(0)` explícito la vacía. Los modelos conservan su identidad; los cambios de colección no persisten SQL. Las colecciones nuevas comparten elementos.
-
-
-<a id="collection---init--"></a>
-
-### `__init__`
-
-```text
-def __init__(self, items: list[Any] | None=None) -> None
-```
-
-Construye una colección en memoria; `None` crea una lista vacía. Conserva por referencia las listas o diccionarios recibidos, incluso vacíos; copia los datos para aislarlos. `ModelCollection` es el mismo tipo, no una subclase de persistencia.
+Para un índice de artículos publicados, selecciona en SQL los campos necesarios. Tras `get()`, puedes usar el ID como clave o extraer una lista de títulos en memoria.
 
 ```python
-values = Collection([1, 2, 3])
-```
-
-<a id="collection-take"></a>
-
-### `take`
-
-```text
-def take(self, number: int) -> Collection
-```
-
-Colección nueva con los primeros `number` elementos; si es negativo toma desde el final y si es cero devuelve vacía. No consulta ni limita SQL.
-
-```python
-assert Collection([1, 2, 3]).take(-2).all() == [2, 3]
-```
-
-<a id="collection-first"></a>
-
-### `first`
-
-```text
-def first(self, callback: Callable | None=None) -> object
-```
-
-Primer elemento o `None`; con callback devuelve la primera coincidencia. Callback no callable produce `ValueError`; excepciones internas se propagan.
-
-```python
-assert Collection([1, 2, 3]).first(lambda n: n > 1) == 2
-```
-
-<a id="collection-last"></a>
-
-### `last`
-
-```text
-def last(self, callback: Callable | None=None) -> object
-```
-
-Último elemento/coincidencia o `None`. Con callback recorre los elementos en orden para recordar el último que cumple.
-
-```python
-assert Collection([1, 2, 3]).last(lambda n: n < 3) == 2
-```
-
-<a id="collection-all"></a>
-
-### `all`
-
-```text
-def all(self) -> list[Any]
-```
-
-Devuelve la lista subyacente, no una copia ni serialización. Si proviene de `pluck(..., key)`/`groupBy`, devuelve el mapping almacenado aunque la anotación indique list.
-
-```python
-raw = Collection([1, 2]).all()
-assert raw == [1, 2]
-```
-
-<a id="collection-avg"></a>
-
-### `avg`
-
-```text
-def avg(self, key: str | None=None) -> float
-```
-
-Promedio numérico en memoria, con clave opcional de dict/atributo; vacío o TypeError devuelve `0`. No es un agregado SQL y no carga columnas ausentes.
-
-```python
-assert Collection([{"score": 2}, {"score": 4}]).avg("score") == 3
-```
-
-<a id="collection-max"></a>
-
-### `max`
-
-```text
-def max(self, key: str | None=None) -> object
-```
-
-Máximo en memoria, opcionalmente por clave; vacío o comparación incompatible devuelve `0`.
-
-```python
-assert Collection([2, 4]).max() == 4
-```
-
-<a id="collection-min"></a>
-
-### `min`
-
-```text
-def min(self, key: str | None=None) -> object
-```
-
-Mínimo en memoria, opcionalmente por clave; vacío o comparación incompatible devuelve `0`.
-
-```python
-assert Collection([2, 4]).min() == 2
-```
-
-<a id="collection-chunk"></a>
-
-### `chunk`
-
-```text
-def chunk(self, size: int) -> Collection
-```
-
-Nueva colección de subcolecciones de tamaño `size`; tamaño no positivo produce `ValueError`. Divide resultados ya cargados, no consulta por lotes SQL.
-
-```python
-chunks = Collection([1, 2, 3]).chunk(2)
-assert chunks[0].all() == [1, 2]
-```
-
-<a id="collection-collapse"></a>
-
-### `collapse`
-
-```text
-def collapse(self) -> Collection
-```
-
-Aplana un nivel de listas o colecciones; devuelve colección nueva. Entradas escalares no iterables pueden producir `TypeError`; para anidación profunda de listas/dicts usa `flatten`.
-
-```python
-assert Collection([[1, 2], [3]]).collapse().all() == [1, 2, 3]
-```
-
-<a id="collection-contains"></a>
-
-### `contains`
-
-```text
-def contains(self, key: str | Callable, value: object=None) -> bool
-```
-
-Bool de pertenencia con valor directo, callback o clave/valor. `value=None` se interpreta como ausencia del segundo argumento; usa callback para buscar un atributo nulo.
-
-```python
-assert Collection([{"id": 2}]).contains("id", 2)
-```
-
-<a id="collection-count"></a>
-
-### `count`
-
-```text
-def count(self) -> int
-```
-
-Número de elementos ya cargados. No ejecuta COUNT SQL.
-
-```python
-assert Collection([1, 2]).count() == 2
-```
-
-<a id="collection-diff"></a>
-
-### `diff`
-
-```text
-def diff(self, items: list[Any] | ICollection) -> Collection
-```
-
-Nueva colección de elementos que no están en lista/colección comparada. Usa igualdad; soporta elementos no hashables mediante comparación secuencial.
-
-```python
-assert Collection([1, 2]).diff([2]).all() == [1]
-```
-
-<a id="collection-each"></a>
-
-### `each`
-
-```text
-def each(self, callback: Callable) -> Collection
-```
-
-**Modifica** cada posición con el retorno truthy del callback y se detiene en el primer retorno falsy, sin sustituir esa posición. Retorna self. No es un iterador de efectos secundarios con callbacks que devuelven None.
-
-```python
-values = Collection([1, 2, 3])
-assert values.each(lambda n: n * 2).all() == [2, 4, 6]
-```
-
-<a id="collection-every"></a>
-
-### `every`
-
-```text
-def every(self, callback: Callable) -> bool
-```
-
-Bool indicando si todos cumplen callback; en vacía devuelve `True`. Callback inválido: `ValueError`.
-
-```python
-assert Collection([2, 4]).every(lambda n: n % 2 == 0)
-```
-
-<a id="collection-filter"></a>
-
-### `filter`
-
-```text
-def filter(self, callback: Callable) -> Collection
-```
-
-Colección nueva con elementos cuyo callback sea truthy. Callback obligatorio; inválido produce `ValueError`.
-
-```python
-assert Collection([1, 2, 3]).filter(lambda n: n > 1).all() == [2, 3]
-```
-
-<a id="collection-flatten"></a>
-
-### `flatten`
-
-```text
-def flatten(self) -> Collection
-```
-
-Colección nueva: aplana recursivamente listas y valores de diccionarios. Tuplas/Collection internas se conservan como elementos, no se expanden por esta función.
-
-```python
-assert Collection([1, [2, {"x": 3}]]).flatten().all() == [1, 2, 3]
-```
-
-<a id="collection-forget"></a>
-
-### `forget`
-
-```text
-def forget(self, *keys: int | str) -> Collection
-```
-
-Borra índices/claves en orden descendente y retorna self. Índices/claves inexistentes propagan `IndexError`/`KeyError`; una lista usa índices enteros.
-
-```python
-assert Collection([1, 2, 3]).forget(0, 2).all() == [2]
-```
-
-<a id="collection-forpage"></a>
-
-### `forPage`
-
-```text
-def forPage(self, page: int, number: int) -> Collection
-```
-
-Nueva colección por slice: normaliza `page` a al menos 1 y exige `number>0` (`ValueError`). No produce metadatos ni consulta filas adicionales.
-
-```python
-assert Collection([1, 2, 3]).forPage(2, 2).all() == [3]
-```
-
-<a id="collection-get"></a>
-
-### `get`
-
-```text
-def get(self, key: int | str, default: object=None) -> object
-```
-
-Lee índice/clave o default; si default es callable lo evalúa sin argumentos solo al faltar. Captura `IndexError`/`KeyError`, no un tipo de índice inválido.
-
-```python
-assert Collection([1]).get(7, lambda: "missing") == "missing"
-```
-
-<a id="collection-implode"></a>
-
-### `implode`
-
-```text
-def implode(self, glue: str=',', key: str | None=None) -> str
-```
-
-Une representaciones str con `glue=","`; `key=None` usa elementos completos. Con objetos/dicts y clave extrae esa columna. Vacía devuelve `""`.
-
-```python
-assert Collection([{"name": "A"}, {"name": "B"}]).implode(" / ", "name") == "A / B"
-```
-
-<a id="collection-isempty"></a>
-
-### `isEmpty`
-
-```text
-def isEmpty(self) -> bool
-```
-
-Bool basado en longitud; no consulta existencia SQL.
-
-```python
-assert Collection().isEmpty()
-```
-
-<a id="collection-map"></a>
-
-### `map`
-
-```text
-def map(self, callback: Callable) -> Collection
-```
-
-Colección nueva con cada retorno del callback, incluyendo None y valores falsos; no modifica la lista original.
-
-```python
-assert Collection([1, 2]).map(lambda n: n * 3).all() == [3, 6]
-```
-
-<a id="collection-mapinto"></a>
-
-### `mapInto`
-
-```text
-def mapInto(self, cls: type, method: str | None=None, **kwargs: object) -> Collection
-```
-
-Transforma mediante `cls(item, **kwargs)` o `cls.method(item, **kwargs)`. `cls` debe ser un tipo. Los métodos ausentes o errores por elemento `TypeError`, `AttributeError` o `ValueError` producen `None`. No persiste modelos.
-
-```python
-assert Collection(["1", "bad"]).mapInto(int).all() == [1, None]
-```
-
-<a id="collection-merge"></a>
-
-### `merge`
-
-```text
-def merge(self, items: list[Any] | ICollection) -> Collection
-```
-
-Agrega una lista o cualquier implementación de `ICollection` al mismo objeto y lo devuelve. No combina por clave primaria ni elimina duplicados. Los tipos no admitidos lanzan `TypeError`.
-
-```python
-assert Collection([1]).merge([1, 2]).all() == [1, 1, 2]
-```
-
-<a id="collection-pluck"></a>
-
-### `pluck`
-
-```text
-def pluck(self, value: str, key: str | None=None) -> Collection
-```
-
-Extrae por ruta de dict/atributo; sin `key` devuelve lista omitiendo None. Con `key` devuelve Collection respaldada por dict, sobreescribe claves repetidas y conserva valores nulos. Para leer ese mapping usa `.all()`/`.get()`.
-
-```python
-assert Collection([{"id": 1, "name": "A"}]).pluck("name", "id").all() == {1: "A"}
-```
-
-<a id="collection-pop"></a>
-
-### `pop`
-
-```text
-def pop(self) -> object
-```
-
-Extrae y elimina el último elemento; vacía devuelve None.
-
-```python
-values = Collection([1, 2])
-assert values.pop() == 2
-```
-
-<a id="collection-prepend"></a>
-
-### `prepend`
-
-```text
-def prepend(self, value: object) -> Collection
-```
-
-Inserta al principio del mismo objeto y retorna self.
-
-```python
-assert Collection([2]).prepend(1).all() == [1, 2]
-```
-
-<a id="collection-pull"></a>
-
-### `pull`
-
-```text
-def pull(self, key: int | str) -> object
-```
-
-Devuelve y elimina el valor seleccionado. Los índices o claves ausentes devuelven `None`.
-
-```python
-values = Collection([1, 2])
-assert values.pull(0) == 1
-```
-
-<a id="collection-push"></a>
-
-### `push`
-
-```text
-def push(self, value: object) -> Collection
-```
-
-Añade al final del mismo objeto y retorna self. No guarda entidades.
-
-```python
-assert Collection([1]).push(2).all() == [1, 2]
-```
-
-<a id="collection-put"></a>
-
-### `put`
-
-```text
-def put(self, key: int | str, value: object) -> Collection
-```
-
-Sustituye índice/clave del mismo objeto y retorna self. En lista no amplía un índice fuera de rango: produce IndexError.
-
-```python
-assert Collection([1]).put(0, 2).all() == [2]
-```
-
-<a id="collection-random"></a>
-
-### `random`
-
-```text
-def random(self, count: int | None=None) -> object | Collection | None
-```
-
-Las colecciones vacías devuelven `None`. Omitir count o pasar `None` selecciona un elemento sin modificar. Un conteo explícito no negativo sustituye los elementos por una muestra y devuelve la misma colección; `0` la vacía. Conteos negativos o excesivos lanzan `ValueError`.
-
-```python
-sample = Collection([1, 2, 3]).random(2)
-assert len(sample) == 2
-```
-
-<a id="collection-reduce"></a>
-
-### `reduce`
-
-```text
-def reduce(self, callback: Callable, initial: object=0) -> object
-```
-
-Reduce con callback(acumulado, elemento) e initial=0. Devuelve valor escalar/objeto; errores del callback se propagan.
-
-```python
-assert Collection([1, 2, 3]).reduce(lambda total, n: total + n, 0) == 6
-```
-
-<a id="collection-reject"></a>
-
-### `reject`
-
-```text
-def reject(self, callback: Callable) -> Collection
-```
-
-Elimina del mismo objeto elementos cuyo callback es truthy y retorna self. A diferencia de filter, modifica la colección original.
-
-```python
-assert Collection([1, 2, 3]).reject(lambda n: n == 2).all() == [1, 3]
-```
-
-<a id="collection-reverse"></a>
-
-### `reverse`
-
-```text
-def reverse(self) -> Collection
-```
-
-Invierte en el mismo objeto y retorna self.
-
-```python
-assert Collection([1, 2]).reverse().all() == [2, 1]
-```
-
-<a id="collection-serialize"></a>
-
-### `serialize`
-
-```text
-def serialize(self) -> list[Any]
-```
-
-Devuelve lista de salidas de item.serialize(), o to_dict(), o el propio elemento. En modelos respeta hidden y appends; no incluye automáticamente relaciones. Para colecciones respaldadas por dict itera claves: usa all() para obtener el mapping.
-
-```python
-assert Collection([{"id": 1}]).serialize() == [{"id": 1}]
-```
-
-<a id="collection-shift"></a>
-
-### `shift`
-
-```text
-def shift(self) -> object
-```
-
-Elimina y devuelve el índice cero mediante `pull()`. Una colección vacía devuelve `None`.
-
-```python
-values = Collection([1, 2])
-assert values.shift() == 1
-```
-
-<a id="collection-sort"></a>
-
-### `sort`
-
-```text
-def sort(self, key: str | None=None) -> Collection
-```
-
-Ordena ascendentemente el mismo objeto, por clave opcional o elementos completos. Retorna self; valores no comparables propagan TypeError. No hay argumento descending.
-
-```python
-assert Collection([3, 1, 2]).sort().all() == [1, 2, 3]
-```
-
-<a id="collection-sum"></a>
-
-### `sum`
-
-```text
-def sum(self, key: str | None=None) -> float
-```
-
-Suma en memoria, opcionalmente por clave directa o callback. Un `TypeError` durante la suma devuelve `0`. Omite claves ausentes; una extracción vacía devuelve `0` sin volver a los elementos originales.
-
-```python
-assert Collection([{"points": 2}, {"points": 4}]).sum("points") == 6
-```
-
-<a id="collection-tojson"></a>
-
-### `toJson`
-
-```text
-def toJson(self, **kwargs: object) -> str
-```
-
-json.dumps(serialize(), **kwargs); no añade default=str automáticamente. Pasa default=str para datetime/UUID o provee encoder; errores estándar se propagan.
-
-```python
-text = Collection([{"id": 1}]).toJson(ensure_ascii=False, default=str)
-```
-
-<a id="collection-groupby"></a>
-
-### `groupBy`
-
-```text
-def groupBy(self, key: str) -> Collection
-```
-
-Ordena por clave y devuelve Collection respaldada por mapping valor→lista. No es GROUP BY SQL. Valores no comparables durante ordenación o no hashables como clave pueden producir TypeError; usa all() para consumir los grupos.
-
-```python
-groups = Collection([{"kind": "a", "id": 1}]).groupBy("kind").all()
-assert groups["a"][0]["id"] == 1
-```
-
-<a id="collection-transform"></a>
-
-### `transform`
-
-```text
-def transform(self, callback: Callable) -> Collection
-```
-
-Reemplaza todos los elementos por resultados del callback y retorna self, conservando también None. map crea otra colección; transform modifica esta.
-
-```python
-assert Collection([1, 2]).transform(lambda n: n + 1).all() == [2, 3]
-```
-
-<a id="collection-unique"></a>
-
-### `unique`
-
-```text
-def unique(self, key: str | Callable | None=None) -> Collection
-```
-
-Con campo o selector callable, conserva el primer representante, incluidos valores seleccionados no hashables iguales. Sin clave, los elementos hashables usan un set sin garantía de orden. Una colección respaldada por dict con clave truthy retorna la misma instancia. Consulta la [semántica de valores únicos](/es/utilities/helpers/collection#collection-unique-performance).
-
-```python
-assert sorted(Collection([1, 1, 2]).unique().all()) == [1, 2]
-```
-
-<a id="collection-where"></a>
-
-### `where`
-
-```text
-def where(self, key: str, *args: object) -> Collection
-```
-
-Filtro en memoria: (key,value) o (key,operator,value), operadores <, <=, ==, !=, >, >=. Sin valor produce ValueError; operadores no admitidos se omiten al capturar el error por elemento. No equivale al operador SQL "=". Comparaciones incompatibles intentan texto.
-
-```python
-assert Collection([{"id": 1}, {"id": 2}]).where("id", ">", 1).count() == 1
-```
-
-<a id="collection-wherein"></a>
-
-### `whereIn`
-
-```text
-def whereIn(self, key: str, values: list[Any] | Collection) -> Collection
-```
-
-Colección nueva por pertenencia de clave en lista/Collection. Además de igualdad compara representación str, por lo que 1 puede coincidir con "1". No es comparación SQL estricta.
-
-```python
-assert Collection([{"id": 1}]).whereIn("id", ["1"]).count() == 1
-```
-
-<a id="collection-wherenotin"></a>
-
-### `whereNotIn`
-
-```text
-def whereNotIn(self, key: str, values: list[Any] | Collection) -> Collection
-```
-
-Complemento de whereIn, incluyendo su comparación textual; devuelve colección nueva.
-
-```python
-assert Collection([{"id": 1}, {"id": 2}]).whereNotIn("id", [1]).count() == 1
-```
-
-<a id="collection-zip"></a>
-
-### `zip`
-
-```text
-def zip(self, items: list[Any] | ICollection) -> Collection
-```
-
-Colección nueva de pares hasta la longitud menor. Solo lista/Collection, otro tipo produce TypeError.
-
-```python
-assert Collection([1, 2]).zip(["a"]).all() == [[1, "a"]]
-```
-
-<a id="collection-setappends"></a>
-
-### `setAppends`
-
-```text
-def setAppends(self, appends: list[str]) -> Collection
-```
-
-Agrega nombres a la serialización de elementos sin modificar appends de la clase. Retorna self; en modelos usa getAttribute y respeta hidden. No calcula ni consulta relaciones.
-
-```python
-rows = Collection([Article({"title": "Guide"})]).setAppends(["label"])
-assert rows.serialize()[0]["label"] == "GUIDE"
-```
-
-<a id="collection-addrelation"></a>
-
-### `addRelation`
-
-```text
-def addRelation(self, relation_data: dict[str, Any]) -> Collection
-```
-
-Por cada elemento que tenga setRelation, guarda todos los pares del dict y retorna self. No ejecuta eager loading ni incorpora esas relaciones a toDict automáticamente.
-
-```python
-rows = Collection([Team({"name": "A"})])
-rows.addRelation({"players": Collection()})
-assert rows[0].relationLoaded("players")
-```
+from app.models.article import Article
+
+
+async def titles_by_id() -> dict:
+    articles = await (
+        Article.where("published", True)
+        .select("id", "title")
+        .orderBy("id")
+        .get()
+    )
+    return articles.pluck("title", "id").all()
+```
+
+Con una clave, `pluck("title", "id").all()` devuelve un diccionario. Sin ella, `pluck("title").all()` devuelve una lista. Los cambios en la colección quedan en memoria. Usa `await article.save()` para persistir un modelo editado. Para una respuesta JSON, `articles.serialize()` llama al serializador de cada modelo y respeta sus atributos ocultos.
+
+| Tarea | Métodos de Collection |
+| --- | --- |
+| Construir y leer | <a id="collection---init--"></a><a id="__init__-1"></a>[`__init__`](/es/utilities/helpers/collection#collection-method-init), <a id="collection-get"></a><a id="get"></a>[`get`](/es/utilities/helpers/collection#collection-method-get), <a id="collection-all"></a><a id="all"></a>[`all`](/es/utilities/helpers/collection#collection-method-all), <a id="collection-first"></a><a id="first"></a>[`first`](/es/utilities/helpers/collection#collection-method-first), <a id="collection-last"></a><a id="last"></a>[`last`](/es/utilities/helpers/collection#collection-method-last), <a id="collection-take"></a><a id="take"></a>[`take`](/es/utilities/helpers/collection#collection-method-take), <a id="collection-count"></a><a id="count"></a>[`count`](/es/utilities/helpers/collection#collection-method-count), <a id="collection-contains"></a><a id="contains"></a>[`contains`](/es/utilities/helpers/collection#collection-method-contains), <a id="collection-isempty"></a><a id="isempty"></a>[`isEmpty`](/es/utilities/helpers/collection#collection-method-isempty), <a id="collection-every"></a><a id="every"></a>[`every`](/es/utilities/helpers/collection#collection-method-every) |
+| Filtrar y proyectar | <a id="collection-where"></a><a id="where"></a>[`where`](/es/utilities/helpers/collection#collection-method-where), <a id="collection-wherein"></a><a id="wherein"></a>[`whereIn`](/es/utilities/helpers/collection#collection-method-wherein), <a id="collection-wherenotin"></a><a id="wherenotin"></a>[`whereNotIn`](/es/utilities/helpers/collection#collection-method-wherenotin), <a id="collection-filter"></a><a id="filter"></a>[`filter`](/es/utilities/helpers/collection#collection-method-filter), <a id="collection-pluck"></a><a id="pluck"></a>[`pluck`](/es/utilities/helpers/collection#collection-method-pluck), <a id="collection-map"></a><a id="map"></a>[`map`](/es/utilities/helpers/collection#collection-method-map), <a id="collection-mapinto"></a><a id="mapinto"></a>[`mapInto`](/es/utilities/helpers/collection#collection-method-mapinto), <a id="collection-unique"></a><a id="unique"></a>[`unique`](/es/utilities/helpers/collection#collection-method-unique) |
+| Dividir y combinar | <a id="collection-chunk"></a><a id="chunk"></a>[`chunk`](/es/utilities/helpers/collection#collection-method-chunk), <a id="collection-forpage"></a><a id="forpage"></a>[`forPage`](/es/utilities/helpers/collection#collection-method-forpage), <a id="collection-groupby"></a><a id="groupby"></a>[`groupBy`](/es/utilities/helpers/collection#collection-method-groupby), <a id="collection-collapse"></a><a id="collapse"></a>[`collapse`](/es/utilities/helpers/collection#collection-method-collapse), <a id="collection-flatten"></a><a id="flatten"></a>[`flatten`](/es/utilities/helpers/collection#collection-method-flatten), <a id="collection-diff"></a><a id="diff"></a>[`diff`](/es/utilities/helpers/collection#collection-method-diff), <a id="collection-zip"></a><a id="zip"></a>[`zip`](/es/utilities/helpers/collection#collection-method-zip) |
+| Calcular valores | <a id="collection-sum"></a><a id="sum"></a>[`sum`](/es/utilities/helpers/collection#collection-method-sum), <a id="collection-avg"></a><a id="avg"></a>[`avg`](/es/utilities/helpers/collection#collection-method-avg), <a id="collection-min"></a><a id="min"></a>[`min`](/es/utilities/helpers/collection#collection-method-min), <a id="collection-max"></a><a id="max"></a>[`max`](/es/utilities/helpers/collection#collection-method-max), <a id="collection-reduce"></a><a id="reduce"></a>[`reduce`](/es/utilities/helpers/collection#collection-method-reduce), <a id="collection-implode"></a><a id="implode"></a>[`implode`](/es/utilities/helpers/collection#collection-method-implode) |
+| Cambiar elementos u orden | <a id="collection-each"></a><a id="each"></a>[`each`](/es/utilities/helpers/collection#collection-method-each), <a id="collection-merge"></a><a id="merge"></a>[`merge`](/es/utilities/helpers/collection#collection-method-merge), <a id="collection-push"></a><a id="push"></a>[`push`](/es/utilities/helpers/collection#collection-method-push), <a id="collection-put"></a><a id="put"></a>[`put`](/es/utilities/helpers/collection#collection-method-put), <a id="collection-forget"></a><a id="forget"></a>[`forget`](/es/utilities/helpers/collection#collection-method-forget), <a id="collection-reject"></a><a id="reject"></a>[`reject`](/es/utilities/helpers/collection#collection-method-reject), <a id="collection-transform"></a><a id="transform"></a>[`transform`](/es/utilities/helpers/collection#collection-method-transform), <a id="collection-prepend"></a><a id="prepend"></a>[`prepend`](/es/utilities/helpers/collection#collection-method-prepend), <a id="collection-pop"></a><a id="pop"></a>[`pop`](/es/utilities/helpers/collection#collection-method-pop), <a id="collection-pull"></a><a id="pull"></a>[`pull`](/es/utilities/helpers/collection#collection-method-pull), <a id="collection-shift"></a><a id="shift"></a>[`shift`](/es/utilities/helpers/collection#collection-method-shift), <a id="collection-sort"></a><a id="sort"></a>[`sort`](/es/utilities/helpers/collection#collection-method-sort), <a id="collection-reverse"></a><a id="reverse"></a>[`reverse`](/es/utilities/helpers/collection#collection-method-reverse), <a id="collection-random"></a><a id="random"></a>[`random`](/es/utilities/helpers/collection#collection-method-random) |
+| Preparar la salida | <a id="collection-serialize"></a><a id="serialize"></a>[`serialize`](/es/utilities/helpers/collection#collection-method-serialize), <a id="collection-tojson"></a><a id="tojson-1"></a>[`toJson`](/es/utilities/helpers/collection#collection-method-tojson), <a id="collection-setappends"></a><a id="setappends"></a>[`setAppends`](/es/utilities/helpers/collection#collection-method-setappends), <a id="collection-addrelation"></a><a id="addrelation"></a>[`addRelation`](/es/utilities/helpers/collection#collection-method-addrelation) |
 
 <a id="collection-python-protocol"></a>
+<a id="protocolo-python"></a>
 
-## Protocolo Python
-
-Puedes iterar con `for`, usar `len`, comparar colecciones/listas, leer índices negativos y slices (`rows[:10]` crea Collection nueva), asignar con `rows[0] = value` y borrar con `del rows[0]`. Indexación/asignación/borrado propagan errores de la lista/dict subyacente. Las comparaciones de orden usan orden lexicográfico de elementos, no PK ni orden SQL. `hash(rows)` solo funciona cuando todos los elementos son hashables; no uses una colección mutable como clave que después vas a modificar.
-
-`groupBy` y `pluck` indexado crean colecciones respaldadas por diccionario, incluido `{}` para resultados vacíos indexados. Iterar entrega claves. Lee el mapa mediante `all()` en vez de tratarlo como lista de modelos.
+Al iterar una colección respaldada por una lista obtienes los modelos. Un segmento devuelve otra colección que conserva esas mismas instancias. Operaciones con claves como `groupBy` producen colecciones respaldadas por diccionarios y la iteración recorre sus claves. [Referencia de Collection](/es/utilities/helpers/collection)

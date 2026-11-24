@@ -207,7 +207,7 @@ flowchart TD
 
 Los callbacks de startup se ejecutan antes de construir el kernel HTTP. Este carga rutas, prepara handlers y middleware, crea adaptadores y registra sus cierres internos cuando corresponden. Solo después se publican los manejadores de ambos protocolos. Los callbacks pueden consumir servicios registrados, pero no deben asumir que el kernel ya está preparado en ese momento.
 
-Si llega una petición antes de haber pasado por lifespan, el despacho puede inicializar el kernel bajo demanda. Esta ruta no reproduce los callbacks de startup HTTP; usa un servidor que gestione correctamente el ciclo de vida. Consulta [Puntos de entrada ASGI y RSGI](/es/application/server-entrypoints).
+Habilita lifespan en ASGI o el hook de inicialización de RSGI antes de aceptar peticiones. La carga de rutas puede depender de los servicios que preparan los providers asíncronos. Consulta la secuencia de arranque y cierre en los [puntos de entrada del servidor](/es/application/server-entrypoints).
 
 El kernel mantiene un ámbito por petición HTTP y por conexión WebSocket. La petición HTTP conserva su ámbito durante la generación y transmisión de la respuesta; su `Request` se cierra en `finally`. Una conexión WebSocket conserva el suyo durante la conexión y cierra el socket al terminar. Las solicitudes rechazadas anticipadamente por políticas o capacidad pueden finalizar antes de abrir un scope. Los detalles están en [Scopes y concurrencia](/es/application/container/scopes-and-concurrency).
 

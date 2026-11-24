@@ -45,7 +45,7 @@ Command(
 
 Es una dataclass mutable. `obj` referencia la clase que construirá el contenedor, `method` la acción, `signature` la identidad y `description` la ayuda. `timestamps` configura los mensajes del ejecutor. `args` es una lista declarativa mientras el builder prepara el comando, y un parser construido cuando el loader lo materializa.
 
-El builder devuelve esta entidad mediante `get()`; `Loader.get()` y `Loader.all()` exponen las entidades materializadas. No modifiques sus campos para intentar actualizar un registro persistente: la caché conserva otra representación de metadatos.
+Para consultar una declaración fluida antes de registrarla, usa `signature, metadata = builder.get()`. El segundo elemento es la entidad del comando. `Loader.get()` y `Loader.all()` exponen las entidades materializadas. No modifiques sus campos para intentar actualizar un registro persistente: la caché conserva otra representación de metadatos.
 
 <a id="kernel-cli"></a>
 
@@ -100,7 +100,7 @@ get_core_commands_mapping() -> tuple[type, ...]
 CORE_COMMANDS: tuple
 ```
 
-En `orionis.console.core.commands`, la función devuelve las 68 clases registradas por el framework y `CORE_COMMANDS` conserva ese resultado para el loader. No son instancias ejecutadas al importar el catálogo. El [catálogo completo](/es/console/built-in-commands) documenta todas las firmas, argumentos y opciones; no basta con encontrar otra clase en un archivo para considerarla un comando CLI registrado.
+En `orionis.console.core.commands`, la función devuelve las 72 clases registradas por el framework y `CORE_COMMANDS` conserva ese resultado para el loader. No son instancias ejecutadas al importar el catálogo. El [catálogo completo](/es/console/built-in-commands) documenta todas las firmas, argumentos y opciones; no basta con encontrar otra clase en un archivo para considerarla un comando CLI registrado.
 
 <a id="stub-construction"></a>
 

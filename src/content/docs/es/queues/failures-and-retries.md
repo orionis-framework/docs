@@ -430,7 +430,7 @@ El constructor define el esquema sin crear una tabla. El primer `record`, `all`,
 async record(
     reserved: ReservedJob,
     connection: str,
-    exception: Exception,
+    exception: BaseException,
 ) -> FailedJob
 ```
 
@@ -559,7 +559,7 @@ class FailureRepositoryLifecycle:
         await repository.close()
 ```
 
-La interfaz anota `record.exception` como `BaseException` y la implementación nativa como `Exception`. El parámetro de `find`/`forget` se llama `failed_id` en la interfaz y `failure_id` en la implementación; los ejemplos utilizan identificadores posicionales para funcionar con ambas. Consulta la [referencia de API](/es/queues/api-reference) para los contratos.
+El parámetro de `find`/`forget` se llama `failed_id` en la interfaz y `failure_id` en la implementación; los ejemplos utilizan identificadores posicionales para funcionar con ambas. Consulta la [referencia de API](/es/queues/api-reference) para los contratos.
 
 <a id="failed-job"></a>
 

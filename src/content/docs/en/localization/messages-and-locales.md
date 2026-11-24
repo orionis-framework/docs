@@ -186,7 +186,9 @@ Selecting `locale=` for a query does not change the shared active locale. Use th
 
 `max_locales` must be a positive integer excluding booleans. `negative_ttl` must be finite and nonnegative; zero retries empty results on the next read. These are repository constructor options, not `APP_*` environment settings. The native `LocalizationManager` constructs its loader and repository directly: registering a separate `ITranslationRepository` binding does not configure that manager. Construct a translator explicitly for a custom budget.
 
-Populated maps do not watch the filesystem and remain cached until eviction or explicit invalidation. Use `forget()`, `flush()`, or the translator reload API to refresh them. Loading stays synchronous; preload required locales at startup when first-request file I/O is undesirable. Cached maps are shared within the repository, so consumers should not mutate them.
+After editing translation files, call `Lang.reload("es")` to discard the Spanish map, or `Lang.reload()` to discard every locale cached by that translator. The signature is `reload(locale: str | None = None) -> None`. The next lookup of an invalidated locale reads its files. Use `Lang.forget(locale)` if you need a boolean indicating whether an entry was removed. An invalid locale code raises `InvalidLocaleException`.
+
+These calls are synchronous once the localization provider has booted. Load required locales during startup if you want to avoid file I/O on their first request. Repository reads share the cached map, so treat it as read-only.
 
 ## Loader and repository integration
 

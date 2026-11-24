@@ -88,6 +88,26 @@ Para filtrar, unir y escribir continúa con [condiciones](/es/database/query-fil
 
 `exists()` conserva proyecciones explícitas, agrupación, `HAVING` y uniones. Las agregaciones sobre uniones operan sobre sus filas proyectadas; selecciona la columna objetivo en cada rama.
 
+## Contar y comprobar resultados
+
+`count()`, `sum()`, `avg()`, `min()` y `max()` omiten el orden, el límite y el desplazamiento del constructor. Conservan filtros, grupos, `HAVING` y uniones. Con grupos, `DISTINCT` o `UNION`, `count("*")` cuenta las filas del resultado derivado. Para obtener un agregado por grupo, define una proyección y recupera las filas:
+
+```python
+from orionis.support.facades import DB
+
+
+async def count_by_category():
+    return await (
+        DB.table("products")
+        .select("category_id")
+        .selectRaw("COUNT(*)", alias="product_count")
+        .groupBy("category_id")
+        .get()
+    )
+```
+
+`exists()` consulta una copia sin desplazamiento y con un límite de una fila. Para saber si una página concreta tiene filas, utiliza `forPage(...).get()` y comprueba la colección devuelta. Los errores de compilación o ejecución de SQL pueden producir [QueryException](/es/database/raw-queries).
+
 ## Referencia por operación
 
 <a id="api-tosql"></a>
@@ -531,7 +551,7 @@ Cuenta filas coincidentes; column="*" cuenta todas y una columna cuenta sus valo
 
 **Resultado:** `int`.
 
-Los agregados clonan el plan y quitan orden, limit y offset; conservan filtros, grupos, HAVING y uniones. Con GROUP BY, salvo count("*"), el terminal escalar devuelve el primer valor calculado, no un resultado por grupo. count("*") cuenta las filas del resultado derivado cuando hay grupos, DISTINCT o UNION. Para agregados por grupo usa selectRaw(...).groupBy(...).get(). exists() quita el offset, establece limit=1 y no carga toda la colección.
+Con grupos, los agregados escalares distintos de `count("*")` devuelven solo el primer valor calculado.
 
 ```python
 from orionis.support.facades import DB
@@ -539,8 +559,6 @@ from orionis.support.facades import DB
 async def run_example():
     return await DB.table("products").where("active", True).count()
 ```
-
-**Errores:** `QueryException` si la compilación o ejecución falla; la capa de conexión sanea el mensaje y suprime la causa encadenada del driver.
 
 <a id="api-exists"></a>
 
@@ -554,16 +572,12 @@ Comprueba existencia mediante SELECT limitado a una fila.
 
 **Resultado:** `bool`.
 
-Los agregados clonan el plan y quitan orden, limit y offset; conservan filtros, grupos, HAVING y uniones. Con GROUP BY, salvo count("*"), el terminal escalar devuelve el primer valor calculado, no un resultado por grupo. count("*") cuenta las filas del resultado derivado cuando hay grupos, DISTINCT o UNION. Para agregados por grupo usa selectRaw(...).groupBy(...).get(). exists() quita el offset, establece limit=1 y no carga toda la colección.
-
 ```python
 from orionis.support.facades import DB
 
 async def run_example():
     return await DB.table("products").where("active", True).exists()
 ```
-
-**Errores:** `QueryException` si la compilación o ejecución falla; la capa de conexión sanea el mensaje y suprime la causa encadenada del driver.
 
 <a id="api-doesntexist"></a>
 
@@ -577,16 +591,12 @@ Invierte el resultado de exists().
 
 **Resultado:** `bool`.
 
-Los agregados clonan el plan y quitan orden, limit y offset; conservan filtros, grupos, HAVING y uniones. Con GROUP BY, salvo count("*"), el terminal escalar devuelve el primer valor calculado, no un resultado por grupo. count("*") cuenta las filas del resultado derivado cuando hay grupos, DISTINCT o UNION. Para agregados por grupo usa selectRaw(...).groupBy(...).get(). exists() quita el offset, establece limit=1 y no carga toda la colección.
-
 ```python
 from orionis.support.facades import DB
 
 async def run_example():
     return await DB.table("products").where("active", True).doesntExist()
 ```
-
-**Errores:** `QueryException` si la compilación o ejecución falla; la capa de conexión sanea el mensaje y suprime la causa encadenada del driver.
 
 <a id="api-max"></a>
 
@@ -604,16 +614,12 @@ Devuelve el máximo; sin valores devuelve None.
 
 **Resultado:** `Any`.
 
-Los agregados clonan el plan y quitan orden, limit y offset; conservan filtros, grupos, HAVING y uniones. Con GROUP BY, salvo count("*"), el terminal escalar devuelve el primer valor calculado, no un resultado por grupo. count("*") cuenta las filas del resultado derivado cuando hay grupos, DISTINCT o UNION. Para agregados por grupo usa selectRaw(...).groupBy(...).get(). exists() quita el offset, establece limit=1 y no carga toda la colección.
-
 ```python
 from orionis.support.facades import DB
 
 async def run_example():
     return await DB.table("products").where("active", True).max("price")
 ```
-
-**Errores:** `QueryException` si la compilación o ejecución falla; la capa de conexión sanea el mensaje y suprime la causa encadenada del driver.
 
 <a id="api-min"></a>
 
@@ -631,16 +637,12 @@ Devuelve el mínimo; sin valores devuelve None.
 
 **Resultado:** `Any`.
 
-Los agregados clonan el plan y quitan orden, limit y offset; conservan filtros, grupos, HAVING y uniones. Con GROUP BY, salvo count("*"), el terminal escalar devuelve el primer valor calculado, no un resultado por grupo. count("*") cuenta las filas del resultado derivado cuando hay grupos, DISTINCT o UNION. Para agregados por grupo usa selectRaw(...).groupBy(...).get(). exists() quita el offset, establece limit=1 y no carga toda la colección.
-
 ```python
 from orionis.support.facades import DB
 
 async def run_example():
     return await DB.table("products").where("active", True).min("price")
 ```
-
-**Errores:** `QueryException` si la compilación o ejecución falla; la capa de conexión sanea el mensaje y suprime la causa encadenada del driver.
 
 <a id="api-avg"></a>
 
@@ -658,16 +660,12 @@ Devuelve la media convertida a float, o None sin valores.
 
 **Resultado:** `float | None`.
 
-Los agregados clonan el plan y quitan orden, limit y offset; conservan filtros, grupos, HAVING y uniones. Con GROUP BY, salvo count("*"), el terminal escalar devuelve el primer valor calculado, no un resultado por grupo. count("*") cuenta las filas del resultado derivado cuando hay grupos, DISTINCT o UNION. Para agregados por grupo usa selectRaw(...).groupBy(...).get(). exists() quita el offset, establece limit=1 y no carga toda la colección.
-
 ```python
 from orionis.support.facades import DB
 
 async def run_example():
     return await DB.table("products").where("active", True).avg("price")
 ```
-
-**Errores:** `QueryException` si la compilación o ejecución falla; la capa de conexión sanea el mensaje y suprime la causa encadenada del driver.
 
 <a id="api-sum"></a>
 
@@ -685,16 +683,12 @@ Devuelve la suma; sin valores devuelve 0.
 
 **Resultado:** `Any`.
 
-Los agregados clonan el plan y quitan orden, limit y offset; conservan filtros, grupos, HAVING y uniones. Con GROUP BY, salvo count("*"), el terminal escalar devuelve el primer valor calculado, no un resultado por grupo. count("*") cuenta las filas del resultado derivado cuando hay grupos, DISTINCT o UNION. Para agregados por grupo usa selectRaw(...).groupBy(...).get(). exists() quita el offset, establece limit=1 y no carga toda la colección.
-
 ```python
 from orionis.support.facades import DB
 
 async def run_example():
     return await DB.table("products").where("active", True).sum("price")
 ```
-
-**Errores:** `QueryException` si la compilación o ejecución falla; la capa de conexión sanea el mensaje y suprime la causa encadenada del driver.
 
 <a id="api-raw-connection"></a>
 
@@ -711,8 +705,6 @@ Selecciona una conexión registrada en este builder sin alterar el gateway DB co
 | `name` | Nombre de una conexión registrada en `config/database.py`. |
 
 **Resultado:** el mismo builder mutable (`Self`); no ejecuta SQL.
-
-Los terminales requieren una tabla seleccionada y la aplicación iniciada. Los errores de consulta se propagan; paginate necesita enteros positivos y utiliza dos consultas, no una instantánea atómica.
 
 ```python
 from orionis.support.facades import DB
@@ -737,8 +729,6 @@ Reemplaza la tabla y el alias conservando las cláusulas existentes.
 
 **Resultado:** el mismo builder mutable (`Self`); no ejecuta SQL.
 
-Los terminales requieren una tabla seleccionada y la aplicación iniciada. Los errores de consulta se propagan; paginate necesita enteros positivos y utiliza dos consultas, no una instantánea atómica.
-
 ```python
 from orionis.support.facades import DB
 
@@ -757,16 +747,12 @@ Ejecuta SELECT y devuelve Collection de diccionarios. No hidrata modelos ni apli
 
 **Resultado:** `Collection`.
 
-Los terminales requieren una tabla seleccionada y la aplicación iniciada. Los errores de consulta se propagan; paginate necesita enteros positivos y utiliza dos consultas, no una instantánea atómica.
-
 ```python
 from orionis.support.facades import DB
 
 async def run_example():
     return await DB.table("products").orderBy("id").get()
 ```
-
-**Errores:** `QueryException` si la compilación o ejecución falla; la capa de conexión sanea el mensaje y suprime la causa encadenada del driver.
 
 <a id="api-raw-first"></a>
 
@@ -780,16 +766,12 @@ Consulta una copia con limit=1 y devuelve un dict o None, sin cambiar el límite
 
 **Resultado:** `dict[str, Any] | None`.
 
-Los terminales requieren una tabla seleccionada y la aplicación iniciada. Los errores de consulta se propagan; paginate necesita enteros positivos y utiliza dos consultas, no una instantánea atómica.
-
 ```python
 from orionis.support.facades import DB
 
 async def run_example():
     return await DB.table("products").orderBy("id").first()
 ```
-
-**Errores:** `QueryException` si la compilación o ejecución falla; la capa de conexión sanea el mensaje y suprime la causa encadenada del driver.
 
 <a id="api-raw-value"></a>
 
@@ -807,16 +789,12 @@ Selecciona una columna en una copia y devuelve su primer valor o None. None tamb
 
 **Resultado:** `Any`.
 
-Los terminales requieren una tabla seleccionada y la aplicación iniciada. Los errores de consulta se propagan; paginate necesita enteros positivos y utiliza dos consultas, no una instantánea atómica.
-
 ```python
 from orionis.support.facades import DB
 
 async def run_example():
     return await DB.table("products").where("id", 1).value("name")
 ```
-
-**Errores:** `QueryException` si la compilación o ejecución falla; la capa de conexión sanea el mensaje y suprime la causa encadenada del driver.
 
 <a id="api-raw-pluck"></a>
 
@@ -834,8 +812,6 @@ Selecciona una columna y devuelve una Collection de sus valores, conservando el 
 
 **Resultado:** `Collection`.
 
-Los terminales requieren una tabla seleccionada y la aplicación iniciada. Los errores de consulta se propagan; paginate necesita enteros positivos y utiliza dos consultas, no una instantánea atómica.
-
 ```python
 from orionis.support.facades import DB
 
@@ -843,14 +819,12 @@ async def run_example():
     return await DB.table("products").orderBy("id").pluck("name")
 ```
 
-**Errores:** `QueryException` si la compilación o ejecución falla; la capa de conexión sanea el mensaje y suprime la causa encadenada del driver.
-
 <a id="api-raw-paginate"></a>
 
 ### `paginate()`
 
 ```text
-async paginate(page: int=1, per_page: int=15) -> Paginator
+async paginate(page: int = 1, per_page: int = 15) -> Paginator[dict[str, Any]]
 ```
 
 Configura la página y ejecuta count seguido de get para construir un Paginator de diccionarios.
@@ -862,7 +836,7 @@ Configura la página y ejecuta count seguido de get para construir un Paginator 
 
 **Resultado:** `Paginator`.
 
-Los terminales requieren una tabla seleccionada y la aplicación iniciada. Los errores de consulta se propagan; paginate necesita enteros positivos y utiliza dos consultas, no una instantánea atómica.
+El constructor de tablas cuenta y luego lee la página en dos consultas sucesivas. Una escritura concurrente puede alterar los resultados entre ambas. Un número de página o tamaño inválido produce `InvalidQueryException`.
 
 ```python
 from orionis.support.facades import DB
@@ -870,7 +844,5 @@ from orionis.support.facades import DB
 async def run_example():
     return await DB.table("products").orderBy("id").paginate(page=1, per_page=15)
 ```
-
-**Errores:** `QueryException` si la compilación o ejecución falla; la capa de conexión sanea el mensaje y suprime la causa encadenada del driver.
 
 [Fachada DB](/es/database/db-facade) · [Consultas ORM](/es/orm/querying) · [Escenario de pruebas](/es/orm/testing)

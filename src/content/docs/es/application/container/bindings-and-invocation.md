@@ -89,7 +89,7 @@ async def publish_for_work(app: IApplication) -> list[str]:
         return catalog.names()
 ```
 
-Este ejemplo presupone que `ICatalog` no tiene un singleton global ya materializado. La caché de singletons se consulta antes del scope: publicar un objeto local no reemplaza un singleton global existente. Consulta [precedencia y scopes](/es/application/container/scopes-and-concurrency#scope-precedence).
+Dentro del bloque, tanto el contrato como su alias registrado devuelven el catálogo local. Al salir, los consumidores vuelven a obtener el singleton original. Consulta los [scopes anidados](/es/application/container/scopes-and-concurrency#scope-precedence).
 
 <a id="container-transient"></a>
 
@@ -317,7 +317,7 @@ El contenedor recorre los parámetros en orden y aplica estas reglas:
 4. Resuelve un binding por el tipo reconocido del parámetro.
 5. Utiliza el valor predeterminado o autoconstruye una clase concreta; si no puede hacerlo, lanza un error.
 
-Los parámetros keyword-only participan en la inyección. Los valores restantes de `*args` y `**kwargs` se entregan al callable; los parámetros variádicos no generan por sí mismos dependencias.
+Los parámetros keyword-only participan en la inyección. Los valores restantes de `*args` y `**kwargs` se entregan al callable; los parámetros variádicos no generan por sí mismos dependencias. Pasa por posición los argumentos declarados antes de `/`. Si la función también declara `**kwargs`, una palabra clave con ese mismo nombre pertenece al diccionario de argumentos adicionales.
 
 ```python
 from app.services.catalog import Catalog, CatalogPresenter
@@ -387,7 +387,7 @@ Las utilidades de `orionis.container.entities.invocation` son útiles al integra
 
 | Utilidad | Firma y resultado |
 |---|---|
-| `InvocationPlan` | `InvocationPlan(arguments: tuple[Argument, ...], is_async: bool)`: dataclass inmutable con los parámetros ordenados y el carácter asíncrono. |
+| `InvocationPlan` | `InvocationPlan(arguments: tuple[Argument, ...], is_async: bool, positional_only: frozenset[str] = frozenset())`: dataclass inmutable con los parámetros ordenados y el carácter asíncrono. |
 | `callable_plan()` | `callable_plan(target: Callable) -> InvocationPlan`: analiza una función o método, sin retener el receptor enlazado. |
 | `constructor_plan()` | `constructor_plan(target: type, constructor: object) -> InvocationPlan`: analiza y valida la clase y su constructor. |
 | `warm_controller_plan()` | `warm_controller_plan(target: type, method_name: str) -> None`: prepara los descriptores habituales de constructor y acción sin crear un controlador. |

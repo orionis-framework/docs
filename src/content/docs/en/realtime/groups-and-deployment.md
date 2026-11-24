@@ -56,7 +56,9 @@ function receiveAnnouncement(message) {
 
 Event names must be public Python identifiers of at most 128 characters: `announcement` is valid; names containing dots or `:` are not. Up to 64 arguments per event are supported, all serializable by the connection's codec.
 
-`caller` and `client(id)` also support `await target.invoke("method", *args, timeout=...)` to await a browser result. Multiple-recipient targets do not support this because there is no single result to correlate. The [protocol](/en/realtime/protocol-and-streaming) shows both directions.
+Use `await self.clients.caller.invoke("method", *args, timeout=5.0)` or select one connection with `self.clients.client(id)` to await a value from its handler. The return value can be `None`. A selection built with `clients([id])` or `group(name)` raises `RuntimeError` on invocation, even if it contains exactly one connection.
+
+Handle `ConnectionError` if the selected client is unavailable and `TimeoutError` if sending and waiting for the result exceeds the deadline in seconds. With `timeout=None`, the connection uses `REALTIME_CLIENT_RESULT_TIMEOUT`. A client that replies with an error raises `orionis.realtime.errors.ClientInvocationError`. See the [server-to-client exchange](/en/realtime/protocol-and-streaming).
 
 ## Join and leave groups
 
@@ -228,6 +230,14 @@ The default `ConnectionManager` only knows connections in the current process/wo
 
 For chat tests using a shared registry, use the [one-worker command](/en/realtime/chat#4-run-with-one-worker). The usual `orionis serve` selection differs between Windows and Unix; an application guide must not assume every connection shares a process.
 
-Session affinity can keep a connection on its worker, but does not itself broadcast to other workers' connections. When implementing `IConnectionManager`, `register(connection)` tracks the connection instance and `unregister(connection)` removes that instance and its group memberships. The built-in manager ignores an absent or replaced instance on unregister. The `RealtimeConnectionLike` protocol requires recipients to implement `await sendEncoded(data)` for text or binary frames. Distribution requires your own backplane and a compatible `IConnectionManager` implementation, plus the delivery guarantees your application needs. The framework does not activate Redis pub/sub merely because Redis is configured in another module.
+Session affinity can keep a connection on its worker. Cross-worker delivery requires a shared backplane and a compatible `IConnectionManager` implementation. The native registry uses process memory even when other services use Redis.
+
+### Implementing a connection manager
+
+`register(connection)` tracks a connection instance. `unregister(connection)` removes that instance and its group memberships. The built-in manager ignores an absent or replaced instance on unregister. Recipients implement the `RealtimeConnectionLike` protocol, including `await sendEncoded(data)` for text or binary frames.
+
+When application code calls `await target.send(event, *args)`, the target delegates to `await manager.broadcast(hub, connection_ids, envelope)`. The contract takes the Hub class, a tuple of connection IDs and an envelope encodable by the selected clients’ codecs. It returns a `BroadcastResult` with `sent` and `failed` counts. Encoding can raise `TypeError` or `ValueError` before delivery. Cancellation propagates to the caller.
+
+The native manager attempts each occurrence in the tuple and counts unavailable IDs as failures. An empty tuple returns zero for both counts. The application-level selector `clients(ids)` removes duplicate IDs before calling the manager.
 
 The registry is designed for the application's event loop; it is not a global container supporting safe mutation from threads. For production, configure HTTPS/`wss:`, proxy upgrade support, and infrastructure deadlines suitable for long connections; Realtime options do not configure that proxy automatically.

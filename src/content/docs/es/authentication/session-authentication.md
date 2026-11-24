@@ -343,3 +343,27 @@ Consulta el [catálogo de rutas y pantallas integradas](/es/authentication/accou
 ### Accesores del contrato de identidad
 
 `Authenticatable` implementa los accesores del modelo: `getAuthIdentifierName()` devuelve el nombre del atributo de clave primaria, `getAuthIdentifier()` devuelve su valor (o `None` si ese atributo no está definido) y `getAuthPassword()` devuelve el hash guardado, o `""` si el atributo está ausente o no es texto. Son métodos síncronos. Define la constante de clase `AUTH_PASSWORD` si el hash utiliza otro atributo; el predeterminado es `"password"`. No incluyas el resultado de `getAuthPassword()` en una respuesta HTTP.
+
+## Cambiar la contraseña de un usuario autenticado
+
+El `ProfileController` opcional obtiene la identidad de la sesión. La acción `index` pasa `name` y `email` a `resources/views/profile/index.html`. La acción `changePassword` comprueba la contraseña actual, calcula el hash de la nueva y guarda la cuenta. Estos endpoints tienen sus propias rutas. Si tu aplicación ya declara las rutas de perfil, edita esas declaraciones. En caso contrario, añade lo siguiente a `routes/web.py`:
+
+```python
+from orionis.auth.middleware import AuthenticateSessionMiddleware
+from orionis.http.default.controllers.profile_controller import ProfileController
+from orionis.support.facades import Route
+
+Route.group(
+    middleware=AuthenticateSessionMiddleware,
+    routes=[
+        Route.get("/profile", [ProfileController, "index"]).name("profile"),
+        Route.post("/profile/password", [ProfileController, "changePassword"]).name(
+            "profile.password",
+        ),
+    ],
+)
+```
+
+El controlador espera el modelo `app.models.user.User` de la aplicación con los atributos `password` y `remember_token` disponibles para escritura. El formulario envía `current_password`, `password` y `password_confirmation` por POST e incluye `{% csrf %}`. Los tres campos son obligatorios y admiten hasta 1024 caracteres. La nueva contraseña requiere al menos ocho caracteres, entre ellos una mayúscula ASCII, una minúscula ASCII y un dígito ASCII. La confirmación debe coincidir.
+
+Una contraseña actual incorrecta redirige a `/profile` con un error asociado a `current_password`. Cuando el guardado tiene éxito, se borra el token de acceso persistente y se vuelve a iniciar sesión con la identidad, lo que renueva el identificador de sesión y el token CSRF. La redirección incluye la clave flash `success`.

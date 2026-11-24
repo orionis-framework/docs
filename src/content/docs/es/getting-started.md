@@ -1,6 +1,6 @@
 ---
 title: "Fundamentos de Orionis"
-description: "Construye tu aplicación a partir del esqueleto oficial y añade las funciones que necesite tu proyecto. Para empezar a desarrollar, no necesitas implementar Application, un…"
+description: "Instala Orionis Framework 1.9.0, ejecuta tu primer endpoint HTTP y consulta las guías de configuración, servicios y pruebas."
 editUrl: true
 lastUpdated: false
 ---
@@ -29,13 +29,13 @@ Los comandos de las guías de aplicación usan `uv run python -B reactor ...` de
 
 Foundation también define entidades congeladas para cada subsistema, metadata core inmutable, el servicio de rutas `Directory`, enums y presentación de startup/shutdown. Las aplicaciones lo configuran en `bootstrap/app.py`, llaman `create()` y dejan que servidor HTTP o Reactor dirijan el runtime.
 
-## Requisitos
+<a id="requisitos"></a>
 
-- Python 3.14 o posterior; la construcción rechaza intérpretes anteriores.
-- Raíz de aplicación como `str` o `pathlib.Path`.
-- Módulos de configuración dataclass congelados válidos bajo `config`.
-- Archivos de rutas existentes y con la fachada requerida al registrarlos.
-- Un event loop por worker; el estado mutable no está diseñado para compartirse entre loops o hilos.
+## Estructura del proyecto
+
+El proyecto generado incluye la raíz de la aplicación, el módulo de arranque y los archivos de rutas. Orionis construye la configuración predeterminada y aplica las dataclasses congeladas que descubre en `config/`. Añade tu propia dataclass allí para [definir una sección de configuración](/es/application/configuration#configuration-own).
+
+Un archivo de rutas registrado en `bootstrap/app.py` debe existir y puede estar vacío. Cuando añadas rutas, importa la fachada desde `orionis.support.facades`, como en el [ejemplo del primer controlador](/es/getting-started/quick-start).
 
 ## Recorrido del módulo
 
@@ -47,7 +47,4 @@ Foundation también define entidades congeladas para cada subsistema, metadata c
 - [Crear y arrancar una aplicación](/es/getting-started/quick-start)
 - [Directorios y caché de arranque](/es/application/paths-and-caching)
 
-Continúa por: [environment](/es/environment) · [container](/es/application/container) · [http](/es/http) · [console](/es/console).
-
-
-- [Instalación y primer proyecto](/es/getting-started/installation)
+Consulta también [variables de entorno](/es/environment), [inyección de dependencias](/es/application/container), [HTTP](/es/http) y [comandos de consola](/es/console).

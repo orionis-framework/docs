@@ -84,7 +84,7 @@ asyncio.run(main())
 
 ### `all() -> list[T] | dict[Any, Any]`
 
-Devuelve la estructura de respaldo real, sin copiarla. Aunque la anotación indica una lista, una colección respaldada por un diccionario devuelve ese diccionario.
+Devuelve por referencia la lista o el diccionario que contiene los elementos. Modificar una entrada mediante esa referencia también modifica la colección.
 
 <a id="collection-method-count"></a>
 

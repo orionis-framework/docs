@@ -197,7 +197,6 @@ Construye una factory con cantidad 1, sin estados ni secuencia. locale=None usa 
 
 ```python
 from database.factories.product_factory import ProductFactory
-from orionis.orm.factories import Sequence
 
 result = ProductFactory(locale="es_CO", seed=7)
 ```
@@ -207,14 +206,13 @@ result = ProductFactory(locale="es_CO", seed=7)
 ### `fake`
 
 ```text
-fake() -> Fake
+factory.fake: Fake
 ```
 
 Propiedad que devuelve el mismo Fake de esta instancia; no lo recrea en cada registro.
 
 ```python
 from database.factories.product_factory import ProductFactory
-from orionis.orm.factories import Sequence
 
 result = ProductFactory(seed=7).fake.safeEmail()
 ```
@@ -231,7 +229,6 @@ Override obligatorio y síncrono que devuelve dict[str, Any]. La implementación
 
 ```python
 from database.factories.product_factory import ProductFactory
-from orionis.orm.factories import Sequence
 
 result = ProductFactory(seed=7).definition()
 ```
@@ -248,7 +245,6 @@ Cambia la cantidad para llamadas posteriores. Acepta int >=0; bool, negativos y 
 
 ```python
 from database.factories.product_factory import ProductFactory
-from orionis.orm.factories import Sequence
 
 result = ProductFactory(seed=7).count(2).make()
 ```
@@ -265,7 +261,6 @@ Añade un dict copiado o callback síncrono que recibe atributos actuales separa
 
 ```python
 from database.factories.product_factory import ProductFactory
-from orionis.orm.factories import Sequence
 
 result = ProductFactory(seed=7).state(lambda attributes: {"price": attributes["price"] + 10}).make()
 ```
@@ -299,7 +294,6 @@ Limpia el historial de self.fake.unique, sin volver a sembrar el RNG ni reinicia
 
 ```python
 from database.factories.product_factory import ProductFactory
-from orionis.orm.factories import Sequence
 
 result = ProductFactory(seed=7).clearUnique().make()
 ```
@@ -316,7 +310,6 @@ Construye un modelo si count=1; en otro caso devuelve Collection. No accede a la
 
 ```python
 from database.factories.product_factory import ProductFactory
-from orionis.orm.factories import Sequence
 
 result = ProductFactory(seed=7).make(name="Fixed name")
 ```
@@ -333,7 +326,6 @@ Guarda cada modelo mediante await save(). Misma cardinalidad que make; no abre t
 
 ```python
 from database.factories.product_factory import ProductFactory
-from orionis.orm.factories import Sequence
 
 async def run_example():
     return await ProductFactory(seed=7).count(2).create(active=True)
@@ -351,7 +343,6 @@ Devuelve Iterator[TModel]. Crea atributos al avanzar y mantiene ocupada la facto
 
 ```python
 from database.factories.product_factory import ProductFactory
-from orionis.orm.factories import Sequence
 
 result = list(ProductFactory(seed=7).count(2).iterMake())
 ```
@@ -368,7 +359,6 @@ Devuelve AsyncIterator[TModel]. Espera save antes de cada yield; cerrar el strea
 
 ```python
 from database.factories.product_factory import ProductFactory
-from orionis.orm.factories import Sequence
 
 async def run_example():
     return [model async for model in ProductFactory(seed=7).count(2).iterCreate()]

@@ -118,7 +118,7 @@ On `lifespan.startup`, Orionis awaits eager providers, runs callbacks and prepar
 
 `lifespan.shutdown` runs shutdown callbacks, sends `lifespan.shutdown.complete` and returns. An ordinary error produces `lifespan.shutdown.failed`. Repeated startup within the same lifespan conversation is acknowledged without repeating callbacks. `lifespan.disconnect` ends that conversation, while unrecognized types are ignored.
 
-This duplicate-startup protection belongs to the lifespan conversation; it is not a global lock around every possible startup. If your server or tests omit lifespan, first dispatch can prepare the kernel, but does not replace HTTP startup callbacks.
+When driving ASGI from a test client or embedding it in a server, keep the lifespan conversation open, send `lifespan.startup` and wait for `lifespan.startup.complete` before sending the first request. Direct HTTP dispatch can attempt to build the kernel before asynchronous providers have booted. For example, loading a route that calls `Route.get(...).name(...)` requires the router provider to have pinned the facade. At the end, send `lifespan.shutdown` and wait for its acknowledgement.
 
 <a id="rsgi"></a>
 

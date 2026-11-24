@@ -245,7 +245,7 @@ Route.get("/stock", StockController)
 
 Coloca el bloque en tu archivo de rutas API o separa las clases e impórtalas antes del registro. `GET /stock` devuelve `{"quantity": 5}`. Si cambias el retorno a `StockOutput(quantity=-1)`, el constructor crea la instancia, pero la validación de salida rechaza su cantidad. Una cadena como `StockOutput(quantity="bad")` también se rechaza por tipo.
 
-Una salida inválida es un fallo de la aplicación: con el manejo predeterminado produce **HTTP `500`**, no el `422` de un cuerpo de entrada inválido ni una redirección de formulario. La respuesta al cliente sigue el manejo de errores de servidor y su configuración de depuración; no uses sus detalles como contrato público de errores de entrada.
+Una salida inválida lanza `ResponseValidationException` de `orionis.http.exceptions.response_validation`. El manejador de excepciones de la aplicación puede consultar la `ValidationException` original mediante `__cause__`. El manejo predeterminado devuelve HTTP `500`. Los detalles dependen de la configuración de depuración.
 
 Si devuelves el schema que recibiste como parámetro, sus reglas se ejecutan tanto para la entrada como para la salida. Tenlo en cuenta si una regla consulta servicios externos. Diseña esas comprobaciones sin efectos secundarios y declara un schema de salida adecuado a los datos que publicas.
 

@@ -5,7 +5,7 @@ editUrl: true
 lastUpdated: false
 ---
 
-This reference covers 83 facade names in the E-H range. The whole catalog contains **675 typed methods** (694 signatures including overloads) and **7 backend helpers accessible at runtime**, organized alphabetically. Availability was checked against the installed backend's 110 locales; some methods only exist for specific locales.
+This reference covers 83 facade names in the E-H range. The whole catalog contains **675 typed methods** (694 signatures including overloads) and **7 backend helpers accessible at runtime**, organized alphabetically. The locale counts and runtime defaults below apply to Faker 40.54.0, the version in the Orionis 1.9.0 lockfile. A provider may be specific to one locale.
 
 ## Preparing examples
 
@@ -30,7 +30,7 @@ class SampleFactory(Factory[SampleRecord]):
         return {"value": self.fake.word()}
 ```
 
-Each entry selects a verified compatible locale, presents the typed contract and the backend's actual defaults. **`...` in a typed signature means the stub does not specify that default**, not a value to pass. Runtime signatures show concrete defaults. Locale variants are distinguished when they differ; examples retain native parameter names while facade methods use camelCase.
+Each entry selects a compatible locale, presents the typed contract and the backend's actual defaults. **`...` in a typed signature means the stub does not specify that default**, not a value to pass. Runtime signatures show concrete defaults. Locale variants are distinguished when they differ; examples retain native parameter names while facade methods use camelCase.
 
 Types `T` and `TEnum` preserve received value/Enum types; `Callable`, `Iterable`, `Sequence`, `Collection`, `Any`, `Decimal`, `UUID` and `datetime` types belong to the provider's Python contract. `Optional` permits None and `Literal` restricts concrete values. Results are not automatically converted to ORM attributes or JSON: apply the appropriate cast/encoder.
 

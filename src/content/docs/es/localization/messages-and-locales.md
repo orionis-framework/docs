@@ -186,7 +186,9 @@ Seleccionar `locale=` en una consulta no cambia el idioma activo compartido. Uti
 
 `max_locales` debe ser un entero positivo sin booleanos. `negative_ttl` debe ser finito y no negativo; cero reintenta los resultados vacíos en la siguiente lectura. Son opciones del constructor del repositorio, no variables `APP_*`. `LocalizationManager` construye directamente su loader y su repositorio: registrar por separado un binding de `ITranslationRepository` no configura ese manager. Construye un traductor explícito si necesitas otro presupuesto.
 
-Los mapas poblados no vigilan el filesystem y permanecen cacheados hasta su expulsión o invalidación. Usa `forget()`, `flush()` o la API de recarga del traductor para actualizarlos. La carga es síncrona; precarga los idiomas necesarios al iniciar si quieres evitar I/O en la primera petición. Los mapas se comparten dentro del repositorio: no los mutes.
+Tras editar los archivos de traducción, llama a `Lang.reload("es")` para descartar el mapa en español o a `Lang.reload()` para descartar todos los idiomas cacheados por ese traductor. La firma es `reload(locale: str | None = None) -> None`. La siguiente consulta de un idioma invalidado lee sus archivos. Utiliza `Lang.forget(locale)` si necesitas un booleano que indique si se eliminó una entrada. Un código de idioma inválido lanza `InvalidLocaleException`.
+
+Estas llamadas son síncronas una vez iniciado el proveedor de localización. Carga los idiomas necesarios durante el arranque si quieres evitar la lectura de archivos en su primera petición. Las lecturas del repositorio comparten el mapa cacheado, así que trátalo como de solo lectura.
 
 ## Integrar el loader y el repositorio
 

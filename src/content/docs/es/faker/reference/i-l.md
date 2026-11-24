@@ -5,7 +5,7 @@ editUrl: true
 lastUpdated: false
 ---
 
-Esta referencia cubre 100 nombres de la fachada de Faker en el tramo I-L. El conjunto completo contiene **675 métodos tipados** (694 firmas con overloads) y **7 helpers de backend accesibles en runtime**, repartidos alfabéticamente. La disponibilidad se contrastó con los 110 locales del backend instalado; un método puede estar disponible solo en determinados locales.
+Esta referencia cubre 100 nombres de la fachada de Faker en el tramo I-L. El conjunto completo contiene **675 métodos tipados** (694 firmas con overloads) y **7 helpers de backend accesibles en runtime**, repartidos alfabéticamente. Los recuentos de locales y valores predeterminados corresponden a Faker 40.54.0, la versión fijada en el archivo de bloqueo de Orionis 1.9.0. Un proveedor puede ser específico de un locale.
 
 ## Preparar los ejemplos
 
@@ -30,7 +30,7 @@ class SampleFactory(Factory[SampleRecord]):
         return {"value": self.fake.word()}
 ```
 
-Cada entrada selecciona un locale compatible verificado, muestra el contrato tipado y los valores predeterminados reales del backend. **`...` en la firma tipada significa default no especificado por el stub**, no un valor que debas pasar. Las firmas de runtime muestran el default concreto. Las variantes de locale se distinguen cuando cambian; los ejemplos conservan los nombres nativos de parámetros, aunque los métodos de la fachada usen camelCase.
+Cada entrada selecciona un locale compatible, muestra el contrato tipado y los valores predeterminados reales del backend. **`...` en la firma tipada significa default no especificado por el stub**, no un valor que debas pasar. Las firmas de runtime muestran el default concreto. Las variantes de locale se distinguen cuando cambian; los ejemplos conservan los nombres nativos de parámetros, aunque los métodos de la fachada usen camelCase.
 
 Tipos como `T` y `TEnum` conservan el tipo de los valores o Enum recibidos; `Callable`, `Iterable`, `Sequence`, `Collection`, `Any`, `Decimal`, `UUID` y los tipos `datetime` pertenecen al contrato Python del proveedor. `Optional` permite None y `Literal` limita valores concretos. Los resultados no se convierten automáticamente a atributos ORM ni a JSON: aplica el cast/encoder apropiado.
 

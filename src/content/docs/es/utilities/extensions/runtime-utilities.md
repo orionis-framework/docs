@@ -156,15 +156,15 @@ assert DateTime.fromFormat("06/10/2026", "DD/MM/YYYY", tz="UTC").day == 6
 | `startOf(unit: str, dt: pendulum.DateTime \| None=None, tz: str \| None=None) -> pendulum.DateTime` | Inicio de la unidad indicada. |
 | `endOf(unit: str, dt: pendulum.DateTime \| None=None, tz: str \| None=None) -> pendulum.DateTime` | Final de la unidad indicada. |
 | `startOfDay(dt: pendulum.DateTime \| None=None, tz: str \| None=None) -> pendulum.DateTime` | Inicio de día. |
-| `endOfDay(dt: pendulum.DateTime \| None=None, tz: str \| None=None) -> pendulum.DateTime` | Final de día. |
+| `endOfDay(dt: pendulum.DateTime \| None=None, tz: str \| None=None) -> pendulum.DateTime` | Último instante del día, a las `23:59:59.999999`. |
 | `convertToLocal(dt: str \| stdlib_datetime \| pendulum.DateTime) -> pendulum.DateTime` | Convierte a la zona configurada de la aplicación. |
 | `formatLocal(dt: str \| stdlib_datetime \| pendulum.DateTime \| None=None, format_string: str='YYYY-MM-DD HH:mm:ss') -> str` | Formatea en la zona y locale configurados. |
 | `startOfWeek(dt: pendulum.DateTime \| None=None, tz: str \| None=None) -> pendulum.DateTime` | Inicio de semana. |
-| `endOfWeek(dt: pendulum.DateTime \| None=None, tz: str \| None=None) -> pendulum.DateTime` | Final de semana. |
+| `endOfWeek(dt: pendulum.DateTime \| None=None, tz: str \| None=None) -> pendulum.DateTime` | Último instante del domingo, a las `23:59:59.999999`. |
 | `startOfMonth(dt: pendulum.DateTime \| None=None, tz: str \| None=None) -> pendulum.DateTime` | Inicio de mes. |
-| `endOfMonth(dt: pendulum.DateTime \| None=None, tz: str \| None=None) -> pendulum.DateTime` | Final de mes. |
+| `endOfMonth(dt: pendulum.DateTime \| None=None, tz: str \| None=None) -> pendulum.DateTime` | Último día del mes, a las `23:59:59.999999`. |
 | `startOfYear(dt: pendulum.DateTime \| None=None, tz: str \| None=None) -> pendulum.DateTime` | Inicio de año. |
-| `endOfYear(dt: pendulum.DateTime \| None=None, tz: str \| None=None) -> pendulum.DateTime` | Final de año. |
+| `endOfYear(dt: pendulum.DateTime \| None=None, tz: str \| None=None) -> pendulum.DateTime` | 31 de diciembre a las `23:59:59.999999`. |
 | `addDays(dt: pendulum.DateTime, days: int) -> pendulum.DateTime` | Suma de días. |
 | `addHours(dt: pendulum.DateTime, hours: int) -> pendulum.DateTime` | Suma de horas. |
 | `addMinutes(dt: pendulum.DateTime, minutes: int) -> pendulum.DateTime` | Suma de minutos. |

@@ -148,7 +148,7 @@ assert reflected.getInstance() is service
 ### `__init__`
 
 ```python
-def __init__(self, instance: Any) -> None: ...
+def __init__(self, instance: T) -> None: ...
 ```
 
 `instance` is required and must be an object, not a class. Classes and objects whose `instance.__class__.__module__` is `builtins` or `abc` raise `TypeError`; the `__main__` module raises `ValueError`. Importability is not checked: a synthetic class with another module name can also be accepted. The example uses a class defined in an importable file so its source can be retrieved and `__main__` is avoided. Construction does not yet scan attributes or methods.
@@ -171,7 +171,7 @@ These methods take no arguments. They return references or metadata for the obje
 def getInstance(self) -> T: ...
 ```
 
-Return the reflected object itself (`Any`).
+Returns the original instance with its input type `T`.
 
 ```python
 assert reflected.getInstance() is service
@@ -478,7 +478,7 @@ assert not reflected.hasAttribute("region")
 
 ## Filter methods
 
-Scanning traverses `dir(type(instance))` using static descriptor access: it includes inherited methods, distinguishes instance functions, `classmethod` and `staticmethod`, and separates coroutines with `inspect.iscoroutinefunction`. It does not invoke methods or property getters. A function returning an awaitable without being a coroutine function remains in the sync filter.
+The filters cover inherited members and callable attributes attached to this instance. If an instance attribute shadows a method of the same name, the filter uses the instance value. It reads class descriptors without running property getters. A regular function returning an awaitable belongs to the synchronous filter.
 
 Own private members appear as `__sign`, without the class prefix. `getMethods()` excludes dunder names and combines the categories; it is not an execution order. Filters take no arguments and return cached lists of names, not bound methods.
 
@@ -757,7 +757,7 @@ assert "__validAsync" in reflected.getPrivateStaticAsyncMethods()
 def hasMethod(self, name: str) -> bool: ...
 ```
 
-Check whether required `name` belongs to the classified class method set. This does not inspect instance-only attached callables or include dunder names.
+Includes methods added to this object with `setMethod()`. Look up special methods such as `__init__` in `getDunderMethods()`.
 
 ```python
 assert reflected.hasMethod("render")
@@ -803,14 +803,15 @@ assert reflected.getMethodDocstring("render") == "Render the report."
 def setMethod(self, name: str, method: Callable) -> bool: ...
 ```
 
-`name` and `method: Callable` are required. Validate the name as in `setAttribute`, require a callable (`TypeError`), assign it to the object and return `True`, clearing the cache. This neither binds `self` automatically nor adds it to class filters. Use `types.MethodType` when the function expects an instance.
+A successful call stores the callable on the instance, refreshes the cached member lists and returns `True`. An invalid identifier or Python keyword raises `AttributeError`. A non-callable value raises `TypeError`. Bind a function with `types.MethodType` when it needs the receiver.
 
 ```python
 from types import MethodType
 
 assert reflected.setMethod("extra", lambda: "ready") is True
 assert service.extra() == "ready"
-assert not reflected.hasMethod("extra")
+assert reflected.hasMethod("extra")
+assert "extra" in reflected.getPublicSyncMethods()
 
 def describe(instance):
     return instance.title

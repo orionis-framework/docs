@@ -1,6 +1,6 @@
 ---
 title: "Salud, errores y rutas predeterminadas"
-description: "El router registra favicon, robots.txt, sitemap.xml y la ruta de salud configurada por la aplicación. DefaultResponses renderiza páginas mediante IViewEngine, sirve un conjunto…"
+description: "Consulta la ruta de salud, publica un favicon, robots.txt y sitemap, y utiliza las respuestas de error predeterminadas."
 editUrl: true
 lastUpdated: false
 ---
@@ -13,7 +13,17 @@ La ruta de salud devuelve 200 en estado normal y 503 durante mantenimiento. `Acc
 
 Un servicio que inyecta `IDefaultResponses` también puede llamar a `await pages.favicon()`, `await pages.robotsTxt()` o `await pages.sitemapXml()`. Cada método devuelve una respuesta de archivo si encuentra un candidato o una respuesta de error HTTP si falta.
 
-Puedes reemplazar los GET de favicon, robots y sitemap declarando esos paths en rutas de aplicación. Los archivos públicos usan una selección de candidatos con fallback del paquete donde existe. Un sitemap ausente puede terminar en 404; no se genera un catálogo de URLs de negocio.
+### Publicar archivos para buscadores y un favicon
+
+Coloca los archivos en el directorio de almacenamiento público de la aplicación (`storage/app/public` por defecto). El router expone las siguientes rutas GET:
+
+| Ruta | Archivo de la aplicación, en orden de búsqueda | Si falta |
+| --- | --- | --- |
+| `/favicon.ico` | `favicon.ico`, después `favicon.png` y por último `favicon.svg` | Utiliza el icono incluido en el paquete. |
+| `/robots.txt` | `robots.txt` | Utiliza el archivo robots del paquete. |
+| `/sitemap.xml` | `sitemap.xml` | Devuelve HTTP 404. |
+
+Para generar el sitemap a partir de los datos de tu aplicación, registra una acción GET en `/sitemap.xml`. Una ruta GET de la aplicación en cualquiera de estas tres direcciones sustituye a su manejador predeterminado.
 
 ## Presentar errores desde un servicio
 
@@ -41,7 +51,7 @@ from orionis.support.facades import Route
 Route.auth()
 ```
 
-Solo declara una vez desde rutas web. Puedes pasar `login_controller`, `register_controller` y `forgot_password_controller` para reemplazar cada controlador. Conserva los métodos que espera [el registro real](https://github.com/orionis-framework/framework/blob/v1.9.0/orionis/http/routes/auth.py). Los controladores predeterminados de registro/perfil dependen del modelo `app.models.user.User`, vistas, hashing y correo de la aplicación; no son un flujo genérico para cualquier modelo. Comprueba esos contratos antes de activarlos. Consulta [recuperación de cuentas](/es/authentication/account-recovery).
+Registra el helper una vez en `routes/web.py`. Para sustituir un controlador, pasa `login_controller`, `register_controller` o `forgot_password_controller`. El registro predeterminado utiliza `app.models.user.User`, plantillas de la aplicación, hashing y envío de correo. Consulta [los nombres de ruta y las acciones esperadas](/es/authentication/account-recovery). El perfil y el formulario de cambio de contraseña de un usuario autenticado requieren [sus propias rutas web](/es/authentication/session-authentication#cambiar-la-contraseña-de-un-usuario-autenticado).
 
 ## Cachés y cambios de archivos
 

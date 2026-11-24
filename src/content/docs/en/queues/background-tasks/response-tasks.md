@@ -1,6 +1,6 @@
 ---
 title: "Running actions after responding"
-description: "A background task belongs to the serving process and runs after response delivery. Use it for short side effects whose loss is acceptable; the queues module covers work…"
+description: "Pass arguments to synchronous or asynchronous response tasks, run them in order and handle failures."
 editUrl: true
 lastUpdated: false
 ---
@@ -11,8 +11,9 @@ A background task belongs to the serving process and runs after response deliver
 
 - Python 3.14 or newer.
 - A normal Orionis installation; there is no module-specific extra or configuration.
-- Direct execution expects a running event loop and a booted Orionis logger facade.
+- Manual execution requires a running event loop. In a booted application the logger records task activity.
 - No external service is required unless the wrapped callable requires one.
+
 ## Quick start
 
 Attach a task to an HTTP response; Orionis runs it after sending the response:
@@ -81,7 +82,7 @@ Pass identifiers and stable data instead of a mutable request or a file that wil
 
 Collections preserve order and stop at the first failure. If two actions must be attempted independently, catch failures inside separate callbacks according to your policy; do not assume `BackgroundTasks` will continue. Running the collection again repeats every item: execution does not consume the list. Make operations idempotent when they may be invoked again.
 
-To extend an attached task, subclass `BackgroundTask` and override `async __call__()`. Implementing only `IBackgroundTask` does not satisfy the concrete `Response` check. Manual execution requires an available `Log` facade; logger failures can also interrupt execution.
+To extend an attached task, subclass `BackgroundTask` and override `async __call__()`. Implementing only `IBackgroundTask` does not satisfy the concrete `Response` check. A logging error after a successful callback can propagate to the caller.
 
 ## Core concepts
 
@@ -153,7 +154,7 @@ async def after_import() -> None:
     await BackgroundTask(refresh_index, 17).run()
 ```
 
-Calling `after_import` prints `indexed:17` and records a success log.
+Awaiting `after_import()` prints `indexed:17`. In the running application, the task also logs successful completion.
 
 
 ### Preserve keyword arguments for synchronous work
@@ -244,21 +245,10 @@ Wraps the callable in `BackgroundTask`, appends it, and returns `None`. Passing 
 
 `__call__` awaits stored tasks one by one. `run` is inherited from `BackgroundTask` and dispatches dynamically to the collection's `__call__`. Running an empty collection is a no-op.
 
+<a id="implementation-reference-for-extensions"></a>
+
 ### `IBackgroundTask`
 
 The extension contract requires only `async run() -> None`. HTTP responses currently validate against `BackgroundTask`, so custom response tasks should normally subclass `BackgroundTask` rather than implementing the contract alone.
 
-## Implementation reference for extensions
-
-| Path | Responsibility |
-|---|---|
-| `task.py` | Callable detection, single-task execution, executor dispatch, and logging. |
-| `tasks.py` | Ordered collection and `addTask` convenience method. |
-| `contracts/task.py` | `IBackgroundTask` extension contract exposing async `run()`. |
-| `__init__.py` | Re-exports `BackgroundTask` and `BackgroundTasks`. |
-
----
-
-[Index](/en/queues/background-tasks) · [http](/en/http) · [queues](/en/queues) · [logging](/en/logging)
-
-`is_async_callable(func: object) -> bool`, from `orionis.background.task`, detects coroutine functions, partials, and callable objects with async `__call__`; a synchronous function returning an awaitable is classified as synchronous. The executor copies the current context variables into synchronous tasks.
+[Response tasks](/en/queues/background-tasks) · [HTTP responses](/en/http/responses) · [Queues](/en/queues) · [Logging](/en/logging)

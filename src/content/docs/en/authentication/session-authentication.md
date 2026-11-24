@@ -343,3 +343,27 @@ See the [built-in routes and screens](/en/authentication/account-recovery) and [
 ### Identity contract accessors
 
 `Authenticatable` implements the model's identity accessors: `getAuthIdentifierName()` returns its primary-key attribute name, `getAuthIdentifier()` returns its value (or `None` when that attribute is unset), and `getAuthPassword()` returns the stored hash, or `""` when the attribute is absent or is not a string. These methods are synchronous. Set the class constant `AUTH_PASSWORD` when the hash uses a different model attribute; the default is `"password"`. Never include the result of `getAuthPassword()` in an HTTP response.
+
+## Change a signed-in user’s password
+
+The optional `ProfileController` reads the current identity from the session. Its `index` action passes `name` and `email` to `resources/views/profile/index.html`. Its `changePassword` action verifies the current password, hashes the new one and saves the account. These endpoints have their own routes. If your application already declares the profile routes, edit those declarations. Otherwise, add the following to `routes/web.py`:
+
+```python
+from orionis.auth.middleware import AuthenticateSessionMiddleware
+from orionis.http.default.controllers.profile_controller import ProfileController
+from orionis.support.facades import Route
+
+Route.group(
+    middleware=AuthenticateSessionMiddleware,
+    routes=[
+        Route.get("/profile", [ProfileController, "index"]).name("profile"),
+        Route.post("/profile/password", [ProfileController, "changePassword"]).name(
+            "profile.password",
+        ),
+    ],
+)
+```
+
+The controller expects the application’s `app.models.user.User` model with writable `password` and `remember_token` attributes. The profile form submits `current_password`, `password` and `password_confirmation` by POST and includes `{% csrf %}`. All three fields are required and accept up to 1,024 characters. The new password needs at least eight characters, including an ASCII uppercase letter, lowercase letter and digit. The confirmation must match.
+
+An incorrect current password redirects to `/profile` with an error for `current_password`. A successful save clears the stored remember token and logs the identity back in, rotating the session ID and CSRF token. The redirect carries the flash key `success`.

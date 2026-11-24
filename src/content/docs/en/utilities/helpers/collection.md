@@ -84,7 +84,7 @@ asyncio.run(main())
 
 ### `all() -> list[T] | dict[Any, Any]`
 
-Returns the actual backing structure, not a copy. Although annotated as a list, a dictionary-backed collection returns its dictionary.
+Returns the underlying list or dictionary by reference. Updating an entry through that reference also updates the collection.
 
 <a id="collection-method-count"></a>
 

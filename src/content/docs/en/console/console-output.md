@@ -57,6 +57,18 @@ class WriteValuesCommand(BaseCommand):
         return 0
 ```
 
+## Inspect values in a command
+
+Use the inherited `dump()` to print values while a command runs. It returns `None` synchronously. For example, inside `ImportSummaryCommand.handle()`:
+
+```python
+self.dump({"created": 12, "skipped": 3}, max_depth=2)
+```
+
+By default, the dump includes each value’s type (`show_types=True`), expands nested values (`expand_all=True`) and continues the command. Use `show_index=True` to number multiple arguments, `max_depth` to limit expansion and `insert_line=True` to add spacing. Override the displayed source with `module_path` and `line_number`. The dumper copies each value with `deepcopy`, so pass a printable summary for objects that cannot be copied.
+
+The remaining options default to `False`. With `force_exit=True` the process exits with status 1. With `redirect_output=True` the dump uses the interpreter’s original output streams. Combining both options exits the process immediately. For request-aware debugging, see [Debug](/en/utilities/helpers/debug).
+
 <a id="console-success"></a>
 <a id="console-info"></a>
 <a id="console-warning"></a>

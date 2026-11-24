@@ -137,7 +137,7 @@ Requieren que termine `create()`; antes lanzan `RuntimeError`.
 
 - `isProduction()` conserva si `"prod"` aparece en el texto de `app.env` durante creación. No es una comprobación dinámica ni una comparación exacta con un solo nombre.
 - `isDebug()` conserva si `app.debug is True` durante creación. Cambiar configuración runtime no recalcula estos indicadores.
-- `underMaintenance()` consulta `storage/framework/maintenance`, o `app.maintenance` como fallback. `down` lo activa y `up` lo desactiva; texto desconocido usa el fallback. Cachea el resultado hasta 100 ms en cada worker. Errores de lectura o decodificación activan mantenimiento; no es un lock distribuido.
+- `underMaintenance()` lee el marcador en `app.path("storage_framework") / "maintenance"`. El texto `down` activa el mantenimiento y `up` lo desactiva. Si el archivo falta o su contenido no se reconoce, usa `app.maintenance`, que en la configuración estándar lee `APP_MAINTENANCE` (por defecto `False`). Un error de lectura o decodificación activa el mantenimiento. Cada worker conserva el resultado hasta 100 ms.
 
 Usa los [comandos up/down](/es/console/built-in-application) para administrar el marcador; el alcance entre procesos depende de que compartan ese archivo.
 

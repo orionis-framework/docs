@@ -204,7 +204,23 @@ class WelcomeTemplatesMail(Mailable):
         )
 ```
 
-Send an instance with `send(WelcomeTemplatesMail(...))`, following the [complete controller example](/en/mail/composing-mail#mailable-construction). When passing `Content` directly to `send()`, do not add a `data` argument: it already belongs to the declaration. The `send("emails.welcome", data)` form builds an HTML view declaration; it does not interpret the string as literal HTML or add a text alternative automatically.
+To inspect the message on disk, call the following function from a booted application. The mailable supplies the recipient. Set the sender explicitly here, or configure `mail.from_address.address` for the application.
+
+```python
+from app.notifications.welcome_templates_mail import WelcomeTemplatesMail
+from orionis.mail import MailResult
+from orionis.support.facades import Mail
+
+
+async def store_sample() -> MailResult:
+    notification = WelcomeTemplatesMail("reader@example.test", "Ana & Luis")
+    outgoing = Mail.mailer("file").fromAddress("notifications@example.test")
+    return await outgoing.send(notification)
+```
+
+Open the `.eml` file at the returned `MailResult.file_path` to inspect both alternatives.
+
+When passing `Content` directly to `send()`, do not add a `data` argument: it already belongs to the declaration. The `send("emails.welcome", data)` form builds an HTML view declaration; it does not interpret the string as literal HTML or add a text alternative automatically.
 
 ## Composition flow
 

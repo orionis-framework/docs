@@ -89,7 +89,7 @@ async def publish_for_work(app: IApplication) -> list[str]:
         return catalog.names()
 ```
 
-This example assumes `ICatalog` has no materialized global singleton. The singleton cache is checked before the scope: publishing a local object does not replace an existing global singleton. See [precedence and scopes](/en/application/container/scopes-and-concurrency#scope-precedence).
+Within the block, both the contract and its registered alias resolve to the local catalog. After the block, callers see the original singleton again. See [nested scopes](/en/application/container/scopes-and-concurrency#scope-precedence).
 
 <a id="container-transient"></a>
 
@@ -317,7 +317,7 @@ The container walks the parameters in declaration order and applies these rules:
 4. Resolve a binding using the parameter's recognized type.
 5. Use its default value or build a concrete class automatically; raise an error if resolution is impossible.
 
-Keyword-only parameters participate in injection. Remaining `*args` and `**kwargs` values are forwarded to the callable; variadic parameters do not generate dependencies themselves.
+Keyword-only parameters participate in injection. Remaining `*args` and `**kwargs` values are forwarded to the callable; variadic parameters do not generate dependencies themselves. Supply arguments declared before `/` by position. If the target also declares `**kwargs`, a keyword with the same name belongs to that mapping.
 
 ```python
 from app.services.catalog import Catalog, CatalogPresenter
@@ -387,7 +387,7 @@ The utilities in `orionis.container.entities.invocation` can help when integrati
 
 | Utility | Signature and result |
 |---|---|
-| `InvocationPlan` | `InvocationPlan(arguments: tuple[Argument, ...], is_async: bool)`: immutable dataclass containing ordered parameters and coroutine metadata. |
+| `InvocationPlan` | `InvocationPlan(arguments: tuple[Argument, ...], is_async: bool, positional_only: frozenset[str] = frozenset())`: immutable dataclass containing ordered parameters and coroutine metadata. |
 | `callable_plan()` | `callable_plan(target: Callable) -> InvocationPlan`: analyzes a function or method without retaining a bound receiver. |
 | `constructor_plan()` | `constructor_plan(target: type, constructor: object) -> InvocationPlan`: analyzes and validates the class and constructor. |
 | `warm_controller_plan()` | `warm_controller_plan(target: type, method_name: str) -> None`: prepares ordinary constructor and action descriptors without creating a controller. |

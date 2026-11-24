@@ -1,6 +1,6 @@
 ---
 title: "Orionis foundations"
-description: "Build your application from the official skeleton, then add the features your project needs. You do not need to implement Application, a kernel, or a container to start…"
+description: "Install Orionis Framework 1.9.0, run your first HTTP endpoint and find the guides for configuration, services and testing."
 editUrl: true
 lastUpdated: false
 ---
@@ -29,13 +29,13 @@ Commands in the application guides use `uv run python -B reactor ...` from the g
 
 Foundation also defines frozen configuration entities for every major subsystem, immutable core metadata, the `Directory` path service, runtime/lifespan enums, and startup/shutdown presentation. Most applications configure it in `bootstrap/app.py`, call `create()`, and let the HTTP server or Reactor drive runtime startup.
 
-## Requirements
+<a id="requirements"></a>
 
-- Python 3.14 or newer; construction rejects older interpreters.
-- An application root represented by `str` or `pathlib.Path`.
-- Valid frozen dataclass configuration modules under the configured `config` path.
-- Route files that exist and import their required facade when registered.
-- One event loop per application worker; mutable runtime state is not designed for cross-loop or cross-thread sharing.
+## Project layout
+
+The generated project supplies the application root, bootstrap module and route files. Orionis builds its native configuration defaults and applies the frozen dataclasses it discovers under `config/`. Add your own dataclass there to [define a configuration section](/en/application/configuration#configuration-own).
+
+A route file you register in `bootstrap/app.py` must exist. It may be empty. When you add routes, import the facade through `orionis.support.facades`, as shown in the [first controller example](/en/getting-started/quick-start).
 
 ## Module learning path
 
@@ -47,7 +47,4 @@ Foundation also defines frozen configuration entities for every major subsystem,
 - [Creating and starting an application](/en/getting-started/quick-start)
 - [Directories and bootstrap caching](/en/application/paths-and-caching)
 
-Continue with: [environment](/en/environment) · [container](/en/application/container) · [http](/en/http) · [console](/en/console).
-
-
-- [Installation and your first project](/en/getting-started/installation)
+See also [environment variables](/en/environment), [dependency injection](/en/application/container), [HTTP](/en/http) and [console commands](/en/console).

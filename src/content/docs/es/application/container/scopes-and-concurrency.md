@@ -124,9 +124,27 @@ Si un comando llama a otro mediante Reactor, la ejecución interior recibe un sc
 
 ## Precedencia de resolución y scopes anidados
 
-`make()` consulta, en este orden, el singleton global ya cacheado, las instancias del scope actual y el binding que debe resolverse o autoconstruirse. Por ello:
+Usa `app.instance()` dentro de un scope para proporcionar un servicio durante una operación. `make()` consulta primero el scope actual, incluso al usar un alias. Si el contrato no tiene un valor en ese scope, consulta la caché global de singletons y después el binding o la construcción automática.
 
-- Una instancia publicada en el scope puede proporcionar un contrato todavía no materializado globalmente, pero no sustituye un singleton global ya cacheado.
+El ejemplo utiliza el singleton y el alias de la guía de [registro de servicios](/es/application/container/bindings-and-invocation).
+
+```python
+from app.services.catalog import Catalog, ICatalog
+from orionis import IApplication
+
+
+async def use_local_catalog(app: IApplication) -> None:
+    shared = await app.make("catalog")
+    local = Catalog()
+    async with app.beginScope():
+        app.instance(ICatalog, local)
+        assert await app.make("catalog") is local
+        async with app.beginScope():
+            assert await app.make(ICatalog) is shared
+        assert await app.make(ICatalog) is local
+    assert await app.make("catalog") is shared
+```
+
 - Un scope interior tiene su propio diccionario; no consulta el diccionario del exterior. Los bindings y singletons globales siguen disponibles.
 - Salir del interior restaura el scope exterior y sus objetos.
 - `transient()`, `singleton()` y `scoped()` siempre modifican el registro global, aunque los llames desde un scope. `instance()` es el registro que selecciona el ámbito activo como destino.

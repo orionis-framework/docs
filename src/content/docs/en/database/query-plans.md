@@ -77,7 +77,10 @@ Plans are dataclasses, rather than complete SQL validators. Supply correct colum
 ```python
 from orionis.orm.query.expressions import SUPPORTED_OPERATORS
 
-SUPPORTED_OPERATORS: frozenset[str] = frozenset({'=', '==', '!=', '<>', '<', '<=', '>', '>=', 'like', 'not like', 'ilike', 'not ilike'})
+assert SUPPORTED_OPERATORS == {
+    "=", "==", "!=", "<>", "<", "<=", ">", ">=",
+    "like", "not like", "ilike", "not ilike",
+}
 ```
 
 <a id="enum-wheretype"></a>
@@ -116,7 +119,9 @@ assert WhereType.NOT_EXISTS.value == 'not_exists'
 ```python
 from orionis.orm.query.expressions import COLUMNLESS_WHERE_TYPES, WhereType
 
-COLUMNLESS_WHERE_TYPES: frozenset[WhereType] = frozenset({WhereType.NESTED, WhereType.RAW, WhereType.EXISTS, WhereType.NOT_EXISTS})
+assert COLUMNLESS_WHERE_TYPES == {
+    WhereType.NESTED, WhereType.RAW, WhereType.EXISTS, WhereType.NOT_EXISTS,
+}
 ```
 
 <a id="enum-lockmode"></a>
@@ -173,22 +178,15 @@ WHERE, HAVING and ON conditions combine **left to right**: A OR B AND C is built
 
 ## Public structures
 
+Import the plan and clause classes from `orionis.orm.query.expressions`. The declarations below show their fields, types and defaults. Each `field(default_factory=list)` or `field(default_factory=dict)` creates a new container for that instance.
+
 <a id="plan-rawexpression"></a>
 
 ### `RawExpression`
 
 Trusted SQL fragment with bound values. Its attributes are frozen, but its bindings dictionary remains mutable.
 
-```python
-from dataclasses import dataclass, field
-from typing import Any
-from orionis.orm.schema.table import TableDefinition
-from orionis.orm.query.expressions import (
-    AggregateClause, AggregateFunction, JoinCondition, JoinExpression,
-    JoinType, LockMode, OrderClause, RawExpression, SelectPlan, SortDirection,
-    SubQueryColumn, UnionClause, WhereClause, WhereType,
-)
-
+```text
 @dataclass(slots=True, frozen=True)
 class RawExpression:
     sql: str
@@ -202,17 +200,9 @@ class RawExpression:
 | `bindings` | Names and values dictionary; a separate one is created for each instance. |
 | `alias` | Source or projection alias; None retains its logical name where allowed. |
 
-Each `field(default_factory=list/dict)` creates a separate container. Other defaults and types appear in the declaration above.
-
 ```python
-from orionis.orm.query.expressions import (
-    AggregateClause, AggregateFunction, DeletePlan, InsertPlan, JoinCondition,
-    JoinExpression, JoinType, OrderClause, RawExpression, SelectPlan, SortDirection,
-    SubQueryColumn, UnionClause, UpdatePlan, WhereClause,
-)
-from orionis.orm.schema.table import TableDefinition
+from orionis.orm.query.expressions import RawExpression
 
-table = TableDefinition(name="products")
 expression = RawExpression("price * :factor", {"factor": 2}, alias="double_price")
 ```
 
@@ -222,16 +212,7 @@ expression = RawExpression("price * :factor", {"factor": 2}, alias="double_price
 
 Scalar subquery projection: it must produce one column and at most one row per evaluation. The engine determines the error if it returns several.
 
-```python
-from dataclasses import dataclass, field
-from typing import Any
-from orionis.orm.schema.table import TableDefinition
-from orionis.orm.query.expressions import (
-    AggregateClause, AggregateFunction, JoinCondition, JoinExpression,
-    JoinType, LockMode, OrderClause, RawExpression, SelectPlan, SortDirection,
-    SubQueryColumn, UnionClause, WhereClause, WhereType,
-)
-
+```text
 @dataclass(slots=True, frozen=True)
 class SubQueryColumn:
     plan: SelectPlan
@@ -243,13 +224,12 @@ class SubQueryColumn:
 | `plan` | SelectPlan incorporated into the outer query without executing another connection. |
 | `alias` | Required scalar-column alias in the outer query. |
 
-Each `field(default_factory=list/dict)` creates a separate container. Other defaults and types appear in the declaration above.
-
 ```python
 from orionis.orm.query.expressions import (
-    AggregateClause, AggregateFunction, DeletePlan, InsertPlan, JoinCondition,
-    JoinExpression, JoinType, OrderClause, RawExpression, SelectPlan, SortDirection,
-    SubQueryColumn, UnionClause, UpdatePlan, WhereClause,
+    AggregateClause,
+    AggregateFunction,
+    SelectPlan,
+    SubQueryColumn,
 )
 from orionis.orm.schema.table import TableDefinition
 
@@ -263,16 +243,7 @@ column = SubQueryColumn(SelectPlan(table=table, aggregate=AggregateClause(Aggreg
 
 WHERE or HAVING condition. Its type determines how value is interpreted; boolean connects it to the preceding condition.
 
-```python
-from dataclasses import dataclass, field
-from typing import Any
-from orionis.orm.schema.table import TableDefinition
-from orionis.orm.query.expressions import (
-    AggregateClause, AggregateFunction, JoinCondition, JoinExpression,
-    JoinType, LockMode, OrderClause, RawExpression, SelectPlan, SortDirection,
-    SubQueryColumn, UnionClause, WhereClause, WhereType,
-)
-
+```text
 @dataclass(slots=True)
 class WhereClause:
     column: str
@@ -290,17 +261,9 @@ class WhereClause:
 | `value` | Scalar value; iterable for IN/BETWEEN; WhereClause list for NESTED; RawExpression for RAW; SelectPlan for EXISTS or subquery IN. |
 | `boolean` | and or or, combined left to right with previous conditions. |
 
-Each `field(default_factory=list/dict)` creates a separate container. Other defaults and types appear in the declaration above.
-
 ```python
-from orionis.orm.query.expressions import (
-    AggregateClause, AggregateFunction, DeletePlan, InsertPlan, JoinCondition,
-    JoinExpression, JoinType, OrderClause, RawExpression, SelectPlan, SortDirection,
-    SubQueryColumn, UnionClause, UpdatePlan, WhereClause,
-)
-from orionis.orm.schema.table import TableDefinition
+from orionis.orm.query.expressions import WhereClause
 
-table = TableDefinition(name="products")
 condition = WhereClause("price", operator=">=", value=10)
 ```
 
@@ -310,16 +273,7 @@ condition = WhereClause("price", operator=">=", value=10)
 
 One ordering column and its direction.
 
-```python
-from dataclasses import dataclass, field
-from typing import Any
-from orionis.orm.schema.table import TableDefinition
-from orionis.orm.query.expressions import (
-    AggregateClause, AggregateFunction, JoinCondition, JoinExpression,
-    JoinType, LockMode, OrderClause, RawExpression, SelectPlan, SortDirection,
-    SubQueryColumn, UnionClause, WhereClause, WhereType,
-)
-
+```text
 @dataclass(slots=True)
 class OrderClause:
     column: str
@@ -331,17 +285,9 @@ class OrderClause:
 | `column` | Column name, optionally qualified; empty for columnless conditions. COUNT aggregates may use *. |
 | `direction` | SortDirection.ASC or DESC. |
 
-Each `field(default_factory=list/dict)` creates a separate container. Other defaults and types appear in the declaration above.
-
 ```python
-from orionis.orm.query.expressions import (
-    AggregateClause, AggregateFunction, DeletePlan, InsertPlan, JoinCondition,
-    JoinExpression, JoinType, OrderClause, RawExpression, SelectPlan, SortDirection,
-    SubQueryColumn, UnionClause, UpdatePlan, WhereClause,
-)
-from orionis.orm.schema.table import TableDefinition
+from orionis.orm.query.expressions import OrderClause, SortDirection
 
-table = TableDefinition(name="products")
 order = OrderClause("id", SortDirection.DESC)
 ```
 
@@ -351,16 +297,7 @@ order = OrderClause("id", SortDirection.DESC)
 
 Aggregate replacing the SELECT projection. COUNT accepts *, while the others require a column.
 
-```python
-from dataclasses import dataclass, field
-from typing import Any
-from orionis.orm.schema.table import TableDefinition
-from orionis.orm.query.expressions import (
-    AggregateClause, AggregateFunction, JoinCondition, JoinExpression,
-    JoinType, LockMode, OrderClause, RawExpression, SelectPlan, SortDirection,
-    SubQueryColumn, UnionClause, WhereClause, WhereType,
-)
-
+```text
 @dataclass(slots=True)
 class AggregateClause:
     function: AggregateFunction
@@ -372,17 +309,9 @@ class AggregateClause:
 | `function` | AggregateFunction: COUNT, MAX, MIN, AVG or SUM. |
 | `column` | Column name, optionally qualified; empty for columnless conditions. COUNT aggregates may use *. |
 
-Each `field(default_factory=list/dict)` creates a separate container. Other defaults and types appear in the declaration above.
-
 ```python
-from orionis.orm.query.expressions import (
-    AggregateClause, AggregateFunction, DeletePlan, InsertPlan, JoinCondition,
-    JoinExpression, JoinType, OrderClause, RawExpression, SelectPlan, SortDirection,
-    SubQueryColumn, UnionClause, UpdatePlan, WhereClause,
-)
-from orionis.orm.schema.table import TableDefinition
+from orionis.orm.query.expressions import AggregateClause, AggregateFunction
 
-table = TableDefinition(name="products")
 aggregate = AggregateClause(AggregateFunction.SUM, "price")
 ```
 
@@ -392,16 +321,7 @@ aggregate = AggregateClause(AggregateFunction.SUM, "price")
 
 Comparison between two column references in ON; second is not a bound value.
 
-```python
-from dataclasses import dataclass, field
-from typing import Any
-from orionis.orm.schema.table import TableDefinition
-from orionis.orm.query.expressions import (
-    AggregateClause, AggregateFunction, JoinCondition, JoinExpression,
-    JoinType, LockMode, OrderClause, RawExpression, SelectPlan, SortDirection,
-    SubQueryColumn, UnionClause, WhereClause, WhereType,
-)
-
+```text
 @dataclass(slots=True)
 class JoinCondition:
     first: str
@@ -417,17 +337,9 @@ class JoinCondition:
 | `second` | Right column reference, rather than a string literal value. |
 | `boolean` | and or or, combined left to right with previous conditions. |
 
-Each `field(default_factory=list/dict)` creates a separate container. Other defaults and types appear in the declaration above.
-
 ```python
-from orionis.orm.query.expressions import (
-    AggregateClause, AggregateFunction, DeletePlan, InsertPlan, JoinCondition,
-    JoinExpression, JoinType, OrderClause, RawExpression, SelectPlan, SortDirection,
-    SubQueryColumn, UnionClause, UpdatePlan, WhereClause,
-)
-from orionis.orm.schema.table import TableDefinition
+from orionis.orm.query.expressions import JoinCondition
 
-table = TableDefinition(name="products")
 condition = JoinCondition("p.category_id", "=", "c.id")
 ```
 
@@ -437,16 +349,7 @@ condition = JoinCondition("p.category_id", "=", "c.id")
 
 JOIN source, alias and ON conditions. A subquery source needs an alias. CROSS JOIN does not require ON.
 
-```python
-from dataclasses import dataclass, field
-from typing import Any
-from orionis.orm.schema.table import TableDefinition
-from orionis.orm.query.expressions import (
-    AggregateClause, AggregateFunction, JoinCondition, JoinExpression,
-    JoinType, LockMode, OrderClause, RawExpression, SelectPlan, SortDirection,
-    SubQueryColumn, UnionClause, WhereClause, WhereType,
-)
-
+```text
 @dataclass(slots=True)
 class JoinExpression:
     join_type: JoinType
@@ -462,17 +365,10 @@ class JoinExpression:
 | `alias` | Source or projection alias; None retains its logical name where allowed. |
 | `conditions` | JoinCondition list for ON. |
 
-Each `field(default_factory=list/dict)` creates a separate container. Other defaults and types appear in the declaration above.
-
 ```python
-from orionis.orm.query.expressions import (
-    AggregateClause, AggregateFunction, DeletePlan, InsertPlan, JoinCondition,
-    JoinExpression, JoinType, OrderClause, RawExpression, SelectPlan, SortDirection,
-    SubQueryColumn, UnionClause, UpdatePlan, WhereClause,
-)
+from orionis.orm.query.expressions import JoinCondition, JoinExpression, JoinType
 from orionis.orm.schema.table import TableDefinition
 
-table = TableDefinition(name="products")
 join = JoinExpression(JoinType.LEFT, TableDefinition(name="categories"), alias="c", conditions=[JoinCondition("p.category_id", "=", "c.id")])
 ```
 
@@ -482,16 +378,7 @@ join = JoinExpression(JoinType.LEFT, TableDefinition(name="categories"), alias="
 
 Additional SELECT, either removing duplicates or retaining them with UNION ALL.
 
-```python
-from dataclasses import dataclass, field
-from typing import Any
-from orionis.orm.schema.table import TableDefinition
-from orionis.orm.query.expressions import (
-    AggregateClause, AggregateFunction, JoinCondition, JoinExpression,
-    JoinType, LockMode, OrderClause, RawExpression, SelectPlan, SortDirection,
-    SubQueryColumn, UnionClause, WhereClause, WhereType,
-)
-
+```text
 @dataclass(slots=True)
 class UnionClause:
     plan: SelectPlan
@@ -503,14 +390,8 @@ class UnionClause:
 | `plan` | SelectPlan incorporated into the outer query without executing another connection. |
 | `all_rows` | False generates UNION; True generates UNION ALL. |
 
-Each `field(default_factory=list/dict)` creates a separate container. Other defaults and types appear in the declaration above.
-
 ```python
-from orionis.orm.query.expressions import (
-    AggregateClause, AggregateFunction, DeletePlan, InsertPlan, JoinCondition,
-    JoinExpression, JoinType, OrderClause, RawExpression, SelectPlan, SortDirection,
-    SubQueryColumn, UnionClause, UpdatePlan, WhereClause,
-)
+from orionis.orm.query.expressions import SelectPlan, UnionClause
 from orionis.orm.schema.table import TableDefinition
 
 table = TableDefinition(name="products")
@@ -523,16 +404,7 @@ union = UnionClause(SelectPlan(table=table, columns=("id",)), all_rows=True)
 
 Complete representation of a read. Its attributes can be inspected and modified; constructing it neither opens a connection nor executes SQL.
 
-```python
-from dataclasses import dataclass, field
-from typing import Any
-from orionis.orm.schema.table import TableDefinition
-from orionis.orm.query.expressions import (
-    AggregateClause, AggregateFunction, JoinCondition, JoinExpression,
-    JoinType, LockMode, OrderClause, RawExpression, SelectPlan, SortDirection,
-    SubQueryColumn, UnionClause, WhereClause, WhereType,
-)
-
+```text
 @dataclass(slots=True)
 class SelectPlan:
     table: TableDefinition
@@ -568,14 +440,8 @@ class SelectPlan:
 | `lock` | LockMode or None. SQLite omits row locking; Redshift rejects it. |
 | `unions` | UnionClause list appended to the SELECT. |
 
-Each `field(default_factory=list/dict)` creates a separate container. Other defaults and types appear in the declaration above.
-
 ```python
-from orionis.orm.query.expressions import (
-    AggregateClause, AggregateFunction, DeletePlan, InsertPlan, JoinCondition,
-    JoinExpression, JoinType, OrderClause, RawExpression, SelectPlan, SortDirection,
-    SubQueryColumn, UnionClause, UpdatePlan, WhereClause,
-)
+from orionis.orm.query.expressions import OrderClause, SelectPlan, WhereClause
 from orionis.orm.schema.table import TableDefinition
 
 table = TableDefinition(name="products")
@@ -588,16 +454,7 @@ plan = SelectPlan(table=table, columns=("id", "name"), wheres=[WhereClause("pric
 
 Table and list of rows to insert. It does not apply model configuration or events.
 
-```python
-from dataclasses import dataclass, field
-from typing import Any
-from orionis.orm.schema.table import TableDefinition
-from orionis.orm.query.expressions import (
-    AggregateClause, AggregateFunction, JoinCondition, JoinExpression,
-    JoinType, LockMode, OrderClause, RawExpression, SelectPlan, SortDirection,
-    SubQueryColumn, UnionClause, WhereClause, WhereType,
-)
-
+```text
 @dataclass(slots=True)
 class InsertPlan:
     table: TableDefinition
@@ -609,14 +466,8 @@ class InsertPlan:
 | `table` | TableDefinition describing the table; JoinExpression also accepts SelectPlan for a derived table. |
 | `values` | list[dict] in InsertPlan; column-to-value dict in UpdatePlan. |
 
-Each `field(default_factory=list/dict)` creates a separate container. Other defaults and types appear in the declaration above.
-
 ```python
-from orionis.orm.query.expressions import (
-    AggregateClause, AggregateFunction, DeletePlan, InsertPlan, JoinCondition,
-    JoinExpression, JoinType, OrderClause, RawExpression, SelectPlan, SortDirection,
-    SubQueryColumn, UnionClause, UpdatePlan, WhereClause,
-)
+from orionis.orm.query.expressions import InsertPlan
 from orionis.orm.schema.table import TableDefinition
 
 table = TableDefinition(name="products")
@@ -629,16 +480,7 @@ plan = InsertPlan(table=table, values=[{"name": "Book", "price": 10}])
 
 Table, new values and update filters. It has no JOIN, ordering, limit or offset fields.
 
-```python
-from dataclasses import dataclass, field
-from typing import Any
-from orionis.orm.schema.table import TableDefinition
-from orionis.orm.query.expressions import (
-    AggregateClause, AggregateFunction, JoinCondition, JoinExpression,
-    JoinType, LockMode, OrderClause, RawExpression, SelectPlan, SortDirection,
-    SubQueryColumn, UnionClause, WhereClause, WhereType,
-)
-
+```text
 @dataclass(slots=True)
 class UpdatePlan:
     table: TableDefinition
@@ -652,14 +494,8 @@ class UpdatePlan:
 | `values` | list[dict] in InsertPlan; column-to-value dict in UpdatePlan. |
 | `wheres` | WhereClause list delimiting rows. An empty list adds no WHERE. |
 
-Each `field(default_factory=list/dict)` creates a separate container. Other defaults and types appear in the declaration above.
-
 ```python
-from orionis.orm.query.expressions import (
-    AggregateClause, AggregateFunction, DeletePlan, InsertPlan, JoinCondition,
-    JoinExpression, JoinType, OrderClause, RawExpression, SelectPlan, SortDirection,
-    SubQueryColumn, UnionClause, UpdatePlan, WhereClause,
-)
+from orionis.orm.query.expressions import UpdatePlan, WhereClause
 from orionis.orm.schema.table import TableDefinition
 
 table = TableDefinition(name="products")
@@ -672,16 +508,7 @@ plan = UpdatePlan(table=table, values={"price": 12}, wheres=[WhereClause("id", v
 
 Table and deletion filters. An empty condition list means all rows.
 
-```python
-from dataclasses import dataclass, field
-from typing import Any
-from orionis.orm.schema.table import TableDefinition
-from orionis.orm.query.expressions import (
-    AggregateClause, AggregateFunction, JoinCondition, JoinExpression,
-    JoinType, LockMode, OrderClause, RawExpression, SelectPlan, SortDirection,
-    SubQueryColumn, UnionClause, WhereClause, WhereType,
-)
-
+```text
 @dataclass(slots=True)
 class DeletePlan:
     table: TableDefinition
@@ -693,14 +520,8 @@ class DeletePlan:
 | `table` | TableDefinition describing the table; JoinExpression also accepts SelectPlan for a derived table. |
 | `wheres` | WhereClause list delimiting rows. An empty list adds no WHERE. |
 
-Each `field(default_factory=list/dict)` creates a separate container. Other defaults and types appear in the declaration above.
-
 ```python
-from orionis.orm.query.expressions import (
-    AggregateClause, AggregateFunction, DeletePlan, InsertPlan, JoinCondition,
-    JoinExpression, JoinType, OrderClause, RawExpression, SelectPlan, SortDirection,
-    SubQueryColumn, UnionClause, UpdatePlan, WhereClause,
-)
+from orionis.orm.query.expressions import DeletePlan, WhereClause
 from orionis.orm.schema.table import TableDefinition
 
 table = TableDefinition(name="products")

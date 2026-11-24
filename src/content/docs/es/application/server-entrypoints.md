@@ -118,7 +118,7 @@ Al recibir `lifespan.startup`, Orionis espera providers eager, ejecuta callbacks
 
 `lifespan.shutdown` ejecuta los callbacks de cierre, responde `lifespan.shutdown.complete` y termina. Un error ordinario produce `lifespan.shutdown.failed`. Un startup repetido dentro de la misma conversación de lifespan se confirma sin repetir sus callbacks. `lifespan.disconnect` termina esa conversación y los tipos no reconocidos se ignoran.
 
-Ese control de repetición pertenece a la conversación de lifespan; no es un bloqueo global de todos los arranques posibles. Si tu servidor o tus pruebas omiten lifespan, el primer despacho puede preparar el kernel, pero no reemplaza los callbacks del arranque HTTP.
+Si invocas ASGI desde un cliente de pruebas o un servidor propio, mantén abierta la conversación de lifespan, envía `lifespan.startup` y espera `lifespan.startup.complete` antes de la primera petición. El despacho HTTP directo puede intentar construir el kernel antes de que arranquen los providers asíncronos. Por ejemplo, cargar una ruta que llama a `Route.get(...).name(...)` requiere que el provider del router haya fijado la fachada. Al terminar, envía `lifespan.shutdown` y espera la confirmación.
 
 <a id="rsgi"></a>
 

@@ -1,6 +1,6 @@
 ---
 title: "Testing MCP tools in process"
-description: "Save the complete module below as tests/integration/test_greeting_mcp.py in your generated project (create the directories if necessary). Its server declaration is local to the…"
+description: "Exercise tools, inspect JSON-RPC results and notifications, and read subscriptions with the in-process MCP test client."
 editUrl: true
 lastUpdated: false
 ---
@@ -74,4 +74,4 @@ A browser network error can indicate CORS, DNS, TLS, or another connectivity pro
 
 [mcp.py](https://github.com/orionis-framework/framework/blob/v1.9.0/orionis/test/clients/mcp.py) · [case.py](https://github.com/orionis-framework/framework/blob/v1.9.0/orionis/test/cases/case.py)
 
-[Return to the module index](/en/testing).
+[MCP](/en/mcp) · [Testing applications](/en/testing)

@@ -88,6 +88,26 @@ Continue with [conditions](/en/database/query-filters), [joins](/en/database/joi
 
 `exists()` retains explicit projections, grouping, `HAVING` and unions. Aggregates over unions operate on the union's projected rows; select the target column in every branch.
 
+## Counting and checking results
+
+`count()`, `sum()`, `avg()`, `min()` and `max()` ignore the builder’s order, limit and offset. They keep filters, grouping, `HAVING` and unions. For grouped, distinct and union queries, `count("*")` counts rows in the derived result. For a separate aggregate for each group, use a projection and retrieve the rows:
+
+```python
+from orionis.support.facades import DB
+
+
+async def count_by_category():
+    return await (
+        DB.table("products")
+        .select("category_id")
+        .selectRaw("COUNT(*)", alias="product_count")
+        .groupBy("category_id")
+        .get()
+    )
+```
+
+`exists()` checks a clone with the offset removed and a limit of one. When you need the presence of rows on a particular page, use `forPage(...).get()` and check the returned collection. SQL compilation and execution can raise [QueryException](/en/database/raw-queries#handling-errors).
+
 ## Operation reference
 
 <a id="api-tosql"></a>
@@ -531,7 +551,7 @@ Counts matching rows; column="*" counts all and a column counts non-NULL values.
 
 **Result:** `int`.
 
-Aggregates clone the plan and remove ordering, limit and offset; retain filters, grouping, HAVING and unions. With GROUP BY, scalar terminals other than count("*") return the first calculated value, rather than one result per group. count("*") counts derived-result rows when groups, DISTINCT or UNION are present. For per-group aggregates use selectRaw(...).groupBy(...).get(). exists() clears offset, sets limit=1 and does not load the complete collection.
+With grouped input, scalar aggregates other than `count("*")` return only the first calculated value.
 
 ```python
 from orionis.support.facades import DB
@@ -539,8 +559,6 @@ from orionis.support.facades import DB
 async def run_example():
     return await DB.table("products").where("active", True).count()
 ```
-
-**Errors:** `QueryException` on compilation/execution failure; the connection layer sanitizes messages and suppresses chained driver causes.
 
 <a id="api-exists"></a>
 
@@ -554,16 +572,12 @@ Checks existence with a SELECT limited to one row.
 
 **Result:** `bool`.
 
-Aggregates clone the plan and remove ordering, limit and offset; retain filters, grouping, HAVING and unions. With GROUP BY, scalar terminals other than count("*") return the first calculated value, rather than one result per group. count("*") counts derived-result rows when groups, DISTINCT or UNION are present. For per-group aggregates use selectRaw(...).groupBy(...).get(). exists() clears offset, sets limit=1 and does not load the complete collection.
-
 ```python
 from orionis.support.facades import DB
 
 async def run_example():
     return await DB.table("products").where("active", True).exists()
 ```
-
-**Errors:** `QueryException` on compilation/execution failure; the connection layer sanitizes messages and suppresses chained driver causes.
 
 <a id="api-doesntexist"></a>
 
@@ -577,16 +591,12 @@ Negates exists().
 
 **Result:** `bool`.
 
-Aggregates clone the plan and remove ordering, limit and offset; retain filters, grouping, HAVING and unions. With GROUP BY, scalar terminals other than count("*") return the first calculated value, rather than one result per group. count("*") counts derived-result rows when groups, DISTINCT or UNION are present. For per-group aggregates use selectRaw(...).groupBy(...).get(). exists() clears offset, sets limit=1 and does not load the complete collection.
-
 ```python
 from orionis.support.facades import DB
 
 async def run_example():
     return await DB.table("products").where("active", True).doesntExist()
 ```
-
-**Errors:** `QueryException` on compilation/execution failure; the connection layer sanitizes messages and suppresses chained driver causes.
 
 <a id="api-max"></a>
 
@@ -604,16 +614,12 @@ Returns the maximum; returns None without values.
 
 **Result:** `Any`.
 
-Aggregates clone the plan and remove ordering, limit and offset; retain filters, grouping, HAVING and unions. With GROUP BY, scalar terminals other than count("*") return the first calculated value, rather than one result per group. count("*") counts derived-result rows when groups, DISTINCT or UNION are present. For per-group aggregates use selectRaw(...).groupBy(...).get(). exists() clears offset, sets limit=1 and does not load the complete collection.
-
 ```python
 from orionis.support.facades import DB
 
 async def run_example():
     return await DB.table("products").where("active", True).max("price")
 ```
-
-**Errors:** `QueryException` on compilation/execution failure; the connection layer sanitizes messages and suppresses chained driver causes.
 
 <a id="api-min"></a>
 
@@ -631,16 +637,12 @@ Returns the minimum; returns None without values.
 
 **Result:** `Any`.
 
-Aggregates clone the plan and remove ordering, limit and offset; retain filters, grouping, HAVING and unions. With GROUP BY, scalar terminals other than count("*") return the first calculated value, rather than one result per group. count("*") counts derived-result rows when groups, DISTINCT or UNION are present. For per-group aggregates use selectRaw(...).groupBy(...).get(). exists() clears offset, sets limit=1 and does not load the complete collection.
-
 ```python
 from orionis.support.facades import DB
 
 async def run_example():
     return await DB.table("products").where("active", True).min("price")
 ```
-
-**Errors:** `QueryException` on compilation/execution failure; the connection layer sanitizes messages and suppresses chained driver causes.
 
 <a id="api-avg"></a>
 
@@ -658,16 +660,12 @@ Returns the average converted to float, or None without values.
 
 **Result:** `float | None`.
 
-Aggregates clone the plan and remove ordering, limit and offset; retain filters, grouping, HAVING and unions. With GROUP BY, scalar terminals other than count("*") return the first calculated value, rather than one result per group. count("*") counts derived-result rows when groups, DISTINCT or UNION are present. For per-group aggregates use selectRaw(...).groupBy(...).get(). exists() clears offset, sets limit=1 and does not load the complete collection.
-
 ```python
 from orionis.support.facades import DB
 
 async def run_example():
     return await DB.table("products").where("active", True).avg("price")
 ```
-
-**Errors:** `QueryException` on compilation/execution failure; the connection layer sanitizes messages and suppresses chained driver causes.
 
 <a id="api-sum"></a>
 
@@ -685,16 +683,12 @@ Returns the sum; returns 0 without values.
 
 **Result:** `Any`.
 
-Aggregates clone the plan and remove ordering, limit and offset; retain filters, grouping, HAVING and unions. With GROUP BY, scalar terminals other than count("*") return the first calculated value, rather than one result per group. count("*") counts derived-result rows when groups, DISTINCT or UNION are present. For per-group aggregates use selectRaw(...).groupBy(...).get(). exists() clears offset, sets limit=1 and does not load the complete collection.
-
 ```python
 from orionis.support.facades import DB
 
 async def run_example():
     return await DB.table("products").where("active", True).sum("price")
 ```
-
-**Errors:** `QueryException` on compilation/execution failure; the connection layer sanitizes messages and suppresses chained driver causes.
 
 <a id="api-raw-connection"></a>
 
@@ -711,8 +705,6 @@ Selects a registered connection for this builder without altering the shared DB 
 | `name` | Name of a connection registered in `config/database.py`. |
 
 **Result:** the same mutable builder (`Self`); does not execute SQL.
-
-Terminals require a selected table and a booted application. Query errors propagate; paginate needs positive integers and uses two queries, not an atomic snapshot.
 
 ```python
 from orionis.support.facades import DB
@@ -737,8 +729,6 @@ Replaces the table and alias while retaining existing clauses.
 
 **Result:** the same mutable builder (`Self`); does not execute SQL.
 
-Terminals require a selected table and a booted application. Query errors propagate; paginate needs positive integers and uses two queries, not an atomic snapshot.
-
 ```python
 from orionis.support.facades import DB
 
@@ -757,16 +747,12 @@ Executes SELECT and returns a Collection of dictionaries. Does not hydrate model
 
 **Result:** `Collection`.
 
-Terminals require a selected table and a booted application. Query errors propagate; paginate needs positive integers and uses two queries, not an atomic snapshot.
-
 ```python
 from orionis.support.facades import DB
 
 async def run_example():
     return await DB.table("products").orderBy("id").get()
 ```
-
-**Errors:** `QueryException` on compilation/execution failure; the connection layer sanitizes messages and suppresses chained driver causes.
 
 <a id="api-raw-first"></a>
 
@@ -780,16 +766,12 @@ Queries a clone with limit=1 and returns a dictionary or None, leaving the origi
 
 **Result:** `dict[str, Any] | None`.
 
-Terminals require a selected table and a booted application. Query errors propagate; paginate needs positive integers and uses two queries, not an atomic snapshot.
-
 ```python
 from orionis.support.facades import DB
 
 async def run_example():
     return await DB.table("products").orderBy("id").first()
 ```
-
-**Errors:** `QueryException` on compilation/execution failure; the connection layer sanitizes messages and suppresses chained driver causes.
 
 <a id="api-raw-value"></a>
 
@@ -807,16 +789,12 @@ Selects one column on a clone and returns its first value or None. None may also
 
 **Result:** `Any`.
 
-Terminals require a selected table and a booted application. Query errors propagate; paginate needs positive integers and uses two queries, not an atomic snapshot.
-
 ```python
 from orionis.support.facades import DB
 
 async def run_example():
     return await DB.table("products").where("id", 1).value("name")
 ```
-
-**Errors:** `QueryException` on compilation/execution failure; the connection layer sanitizes messages and suppresses chained driver causes.
 
 <a id="api-raw-pluck"></a>
 
@@ -834,8 +812,6 @@ Selects one column and returns a Collection of its values in query order.
 
 **Result:** `Collection`.
 
-Terminals require a selected table and a booted application. Query errors propagate; paginate needs positive integers and uses two queries, not an atomic snapshot.
-
 ```python
 from orionis.support.facades import DB
 
@@ -843,14 +819,12 @@ async def run_example():
     return await DB.table("products").orderBy("id").pluck("name")
 ```
 
-**Errors:** `QueryException` on compilation/execution failure; the connection layer sanitizes messages and suppresses chained driver causes.
-
 <a id="api-raw-paginate"></a>
 
 ### `paginate()`
 
 ```text
-async paginate(page: int=1, per_page: int=15) -> Paginator
+async paginate(page: int = 1, per_page: int = 15) -> Paginator[dict[str, Any]]
 ```
 
 Configures the page and executes count followed by get to build a dictionary Paginator.
@@ -862,7 +836,7 @@ Configures the page and executes count followed by get to build a dictionary Pag
 
 **Result:** `Paginator`.
 
-Terminals require a selected table and a booted application. Query errors propagate; paginate needs positive integers and uses two queries, not an atomic snapshot.
+The raw builder counts and then reads the page in two successive queries. Concurrent writes can change the result between those queries. Invalid page numbers or sizes raise `InvalidQueryException`.
 
 ```python
 from orionis.support.facades import DB
@@ -870,7 +844,5 @@ from orionis.support.facades import DB
 async def run_example():
     return await DB.table("products").orderBy("id").paginate(page=1, per_page=15)
 ```
-
-**Errors:** `QueryException` on compilation/execution failure; the connection layer sanitizes messages and suppresses chained driver causes.
 
 [DB facade](/en/database/db-facade) · [ORM queries](/en/orm/querying) · [Testing scenario](/en/orm/testing)

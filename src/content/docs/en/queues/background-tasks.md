@@ -1,6 +1,6 @@
 ---
 title: "Tasks after the response"
-description: "A background task belongs to the serving process and runs after response delivery. Use it for short side effects whose loss is acceptable; the queues module covers work…"
+description: "Attach short work to an HTTP response and choose when to dispatch a durable job."
 editUrl: true
 lastUpdated: false
 ---
@@ -34,6 +34,6 @@ Call and return `await acknowledge(message_id)` from your controller flow. Creat
 
 1. [Running actions after responding](/en/queues/background-tasks/response-tasks): prerequisites, progressive usage, configuration, integration, failures, and public reference.
 
-`BackgroundTask` has no provider or configuration of its own. Execution needs the active event loop and the application logger; any additional requirements belong to the callback.
+`BackgroundTask` has no provider or configuration of its own. Await the task in a running event loop. A booted application supplies logging for successful and failed calls.
 
 Related: [http](/en/http) · [queues](/en/queues) · [logging](/en/logging)

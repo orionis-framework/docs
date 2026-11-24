@@ -254,7 +254,7 @@ See [Rendering views](/en/views/rendering-templates) for the complete flow that 
 
 ### trans(key, locale=None, **replace) and __(…)
 
-`trans` translates a key and replaces `:name` placeholders using named arguments. `__` is exactly the same callable registered under another name. When a translation is missing, the translator returns the key after consulting the fallback locale.
+`trans` translates a key and replaces `:name` placeholders using named arguments. `__` is exactly the same callable registered under another name. If both the requested language and the fallback lack the message, the default text is the key. An application can supply its own text through `Lang.missing(handler)`. Template arguments also fill placeholders in that text. See [translation lookup](/en/localization/translating-content).
 
 For a reproducible example, create `resources/lang/en/messages.json`:
 

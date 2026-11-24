@@ -1,6 +1,6 @@
 ---
 title: "Ejecutar acciones después de responder"
-description: "Una tarea de background pertenece al mismo proceso y se ejecuta después de entregar la respuesta. Úsala para efectos secundarios cortos cuya pérdida sea aceptable; el módulo…"
+description: "Pasa argumentos a tareas de respuesta síncronas o asíncronas, ejecútalas en orden y maneja los fallos."
 editUrl: true
 lastUpdated: false
 ---
@@ -11,8 +11,9 @@ Una tarea de background pertenece al mismo proceso y se ejecuta después de entr
 
 - Python 3.14 o posterior.
 - Una instalación normal de Orionis; no existe un extra ni configuración específica del módulo.
-- La ejecución directa espera un event loop activo y la fachada de logging de Orionis iniciada.
+- La ejecución manual requiere un bucle de eventos activo. En una aplicación iniciada, el logger registra la actividad de las tareas.
 - No se requiere un servicio externo salvo que lo necesite el callable envuelto.
+
 ## Inicio rápido
 
 Asocia una tarea a una respuesta HTTP; Orionis la ejecuta después de enviar la respuesta:
@@ -81,7 +82,7 @@ Pasa identificadores y datos estables, en lugar de una request mutable o un arch
 
 La colección conserva el orden y se detiene en el primer error. Si dos acciones deben intentarse independientemente, captura sus fallos dentro de callbacks distintos según tu política; no supongas que `BackgroundTasks` continuará. Ejecutar nuevamente la colección repite todos los elementos: la lista no se consume. Haz idempotentes las operaciones que puedan invocarse otra vez.
 
-Para ampliar el comportamiento de una tarea adjunta, hereda de `BackgroundTask` y redefine `async __call__()`. Implementar únicamente `IBackgroundTask` no basta para la comprobación concreta de `Response`. La invocación manual requiere que `Log` esté disponible; un fallo del logger también puede interrumpir la ejecución.
+Para ampliar el comportamiento de una tarea adjunta, hereda de `BackgroundTask` y redefine `async __call__()`. Implementar únicamente `IBackgroundTask` no basta para la comprobación concreta de `Response`. Un fallo del logger posterior a una ejecución correcta del callback puede propagarse al invocador.
 
 ## Conceptos principales
 
@@ -153,7 +154,7 @@ async def after_import() -> None:
     await BackgroundTask(refresh_index, 17).run()
 ```
 
-Llamar `after_import` imprime `indexed:17` y registra el éxito.
+Al ejecutar `await after_import()` se imprime `indexed:17`. En la aplicación iniciada, la tarea también registra que terminó correctamente.
 
 
 ### Conservar argumentos con nombre en trabajo síncrono
@@ -244,21 +245,10 @@ Envuelve el callable en `BackgroundTask`, lo añade y devuelve `None`. Se admite
 
 `__call__` espera las tareas almacenadas una a una. `run` se hereda de `BackgroundTask` y despacha dinámicamente al `__call__` de la colección. Ejecutar una colección vacía no hace nada.
 
+<a id="referencia-de-implementación-para-extensiones"></a>
+
 ### `IBackgroundTask`
 
 El contrato de extensión solo exige `async run() -> None`. Las respuestas HTTP actualmente validan contra `BackgroundTask`, por lo que tareas personalizadas para respuestas normalmente deben heredar de `BackgroundTask` en lugar de limitarse a implementar el contrato.
 
-## Referencia de implementación para extensiones
-
-| Ruta | Responsabilidad |
-|---|---|
-| `task.py` | Detección de callables, ejecución individual, despacho al ejecutor y logging. |
-| `tasks.py` | Colección ordenada y método auxiliar `addTask`. |
-| `contracts/task.py` | Contrato de extensión `IBackgroundTask` con `run()` async. |
-| `__init__.py` | Reexporta `BackgroundTask` y `BackgroundTasks`. |
-
----
-
-[Índice](/es/queues/background-tasks) · [http](/es/http) · [queues](/es/queues) · [logging](/es/logging)
-
-`is_async_callable(func: object) -> bool`, de `orionis.background.task`, detecta funciones coroutine, parciales y objetos con `__call__` asíncrono; una función síncrona que devuelve un awaitable se clasifica como síncrona. El ejecutor copia las variables de contexto actuales al trabajo síncrono.
+[Tareas de respuesta](/es/queues/background-tasks) · [Respuestas HTTP](/es/http/responses) · [Colas](/es/queues) · [Logging](/es/logging)

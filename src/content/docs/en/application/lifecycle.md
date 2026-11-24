@@ -207,7 +207,7 @@ flowchart TD
 
 Startup callbacks run before the HTTP kernel is built. The kernel loads routes, prepares handlers and middleware, creates adapters and registers internal cleanup where applicable. Only then are both protocol handlers published. Callbacks can consume registered services, but must not assume the kernel is ready at that point.
 
-If a request arrives before lifespan has run, dispatch can initialize the kernel on demand. This path does not replay HTTP startup callbacks; use a server that manages the lifecycle correctly. See [ASGI and RSGI entry points](/en/application/server-entrypoints).
+Enable ASGI lifespan or the RSGI initialization hook before accepting requests. Route loading can depend on services initialized by asynchronous providers. See [server entry points](/en/application/server-entrypoints) for the startup and shutdown sequence.
 
 The kernel maintains one scope per HTTP request and per WebSocket connection. An HTTP request retains its scope during response generation and transmission; its `Request` is closed in `finally`. A WebSocket connection keeps its scope for the connection lifetime and closes the socket when it ends. Requests rejected early by policies or capacity may finish before opening a scope. Details are covered in [Scopes and concurrency](/en/application/container/scopes-and-concurrency).
 

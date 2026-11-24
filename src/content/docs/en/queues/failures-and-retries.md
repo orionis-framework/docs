@@ -430,7 +430,7 @@ Construction defines the schema without creating a table. The first `record`, `a
 async record(
     reserved: ReservedJob,
     connection: str,
-    exception: Exception,
+    exception: BaseException,
 ) -> FailedJob
 ```
 
@@ -559,7 +559,7 @@ class FailureRepositoryLifecycle:
         await repository.close()
 ```
 
-The interface annotates `record.exception` as `BaseException`, whereas the native implementation annotates `Exception`. Its `find`/`forget` parameter is named `failed_id` in the interface and `failure_id` in the implementation; the examples use positional identifiers to work with both. See the [API reference](/en/queues/api-reference) for contracts.
+The `find`/`forget` parameter is named `failed_id` in the interface and `failure_id` in the implementation; the examples use positional identifiers to work with both. See the [API reference](/en/queues/api-reference) for contracts.
 
 <a id="failed-job"></a>
 
