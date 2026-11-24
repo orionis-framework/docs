@@ -7,6 +7,8 @@ lastUpdated: false
 
 `ReflectionInstance` inspects an already constructed object: its current data, defining class, methods, properties and signatures. Use it for diagnostics, adapters and extensions that need to examine a service without constructing another instance. It does not execute discovered methods or resolve their dependencies.
 
+For a `ReflectionInstance[T]`, `T` is the type of the object you pass to `Reflection.instance()`. This preserves the target type when retrieving the instance or its class.
+
 ## Quick start
 
 For data belonging to an imported class, construct a wrapper around the object.
@@ -166,7 +168,7 @@ These methods take no arguments. They return references or metadata for the obje
 ### `getInstance`
 
 ```python
-def getInstance(self) -> Any: ...
+def getInstance(self) -> T: ...
 ```
 
 Return the reflected object itself (`Any`).
@@ -180,7 +182,7 @@ assert reflected.getInstance() is service
 ### `getClass`
 
 ```python
-def getClass(self) -> type: ...
+def getClass(self) -> type[T]: ...
 ```
 
 Return its class (`type`).

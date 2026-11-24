@@ -660,7 +660,7 @@ fake.iso8601(tzinfo: datetime.tzinfo | None = None, end_datetime: datetime.date 
 
 | Parameter | Purpose |
 | --- | --- |
-| `tzinfo` | Timezone for generated datetime; None uses native behavior. |
+| `tzinfo` | Omit to use the application timezone. An explicit value, including `None`, is passed to the provider. |
 | `end_datetime` | Ending datetime interval boundary. |
 | `sep` | Format separator. |
 | `timespec` | Temporal precision of ISO 8601 text. |

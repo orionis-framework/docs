@@ -80,7 +80,7 @@ La misma inyección de servicio funciona en componentes invocados por el contene
 QueueManager(app: IApplication, serializer: IJobSerializer) -> None
 ```
 
-La implementación es `orionis.queues.manager.QueueManager`. Su constructor obtiene `app.config("queue")` como diccionario, lo valida mediante la entidad de configuración y conserva el serializador. No abre SQL ni Redis. Los campos desconocidos y tipos incorrectos pueden producir `TypeError`; las relaciones o valores inválidos, `ValueError`. En la aplicación normal utiliza la fachada o el contrato en lugar de construir otro administrador.
+El contenedor proporciona `orionis.queues.manager.QueueManager`. Su constructor valida el diccionario de `app.config("queue")` mediante la entidad nativa `Queue`. Los atributos públicos adicionales válidos se conservan durante la normalización. El worker y los drivers leen sus opciones declaradas. Un nombre adicional inválido o un tipo incorrecto puede generar `TypeError`, y una opción o combinación inválida, `ValueError`. Los clientes de backend se resuelven al usarlos.
 
 <a id="manager-boot"></a>
 
@@ -210,6 +210,8 @@ async def migrate(self) -> None: ...
 ```
 
 Crea las tablas faltantes de todas las conexiones de colas con driver `database` y del repositorio `queue.failed`, con sus columnas e índices. Usa las conexiones SQL, nombres de tablas y prefijos configurados, incluso cuando la conexión de colas predeterminada sea `sync` o `redis`. Conserva las tablas y los datos existentes; no actualiza una estructura antigua incompatible.
+
+Una implementación propia de `IQueueManager` debe implementar el método asíncrono `migrate()`. Los servicios de la aplicación también pueden llamarlo mediante un `IQueueManager` inyectado.
 
 ```python
 from orionis.support.facades import Queue

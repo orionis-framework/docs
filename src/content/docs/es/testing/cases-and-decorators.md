@@ -5,9 +5,11 @@ editUrl: true
 lastUpdated: false
 ---
 
-## La clase base de todas las pruebas
+<a id="la-clase-base-de-todas-las-pruebas"></a>
 
-Todos los casos de prueba de una aplicación Orionis deben heredar de `TestCase`, importado desde el paquete público:
+## Casos de prueba con inyección de dependencias
+
+Importa la clase `TestCase` del framework para usar inyección en los métodos y escribir pruebas asíncronas.
 
 ```python
 from orionis.test import TestCase

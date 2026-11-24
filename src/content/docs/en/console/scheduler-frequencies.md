@@ -21,6 +21,8 @@ class Scheduler(BaseScheduler):
 
 Do not paste all alternatives together with the same signature: the agenda keys tasks by command signature, so the last declaration replaces the previous one. All calendars use `DateTime.getZoneInfo()` from application configuration; this API has no per-task timezone setter.
 
+For a calendar schedule such as `dailyAt(2, 30)`, a local time skipped when clocks move forward produces no run that day. If the scheduled time occurs twice when clocks move back, the task runs at the first occurrence only. An interval such as `hourly()` measures elapsed time between runs. For an explicit date passed to `startDate()`, `endDate()` or `onceAt()`, a nonexistent local time raises `ValueError` at declaration. A repeated time selects its first occurrence. The task captures the application zone when constructed.
+
 ## Construction and configuration
 
 <a id="task-construction"></a>

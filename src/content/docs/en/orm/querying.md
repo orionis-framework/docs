@@ -9,6 +9,8 @@ lastUpdated: false
 
 `Product.query()` creates a `ModelQueryBuilder[Product]`. Clauses are added without I/O; asynchronous terminals execute the plan, receive Database rows and construct `Product` instances. Hydration establishes original state and dispatches `retrieved`; eager loading runs afterwards.
 
+For a function that adds filters before execution, annotate the parameter and return with `IModelQueryBuilder[Product]` from `orionis.orm.contracts`. A relation implements this query contract as well. The table-only builder returned by `DB.table()` implements `IRawQueryBuilder` from `orionis.orm.contracts.raw_builder`. Both share the clauses declared by `IQueryBuilderBase` in `orionis.orm.contracts.base_builder`.
+
 ```mermaid
 flowchart LR
   M["Product.query()"] --> B["ModelQueryBuilder"]
@@ -175,7 +177,7 @@ async def archive_out_of_stock() -> int:
     return await Product.where("stock", 0).update({"active": False})
 ```
 
-The first function uses instance `fillable`, mutators, state and events. A listener may veto the operation, producing `False`. The second updates a set in SQL and returns a count: dict/list/UUID storage serialization follows column types and the update timestamp applies where configured, but assignment casts from `Model.casts`, per-instance `fillable`, mutators and events do not.
+A mass update returns the number of affected rows. Model-aware writes still prepare dictionaries, lists, UUIDs and datetime columns for storage. The model adds its update timestamp when configured. Instance assignment hooks, mass-assignment restrictions and individual events apply to the first function. For the datetime binding rules, see [timestamp storage](/en/orm/models-and-attributes#datetime-storage).
 
 `insert()` returns `InsertResult`, rather than models or a list of IDs; it does not automatically add creation timestamps. `update()` and `delete()` ignore read JOINs, ordering, limit and offset: restrict them through `where` and explicit keys. Individual operations use the normal execution lifecycle; use [transactions](/en/database/transactions) for an atomic unit.
 

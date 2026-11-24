@@ -51,7 +51,7 @@ This definition uses the native entities' environment values and defaults. Orion
 | `failed` | `Failed` or `dict`. | `Failed()`. | Shared SQL connection and table for terminal failures. |
 | `worker` | `Worker` or `dict`. | `Worker()`. | Concurrency, polling pause, and execution defaults inherited by jobs. |
 
-Entities are frozen dataclasses with keyword-only construction arguments. Nested dictionaries are converted to validated entities; unknown fields raise `TypeError`. `toDict()` returns a recursive copy and serializes `Drivers` members to their string values; `getFields()` describes fields and metadata.
+The native `Queue` entity converts nested connection, worker and failed-job dictionaries to validated entities. They retain valid public extra attributes in `toDict()`, which also converts `Drivers` members to their string values. Use `getFields(include_dynamic=True)` to include extras in field metadata. Private names, keywords, invalid identifiers and names already used by the class raise `TypeError`. The project template’s `BootstrapQueue` constructor accepts only its declared top-level arguments.
 
 <a id="config-connections"></a>
 

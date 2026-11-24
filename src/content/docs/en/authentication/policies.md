@@ -97,6 +97,8 @@ app.withProviders(AuthorizationProvider)
 
 Integrate these lines into the existing bootstrap; `app` is the configured `Application` instance. Do not register the policy inside every request.
 
+The default implementation of `IAuthorizer` exposes `registry()`. Its `PolicyRegistry.policyFor(resource_class)` returns the policy class selected through the resource’s MRO or `None`; `bindings()` returns a shallow copy of explicit registrations. Application providers can use `Auth.registerPolicy()` directly.
+
 Registration associates a resource class with a class implementing `IPolicy`; `Policy` already implements that contract. Policy lookup also walks the resource's base classes, so a subclass may use its ancestor's policy. Registering a new association replaces the previous one for that type.
 
 ## Authorize a resource in a controller

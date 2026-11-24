@@ -205,7 +205,7 @@ El recurso y el prompt muestran la misma inyección por constructor y método. S
 
 ### Contexto de la llamada
 
-`McpRequest` expone `id`, `method`, `server_id`, `transport`, `arguments`, `params`, `meta`, `uri`, `uri_variables`, `input_responses`, `request_state`, `identity`, `authentication` y `client_capabilities`. Los mappings del contexto son snapshots inmutables, incluidos sus valores anidados. Las capacidades pertenecen a la petición actual y no a una sesión recordada.
+`McpRequest` expone `id`, `method`, `server_id`, `transport`, `arguments`, `params`, `meta`, `uri`, `uri_variables`, `input_responses`, `request_state`, `identity`, `authentication` y `clientCapabilities`. `McpContext` es un alias de `McpRequest`. En HTTP, `native_request` contiene el `Request` de Orionis que originó la llamada. En STDIO vale `None`. Los mappings del contexto son snapshots inmutables, incluidos sus valores anidados. Las capacidades pertenecen a la petición actual. En el handler puedes consultar `request.clientCapabilities.get("extensions", {})` para conocer las extensiones anunciadas.
 
 Un parámetro `Request` HTTP solo puede resolverse en el transporte HTTP; utiliza `McpRequest` para componentes reutilizables en STDIO. Los parámetros sin una fuente válida fallan al compilar. No se admiten `*args` ni `**kwargs` en los handlers. Los valores predeterminados de parámetros ordinarios se usan como tales; no representan argumentos de herramienta adicionales fuera del contrato declarado.
 

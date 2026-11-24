@@ -82,6 +82,8 @@ sample = {
 
 `dateBetween()` devuelve una fecha y `pydecimal()` un Decimal: conserva sus tipos o conviértelos explícitamente al formato que acepte tu columna o respuesta. `fileName()` y `filePath()` generan nombres y rutas ficticias, no crean archivos. Los métodos de identidad o pagos generan ejemplos con formatos locales, no documentos ni medios de pago válidos para uso real.
 
+En los proveedores temporales nativos que aceptan `tzinfo`, omitir el argumento usa la zona horaria de la aplicación. También se aplica a `unique` y `optional`. Para generar una fecha explícitamente sin zona, llama a `fake.dateTime(tzinfo=None)`. Para usar UTC, pasa `tzinfo=UTC` tras importar `UTC` de `datetime`.
+
 El [catálogo de proveedores A–D](/es/faker/reference/a-d) y sus continuaciones relacionan todos los nombres declarados por el tipado de Orionis con sus firmas, disponibilidad por locale y ejemplos. El catálogo distingue lo declarado de lo disponible en un locale concreto; los proveedores personalizados pueden ampliar ese conjunto en tiempo de ejecución.
 
 ## Unicidad de una instancia

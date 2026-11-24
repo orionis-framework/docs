@@ -195,7 +195,7 @@ To convert content, use [EnvironmentCaster](/en/environment/typed-configuration#
 ## APP_KEY generation
 
 ```text
-SecureKeyGenerator.generate(cipher: str | Cipher = Cipher.AES_256_CBC) -> str
+SecureKeyGenerator.generate(cipher: str | Cipher = Cipher.AES_256_GCM) -> str
 ```
 
 `SecureKeyGenerator`, in `orionis.environment.key.key_generator`, generates random bytes with `os.urandom` and returns text with the `base64:` prefix. `KEY_SIZES` maps the four options to their size:
@@ -206,6 +206,8 @@ SecureKeyGenerator.generate(cipher: str | Cipher = Cipher.AES_256_CBC) -> str
 | `Cipher.AES_256_CBC` / `"AES-256-CBC"` | 32 |
 | `Cipher.AES_128_GCM` / `"AES-128-GCM"` | 16 |
 | `Cipher.AES_256_GCM` / `"AES-256-GCM"` | 32 |
+
+This table describes the standalone key generator. For application encryption, `APP_CIPHER` accepts only the two GCM variants. `AES-256-GCM` is the default.
 
 An unknown algorithm string raises `ValueError`; its case is not normalized. Generating a key does not persist it by itself. The native `App` configuration entity uses this generator when the key is absent and writes `APP_KEY` during validation.
 

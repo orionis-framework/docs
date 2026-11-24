@@ -14,7 +14,7 @@ Este cliente corresponde a **hubs Realtime**. Para `Route.websocket(...)` y SSE,
 Desde el proyecto de tu frontend, o desde la raíz de Orionis si vas a servir JavaScript directamente, instala el paquete:
 
 ```bash
-npm install @orionis-framework/realtime-client
+npm install @orionis-framework/realtime-client@1.0.1
 ```
 
 En una aplicación con bundler, importa las exportaciones nombradas desde la raíz del paquete:
@@ -25,7 +25,7 @@ import { RealtimeClient, RemoteError } from "@orionis-framework/realtime-client"
 
 El paquete utiliza ESM e incluye sus tipos; no requiere instalar un paquete adicional de declaraciones. No dispone de una exportación predeterminada ni una entrada CommonJS para `require()`. Importarlo no abre conexiones: estas comienzan al ejecutar `connect()`.
 
-Utiliza un navegador moderno con módulos ESM, `WebSocket`, `AbortController`, `TextEncoder` e iteradores asíncronos. Para ejecutarlo en Node.js, utiliza un entorno que cumpla el campo `engines` del paquete y proporcione esas APIs. En el navegador, el nombre npm necesita la resolución del frontend; un HTML sin bundler debe importar una URL de archivo servido, como se muestra a continuación.
+Utiliza un navegador moderno con módulos ESM, `WebSocket`, `AbortController`, `TextEncoder` e iteradores asíncronos. La versión 1.0.1 declara Node.js 22 o posterior en `engines` y requiere esas APIs al ejecutarse en Node.js. En el navegador, el nombre npm necesita la resolución del frontend; un HTML sin bundler debe importar una URL de archivo servido, como se muestra a continuación.
 
 ### Servir el módulo desde Orionis
 

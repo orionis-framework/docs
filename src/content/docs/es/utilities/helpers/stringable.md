@@ -1825,7 +1825,7 @@ Todos los métodos condicionales auxiliares usan `when(condition, callback, defa
 
 <a id="stringable-method-pipe"></a>
 
-**`pipe(callback: Callable) -> Stringable`**
+**`pipe(callback: Callable[[Stringable], object]) -> Stringable`**
 
 Llama una vez a `callback(self)` y usa su resultado. Conserva un Stringable devuelto; en otro caso construye `Stringable(result)`, de modo que los números se convierten a texto y `None` queda como `"None"`. Siempre devuelve Stringable, no un resultado arbitrario. Un no callable produce `TypeError`; propaga excepciones del callback. No espera callbacks async.
 
@@ -1838,7 +1838,7 @@ assert Stringable("hello").pipe(lambda s: s.upper()) == "HELLO"
 
 <a id="stringable-method-tap"></a>
 
-**`tap(callback: Callable[[Stringable], Any]) -> Stringable`**
+**`tap(callback: Callable[[Stringable], object]) -> Stringable`**
 
 Llama a `callback(self)` por su efecto secundario, ignora su resultado y devuelve la misma instancia (`is`). Stringable sigue siendo inmutable. Un no callable falla con `TypeError` al llamarlo; propaga excepciones y no espera callbacks async.
 
@@ -1854,7 +1854,7 @@ assert s.tap(lambda value: value.upper()) == "hello"
 
 <a id="stringable-method-when"></a>
 
-**`when(condition: bool | Callable, callback: Callable, default: Callable | None=None) -> Stringable`**
+**`when(condition: bool | Callable[[Stringable], object], callback: Callable[[Stringable], object], default: Callable[[Stringable], object] | None=None) -> Stringable`**
 
 Acepta bool o predicado síncrono `condition(self)`; evalúa una vez el predicado y usa el valor booleano de su resultado. Ejecuta `callback(self)` si cumple o `default(self)` si no cumple y existe. Envuelve resultados que no sean Stringable con `Stringable`, incluido `None`→`"None"`. Sin rama seleccionada devuelve la misma instancia. Tipos inválidos producen `TypeError`; propaga excepciones. No espera predicados ni callbacks.
 
@@ -1870,7 +1870,7 @@ assert s.when(True, lambda value: None) == "None"
 
 <a id="stringable-method-whencontains"></a>
 
-**`whenContains(needles: str | list[str], callback: Callable, default: Callable | None=None) -> Stringable`**
+**`whenContains(needles: str | list[str], callback: Callable[[Stringable], object], default: Callable[[Stringable], object] | None=None) -> Stringable`**
 
 Usa la condición de alguna coincidencia `contains(needles)`, distinguiendo mayúsculas; hereda su soporte de iterables y errores. Los callbacks reciben un argumento Stringable; `default=None` y la conversión/identidad del resultado siguen `when`.
 
@@ -1882,7 +1882,7 @@ assert Stringable("hello world").whenContains("world", lambda s: s.upper()) == "
 
 <a id="stringable-method-whencontainsall"></a>
 
-**`whenContainsAll(needles: list[str], callback: Callable, default: Callable | None=None) -> Stringable`**
+**`whenContainsAll(needles: list[str], callback: Callable[[Stringable], object], default: Callable[[Stringable], object] | None=None) -> Stringable`**
 
 Evalúa directamente `all(needle in str(self) for needle in needles)`. A diferencia de `containsAll`, un iterable vacío selecciona el callback y una cadena se recorre carácter a carácter; no aplica la validación estricta de lista. Los callbacks reciben un argumento Stringable; `default=None` y la conversión/identidad del resultado siguen `when`.
 
@@ -1895,7 +1895,7 @@ assert Stringable("hello").whenContainsAll([], lambda s: "selected") == "selecte
 
 <a id="stringable-method-whenempty"></a>
 
-**`whenEmpty(callback: Callable, default: Callable | None=None) -> Stringable`**
+**`whenEmpty(callback: Callable[[Stringable], object], default: Callable[[Stringable], object] | None=None) -> Stringable`**
 
 Selecciona el callback solo para cadena vacía mediante `isEmpty`; los espacios seleccionan default o conservan el original. Los callbacks reciben un argumento Stringable; `default=None` y la conversión/identidad del resultado siguen `when`.
 
@@ -1907,7 +1907,7 @@ assert Stringable("").whenEmpty(lambda s: "fallback") == "fallback"
 
 <a id="stringable-method-whennotempty"></a>
 
-**`whenNotEmpty(callback: Callable, default: Callable | None=None) -> Stringable`**
+**`whenNotEmpty(callback: Callable[[Stringable], object], default: Callable[[Stringable], object] | None=None) -> Stringable`**
 
 Selecciona el callback cuando `isNotEmpty()` es verdadero, incluso con solo espacios. Los callbacks reciben un argumento Stringable; `default=None` y la conversión/identidad del resultado siguen `when`.
 
@@ -1919,7 +1919,7 @@ assert Stringable("hello").whenNotEmpty(lambda s: s.upper()) == "HELLO"
 
 <a id="stringable-method-whenendswith"></a>
 
-**`whenEndsWith(needles: str | list[str], callback: Callable, default: Callable | None=None) -> Stringable`**
+**`whenEndsWith(needles: str | list[str], callback: Callable[[Stringable], object], default: Callable[[Stringable], object] | None=None) -> Stringable`**
 
 Usa la condición de algún sufijo `endsWith` distinguiendo mayúsculas, con su soporte de iterables y errores. Los callbacks reciben un argumento Stringable; `default=None` y la conversión/identidad del resultado siguen `when`.
 
@@ -1931,7 +1931,7 @@ assert Stringable("file.py").whenEndsWith(".py", lambda s: s.upper()) == "FILE.P
 
 <a id="stringable-method-whendoesntendwith"></a>
 
-**`whenDoesntEndWith(needles: str | list[str], callback: Callable, default: Callable | None=None) -> Stringable`**
+**`whenDoesntEndWith(needles: str | list[str], callback: Callable[[Stringable], object], default: Callable[[Stringable], object] | None=None) -> Stringable`**
 
 Niega `endsWith`; delega en su API de iterables, más amplia que la validación de `doesntEndWith`. Los callbacks reciben un argumento Stringable; `default=None` y la conversión/identidad del resultado siguen `when`.
 
@@ -1943,7 +1943,7 @@ assert Stringable("file.txt").whenDoesntEndWith(".py", lambda s: s.upper()) == "
 
 <a id="stringable-method-whenexactly"></a>
 
-**`whenExactly(value: str, callback: Callable, default: Callable | None=None) -> Stringable`**
+**`whenExactly(value: str, callback: Callable[[Stringable], object], default: Callable[[Stringable], object] | None=None) -> Stringable`**
 
 Usa `exactly(value)`, que exige coincidencia completa distinguiendo mayúsculas y un valor de cadena. Los callbacks reciben un argumento Stringable; `default=None` y la conversión/identidad del resultado siguen `when`.
 
@@ -1955,7 +1955,7 @@ assert Stringable("hello").whenExactly("hello", lambda s: s.upper()) == "HELLO"
 
 <a id="stringable-method-whennotexactly"></a>
 
-**`whenNotExactly(value: str, callback: Callable, default: Callable | None=None) -> Stringable`**
+**`whenNotExactly(value: str, callback: Callable[[Stringable], object], default: Callable[[Stringable], object] | None=None) -> Stringable`**
 
 Niega `exactly(value)`; un valor de comparación que no sea cadena produce `TypeError` antes de seleccionar rama. Los callbacks reciben un argumento Stringable; `default=None` y la conversión/identidad del resultado siguen `when`.
 
@@ -1967,7 +1967,7 @@ assert Stringable("hello").whenNotExactly("world", lambda s: s.upper()) == "HELL
 
 <a id="stringable-method-whenstartswith"></a>
 
-**`whenStartsWith(needles: str | list[str], callback: Callable, default: Callable | None=None) -> Stringable`**
+**`whenStartsWith(needles: str | list[str], callback: Callable[[Stringable], object], default: Callable[[Stringable], object] | None=None) -> Stringable`**
 
 Comprueba algún prefijo distinguiendo mayúsculas. Si el argumento no es lista se envuelve en una; cada elemento debe ser cadena (`TypeError` en otro caso). No interpreta tuplas como varios prefijos. Los callbacks reciben un argumento Stringable; `default=None` y la conversión/identidad del resultado siguen `when`.
 
@@ -1979,7 +1979,7 @@ assert Stringable("hello world").whenStartsWith(["hi", "hello"], lambda s: s.upp
 
 <a id="stringable-method-whendoesntstartwith"></a>
 
-**`whenDoesntStartWith(needles: str | list[str], callback: Callable, default: Callable | None=None) -> Stringable`**
+**`whenDoesntStartWith(needles: str | list[str], callback: Callable[[Stringable], object], default: Callable[[Stringable], object] | None=None) -> Stringable`**
 
 Niega la misma comprobación de algún prefijo de `whenStartsWith`, con la misma validación de cadena/lista. Una lista vacía selecciona el callback. Los callbacks reciben un argumento Stringable; `default=None` y la conversión/identidad del resultado siguen `when`.
 
@@ -1991,7 +1991,7 @@ assert Stringable("hello").whenDoesntStartWith("world", lambda s: s.upper()) == 
 
 <a id="stringable-method-whentest"></a>
 
-**`whenTest(pattern: str, callback: Callable, default: Callable | None=None) -> Stringable`**
+**`whenTest(pattern: str, callback: Callable[[Stringable], object], default: Callable[[Stringable], object] | None=None) -> Stringable`**
 
 Usa `test(pattern)` como condición de búsqueda regex Python; propaga sus errores de patrón/tipo antes de seleccionar rama. Los callbacks reciben un argumento Stringable; `default=None` y la conversión/identidad del resultado siguen `when`.
 
@@ -2003,7 +2003,7 @@ assert Stringable("hello42").whenTest(r"\d+$", lambda s: s.upper()) == "HELLO42"
 
 <a id="stringable-method-whenis"></a>
 
-**`whenIs(pattern: str | list[str], callback: Callable, default: Callable | None=None) -> Stringable`**
+**`whenIs(pattern: str | list[str], callback: Callable[[Stringable], object], default: Callable[[Stringable], object] | None=None) -> Stringable`**
 
 Usa la coincidencia shell de todo el valor de `isPattern(pattern)`, con ignore_case predeterminado y comportamiento de plataforma. No expone ignore_case; propaga errores de patrón. Los callbacks reciben un argumento Stringable; `default=None` y la conversión/identidad del resultado siguen `when`.
 
@@ -2015,7 +2015,7 @@ assert Stringable("hello.txt").whenIs("*.txt", lambda s: s.upper()) == "HELLO.TX
 
 <a id="stringable-method-whenisascii"></a>
 
-**`whenIsAscii(callback: Callable, default: Callable | None=None) -> Stringable`**
+**`whenIsAscii(callback: Callable[[Stringable], object], default: Callable[[Stringable], object] | None=None) -> Stringable`**
 
 Selecciona mediante `isAscii`, que incluye texto vacío y caracteres ASCII de control. Los callbacks reciben un argumento Stringable; `default=None` y la conversión/identidad del resultado siguen `when`.
 
@@ -2027,7 +2027,7 @@ assert Stringable("hello").whenIsAscii(lambda s: s.upper()) == "HELLO"
 
 <a id="stringable-method-whenisuuid"></a>
 
-**`whenIsUuid(callback: Callable, default: Callable | None=None) -> Stringable`**
+**`whenIsUuid(callback: Callable[[Stringable], object], default: Callable[[Stringable], object] | None=None) -> Stringable`**
 
 Selecciona mediante `isUuid()` sin filtro de versión. Solo valida un valor existente. Los callbacks reciben un argumento Stringable; `default=None` y la conversión/identidad del resultado siguen `when`.
 
@@ -2039,7 +2039,7 @@ assert Stringable("550e8400-e29b-41d4-a716-446655440000").whenIsUuid(lambda s: "
 
 <a id="stringable-method-whenisulid"></a>
 
-**`whenIsUlid(callback: Callable, default: Callable | None=None) -> Stringable`**
+**`whenIsUlid(callback: Callable[[Stringable], object], default: Callable[[Stringable], object] | None=None) -> Stringable`**
 
 Selecciona mediante la comprobación de alfabeto/longitud de `isUlid`, con sus limitaciones de rango documentadas. Los callbacks reciben un argumento Stringable; `default=None` y la conversión/identidad del resultado siguen `when`.
 

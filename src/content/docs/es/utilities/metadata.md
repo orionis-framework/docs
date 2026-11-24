@@ -42,7 +42,7 @@ Todas las cadenas son `str`; `PYTHON_REQUIRES` es una tupla de enteros. No recib
 | `AUTHOR_EMAIL` | `str` | Correo de contacto publicado por el paquete. |
 | `PYTHON_REQUIRES` | `tuple[int, int]` | Versión mínima de Python como `(major, minor)`, actualmente `(3, 14)`. |
 | `API` | `str` | URL de los metadatos JSON de la distribución en PyPI. |
-| `DOCS` | `str` | URL raíz de la documentación. |
+| `DOCS` | `str` | Página principal del proyecto (`https://orionis-framework.com/`). |
 | `FRAMEWORK` | `str` | URL del repositorio del framework. |
 | `SKELETON` | `str` | URL del repositorio del esqueleto de aplicación. |
 

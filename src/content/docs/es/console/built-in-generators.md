@@ -11,7 +11,7 @@ Todos reciben `name` como cadena posicional obligatoria y `-h` / `--help` para c
 
 El stub común acepta `/` y `\` como separadores, crea subdirectorios y normaliza los directorios/nombres de archivo a minúsculas. Las palabras separadas por `_` forman el nombre de clase y cada generador agrega su prefijo/sufijo cuando corresponde. Por ejemplo, `sales/report_export` con `make:console-command` produce `app/console/commands/sales/report_export_command.py` y `ReportExportCommand`. **No separa CamelCase en snake_case**: `ReportExport` produce `reportexport_command.py`. El generador de factories tiene su propia normalización, descrita más abajo.
 
-Los nombres absolutos, componentes vacíos, `.` / `..`, guiones y componentes que no cumplan el formato de módulos admitido se rechazan. Los errores de filesystem o de nombres se imprimen. En el generador común y en `make:console-command`, esos errores se capturan y `handle()` devuelve `None`; por ello el código de salida puede ser `0` aunque la generación haya fallado. Comprueba el mensaje y el archivo generado antes de continuar.
+Los generadores rechazan los nombres absolutos, los segmentos vacíos, `.`, `..`, los guiones y los nombres de módulo inválidos. Informan los errores de nombre, tipo y acceso al sistema de archivos y devuelven el código `1`. La generación correcta devuelve `0`.
 
 <a id="command-make-console-command"></a>
 
@@ -139,14 +139,17 @@ Genera una fachada y su interfaz de tipos.
 |---|---|---|---|
 | `name` | str, obligatorio | — | Nombre del archivo/clase; admite subdirectorios cuando se usa el generador. |
 | `--accessor` / `-a` | str, obligatorio | — | Identificador de servicio del contenedor. |
+| `--contract` | str, opcional | `None` | Clase cualificada del servicio que define la interfaz de tipos. |
 
-`--accessor` / `-a` es una cadena obligatoria con el identificador del servicio del contenedor. Se crean dos archivos del mismo nombre: `.py` y `.pyi`. El generador no registra el servicio. Las escrituras son secuenciales: si falla el segundo archivo, el primero puede haber sido creado.
+La fachada `.py` resuelve el servicio identificado por `--accessor`. Vincula ese identificador en tu provider. Al indicar `--contract modulo.Clase` o `--contract modulo:Clase`, el generador lee el código Python y escribe las firmas en un archivo `.pyi` del mismo nombre, incluidas las de métodos heredados y sobrecargas. Si omites la opción, la clase de la interfaz queda vacía. Si la escritura de la interfaz produce un error de archivo, tipo o valor, el generador elimina el archivo de implementación recién creado.
 
 **Destino predeterminado:** `app/facades`. Sufijo de clase/archivo: ninguno.
 
+El segundo ejemplo presupone una clase `Catalog` definida en `app/services/catalog.py`.
+
 ```shell
 orionis make:facade reporting --accessor app.reporting
-python -B reactor make:facade reporting --accessor app.reporting
+python -B reactor make:facade catalog --accessor app.catalog --contract app.services.catalog.Catalog
 ```
 
 <a id="command-make-factory"></a>
@@ -238,7 +241,7 @@ Genera una regla de validación personalizada.
 |---|---|---|---|
 | `name` | str, obligatorio | — | Nombre del archivo/clase; admite subdirectorios cuando se usa el generador. |
 
-Usa `http_schema_rule.stub` y el sufijo `Rule`. Implementa el criterio de `enforce(field, value, instance)`; el stub usa un método síncrono y solo produce la estructura de la regla.
+Usa `http_schema_rule.stub` y el sufijo `Rule`. Implementa `async def enforce(self, field, value, instance) -> bool`. El método generado lanza `NotImplementedError` hasta que definas la validación.
 
 **Destino predeterminado:** `app/http/schemas/rules`. Sufijo de clase/archivo: `Rule`.
 

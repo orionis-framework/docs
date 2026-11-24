@@ -7,11 +7,13 @@ lastUpdated: false
 
 `Collection` envuelve datos ya cargados en memoria. Impórtala desde `orionis.support.types`; `orionis.support.types.collection.Collection` es la misma clase. Filtrar una colección no ejecuta SQL.
 
+Usa `Collection[T]` para anotar una colección de elementos de tipo `T`. Por ejemplo, `Collection([2, 3]).map(str)` devuelve una `Collection[str]`. Un índice de una colección basada en lista devuelve un elemento y un segmento devuelve una colección. En las firmas siguientes, `U` representa el tipo transformado y `Self`, el tipo concreto de la colección.
+
 ## Construcción y propiedad de los datos
 
 <a id="collection-method-init"></a>
 
-### `Collection(items: list[Any] | dict[Any, Any] | None = None)` — `__init__`
+### `Collection(items: list[T] | dict[Any, Any] | None = None)` — `__init__`
 
 El constructor `Collection(items=None)` conserva por referencia las listas o diccionarios recibidos, incluso vacíos. Solo `None` crea una lista vacía nueva. Los resultados de diccionario de `pluck(value, key)` y `groupBy(key)` conservan ese tipo, incluido `{}`. Léelos con `all()` o por clave; la iteración entrega claves. Las operaciones exclusivas de listas no son operaciones generales de diccionario.
 
@@ -80,7 +82,7 @@ asyncio.run(main())
 
 <a id="collection-method-all"></a>
 
-### `all() -> list[Any]`
+### `all() -> list[T] | dict[Any, Any]`
 
 Devuelve la estructura de respaldo real, sin copiarla. Aunque la anotación indica una lista, una colección respaldada por un diccionario devuelve ese diccionario.
 
@@ -108,13 +110,13 @@ assert Collection().isEmpty()
 
 <a id="collection-method-first"></a>
 
-### `first(callback: Callable | None = None) -> object`
+### `first(callback: Callable[[T], object] | None = None) -> T | None`
 
 Devuelve el primer elemento o el primero para el que `callback(item)` sea truthy. Se detiene al encontrar la primera coincidencia. Devuelve `None` si la lista está vacía o no hay coincidencias.
 
 <a id="collection-method-last"></a>
 
-### `last(callback: Callable | None = None) -> object`
+### `last(callback: Callable[[T], object] | None = None) -> T | None`
 
 Devuelve el último elemento o la última coincidencia; en otro caso, `None`. Con callback recorre todos los elementos. Un `None` coincidente no se distingue de la ausencia de coincidencias.
 
@@ -134,7 +136,7 @@ assert Collection().last() is None
 
 <a id="collection-method-get"></a>
 
-### `get(key: int | str, default: object = None) -> object`
+### `get(key: int | str, default: object | None = None) -> object`
 
 Lee mediante acceso con corchetes. Si falta el índice o la clave (`IndexError`, `KeyError`), devuelve el valor predeterminado; si este es callable, lo invoca sin argumentos únicamente cuando falta el dato. Admite índices negativos de lista. No interpreta rutas anidadas. Un tipo de clave inválido para una lista sigue produciendo `TypeError`; un slice funciona en ejecución y devuelve una colección nueva.
 
@@ -153,13 +155,13 @@ assert Collection({"name": "Ada"}).get("name") == "Ada"
 
 <a id="collection-method-contains"></a>
 
-### `contains(key: str | Callable, value: object = None) -> bool`
+### `contains(key: str | Callable[[T], object], value: object | None = None) -> bool`
 
 Tiene tres formas: `contains(item)` usa pertenencia ordinaria; `contains(predicate)` evalúa `predicate(item)` hasta encontrar una coincidencia truthy; `contains(path, value)` compara el dato extraído usando igualdad de Python. La tercera forma solo se selecciona cuando `value is not None`: para buscar un campo `None`, usa un predicado. Un primer argumento callable siempre se interpreta como predicado si no se suministra un segundo valor distinto de `None`.
 
 <a id="collection-method-every"></a>
 
-### `every(callback: Callable) -> bool`
+### `every(callback: Callable[[T], object]) -> bool`
 
 Evalúa `callback(item)` hasta obtener un resultado falsy. Una colección vacía devuelve `True`.
 
@@ -182,31 +184,31 @@ assert Collection().every(lambda item: False)
 
 <a id="collection-method-map"></a>
 
-### `map(callback: Callable) -> Collection`
+### `map(callback: Callable[[T], U]) -> Collection[U]`
 
 **Nueva.** Conserva todos los resultados de `callback(item)`, incluidos los valores falsy.
 
 <a id="collection-method-filter"></a>
 
-### `filter(callback: Callable) -> Collection`
+### `filter(callback: Callable[[T], object]) -> Collection[T]`
 
 **Nueva.** Conserva los elementos cuyo resultado de `callback(item)` sea truthy. El callback es obligatorio; no existe una forma sin parámetros que filtre por truthiness.
 
 <a id="collection-method-reject"></a>
 
-### `reject(callback: Callable) -> Collection`
+### `reject(callback: Callable[[T], object]) -> Self`
 
 **Misma instancia.** Sustituye la lista por los elementos cuyo callback devuelva un resultado falsy.
 
 <a id="collection-method-transform"></a>
 
-### `transform(callback: Callable) -> Collection`
+### `transform(callback: Callable[[T], T]) -> Collection[T]`
 
 **Misma instancia.** Sustituye la lista por todos los resultados del callback, incluidos `0`, `False` y `None`.
 
 <a id="collection-method-each"></a>
 
-### `each(callback: Callable) -> Collection`
+### `each(callback: Callable[[T], T]) -> Collection[T]`
 
 **Misma instancia.** Sustituye cada elemento visitado por el resultado truthy del callback. Un resultado falsy detiene el recorrido **antes de sustituir ese elemento**; los posteriores quedan intactos. Un callback que solo tenga efectos secundarios y devuelva `None` se detiene, por tanto, en el primer elemento.
 
@@ -228,7 +230,7 @@ assert items.all() == [10, 2, 3]
 
 <a id="collection-method-mapinto"></a>
 
-### `mapInto(cls: type, method: str | None = None, **kwargs: object) -> Collection`
+### `mapInto(cls: type, method: str | None = None, **kwargs: object) -> Collection[Any]`
 
 **Nueva.** Llama a `cls(item, **kwargs)` si no se indica método, o al método de clase/estático como `method(item, **kwargs)`. Si `cls` no es un tipo, lanza `TypeError`. Un método ausente produce un `None` por elemento. Los errores `TypeError`, `AttributeError` y `ValueError` de cada elemento se convierten en `None`; los demás se propagan.
 
@@ -261,7 +263,7 @@ Los lectores de campos usados por `pluck`, `contains(path, value)`, `where`, `wh
 
 <a id="collection-method-pluck"></a>
 
-### `pluck(value: str, key: str | None = None) -> Collection`
+### `pluck(value: str, key: str | None = None) -> Collection[Any]`
 
 **Nueva.** Con `key` omitido o falsy, devuelve una lista de valores extraídos que omite `None`, pero conserva otros valores falsy. Con `key` truthy, construye un diccionario indexado por ese campo: conserva valores y claves `None`, las claves duplicadas sobrescriben valores anteriores y las claves no hashables producen `TypeError`. El resultado puede quedar respaldado por un diccionario; un resultado indexado vacío es `{}`.
 
@@ -283,7 +285,7 @@ assert Collection([{"users": [{"name": "Ada"}, {"name": "Grace"}]}]).pluck("user
 
 <a id="collection-method-where"></a>
 
-### `where(key: str, *args: object) -> Collection`
+### `where(key: str, *args: object) -> Collection[T]`
 
 **Nueva.** `where(key, value)` usa `==`; `where(key, operator, value)` admite `<`, `<=`, `==`, `!=`, `>`, `>=`. Omitir el valor produce `ValueError`. Los argumentos posteriores al operador/valor se ignoran. Primero intenta comparar con las operaciones nativas de Python; un `TypeError` reintenta convirtiendo ambos operandos a texto, lo que puede producir orden lexicográfico. Los operadores no admitidos y los `TypeError`/`ValueError` de comparación hacen que se omita el elemento, normalmente generando una colección vacía en lugar de lanzar una excepción. Los campos ausentes se comparan como `None`.
 
@@ -303,13 +305,13 @@ assert Collection([{}]).where("missing", None).count() == 1
 
 <a id="collection-method-wherein"></a>
 
-### `whereIn(key: str, values: list[Any] | Collection) -> Collection`
+### `whereIn(key: str, values: list[Any] | ICollection) -> Collection[T]`
 
 **Nueva.** Conserva elementos cuyo valor extraído sea igual a un miembro de `values` **o tenga la misma representación `str()`**. Admite valores no hashables mediante comparación por igualdad.
 
 <a id="collection-method-wherenotin"></a>
 
-### `whereNotIn(key: str, values: list[Any] | Collection) -> Collection`
+### `whereNotIn(key: str, values: list[Any] | ICollection) -> Collection[T]`
 
 **Nueva.** Excluye las mismas coincidencias. Ambos métodos admiten una lista o colección como entrada documentada; no proporcionan comparación estricta de tipos. Otras entradas en ejecución no se validan por tipo y deben ser iterables y reutilizables para los múltiples recorridos de la implementación.
 
@@ -328,19 +330,19 @@ assert nested.whereNotIn("v", [[2]]).all() == [{"v": [1]}]
 
 <a id="collection-method-take"></a>
 
-### `take(number: int) -> Collection`
+### `take(number: int) -> Collection[T]`
 
 **Nueva.** Un número positivo toma los primeros elementos; uno negativo, los últimos `abs(number)`; cero devuelve una colección vacía. Los límites de slice se ajustan a la longitud disponible.
 
 <a id="collection-method-chunk"></a>
 
-### `chunk(size: int) -> Collection`
+### `chunk(size: int) -> Collection[Self]`
 
 **Nueva.** Devuelve una colección de colecciones de hasta `size` elementos. `size <= 0` produce `ValueError`; un tamaño no entero no puede usarse con `range` y produce `TypeError`.
 
 <a id="collection-method-forpage"></a>
 
-### `forPage(page: int, number: int) -> Collection`
+### `forPage(page: int, number: int) -> Collection[T]`
 
 **Nueva.** Devuelve una página en memoria de `number` elementos, normalizando `page < 1` a 1. `number <= 0` produce `ValueError`; los índices usados para el slice deben ser enteros. Una página fuera de rango queda vacía. No incluye total de base de datos, consulta ni metadatos de paginador.
 
@@ -361,13 +363,13 @@ assert items.forPage(9, 2).all() == []
 
 <a id="collection-method-collapse"></a>
 
-### `collapse() -> Collection`
+### `collapse() -> Collection[Any]`
 
 **Nueva.** Extiende una lista con cada elemento anidado, extrayendo primero los datos de las colecciones anidadas. Aplana un nivel iterable: los diccionarios aportan claves, las cadenas aportan caracteres y los escalares no iterables producen `TypeError`.
 
 <a id="collection-method-flatten"></a>
 
-### `flatten() -> Collection`
+### `flatten() -> Collection[Any]`
 
 **Nueva.** Recorre recursivamente listas y **valores** de diccionarios. Las tuplas, cadenas, instancias anidadas de `Collection` y otros objetos permanecen como valores hoja. No tiene argumento de profundidad; las listas/diccionarios cíclicos terminan produciendo `RecursionError`.
 
@@ -384,13 +386,13 @@ assert flat[-1] is nested
 
 <a id="collection-method-diff"></a>
 
-### `diff(items: list[Any] | Collection) -> Collection`
+### `diff(items: list[Any] | ICollection) -> Collection[T]`
 
 **Nueva.** Conserva los elementos de origen ausentes de los datos recibidos, respetando orden y duplicados del origen. Intenta usar un set para pertenencia y recurre a pertenencia por igualdad si hay valores no hashables. Extrae los datos de una `Collection` sin exigir que la entrada sea una lista; argumentos incompatibles o no iterables pueden producir `TypeError`.
 
 <a id="collection-method-zip"></a>
 
-### `zip(items: list[Any] | ICollection) -> Collection`
+### `zip(items: list[U] | ICollection[U]) -> Collection[list[T | U]]`
 
 **Nueva.** Forma listas de dos elementos hasta la longitud menor. Admite listas o cualquier implementación de `ICollection`; otros tipos lanzan `TypeError`. Recibe una sola secuencia adicional.
 
@@ -406,7 +408,7 @@ assert Collection([1]).zip(Collection(["a"])).all() == [[1, "a"]]
 
 <a id="collection-method-groupby"></a>
 
-### `groupBy(key: str) -> Collection`
+### `groupBy(key: str) -> Collection[Any]`
 
 **Nueva `Collection` base.** Construye `{clave: [elementos_originales]}` tras extraer y ordenar las claves de agrupación. Una entrada vacía produce `{}`. Las claves deben poder ordenarse entre sí y ser hashables; los valores incompatibles lanzan `TypeError`. El orden dentro de cada grupo es estable. Recibe un nombre/ruta de campo, no un callback. Los campos ausentes se convierten en `None`.
 
@@ -414,7 +416,7 @@ assert Collection([1]).zip(Collection(["a"])).all() == [[1, "a"]]
 
 <a id="collection-unique-performance"></a>
 
-### `unique(key: str | Callable | None = None) -> Collection`
+### `unique(key: str | Callable[[T], object] | None = None) -> Collection[T]`
 
 Sin clave truthy, devuelve una colección **nueva** mediante `list(set(items))` para elementos hashables, sin prometer orden. Los elementos no hashables conservan su primera aparición mediante deduplicación compatible con igualdad. Con una clave de texto o selector callable síncrono, las colecciones respaldadas por listas conservan el primer elemento de cada valor seleccionado, incluidas listas y diccionarios iguales; los campos ausentes cuentan como `None`. Una clave truthy en una colección respaldada por diccionario sigue retornando `self`; omitirla elimina duplicados entre las claves del diccionario.
 
@@ -443,25 +445,25 @@ assert sorted(indexed.unique().all()) == ["a", "b"]
 
 <a id="collection-method-push"></a>
 
-### `push(value: object) -> Collection`
+### `push(value: T) -> Self`
 
 **Misma instancia.** Agrega un valor al final de una lista; una lista como argumento se agrega como un solo elemento anidado.
 
 <a id="collection-method-prepend"></a>
 
-### `prepend(value: object) -> Collection`
+### `prepend(value: T) -> Self`
 
 **Misma instancia.** Inserta un valor en el índice cero. No tiene parámetro de clave.
 
 <a id="collection-method-put"></a>
 
-### `put(key: int | str, value: object) -> Collection`
+### `put(key: int | str, value: T) -> Self`
 
 **Misma instancia.** Delega en la asignación con corchetes. En una lista sustituye un índice existente, incluidos los negativos; no puede agregar más allá del final. El respaldo de diccionario admite claves de diccionario. Los tipos de índice/clave inválidos propagan los errores subyacentes.
 
 <a id="collection-method-merge"></a>
 
-### `merge(items: list[Any] | ICollection) -> Collection`
+### `merge(items: list[T] | ICollection[T]) -> Self`
 
 **Misma instancia.** Extiende la lista con `+=`. Admite listas o cualquier implementación de `ICollection`; otros tipos lanzan `TypeError`. Las colecciones respaldadas por diccionario aportan sus claves. No combina diccionarios anidados.
 
@@ -481,25 +483,25 @@ assert indexed.put("b", 2).all() == {"a": 1, "b": 2}
 
 <a id="collection-method-forget"></a>
 
-### `forget(*keys: int | str) -> Collection`
+### `forget(*keys: int | str) -> Self`
 
 **Misma instancia.** Ordena las claves de forma descendente y elimina cada clave/índice. Sin claves no cambia nada. Usa índices de lista no negativos y distintos para evitar sorpresas por desplazamiento; los índices negativos/duplicados siguen la eliminación secuencial de Python. Mezclar claves no ordenables produce `TypeError`; los índices/claves ausentes producen `IndexError`/`KeyError` y pueden haberse efectuado eliminaciones anteriores.
 
 <a id="collection-method-pop"></a>
 
-### `pop() -> object`
+### `pop() -> T | None`
 
 Extrae y devuelve el último elemento de lista; una colección vacía devuelve `None`. No acepta un índice como argumento.
 
 <a id="collection-method-pull"></a>
 
-### `pull(key: int | str) -> object`
+### `pull(key: int | str) -> T | None`
 
 Lee y elimina el elemento seleccionado y devuelve su valor. Los índices o claves ausentes devuelven `None`; no tiene argumento de valor predeterminado.
 
 <a id="collection-method-shift"></a>
 
-### `shift() -> object`
+### `shift() -> T | None`
 
 Elimina y devuelve el primer elemento mediante `pull(0)`. Las colecciones vacías devuelven `None`.
 
@@ -523,13 +525,13 @@ assert Collection([1]).pull(9) is None
 
 <a id="collection-method-reverse"></a>
 
-### `reverse() -> Collection`
+### `reverse() -> Self`
 
 **Misma instancia.** Invierte la lista de respaldo.
 
 <a id="collection-method-sort"></a>
 
-### `sort(key: str | None = None) -> Collection`
+### `sort(key: str | None = None) -> Self`
 
 **Misma instancia.** Ordena ascendentemente la lista de respaldo, directamente o por el campo extraído si la clave es truthy. No admite indicador de orden inverso ni callback. Usa `.sort().reverse()` para obtener orden descendente. Los valores deben ser ordenables entre sí; las excepciones de ordenación de Python se propagan.
 
@@ -547,7 +549,7 @@ assert rows.sort("v").all() == [{"v": 1}, {"v": 3}]
 
 <a id="collection-method-random"></a>
 
-### `random(count: int | None = None) -> object | Collection | None`
+### `random(count: int | None = None) -> T | Collection[T] | None`
 
 Las colecciones vacías devuelven `None` antes de validar count. Si se omite o es `None`, devuelve un elemento sin modificar la colección. Un conteo explícito no negativo muestrea posiciones sin reemplazo, sustituye la lista interna y devuelve la misma colección; `0` la vacía. Puede haber valores repetidos si el origen los contiene. Los conteos negativos o mayores que la colección lanzan `ValueError`.
 
@@ -682,13 +684,13 @@ assert Collection({"a": 1}).serialize() == ["a"]
 
 <a id="collection-method-setappends"></a>
 
-### `setAppends(appends: list[str]) -> Collection`
+### `setAppends(appends: list[str]) -> Self`
 
 **Misma instancia.** Extiende `__appends__`; las llamadas repetidas acumulan entradas, sin sustituirlas ni eliminar duplicados. Al serializar, invoca `set_appends(appends)` de cada elemento si existe y suprime únicamente `AttributeError` de esa llamada. Cuando `serialize()` devuelve un diccionario y el elemento tiene un `getAttribute` callable, agrega cada atributo nombrado salvo los incluidos en `type(item).__meta__.hidden`. Los atributos agregados pueden sustituir claves que el serializador ya devolvió. Los diccionarios ordinarios no tienen estos hooks y no reciben campos nuevos. Los appends mal formados u otros errores de hooks se propagan.
 
 <a id="collection-method-addrelation"></a>
 
-### `addRelation(relation_data: dict[str, Any]) -> Collection`
+### `addRelation(relation_data: dict[str, Any]) -> Self`
 
 **Misma instancia.** Por cada elemento que exponga `setRelation`, invoca `item.setRelation(name, value)` para cada entrada del diccionario. Omite los elementos sin ese atributo. No crea claves en diccionarios, carga relaciones ni consulta una base de datos. Un hook no callable, una estructura de entrada inválida o un error del hook se propaga.
 

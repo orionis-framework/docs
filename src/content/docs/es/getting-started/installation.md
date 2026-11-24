@@ -21,6 +21,12 @@ uv run python -B reactor serve
 
 El instalador crea una aplicación desde uno de siete skeletons disponibles. Cada skeleton declara el requisito de Orionis en `pyproject.toml`; el instalador lo conserva y resuelve en el lockfile del proyecto.
 
+Para seguir esta edición, comprueba la versión resuelta dentro del proyecto generado. Si creas un proyecto específicamente para 1.9.0, declara `orionis==1.9.0` en las dependencias, conserva los extras de tus drivers (por ejemplo, `orionis[pgsql]==1.9.0`), ejecuta `uv sync` y guarda `uv.lock` en el control de versiones.
+
+```bash
+uv run python -c "from orionis.metadata import VERSION; print(VERSION)"
+```
+
 ## Requisitos previos
 
 - **[uv](https://docs.astral.sh/uv/getting-started/installation/) y [Git](https://git-scm.com/downloads)** disponibles en `PATH`. Git descarga el esqueleto incluso si omites la inicialización del repositorio de tu nueva aplicación.

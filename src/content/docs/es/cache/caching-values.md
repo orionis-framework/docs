@@ -565,13 +565,13 @@ Consulta [locks y regeneración concurrente](/es/cache/locks) antes de utilizarl
 
 ## Proxies del store predeterminado
 
-`CacheManager` delega las catorce operaciones asíncronas de valores anteriores, excepto `replace`, en `store()`. Sus argumentos, valores predeterminados, resultados y errores no cambian. Además, expone la fábrica síncrona `lock(key: str, timeout: float | None = None) -> Any`, cuyo resultado concreto es `CacheLock`.
+`CacheManager` delega sus catorce operaciones asíncronas de valores en el almacén predeterminado. Su fábrica síncrona `lock(key: str, timeout: float | None = None) -> CacheLock` devuelve un gestor de contexto asíncrono.
 
 El [mapa completo de proxies](/es/cache/manager-and-injection#manager-proxies) enumera todas las firmas del manager y enlaza con la operación correspondiente en esta página. Un proxy no añade reintentos, fallback ni una transacción.
 
 Para la fábrica síncrona de locks mediante la fachada, utiliza `manager = await Cache.resolve()` seguido de `manager.lock(...)`. Las operaciones asíncronas pueden esperarse directamente mediante `Cache`.
 
-`replace` está disponible en `ICacheRepository` y `CacheRepository`, no en `CacheManager`. Las fábricas concretas `lock` no están declaradas por `ICacheManager` ni `ICacheRepository`; considera esa diferencia al tipar un contrato inyectado. La [referencia de API](/es/cache/api-reference) enumera los contratos y los demás componentes públicos.
+Para un reemplazo condicional, llama a `await cache.store().replace(key, value, ttl)`. Tanto el contrato del administrador como el del repositorio declaran `lock()`. Consulta la [referencia de contratos](/es/cache/api-reference).
 
 ## Errores, concurrencia e invalidación
 

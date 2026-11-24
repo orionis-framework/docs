@@ -16,6 +16,8 @@ lastUpdated: false
 | `handleFailure(exception, context)` | `FailureHandling \| None` | Recibir la excepción original y seleccionar efectos diferidos una vez por incidente. |
 | `handleResult(value, context)` | `FailureHandling \| None` | Recibir un resultado declarado fallido sin fabricar una excepción. |
 
+Llamar a `handleCLI(exception, console)` o `handleHTTP(exception, request)` con `await` sobre una instancia de `BaseExceptionHandler` emite `DeprecationWarning` en 1.9.0. Al extender el handler, usa `handleFailure` para elegir la presentación en cualquiera de los dos transportes.
+
 `BaseExceptionHandler` implementa ambos. Su `handleFailure` retorna un plan que conserva logging y presentación HTTP/CLI predeterminados; su `handleResult` retorna `None`. El helper `toThrowable(exception)` convierte argumentos a texto y conserva el traceback nativo. `isExceptionIgnored(exception)` comprueba la clase exacta en `dont_catch` y rechaza valores que no sean excepciones con `TypeError`.
 
 ### `FailureHandling`

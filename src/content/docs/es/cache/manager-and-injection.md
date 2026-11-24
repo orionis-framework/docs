@@ -177,9 +177,9 @@ Estos métodos llaman al repositorio predeterminado. Sus parámetros, retornos y
 | `async add(key: str, value: Any, ttl: float \| None = None) -> bool` | [Agregar si falta](/es/cache/caching-values#repository-add). |
 | `async increment(key: str, amount: int = 1) -> int` | [Incrementar](/es/cache/caching-values#repository-increment). |
 | `async decrement(key: str, amount: int = 1) -> int` | [Decrementar](/es/cache/caching-values#repository-decrement). |
-| `lock(key: str, timeout: float \| None = None) -> Any` | Crear un [contexto CacheLock](/es/cache/locks). Síncrono; el retorno real es `CacheLock`. |
+| `lock(key: str, timeout: float \| None = None) -> CacheLock` | Crea de forma síncrona un [contexto de bloqueo](/es/cache/locks) para el almacén predeterminado. |
 
-`replace()` pertenece al repositorio: utiliza `cache.store().replace(...)`. No existe un proxy `Cache.replace(...)`. `lock()` existe en las implementaciones concretas del manager y del repositorio, aunque no figura en sus contratos abstractos actuales; la guía de bloqueos utiliza la fachada resuelta para acceder a él.
+Usa `await cache.store().replace(...)` para un reemplazo condicional. Para bloquear una clave en un almacén concreto, usa `async with cache.store(name).lock(key)`.
 
 ## Mantener coherencia con los datos permanentes
 

@@ -309,7 +309,7 @@ Estas instancias no leen `config/hashing.py` ni requieren la fachada. Los servic
 | `needsRehash(hashed)` | `bool` | Compara el hash con la política actual del driver. |
 | `getAlgorithm()` | `str` | `argon2id` o `bcrypt`. |
 | `setRounds(rounds)` | La misma instancia. | Modifica el coste del driver seleccionado. |
-| `driver(name=None)` | `IHasher` | Disponible en el manager y la fachada. Selecciona un driver sin cambiar el predeterminado. |
+| `driver(name=None)` | `Argon2Hasher` (`"argon2"`), `BcryptHasher` (`"bcrypt"`), `IHasher` (anotación para un nombre dinámico o el driver predeterminado) | Disponible en el manager y la fachada. Selecciona un driver sin cambiar el predeterminado. |
 | `getDefaultDriver()` | `str` | Disponible en el manager y la fachada. Devuelve `argon2` o `bcrypt`. |
 
 ## Errores y comportamiento verificado

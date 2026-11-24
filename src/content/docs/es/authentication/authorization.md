@@ -138,7 +138,7 @@ Consulta `/access` con el token descrito en [Tokens personales](/es/authenticati
 | `await Auth.canAny(names)` | Si concede al menos uno. |
 | `await Auth.canAll(names)` | Si concede todos. |
 | `await Auth.hasRole(name)` | Si la identidad pertenece al rol. |
-| `await Auth.authorization()` | Snapshot inmutable de permisos, roles y límites de la credencial. |
+| `await Auth.authorization()` | Un `IAuthorizationSnapshot` (la implementación integrada es `AuthorizationSnapshot`) con los permisos, roles y límites de la credencial. |
 
 Un invitado obtiene `False` al consultar permisos o roles. No hay herencia entre roles ni coincidencias por prefijo: `articles.*` no concede automáticamente `articles.publish`.
 

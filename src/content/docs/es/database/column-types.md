@@ -393,7 +393,7 @@ model_column = DateTime(timezone=True)
 
 La factoría devuelve `DateTime`; el constructor devuelve una nueva instancia del mismo tipo. Ambos heredan `ColumnDefinition`.
 
-DDL de la declaración de prueba: `sqlite`: `DATETIME NOT NULL`; `mysql`: `DATETIME NOT NULL`; `pgsql`: `TIMESTAMP WITHOUT TIME ZONE NOT NULL`; `sqlserver`: `DATETIME NOT NULL`; `oracle`: `DATE NOT NULL`.
+DDL de la declaración de prueba: `sqlite`: `DATETIME NOT NULL`; `mysql`: `DATETIME(6) NOT NULL`; `pgsql`: `TIMESTAMP WITHOUT TIME ZONE NOT NULL`; `sqlserver`: `DATETIME NOT NULL`; `oracle`: `DATE NOT NULL`.
 
 <a id="column-interval"></a>
 
@@ -803,7 +803,7 @@ model_column = StrictTimestamp(timezone=True)
 
 La factoría devuelve `StrictTimestamp`; el constructor devuelve una nueva instancia del mismo tipo. Ambos heredan `ColumnDefinition`.
 
-DDL de la declaración de prueba: `sqlite`: `TIMESTAMP NOT NULL`; `mysql`: `TIMESTAMP NOT NULL`; `pgsql`: `TIMESTAMP WITHOUT TIME ZONE NOT NULL`; `sqlserver`: `TIMESTAMP NOT NULL`; `oracle`: `TIMESTAMP NOT NULL`.
+DDL de la declaración de prueba: `sqlite`: `TIMESTAMP NOT NULL`; `mysql`: `TIMESTAMP(6) NOT NULL`; `pgsql`: `TIMESTAMP WITHOUT TIME ZONE NOT NULL`; `sqlserver`: `TIMESTAMP NOT NULL`; `oracle`: `TIMESTAMP NOT NULL`.
 
 <a id="column-strictbinary"></a>
 

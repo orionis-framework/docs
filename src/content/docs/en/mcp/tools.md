@@ -205,7 +205,7 @@ The resource and prompt demonstrate the same constructor and method injection. U
 
 ### Request context
 
-`McpRequest` exposes `id`, `method`, `server_id`, `transport`, `arguments`, `params`, `meta`, `uri`, `uri_variables`, `input_responses`, `request_state`, `identity`, `authentication` and `client_capabilities`. Context mappings are immutable snapshots, including nested values. Capabilities belong to the current request, not a remembered session.
+`McpRequest` exposes `id`, `method`, `server_id`, `transport`, `arguments`, `params`, `meta`, `uri`, `uri_variables`, `input_responses`, `request_state`, `identity`, `authentication` and `clientCapabilities`. `McpContext` is an alias for `McpRequest`. On HTTP, `native_request` holds the underlying Orionis `Request`. STDIO leaves it as `None`. Context mappings are immutable snapshots, including nested values. Capabilities belong to the current request. Read `request.clientCapabilities.get("extensions", {})` inside a handler to inspect its advertised extensions.
 
 An HTTP `Request` parameter resolves only on the HTTP transport; use `McpRequest` for components shared with STDIO. Parameters without a valid source fail during compilation. Handlers cannot accept `*args` or `**kwargs`. Defaults on ordinary parameters are used as defaults; they do not declare additional tool arguments outside the input contract.
 

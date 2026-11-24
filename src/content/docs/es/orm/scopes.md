@@ -10,7 +10,8 @@ Los scopes reúnen filtros repetidos. Un scope local se aplica cuando lo invocas
 ## Declarar y componer scopes locales
 
 ```python
-from orionis.orm import DateTime, Integer, Model, String
+from typing import TYPE_CHECKING, Self
+from orionis.orm import DateTime, Integer, Model, ModelQueryBuilder, String
 
 
 class Document(Model):
@@ -22,6 +23,10 @@ class Document(Model):
     timestamps = False
     soft_deletes = True
     fillable = ["title", "status", "tenant_id"]
+
+    if TYPE_CHECKING:
+        @classmethod
+        def forTenant(cls, tenant_id: int) -> ModelQueryBuilder[Self]: ...
 
     @staticmethod
     def scopePublished(query):
@@ -35,6 +40,8 @@ class Document(Model):
 async def published_for(tenant_id: int):
     return await Document.forTenant(tenant_id).published().orderBy("id").get()
 ```
+
+Los métodos de consulta de clase incorporados ya tienen declaraciones de tipos. Para un scope de la aplicación, el bloque opcional `TYPE_CHECKING` muestra al editor sus argumentos y el tipo de constructor del modelo. En ejecución, Orionis resuelve `Document.forTenant(tenant_id)` mediante `scopeForTenant`.
 
 `scopePublished` se expone como `published`; `scopeForTenant` como `forTenant`. El sufijo debe empezar por mayúscula. Decláralos con `@staticmethod` o `@classmethod`; reciben el builder seguido de tus argumentos, modifican ese objeto y no ejecutan SQL. Los valores de retorno no se encadenan. Una función async no sirve como scope porque no se espera su resultado.
 

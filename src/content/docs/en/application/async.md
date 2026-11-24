@@ -53,7 +53,7 @@ print(result)  # JOB-7
 
 Inside an async controller, use `await` directly. Both `run()` and `runSync()` raise `RuntimeError` if a loop is already running in the calling thread. They do not create another thread to handle this situation. A rejected coroutine remains unconsumed: its caller must await or close it.
 
-`execute()` accepts a function, not an already-created coroutine object. Sync callables run through `asyncio.to_thread`, which propagates the caller's `ContextVar` values to the worker. If one returns an awaitable, including a generator-based coroutine, that result is awaited back on the original loop.
+`execute()` accepts a function, not an already-created coroutine object. Sync callables run in the loop's default executor with a copy of the caller's `ContextVar` values. If one returns an awaitable, including a generator-based coroutine, that result is awaited back on the original loop.
 
 ### Resource ownership
 
@@ -69,7 +69,7 @@ Use [queues](/en/queues) when work must survive a restart; an asyncio task is no
 
 ### Callable bridge
 
-`Loop.execute(func, *args, **kwargs)` accepts both kinds of callable. A coroutine function is called and awaited on the current loop. A synchronous callable is sent through `asyncio.to_thread` to that loop's default executor, preserving the caller's context. If it returns an awaitable, the returned object is subsequently awaited on the current loop.
+`Loop.execute(func, *args, **kwargs)` accepts both kinds of callable. A coroutine function runs on the current loop. A synchronous callable runs in its default executor with the caller's context. If it returns an awaitable, the returned object is subsequently awaited on the current loop.
 
 ### Synchronous coroutine bridge
 
@@ -222,7 +222,7 @@ Loop-factory resolution and `uvloop` detection are process-wide caches guarded b
 
 The `asyncio` registration determines the thread's loop. `getEventLoop()` respects changes made with `asyncio.set_event_loop()` and reuses the registered open loop; a currently running loop takes precedence.
 
-`execute` uses the current loop's default executor through `asyncio.to_thread`; its capacity and lifecycle belong to that event loop. `runSync` runs in the calling thread and has no global pool serializing calls made from different threads.
+`execute` uses the current loop's default executor; its capacity and lifecycle belong to that event loop. `runSync` runs in the calling thread and has no global pool serializing calls made from different threads.
 
 `runSync` rejects nested loops. `createTask` only schedules work; concurrency depends on the coroutine yielding control.
 
@@ -259,10 +259,12 @@ The method accepts a coroutine object, not a coroutine function or a general awa
 #### `execute(func, /, *args, **kwargs)`
 
 ```text
-await Loop.execute(func, *args, **kwargs) -> Any
+await Loop.execute(func, /, *args, **kwargs) -> R
 ```
 
-Invokes a coroutine function directly and awaits it. It offloads any other callable to the current loop's default executor using `asyncio.to_thread`, propagating the caller's `ContextVar` values. Arguments and return values pass through unchanged; an awaitable recognized by `inspect.isawaitable` is awaited on the original loop before returning the result. Original exceptions cross the await boundary unchanged.
+Pass the function as the first positional argument. `R` is the resulting value type after the call and any returned awaitable have completed. If the caller is cancelled while waiting for a synchronous callback, queued work can be skipped. A callback already running in a thread may finish after the caller receives `CancelledError`.
+
+Invokes a coroutine function directly and awaits it. It offloads any other callable to the current loop's default executor, propagating the caller's `ContextVar` values. Arguments and return values pass through unchanged; an awaitable recognized by `inspect.isawaitable` is awaited on the original loop before returning the result. Original exceptions cross the await boundary unchanged.
 
 Await this method from a running event loop. It creates no private executor.
 

@@ -328,6 +328,8 @@ Ambos muestran las rutas HTTP registradas, ordenadas por URI, y su total. La tab
 La columna `Middleware` muestra los middleware explícitos de aplicación, grupos y rutas. Las capas automáticas de API y WEB representadas en los gráficos no aparecen en esa columna.
 :::
 
+Para inspeccionar las declaraciones desde Python durante la carga del archivo de rutas, llama a `Route.export()` después de registrarlas. El resultado es un diccionario `RouterExport`. Su lista `routes` contiene las declaraciones en orden de registro, incluidos `method`, `path`, `name`, `protocol`, los handlers y las clases de middleware. `fallback` es el par `(controlador, handler)`, inicialmente `(None, None)`. Una ruta incompleta sin acción ni vista produce `ValueError`. Las entradas pueden contener clases y funciones de Python. Selecciona los campos que necesitas antes de serializarlos.
+
 ## Resolución y conflictos
 
 Las rutas estáticas se consultan antes que las dinámicas. Las dinámicas se ordenan por especificidad de sus segmentos; si empatan, conservan el orden de registro. No supongas que `{id:int}` tiene prioridad automática sobre `{name:str}` cuando ambas pueden coincidir: evita solapamientos o declara primero la más específica.

@@ -5,9 +5,11 @@ editUrl: true
 lastUpdated: false
 ---
 
-## The base class for every test
+<a id="the-base-class-for-every-test"></a>
 
-All test cases in an Orionis application must extend `TestCase`, imported from the public package:
+## Test cases with dependency injection
+
+Import the framework’s `TestCase` to enable method injection and asynchronous tests.
 
 ```python
 from orionis.test import TestCase

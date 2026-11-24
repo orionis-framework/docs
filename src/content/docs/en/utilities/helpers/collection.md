@@ -7,11 +7,13 @@ lastUpdated: false
 
 `Collection` wraps data already loaded in memory. Import it from `orionis.support.types`; `orionis.support.types.collection.Collection` is the same class. Filtering a collection does not execute SQL.
 
+Use `Collection[T]` to annotate a collection of items of type `T`. For example, `Collection([2, 3]).map(str)` returns a `Collection[str]`. Indexing a list-backed collection returns one item, while slicing returns a collection. In the signatures below, `U` is a transformed item type and `Self` is the concrete collection type.
+
 ## Construction and data ownership
 
 <a id="collection-method-init"></a>
 
-### `Collection(items: list[Any] | dict[Any, Any] | None = None)` — `__init__`
+### `Collection(items: list[T] | dict[Any, Any] | None = None)` — `__init__`
 
 The initializer `Collection(items=None)` keeps supplied lists or dictionaries by reference, including empty ones. Only `None` creates a fresh empty list. Dictionary-backed results from `pluck(value, key)` and `groupBy(key)` remain dictionaries, including `{}`. Read them with `all()` or key access; iteration yields keys. List-only operations are not general dictionary operations.
 
@@ -80,7 +82,7 @@ asyncio.run(main())
 
 <a id="collection-method-all"></a>
 
-### `all() -> list[Any]`
+### `all() -> list[T] | dict[Any, Any]`
 
 Returns the actual backing structure, not a copy. Although annotated as a list, a dictionary-backed collection returns its dictionary.
 
@@ -108,13 +110,13 @@ assert Collection().isEmpty()
 
 <a id="collection-method-first"></a>
 
-### `first(callback: Callable | None = None) -> object`
+### `first(callback: Callable[[T], object] | None = None) -> T | None`
 
 Returns the first item, or the first for which `callback(item)` is truthy. Stops after the first match. Returns `None` on an empty list or no match.
 
 <a id="collection-method-last"></a>
 
-### `last(callback: Callable | None = None) -> object`
+### `last(callback: Callable[[T], object] | None = None) -> T | None`
 
 Returns the last item or last matching item, otherwise `None`. With a callback it traverses all items. A matching `None` is indistinguishable from no match.
 
@@ -134,7 +136,7 @@ assert Collection().last() is None
 
 <a id="collection-method-get"></a>
 
-### `get(key: int | str, default: object = None) -> object`
+### `get(key: int | str, default: object | None = None) -> object`
 
 Reads through bracket access. Missing indices or dictionary keys (`IndexError`, `KeyError`) return the default; a callable default is invoked with no arguments only when missing. Negative list indices work. It does not interpret nested paths. Invalid list key types still raise `TypeError`; a slice works at runtime and returns a new collection.
 
@@ -153,13 +155,13 @@ assert Collection({"name": "Ada"}).get("name") == "Ada"
 
 <a id="collection-method-contains"></a>
 
-### `contains(key: str | Callable, value: object = None) -> bool`
+### `contains(key: str | Callable[[T], object], value: object | None = None) -> bool`
 
 Three forms: `contains(item)` uses ordinary membership; `contains(predicate)` tests `predicate(item)` until a truthy match; `contains(path, value)` compares the extracted value using Python equality. The third form is selected only when `value is not None`: to search for a `None` field, use a predicate. A callable first argument is always treated as a predicate when no non-`None` second value is supplied.
 
 <a id="collection-method-every"></a>
 
-### `every(callback: Callable) -> bool`
+### `every(callback: Callable[[T], object]) -> bool`
 
 Evaluates `callback(item)` until a falsy result. An empty collection returns `True`.
 
@@ -182,31 +184,31 @@ assert Collection().every(lambda item: False)
 
 <a id="collection-method-map"></a>
 
-### `map(callback: Callable) -> Collection`
+### `map(callback: Callable[[T], U]) -> Collection[U]`
 
 **New.** Stores every `callback(item)` result, including falsy values.
 
 <a id="collection-method-filter"></a>
 
-### `filter(callback: Callable) -> Collection`
+### `filter(callback: Callable[[T], object]) -> Collection[T]`
 
 **New.** Keeps items with a truthy `callback(item)` result. The callback is required; there is no parameterless truthiness filter.
 
 <a id="collection-method-reject"></a>
 
-### `reject(callback: Callable) -> Collection`
+### `reject(callback: Callable[[T], object]) -> Self`
 
 **Same instance.** Replaces the list with items whose callback result is falsy.
 
 <a id="collection-method-transform"></a>
 
-### `transform(callback: Callable) -> Collection`
+### `transform(callback: Callable[[T], T]) -> Collection[T]`
 
 **Same instance.** Replaces the list with all callback results, including `0`, `False`, and `None`.
 
 <a id="collection-method-each"></a>
 
-### `each(callback: Callable) -> Collection`
+### `each(callback: Callable[[T], T]) -> Collection[T]`
 
 **Same instance.** Replaces each visited item with the callback's truthy result. A falsy result stops iteration **before replacing that item**; later items remain unchanged. A side-effect-only callback returning `None` therefore stops on the first item.
 
@@ -228,7 +230,7 @@ assert items.all() == [10, 2, 3]
 
 <a id="collection-method-mapinto"></a>
 
-### `mapInto(cls: type, method: str | None = None, **kwargs: object) -> Collection`
+### `mapInto(cls: type, method: str | None = None, **kwargs: object) -> Collection[Any]`
 
 **New.** Calls `cls(item, **kwargs)` when no method is supplied, or the selected class/static method as `method(item, **kwargs)`. A non-type `cls` raises `TypeError`. A missing method yields one `None` per item. Per-item `TypeError`, `AttributeError`, or `ValueError` becomes `None`; other exceptions propagate.
 
@@ -261,7 +263,7 @@ The field readers used by `pluck`, `contains(path, value)`, `where`, `whereIn`, 
 
 <a id="collection-method-pluck"></a>
 
-### `pluck(value: str, key: str | None = None) -> Collection`
+### `pluck(value: str, key: str | None = None) -> Collection[Any]`
 
 **New.** With a falsy/omitted `key`, returns a list of extracted values, omitting `None` but keeping other falsy values. With a truthy `key`, builds a dictionary indexed by that extracted field: `None` values/keys are retained, duplicate keys overwrite earlier values, and unhashable keys raise `TypeError`. The result may be dictionary-backed; an empty keyed result is `{}`.
 
@@ -283,7 +285,7 @@ assert Collection([{"users": [{"name": "Ada"}, {"name": "Grace"}]}]).pluck("user
 
 <a id="collection-method-where"></a>
 
-### `where(key: str, *args: object) -> Collection`
+### `where(key: str, *args: object) -> Collection[T]`
 
 **New.** `where(key, value)` uses `==`; `where(key, operator, value)` accepts `<`, `<=`, `==`, `!=`, `>`, `>=`. No value raises `ValueError`. Extra arguments beyond operator/value are ignored. Comparisons first use native Python operations; a `TypeError` retries with both operands converted to strings, which can produce lexicographic ordering. Unsupported operators and comparison `TypeError`/`ValueError` cause that item to be skipped, usually producing an empty collection rather than raising. Missing fields compare as `None`.
 
@@ -303,13 +305,13 @@ assert Collection([{}]).where("missing", None).count() == 1
 
 <a id="collection-method-wherein"></a>
 
-### `whereIn(key: str, values: list[Any] | Collection) -> Collection`
+### `whereIn(key: str, values: list[Any] | ICollection) -> Collection[T]`
 
 **New.** Keeps items whose extracted value equals a member of `values` **or has the same `str()` representation**. Supports unhashable values through an equality fallback.
 
 <a id="collection-method-wherenotin"></a>
 
-### `whereNotIn(key: str, values: list[Any] | Collection) -> Collection`
+### `whereNotIn(key: str, values: list[Any] | ICollection) -> Collection[T]`
 
 **New.** Excludes the same matches. Both methods accept a list or collection as their documented input; they do not provide strict-type matching. Other runtime inputs are not type-validated and must be iterable/reusable for the implementation's multiple passes.
 
@@ -328,19 +330,19 @@ assert nested.whereNotIn("v", [[2]]).all() == [{"v": [1]}]
 
 <a id="collection-method-take"></a>
 
-### `take(number: int) -> Collection`
+### `take(number: int) -> Collection[T]`
 
 **New.** A positive number takes the first items, a negative number takes the last `abs(number)` items, and zero returns an empty collection. Ordinary slice bounds clamp to the available length.
 
 <a id="collection-method-chunk"></a>
 
-### `chunk(size: int) -> Collection`
+### `chunk(size: int) -> Collection[Self]`
 
 **New.** Returns a collection of collections of up to `size` items. `size <= 0` raises `ValueError`; a non-integer size cannot be used by `range` and raises `TypeError`.
 
 <a id="collection-method-forpage"></a>
 
-### `forPage(page: int, number: int) -> Collection`
+### `forPage(page: int, number: int) -> Collection[T]`
 
 **New.** Returns an in-memory page of `number` items, normalizing `page < 1` to 1. `number <= 0` raises `ValueError`; usable slice indices must be integers. An out-of-range page is empty. It has no database total, query, or paginator metadata.
 
@@ -361,13 +363,13 @@ assert items.forPage(9, 2).all() == []
 
 <a id="collection-method-collapse"></a>
 
-### `collapse() -> Collection`
+### `collapse() -> Collection[Any]`
 
 **New.** Extends a list with each nested item, unwrapping nested collections first. Flattens one iterable level: dictionaries contribute keys, strings contribute characters, and noniterable scalars raise `TypeError`.
 
 <a id="collection-method-flatten"></a>
 
-### `flatten() -> Collection`
+### `flatten() -> Collection[Any]`
 
 **New.** Recursively traverses lists and dictionary **values**. Tuples, strings, nested `Collection` instances, and other objects remain leaf values. There is no depth argument; cyclic lists/dictionaries eventually raise `RecursionError`.
 
@@ -384,13 +386,13 @@ assert flat[-1] is nested
 
 <a id="collection-method-diff"></a>
 
-### `diff(items: list[Any] | Collection) -> Collection`
+### `diff(items: list[Any] | ICollection) -> Collection[T]`
 
 **New.** Keeps source items absent from the supplied data, preserving source order and duplicates. Tries a set for membership and falls back to equality-based list membership when values are unhashable. It unwraps a `Collection` without enforcing list input; incompatible/noniterable arguments can raise `TypeError`.
 
 <a id="collection-method-zip"></a>
 
-### `zip(items: list[Any] | ICollection) -> Collection`
+### `zip(items: list[U] | ICollection[U]) -> Collection[list[T | U]]`
 
 **New.** Pairs items as two-element lists up to the shorter length. Accepts a list or any `ICollection` implementation; other types raise `TypeError`. Takes one other sequence.
 
@@ -406,7 +408,7 @@ assert Collection([1]).zip(Collection(["a"])).all() == [[1, "a"]]
 
 <a id="collection-method-groupby"></a>
 
-### `groupBy(key: str) -> Collection`
+### `groupBy(key: str) -> Collection[Any]`
 
 **New base `Collection`.** Builds `{group_key: [original_items]}` after extracting and sorting grouping keys. Empty input produces `{}`. Keys must be mutually orderable and hashable; unsupported sorting or keys raise `TypeError`. Order within each group remains stable. Accepts a field name/path, not a callback. Missing fields become `None`.
 
@@ -414,7 +416,7 @@ assert Collection([1]).zip(Collection(["a"])).all() == [[1, "a"]]
 
 <a id="collection-unique-performance"></a>
 
-### `unique(key: str | Callable | None = None) -> Collection`
+### `unique(key: str | Callable[[T], object] | None = None) -> Collection[T]`
 
 Without a truthy key, returns a **new** collection through `list(set(items))` for hashable items, with no promised order. Unhashable items retain their first occurrence using equality-compatible deduplication. With a string key or synchronous callable selector, list-backed collections keep the first item for each selected value, including equal lists and dictionaries; missing fields count as `None`. A truthy key on a dictionary-backed collection still returns `self`; omitting the key deduplicates dictionary keys.
 
@@ -443,25 +445,25 @@ assert sorted(indexed.unique().all()) == ["a", "b"]
 
 <a id="collection-method-push"></a>
 
-### `push(value: object) -> Collection`
+### `push(value: T) -> Self`
 
 **Same instance.** Appends one value to a list; a list argument is one nested item.
 
 <a id="collection-method-prepend"></a>
 
-### `prepend(value: object) -> Collection`
+### `prepend(value: T) -> Self`
 
 **Same instance.** Inserts one value at index zero. There is no key parameter.
 
 <a id="collection-method-put"></a>
 
-### `put(key: int | str, value: object) -> Collection`
+### `put(key: int | str, value: T) -> Self`
 
 **Same instance.** Delegates to bracket assignment. For a list it replaces an existing index (including negative indices); it cannot append beyond the end. Dictionary backing supports dictionary keys. Invalid index/key types propagate the underlying errors.
 
 <a id="collection-method-merge"></a>
 
-### `merge(items: list[Any] | ICollection) -> Collection`
+### `merge(items: list[T] | ICollection[T]) -> Self`
 
 **Same instance.** Extends the current list using `+=`. Accepts a list or any `ICollection` implementation; other types raise `TypeError`. Dictionary-backed collections contribute keys. It does not merge nested dictionaries.
 
@@ -481,25 +483,25 @@ assert indexed.put("b", 2).all() == {"a": 1, "b": 2}
 
 <a id="collection-method-forget"></a>
 
-### `forget(*keys: int | str) -> Collection`
+### `forget(*keys: int | str) -> Self`
 
 **Same instance.** Sorts keys in descending order, then deletes each key/index. With no keys it changes nothing. Use distinct nonnegative list indices to avoid shifting surprises; negative/duplicate indices follow sequential Python deletion semantics. Mixing unsortable keys raises `TypeError`; missing indices/keys raise `IndexError`/`KeyError`, and earlier deletions can already have happened.
 
 <a id="collection-method-pop"></a>
 
-### `pop() -> object`
+### `pop() -> T | None`
 
 Removes and returns the last list item; an empty collection returns `None`. Takes no index argument.
 
 <a id="collection-method-pull"></a>
 
-### `pull(key: int | str) -> object`
+### `pull(key: int | str) -> T | None`
 
 Reads and deletes the selected item, returning its value. Missing list indices or dictionary keys return `None`; there is no default argument.
 
 <a id="collection-method-shift"></a>
 
-### `shift() -> object`
+### `shift() -> T | None`
 
 Removes and returns the first item through `pull(0)`. Empty collections return `None`.
 
@@ -523,13 +525,13 @@ assert Collection([1]).pull(9) is None
 
 <a id="collection-method-reverse"></a>
 
-### `reverse() -> Collection`
+### `reverse() -> Self`
 
 **Same instance.** Reverses the backing list.
 
 <a id="collection-method-sort"></a>
 
-### `sort(key: str | None = None) -> Collection`
+### `sort(key: str | None = None) -> Self`
 
 **Same instance.** Sorts the backing list ascending, directly or by the extracted field for a truthy key. No reverse flag or callback parameter is supported. Use `.sort().reverse()` for descending order. Values must be mutually orderable; Python sorting exceptions propagate.
 
@@ -547,7 +549,7 @@ assert rows.sort("v").all() == [{"v": 1}, {"v": 3}]
 
 <a id="collection-method-random"></a>
 
-### `random(count: int | None = None) -> object | Collection | None`
+### `random(count: int | None = None) -> T | Collection[T] | None`
 
 Empty collections return `None` before count validation. An omitted count or `None` returns one item without mutation. An explicit nonnegative count samples positions without replacement, replaces the backing list and returns the same collection; `0` empties it. Duplicate values can remain when the source contains duplicates. Negative or oversized counts raise `ValueError`.
 
@@ -682,13 +684,13 @@ assert Collection({"a": 1}).serialize() == ["a"]
 
 <a id="collection-method-setappends"></a>
 
-### `setAppends(appends: list[str]) -> Collection`
+### `setAppends(appends: list[str]) -> Self`
 
 **Same instance.** Extends `__appends__`; repeated calls accumulate and do not replace/deduplicate entries. During serialization, calls an item's `set_appends(appends)` if present, suppressing only `AttributeError` from that call. When `serialize()` returns a dictionary and the item has callable `getAttribute`, appends each named attribute unless listed in `type(item).__meta__.hidden`. Appended values can replace existing serializer keys. Ordinary dictionaries have neither hook and gain no fields. Malformed appends or other hook errors propagate.
 
 <a id="collection-method-addrelation"></a>
 
-### `addRelation(relation_data: dict[str, Any]) -> Collection`
+### `addRelation(relation_data: dict[str, Any]) -> Self`
 
 **Same instance.** For each item exposing `setRelation`, calls `item.setRelation(name, value)` for every dictionary entry. Items without that attribute are skipped. It does not create dictionary keys, load relations, or query a database. A non-callable hook, invalid mapping, or hook error propagates.
 

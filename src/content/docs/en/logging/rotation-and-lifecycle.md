@@ -32,7 +32,7 @@ Relative paths resolve from the application root; absolute paths retain their lo
 
 ## Rotation by period
 
-Each record requests the current suffix. When it differs from the open file's suffix, the handler closes that file, applies retention, and opens the file for the new period. Without new records, no files are created, period changes are not checked, and cleanup does not run.
+For time-based channels, the record’s creation time determines the destination file and the timestamp printed in the log. A record queued before midnight still belongs to that day when the listener writes it after midnight. A change of suffix closes the open file and triggers retention. Cleanup runs on rotation.
 
 | Channel | Suffix | Effective file boundary |
 |---|---|---|
@@ -41,7 +41,7 @@ Each record requests the current suffix. When it differs from the open file's su
 | `weekly` | `YYYY-weekWW` | ISO week change: Monday, using the ISO year. |
 | `monthly` | `YYYY-MM` | Calendar month change. |
 
-For example, December 29, 2025 belongs to `2026-week01`. The week is not calculated by splitting the year into seven-day blocks. Resolvers capture the `DateTime` timezone when constructed; when passed an explicit `datetime`, `getSuffix(dt)` formats that value without converting it to another timezone.
+December 29, 2025 belongs to ISO week `2026-week01`. When clocks move back, the second occurrence of an hour adds its UTC offset to the hourly filename, for example `2026-11-01_01_-0500` in `America/New_York`. The built-in resolvers use the current application zone each time. They convert aware datetimes to that zone and interpret naive datetimes as local time. Set a resolver’s `tz` to a specific `tzinfo` to pin it, or assign `None` to follow the application again.
 
 ```dotenv
 LOG_CHANNEL=daily
@@ -199,13 +199,13 @@ getNextRotationTime(current_time: datetime) -> datetime
 
 | Class | Constructor | `getNextRotationTime()` result |
 |---|---|---|
-| `HourlySuffixResolver` | `()` | Beginning of the following hour, using the resolver's timezone. |
-| `DailySuffixResolver` | `(at_time: time | None = None)` | Next configured daily date/time; the following day if it has passed. |
+| `HourlySuffixResolver` | `()` | Next change of local hour or occurrence of a repeated hour. |
+| `DailySuffixResolver` | `(at_time: time \| None = None)` | Next configured daily date/time; the following day if it has passed. |
 | `WeeklySuffixResolver` | `(at_time: time \| None = None)` | The upcoming Monday at that time; today if it is Monday before the configured time, otherwise next week. |
 | `MonthlySuffixResolver` | `(at_time: time \| None = None)` | The upcoming first day at that time; today if it is the first before that time, otherwise next month. |
-| `ChunkedSuffixResolver` | `()` | `current_time + timedelta(hours=1)`, unused as an integrated trigger. |
+| `ChunkedSuffixResolver` | `()` | One elapsed hour later in the resolver’s zone. Chunk rotation uses the file size. |
 
-For the three constructors with `at_time`, `None` means midnight. These are extension APIs: the integrated handler consumes `getSuffix()` and does not schedule the time calculated by `getNextRotationTime()`.
+For the three constructors with `at_time`, `None` means midnight. When a configured boundary falls in a skipped local hour, the resolver advances to the next existing daily, weekly or monthly boundary. These are extension APIs: the integrated handler consumes `getSuffix()` and does not schedule the time calculated by `getNextRotationTime()`.
 
 ```python
 from datetime import UTC, datetime, time
@@ -215,8 +215,11 @@ from orionis.logging.handlers.weekly_suffix_resolver import WeeklySuffixResolver
 moment = datetime(2026, 10, 23, 15, 30, tzinfo=UTC)
 daily = DailySuffixResolver(time(2, 30))
 
+daily.tz = UTC
+weekly = WeeklySuffixResolver()
+weekly.tz = UTC
 assert daily.getSuffix(moment) == "2026-10-23"
-assert WeeklySuffixResolver().getSuffix(moment) == "2026-week43"
+assert weekly.getSuffix(moment) == "2026-week43"
 ```
 
 <a id="handler-api"></a>

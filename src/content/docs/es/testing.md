@@ -7,7 +7,7 @@ lastUpdated: false
 
 El componente de pruebas de Orionis integra el descubrimiento de casos, el contenedor de la aplicación y la ejecución asíncrona con las aserciones de `unittest`. Permite comprobar reglas, servicios e integraciones desde la misma aplicación que registra sus proveedores y configuración.
 
-**Todos los casos deben heredar de `TestCase`, importado mediante `from orionis.test import TestCase`.** Admite métodos `def` y `async def`; el método seleccionado se ejecuta con resolución automática de dependencias. Cada caso dispone de un event loop aislado, mientras que el contenedor y los datos externos pueden seguir compartidos.
+Hereda de `orionis.test.TestCase` cuando el método de prueba necesite un servicio del contenedor. Esta clase admite métodos síncronos y asíncronos y proporciona un bucle de eventos aislado por caso. El motor también descubre subclases de `unittest.TestCase`, que conservan su ciclo de vida y se ejecutan sin la inyección de métodos de Orionis.
 
 ## Recorrido recomendado
 

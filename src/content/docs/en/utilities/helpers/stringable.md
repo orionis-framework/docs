@@ -1825,7 +1825,7 @@ All conditional convenience methods use `when(condition, callback, default=None)
 
 <a id="stringable-method-pipe"></a>
 
-**`pipe(callback: Callable) -> Stringable`**
+**`pipe(callback: Callable[[Stringable], object]) -> Stringable`**
 
 Call `callback(self)` once and use its result. Preserve a returned Stringable; otherwise construct `Stringable(result)`, so numbers stringify and `None` becomes `"None"`. It always returns a Stringable rather than an arbitrary callback result. A non-callable raises `TypeError`; callback exceptions propagate. Async callbacks are not awaited.
 
@@ -1838,7 +1838,7 @@ assert Stringable("hello").pipe(lambda s: s.upper()) == "HELLO"
 
 <a id="stringable-method-tap"></a>
 
-**`tap(callback: Callable[[Stringable], Any]) -> Stringable`**
+**`tap(callback: Callable[[Stringable], object]) -> Stringable`**
 
 Call `callback(self)` for a side effect, ignore its return and return the same instance (`is`). Stringable itself remains immutable. A non-callable fails with `TypeError` when called; callback exceptions propagate and async callbacks are not awaited.
 
@@ -1854,7 +1854,7 @@ assert s.tap(lambda value: value.upper()) == "hello"
 
 <a id="stringable-method-when"></a>
 
-**`when(condition: bool | Callable, callback: Callable, default: Callable | None=None) -> Stringable`**
+**`when(condition: bool | Callable[[Stringable], object], callback: Callable[[Stringable], object], default: Callable[[Stringable], object] | None=None) -> Stringable`**
 
 Accept a bool or synchronous predicate `condition(self)`; evaluate a callable predicate once and test its result by truthiness. Execute `callback(self)` if true, otherwise `default(self)` when provided. Wrap a non-Stringable branch result with `Stringable`, including `None`→`"None"`. With no selected branch, return the same instance. Invalid condition/callback/default types raise `TypeError`; callback exceptions propagate. Predicates and callbacks are not awaited.
 
@@ -1870,7 +1870,7 @@ assert s.when(True, lambda value: None) == "None"
 
 <a id="stringable-method-whencontains"></a>
 
-**`whenContains(needles: str | list[str], callback: Callable, default: Callable | None=None) -> Stringable`**
+**`whenContains(needles: str | list[str], callback: Callable[[Stringable], object], default: Callable[[Stringable], object] | None=None) -> Stringable`**
 
 Use the case-sensitive `contains(needles)` any-match condition; inherit its iterable support and errors. Branch callbacks receive one Stringable argument; `default=None` and result coercion/identity follow `when`.
 
@@ -1882,7 +1882,7 @@ assert Stringable("hello world").whenContains("world", lambda s: s.upper()) == "
 
 <a id="stringable-method-whencontainsall"></a>
 
-**`whenContainsAll(needles: list[str], callback: Callable, default: Callable | None=None) -> Stringable`**
+**`whenContainsAll(needles: list[str], callback: Callable[[Stringable], object], default: Callable[[Stringable], object] | None=None) -> Stringable`**
 
 Test `all(needle in str(self) for needle in needles)` directly. Unlike `containsAll`, an empty iterable selects the callback and a string is iterated character by character; it does not perform the stricter list validation. Branch callbacks receive one Stringable argument; `default=None` and result coercion/identity follow `when`.
 
@@ -1895,7 +1895,7 @@ assert Stringable("hello").whenContainsAll([], lambda s: "selected") == "selecte
 
 <a id="stringable-method-whenempty"></a>
 
-**`whenEmpty(callback: Callable, default: Callable | None=None) -> Stringable`**
+**`whenEmpty(callback: Callable[[Stringable], object], default: Callable[[Stringable], object] | None=None) -> Stringable`**
 
 Select the callback only for the empty string, using `isEmpty`; whitespace selects the default or leaves the original. Branch callbacks receive one Stringable argument; `default=None` and result coercion/identity follow `when`.
 
@@ -1907,7 +1907,7 @@ assert Stringable("").whenEmpty(lambda s: "fallback") == "fallback"
 
 <a id="stringable-method-whennotempty"></a>
 
-**`whenNotEmpty(callback: Callable, default: Callable | None=None) -> Stringable`**
+**`whenNotEmpty(callback: Callable[[Stringable], object], default: Callable[[Stringable], object] | None=None) -> Stringable`**
 
 Select the callback whenever `isNotEmpty()` is true, including whitespace-only text. Branch callbacks receive one Stringable argument; `default=None` and result coercion/identity follow `when`.
 
@@ -1919,7 +1919,7 @@ assert Stringable("hello").whenNotEmpty(lambda s: s.upper()) == "HELLO"
 
 <a id="stringable-method-whenendswith"></a>
 
-**`whenEndsWith(needles: str | list[str], callback: Callable, default: Callable | None=None) -> Stringable`**
+**`whenEndsWith(needles: str | list[str], callback: Callable[[Stringable], object], default: Callable[[Stringable], object] | None=None) -> Stringable`**
 
 Use the case-sensitive any-suffix `endsWith` condition, including its iterable support and errors. Branch callbacks receive one Stringable argument; `default=None` and result coercion/identity follow `when`.
 
@@ -1931,7 +1931,7 @@ assert Stringable("file.py").whenEndsWith(".py", lambda s: s.upper()) == "FILE.P
 
 <a id="stringable-method-whendoesntendwith"></a>
 
-**`whenDoesntEndWith(needles: str | list[str], callback: Callable, default: Callable | None=None) -> Stringable`**
+**`whenDoesntEndWith(needles: str | list[str], callback: Callable[[Stringable], object], default: Callable[[Stringable], object] | None=None) -> Stringable`**
 
 Negate `endsWith`; this delegates to its broader iterable API, rather than to the stricter `doesntEndWith` validator. Branch callbacks receive one Stringable argument; `default=None` and result coercion/identity follow `when`.
 
@@ -1943,7 +1943,7 @@ assert Stringable("file.txt").whenDoesntEndWith(".py", lambda s: s.upper()) == "
 
 <a id="stringable-method-whenexactly"></a>
 
-**`whenExactly(value: str, callback: Callable, default: Callable | None=None) -> Stringable`**
+**`whenExactly(value: str, callback: Callable[[Stringable], object], default: Callable[[Stringable], object] | None=None) -> Stringable`**
 
 Use `exactly(value)`, requiring a case-sensitive whole-string match and a string value. Branch callbacks receive one Stringable argument; `default=None` and result coercion/identity follow `when`.
 
@@ -1955,7 +1955,7 @@ assert Stringable("hello").whenExactly("hello", lambda s: s.upper()) == "HELLO"
 
 <a id="stringable-method-whennotexactly"></a>
 
-**`whenNotExactly(value: str, callback: Callable, default: Callable | None=None) -> Stringable`**
+**`whenNotExactly(value: str, callback: Callable[[Stringable], object], default: Callable[[Stringable], object] | None=None) -> Stringable`**
 
 Negate `exactly(value)`; a non-string comparison value raises `TypeError` before branch selection. Branch callbacks receive one Stringable argument; `default=None` and result coercion/identity follow `when`.
 
@@ -1967,7 +1967,7 @@ assert Stringable("hello").whenNotExactly("world", lambda s: s.upper()) == "HELL
 
 <a id="stringable-method-whenstartswith"></a>
 
-**`whenStartsWith(needles: str | list[str], callback: Callable, default: Callable | None=None) -> Stringable`**
+**`whenStartsWith(needles: str | list[str], callback: Callable[[Stringable], object], default: Callable[[Stringable], object] | None=None) -> Stringable`**
 
 Test any case-sensitive prefix. A non-list argument becomes a one-item list, then every item must be a string (`TypeError` otherwise); tuples are not treated as multiple prefixes. Branch callbacks receive one Stringable argument; `default=None` and result coercion/identity follow `when`.
 
@@ -1979,7 +1979,7 @@ assert Stringable("hello world").whenStartsWith(["hi", "hello"], lambda s: s.upp
 
 <a id="stringable-method-whendoesntstartwith"></a>
 
-**`whenDoesntStartWith(needles: str | list[str], callback: Callable, default: Callable | None=None) -> Stringable`**
+**`whenDoesntStartWith(needles: str | list[str], callback: Callable[[Stringable], object], default: Callable[[Stringable], object] | None=None) -> Stringable`**
 
 Negate the same inline prefix-any check as `whenStartsWith`, with the same string/list element validation. An empty list selects the callback. Branch callbacks receive one Stringable argument; `default=None` and result coercion/identity follow `when`.
 
@@ -1991,7 +1991,7 @@ assert Stringable("hello").whenDoesntStartWith("world", lambda s: s.upper()) == 
 
 <a id="stringable-method-whentest"></a>
 
-**`whenTest(pattern: str, callback: Callable, default: Callable | None=None) -> Stringable`**
+**`whenTest(pattern: str, callback: Callable[[Stringable], object], default: Callable[[Stringable], object] | None=None) -> Stringable`**
 
 Use `test(pattern)` as a Python regex search condition; regex/type errors propagate before branch selection. Branch callbacks receive one Stringable argument; `default=None` and result coercion/identity follow `when`.
 
@@ -2003,7 +2003,7 @@ assert Stringable("hello42").whenTest(r"\d+$", lambda s: s.upper()) == "HELLO42"
 
 <a id="stringable-method-whenis"></a>
 
-**`whenIs(pattern: str | list[str], callback: Callable, default: Callable | None=None) -> Stringable`**
+**`whenIs(pattern: str | list[str], callback: Callable[[Stringable], object], default: Callable[[Stringable], object] | None=None) -> Stringable`**
 
 Use `isPattern(pattern)` shell-style whole-value matching with its default ignore_case setting and platform behavior. It exposes no ignore_case parameter; pattern validation errors propagate. Branch callbacks receive one Stringable argument; `default=None` and result coercion/identity follow `when`.
 
@@ -2015,7 +2015,7 @@ assert Stringable("hello.txt").whenIs("*.txt", lambda s: s.upper()) == "HELLO.TX
 
 <a id="stringable-method-whenisascii"></a>
 
-**`whenIsAscii(callback: Callable, default: Callable | None=None) -> Stringable`**
+**`whenIsAscii(callback: Callable[[Stringable], object], default: Callable[[Stringable], object] | None=None) -> Stringable`**
 
 Select using `isAscii`, which includes empty text and ASCII control characters. Branch callbacks receive one Stringable argument; `default=None` and result coercion/identity follow `when`.
 
@@ -2027,7 +2027,7 @@ assert Stringable("hello").whenIsAscii(lambda s: s.upper()) == "HELLO"
 
 <a id="stringable-method-whenisuuid"></a>
 
-**`whenIsUuid(callback: Callable, default: Callable | None=None) -> Stringable`**
+**`whenIsUuid(callback: Callable[[Stringable], object], default: Callable[[Stringable], object] | None=None) -> Stringable`**
 
 Select using `isUuid()` with no version filter. This only validates an existing value. Branch callbacks receive one Stringable argument; `default=None` and result coercion/identity follow `when`.
 
@@ -2039,7 +2039,7 @@ assert Stringable("550e8400-e29b-41d4-a716-446655440000").whenIsUuid(lambda s: "
 
 <a id="stringable-method-whenisulid"></a>
 
-**`whenIsUlid(callback: Callable, default: Callable | None=None) -> Stringable`**
+**`whenIsUlid(callback: Callable[[Stringable], object], default: Callable[[Stringable], object] | None=None) -> Stringable`**
 
 Select using the current alphabet/length `isUlid` check, including its documented range limitations. Branch callbacks receive one Stringable argument; `default=None` and result coercion/identity follow `when`.
 

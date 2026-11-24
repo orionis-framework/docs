@@ -47,7 +47,7 @@ Responde `{"name":"Ada"}`. En PowerShell, utiliza `curl.exe` si `curl` es un ali
 | `await request.data()` | Diccionario para JSON objeto, URL encoded, multipart o MessagePack mapa. Conserva campos repetidos de formularios como listas. |
 | `await request.payload()` | Selecciona un parser por `Content-Type`; si no existe, devuelve bytes. Su resultado depende del formato. |
 | `await request.json()` | Cualquier valor JSON: objeto, lista, cadena, número, booleano o `None`. |
-| `await request.formUrlEncoded()` | Diccionario de textos URL encoded; conserva el último valor de cada nombre. |
+| `await request.formUrlEncoded()` | `dict[str, str]` de campos URL encoded. Conserva el último valor de cada nombre. |
 | `await request.form()` | `FormData` multipart, con campos repetidos y archivos. |
 | `await request.xml()` | Elemento raíz de un documento XML. |
 | `await request.msgpack()` | Valor MessagePack decodificado. |

@@ -13,19 +13,17 @@ These settings belong to `config/app.py`. `config/hashing.py` configures passwor
 
 | Setting | Environment variable | Behavior |
 | --- | --- | --- |
-| `app.cipher` | `APP_CIPHER` | Cipher identifier. Default: `AES-256-CBC`. |
+| `app.cipher` | `APP_CIPHER` | Cipher identifier. Default: `AES-256-GCM`. |
 | `app.key` | `APP_KEY` | Key shared by the processes that must decrypt the same values. |
 
 Write the identifiers exactly as shown:
 
 | Cipher | Key | IV per operation | Content authentication |
 | --- | --- | --- | --- |
-| `AES-128-CBC` | 16 bytes | 16 bytes | Adds no MAC or tag; uses PKCS7 padding. |
-| `AES-256-CBC` | 32 bytes | 16 bytes | Adds no MAC or tag; uses PKCS7 padding. |
 | `AES-128-GCM` | 16 bytes | 12 bytes | Creates and verifies a 16-byte tag. |
 | `AES-256-GCM` | 32 bytes | 12 bytes | Creates and verifies a 16-byte tag. |
 
-To use GCM in a workflow that needs to verify content authenticity, configure, for example:
+For a 32-byte application key, use the default setting in `.env`.
 
 ```dotenv
 APP_CIPHER=AES-256-GCM
@@ -234,11 +232,9 @@ flowchart TD
     E --> F["Text token for storage or transport"]
 ```
 
-The binary `iv`, `value`, and `tag` fields are also represented in Base64. In CBC, `tag` is `None`; in GCM, it contains the authentication tag. Store the **complete token**: ciphertext alone does not include all the information needed for decryption.
+Save the complete token. Its Base64-encoded fields carry the 12-byte IV, ciphertext and 16-byte authentication tag. Decryption checks the tag before returning the plaintext.
 
-The token takes more space than the original text because of the IV, tag where applicable, JSON, and Base64. It contains no key, key identifier, expiration date, or list of previous keys. Its `cipher` field must match the decrypting instance; it does not automatically change that instance's configuration.
-
-GCM checks its tag during decryption and rejects altered content. CBC checks padding, but this implementation adds no MAC: successful CBC decryption does not prove integrity.
+The token takes more space than the original text because of the IV, tag, JSON, and Base64. It contains no key, key identifier, expiration date, or list of previous keys. Its `cipher` field must match the decrypting instance; it does not automatically change that instance's configuration.
 
 ## Input and decryption errors
 
@@ -246,9 +242,9 @@ GCM checks its tag during decryption and rejects altered content. CBC checks pad
 | --- | --- |
 | Input that is not a `str`. | `TypeError`. |
 | Empty text or token; text that cannot be encoded as UTF-8. | `ValueError`. |
-| Invalid Base64/JSON envelope, incompatible fields, different cipher, or incorrect IV size. | `ValueError`. |
+| Invalid Base64/JSON envelope, missing or incompatible fields, different cipher, or incorrect IV size. | `ValueError`. |
 | Encryption failure. | `RuntimeError`. |
-| Missing or incorrectly sized GCM tag, authentication failure, invalid CBC padding, or failure to recover UTF-8. | `RuntimeError`, with the original cause chained. |
+| Null or incorrectly sized GCM tag, authentication failure, or failure to recover UTF-8. | `RuntimeError`, with the original cause chained. |
 
 The example's `decrypt` action converts expected token errors into an HTTP response without exposing the exception's internal details. Other failures follow the [HTTP exception flow](/en/http/exceptions). Catching `TypeError` is unnecessary there because the schema already requires a `str`.
 
@@ -268,4 +264,4 @@ The application must identify which configuration applies to each record during 
 
 ---
 
-[Encryption index](/en/cryptography/encryption) · [Password hashing](/en/cryptography/hashing) · [Controllers](/en/deployment/health-and-default-responses)
+[Encryption index](/en/cryptography/encryption) · [Password hashing](/en/cryptography/hashing) · [Controllers](/en/http/controllers)

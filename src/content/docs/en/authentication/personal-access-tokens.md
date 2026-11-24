@@ -260,7 +260,7 @@ curl --request DELETE \
 | `tokens.expiration` / `AUTH_TOKEN_EXPIRATION` | `None` | Lifetime in minutes; `None` sets no automatic expiration. |
 | `tokens.secret_bytes` / `AUTH_TOKEN_SECRET_BYTES` | `40` | Random bytes before encoding; accepts 32 to 128. |
 
-An explicit `expires_at` overrides the configured lifetime. Passing `None` applies that lifetime: to issue credentials without automatic expiration, configuration must use `expiration=None`. Dates are normalized to UTC for persistence. A token stops being accepted at its deadline even while its row remains stored.
+An explicit `expires_at` overrides the configured lifetime. Passing `None` applies that lifetime: to issue credentials without automatic expiration, configuration must use `expiration=None`. A deadline with an offset identifies an exact instant. A deadline without an offset uses `app.timezone`. The repository compares UTC instants and interprets existing database timestamps without offsets as UTC. The returned `AccessToken` presents `created_at`, `expires_at` and `last_used_at` in the application timezone when those values exist. A token stops being accepted at its deadline even while its row remains stored.
 
 `IAccessTokenRepository` exposes these asynchronous operations:
 
@@ -292,12 +292,14 @@ class TokenMaintenance:
 
 Physical cleanup requires your application to invoke this service from its maintenance task. The guard rejects expired or revoked tokens without waiting for cleanup.
 
-When disabling an account or changing its credentials outside the recovery flow, explicitly decide which tokens to revoke. The token guard checks the identity and stored credential; it does not independently impose a condition on the `active` column. [Password recovery](/en/authentication/account-recovery) does revoke the owner's tokens during its transaction.
+When disabling an account or changing its credentials outside the recovery flow, explicitly decide which tokens to revoke. The token guard rejects a missing owner and any owner whose `active` attribute exists and is not exactly `True`. It applies this check before updating `last_used_at`. If the attribute is absent the owner passes this status check. Disabling an account leaves the token row in place. [Password recovery](/en/authentication/account-recovery) does revoke the owner's tokens during its transaction.
 
 <a id="token-lookup-performance"></a>
 
 ## Native token lookup
 
 The native token repository and model identity provider can retrieve the token and owner in one joined SELECT when they share a native connection, use supported integer/string owner keys and retain a simple scoped query. The guard still performs its final conditional `last_used_at` update after identity resolution, rechecking revocation and expiration. The eligible token/owner path uses two statements rather than three; eager relations may issue additional queries.
+
+When extending token lookup, the guard recognizes an optional async `findWithIdentity(plain_text, identities)` hook. Return `(access_token, identity)` for a matched pair, `None` to reject that credential, or `NotImplemented` to use `findByPlainText()` followed by `retrieveById()`. The guard still checks the returned identity and confirms token validity before establishing the request context.
 
 Token metadata is validated before identity events. Global filters, hydration, retrieved events and eager relationships remain in effect; authentication decisions are not cached. Custom providers or repositories, separate connections, UUID keys and complex query shapes use separate token and identity lookups.

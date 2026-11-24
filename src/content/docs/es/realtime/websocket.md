@@ -610,6 +610,8 @@ El [constructor WebSocket del navegador](https://websockets.spec.whatwg.org/#the
 | `socket.closed` | Indica el estado terminal. |
 | `socket.supportsCloseDetails` | Indica si el transporte permite enviar código y razón de cierre personalizados. |
 
+Para usar códigos de cierre por nombre, importa `WebSocketStatus` desde `orionis.http.enums`. Por ejemplo, `await socket.close(WebSocketStatus.NORMAL_CLOSURE)` envía el código `1000` en transportes que admiten detalles de cierre. Los códigos reservados para informar del estado, como `1006`, no pueden enviarse como código de cierre.
+
 `await socket.accept(subprotocol=None, headers=None)` acepta una sola vez. Los datos no pueden enviarse ni recibirse antes de aceptar. `await socket.reject(status_code=403)` rechaza antes de aceptar y admite estados HTTP entre `400` y `599`. El código de estado visible depende del transporte.
 
 `await socket.close()` es la forma portable de cerrar. Antes de aceptar rechaza el handshake; después de aceptar solicita cierre normal. Las llamadas repetidas una vez cerrado no hacen nada.

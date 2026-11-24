@@ -165,6 +165,21 @@ AUTH_REMEMBER_SECURE=bool:true
 
 To limit new tokens to one hour, change only `AUTH_TOKEN_EXPIRATION=int:60`. To disable the login redirect, use `AUTH_REDIRECT_TO=null`. The `int:` and `bool:` prefixes and the `null` literal provide the required types; do not use `"None"` as a table name or lifetime.
 
+`Auth.guard(name=None)` returns an `IGuard` from `orionis.auth.contracts`. The selected guard exposes a `name` property. `await guard.resolve(request)` returns `None` for a guest or a `GuardResult` with `identity`, `guard`, optional `abilities` and `credential_id`. The manager constructs its registry from the injected session guard and `TokenGuard`. Adding a string to the configuration does not register another guard.
+
+## Supply a different identity provider
+
+The session and token guards resolve `IIdentityProvider` from the container. The framework binds `ModelIdentityProvider` by default. To supply another implementation, bind the `IIdentityProvider` contract in an application service provider before the guards are resolved. Implement these async methods:
+
+| Method | Expected result |
+| --- | --- |
+| `retrieveById(identifier)` | An `IAuthenticatable` or `None` when the identity cannot be found. |
+| `retrieveByCredentials(credentials)` | Look up the identity by its public login fields. Return the identity or `None`. |
+| `validateCredentials(identity, credentials)` | Verify the submitted credentials and return `bool`. |
+| `updateRememberToken(identity, expected, token)` | For persistent login, replace the stored token conditionally and report whether the update succeeded. A `None` replacement revokes it. The inherited implementation returns `False`. |
+
+For the default provider, an unimportable or incompatible `auth.identity.model` raises `IdentityProviderException`. Asking `Auth.guard(name)` for an unregistered name raises `GuardNotFoundException`. Invalid token names, abilities or timestamps can raise `TokenException`. These exceptions are exported from `orionis.auth`.
+
 ## Choose your application's flow
 
 - **Browser:** register WEB routes, configure the model and storage, and use [session login](/en/authentication/session-authentication) with CSRF in forms.

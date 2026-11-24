@@ -62,7 +62,7 @@ Cada diccionario se convierte en su entidad y pasa por su validación. Las fábr
 
 `Stores(redis=None)`, `Stores(memcached=None)` y `Stores(database=None)` dejan esas entradas sin configurar: seleccionarlas produce `CacheStoreException`. `memory=None` es aceptado por la entidad, pero el manager construye el backend de memoria sin consultar ese campo; no desactiva `store("memory")`.
 
-Las entradas son fijas. Un nombre adicional como `secondary` produce `TypeError` al construir `Stores`. El manager no incluye un registro `extend()` de stores. Tampoco utiliza el atributo `driver` para redirigir arbitrariamente una entrada: elige la implementación por el nombre solicitado.
+El administrador nativo resuelve cinco nombres de almacén. `Stores(secondary={"driver": "memory"})` conserva `secondary` como atributo adicional, pero `manager.store("secondary")` lanza `CacheStoreException` porque el administrador carece de un backend para ese nombre. Selecciona `manager.store("memory")` para usar el backend de memoria incorporado.
 
 <a id="config-file"></a>
 
@@ -118,7 +118,7 @@ REDIS_PORT=6379
 REDIS_DB=0
 ```
 
-Define `REDIS_PASSWORD` si el servidor exige contraseña. Las opciones expuestas no incluyen usuario ACL, URL de conexión, TLS, Sentinel ni Cluster. El constructor incorporado entrega al cliente las opciones de la tabla y configura el protocolo RESP 2. Un servidor con requisitos distintos necesita una integración de backend adecuada; añadir claves desconocidas al diccionario no amplía esta entidad.
+Define `REDIS_PASSWORD` cuando el servidor requiera contraseña. El constructor Redis nativo pasa al cliente la dirección, el puerto, la base y la contraseña, y configura RESP 2. Los atributos adicionales de la entidad, como `tls`, no tienen efecto en esa conexión.
 
 <a id="config-memcached"></a>
 
@@ -214,6 +214,6 @@ settings = Cache(
 )
 ```
 
-Las conversiones anidadas conservan la validación y rechazan campos desconocidos. En diccionarios Python utiliza enteros reales para puertos y `db`; en `.env`, `Env.get(...)` lee los valores antes de construir la entidad. Las credenciales, conexiones disponibles y accesibilidad de los servicios se comprueban al resolverlos o utilizarlos, no al validar esos tipos.
+Las entidades nativas `Cache`, `Stores` y las de cada almacén conservan los atributos públicos adicionales en `toDict()`. Las opciones declaradas siguen validándose. Usa enteros para los puertos y `db`. Un nombre adicional debe ser un identificador Python, no puede ser una palabra reservada, empezar por guion bajo ni ocultar un miembro como `toDict`. La subclase `BootstrapCache` de la plantilla genera su propio constructor y acepta sus campos declarados en el nivel superior.
 
 Consulta [drivers y almacenes](/es/cache/stores-and-drivers) para elegir su alcance y [fachada e inyección](/es/cache/manager-and-injection) para utilizarlos desde tus componentes.

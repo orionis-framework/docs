@@ -7,7 +7,17 @@ lastUpdated: false
 
 Each name identifies configuration and a reusable `Connection` object, not a permanently open physical session. The manager caches resolved objects; the engine acquires physical connections per operation or transaction.
 
-Typed configuration accepts `sqlite`, `mysql`, `pgsql`, `oracle`, `sqlserver` and `redshift`. Register additional names during startup for multiple databases of one backend; do not add `reporting=...` to `Connections`: its fields are fixed.
+The typed `Connections` entity validates the six built-in entries. To configure a second database of the same kind, supply another backend entity or a dictionary with an explicit driver under a public attribute name. A backend entity validates its options before the manager receives them. The extra name is preserved by `toDict()` and the manager can resolve it. The typed `Database.default` field still accepts only the six built-in names, so select the additional connection explicitly. A [provider](#registering-a-second-connection) can also register one at startup.
+
+To add a SQLite connection for tests, include the `reporting` keyword below in the existing `Connections(...)` factory in `config/database.py`.
+
+```python
+from orionis.foundation.config.database import Connections, SQLite
+
+connections = Connections(reporting=SQLite(database=":memory:"))
+```
+
+After boot, select the named connection with `DB.connection("reporting")`.
 
 ## Per-operation selection
 

@@ -237,7 +237,7 @@ flowchart TD
 
 Login rotates the session identifier, stores the user's key and a fingerprint of the password hash, and generates a new CSRF token. On the next request, the guard queries the identity again and checks that fingerprint. If the user no longer exists or its hash changed, it removes the authentication data and attempts to restore a valid remembered login, if present.
 
-`active` is checked when validating credentials and restoring a remembered login. Restoring an already authenticated session checks the identity and fingerprint without an additional `active` check. If your application must immediately block existing sessions based on business state, enforce that condition through an [access middleware](/en/authentication/middleware) as well.
+Password sign-in and remember-cookie restoration require the identity’s `active` attribute to be exactly `True`. On subsequent requests the session guard loads the identity again and checks its password fingerprint. If `active` exists and is anything other than `True`, the guard discards the stored login. An identity without that attribute passes this status check when restoring an existing session.
 
 ## Persistent login: remember me
 
@@ -274,7 +274,7 @@ Always import the facade from `orionis.support.facades`. These reads are synchro
 | `Auth.identifier()` | The identity's primary key or `None`. |
 | `Auth.check()` | `True` when the request is authenticated. |
 | `Auth.guest()` | `True` for a guest request. |
-| `Auth.context()` | The current authentication context. |
+| `Auth.context()` | Current `IAuthenticationContext`, implemented by `AuthenticationContext`. Read `isAuthenticated`, `isGuest`, `identity`, `guard`, `abilities` and `credentialId` as properties. `identifier()` returns the identity’s key or `None`. |
 
 The API is named `identifier()`; there is no `Auth.id()` alias. Any component executing within the request scope can read the identity. Do not retain a request's user in a global variable or shared service.
 

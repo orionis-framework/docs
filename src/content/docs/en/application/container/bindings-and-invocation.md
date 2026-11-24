@@ -191,8 +191,8 @@ Await these four operations even when the final constructor or function is synch
 ### `make()` — resolve a contract or alias
 
 ```text
-async make(key: type[Any] | str, *args: tuple[Any, ...],
-           **kwargs: dict[str, Any]) -> Any
+async make[T](key: type[T], *args: object, **kwargs: object) -> T
+async make(key: str, *args: object, **kwargs: object) -> Any
 ```
 
 Respects the binding's lifetime. Without a registration, it attempts to activate a deferred provider and, for a concrete class, build it automatically. A string identifies an alias; it does not arbitrarily import a class from its module path. An unknown alias raises `ValueError`.
@@ -218,11 +218,10 @@ The result is the service object. Resolving a callable instance does not execute
 ### `build()` — construct a concrete class
 
 ```text
-async build(type_: Callable[..., Any], *args: tuple[Any, ...],
-            **kwargs: dict[str, Any]) -> Any
+async build[T](type_: type[T], *args: object, **kwargs: object) -> T
 ```
 
-Although the annotation uses `Callable`, the implementation requires a class and rejects functions or objects with `TypeError`. It constructs that class directly with recursive `__init__` injection; it does not substitute the target's contract binding or retrieve its singleton instance. Its dependencies are resolved through `make()`.
+Pass a concrete class. Passing a function or a non-class instance raises `TypeError`. It constructs that class directly with recursive `__init__` injection; it does not substitute the target's contract binding or retrieve its singleton instance. Its dependencies are resolved through `make()`.
 
 ```python
 from app.services.catalog import CatalogPresenter
@@ -243,8 +242,8 @@ Reflection rejects abstract or otherwise nonconstructible classes. An exception 
 ### `invoke()` — execute a function
 
 ```text
-async invoke(fn: Callable[..., Any], *args: tuple[Any, ...],
-             **kwargs: dict[str, Any]) -> Any
+async invoke(fn: Callable[..., Any], *args: object,
+             **kwargs: object) -> Any
 ```
 
 Supports inspectable Python functions, asynchronous functions, lambdas, and bound methods. Classes and noncallable values raise `TypeError`. Reflection does not accept every object merely because it implements `__call__`; use `call(object, "__call__", ...)` in that case.

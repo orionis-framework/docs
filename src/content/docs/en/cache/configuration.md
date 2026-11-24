@@ -62,7 +62,7 @@ Each dictionary is converted into its entity and validated. Factories create ind
 
 `Stores(redis=None)`, `Stores(memcached=None)`, and `Stores(database=None)` leave those entries unconfigured; selecting them raises `CacheStoreException`. `memory=None` is accepted by the entity, but the manager builds its memory backend without reading that field; it does not disable `store("memory")`.
 
-Entries are fixed. Adding a name such as `secondary` raises `TypeError` when constructing `Stores`. The manager has no `extend()` registry for stores. An entry's `driver` field cannot redirect it arbitrarily: the manager chooses the implementation by the requested store name.
+The native manager resolves five store names. `Stores(secondary={"driver": "memory"})` retains `secondary` as an extra attribute, but `manager.store("secondary")` raises `CacheStoreException` because the manager has no backend registered under that name. Select `manager.store("memory")` to use the built-in memory backend.
 
 <a id="config-file"></a>
 
@@ -118,7 +118,7 @@ REDIS_PORT=6379
 REDIS_DB=0
 ```
 
-Set `REDIS_PASSWORD` if the server requires it. Exposed options do not include an ACL username, connection URL, TLS, Sentinel, or Cluster. The built-in constructor passes the listed options to the client and configures RESP 2. A server with different requirements needs an appropriate backend integration; unknown dictionary keys do not extend this entity.
+Set `REDIS_PASSWORD` when the server requires it. The native Redis builder forwards only the endpoint, port, database and password, and configures RESP 2. Extra attributes on the entity such as `tls` have no effect on that connection.
 
 <a id="config-memcached"></a>
 
@@ -214,6 +214,6 @@ settings = Cache(
 )
 ```
 
-Nested conversions retain validation and reject unknown fields. Use actual integers for ports and `db` in Python dictionaries; in `.env`, `Env.get(...)` reads values before entity construction. Credentials, available database connections, and service connectivity are checked when resolving or using them, rather than during type validation.
+The native `Cache`, `Stores` and individual store entities retain extra public attributes in `toDict()`. Declared options still undergo validation: supply actual integers for ports and `db`. An extra name must be a Python identifier and cannot be a keyword, begin with an underscore or shadow a class member such as `toDict`. The `BootstrapCache` subclass in the supplied template generates its own constructor and accepts its declared top-level fields.
 
 See [drivers and stores](/en/cache/stores-and-drivers) to choose a scope and [facades and injection](/en/cache) to use them from your application components.

@@ -198,7 +198,7 @@ No hay un snapshot atómico de fuentes y resultado. Si los archivos cambian mien
 
 ## Serializer: JSON enriquecido para artefactos
 
-Importa `Serializer` desde `orionis.cache.serializer`. Sus cuatro operaciones son estáticas y síncronas. No son una API de caché por claves ni sustituyen las respuestas JSON HTTP.
+Importa `Serializer` desde `orionis.cache.serializer`. Sus métodos son estáticos y síncronos.
 
 <a id="serializer-dumps"></a>
 ### dumps(data: Any, indent: int | None = None) -> str
@@ -210,6 +210,21 @@ Transforma los tipos soportados en datos JSON con marcadores y devuelve un `str`
 
 Decodifica el JSON con `msgspec.json` y reconstruye los marcadores recursivamente. Devuelve el objeto restaurado: puede ser un diccionario, una colección o un valor simple. JSON inválido propaga `msgspec.DecodeError`; un marcador desconocido genera `ValueError`. Un marcador incompleto o un valor incompatible también puede generar `KeyError`, `TypeError`, `ValueError` u otros errores del conversor.
 
+### equivalent(left: Any, right: Any) -> bool
+
+Compara los valores codificados, incluida la zona y la ocurrencia de una hora local repetida. `FileBasedCache.save()` usa esta comparación para decidir si cambiaron los datos. Un valor no admitido genera `TypeError`.
+
+```python
+from datetime import datetime
+from zoneinfo import ZoneInfo
+from orionis.cache.serializer import Serializer
+
+first = datetime(2024, 11, 3, 1, 30, tzinfo=ZoneInfo("America/New_York"))
+second = first.replace(fold=1)
+assert not Serializer.equivalent(first, second)
+assert Serializer.loads(Serializer.dumps(second)).fold == 1
+```
+
 <a id="serializer-types"></a>
 ### Tipos soportados y ejemplo completo
 
@@ -219,7 +234,7 @@ Decodifica el JSON con `msgspec.json` y reconstruye los marcadores recursivament
 | `dict`, `list` | Contenedores con valores procesados recursivamente. |
 | `bytes` | Base64, restaurado como `bytes`. |
 | `Path` y sus variantes de plataforma | Ruta reconstruida con `Path`. |
-| `datetime`, `date`, `time` | Representación ISO; conserva el valor de fecha/hora y su offset cuando existe. |
+| `datetime`, `date`, `time` | Representación ISO. Para fechas con hora y horas conserva el identificador de `ZoneInfo` y el atributo `fold` que distingue una hora local repetida. La zona IANA debe estar disponible al leer. Las entradas antiguas que solo guardan el desplazamiento conservan un desplazamiento fijo. |
 | `timedelta` | Días, segundos y microsegundos. |
 | `Decimal`, `UUID`, `complex` | Se restauran sus tipos y valores. |
 | `tuple`, `set`, `frozenset` | Marcadores que conservan el tipo de colección y procesan sus elementos. |
@@ -281,7 +296,7 @@ def serializer_roundtrip(app: IApplication) -> dict:
 
 No es un serializador general de instancias arbitrarias, modelos o dataclasses. Algunos subtipos admitidos —como dict/list y tuple— se reconstruyen como el contenedor base, no como tu clase personalizada. No presupongas soporte para cualquier subtipo de un primitivo solo porque el tipo base esté en la tabla.
 
-Los tipos y enums se resuelven por módulo y nombre de clase. Usa clases importables de nivel superior y valores de enum compatibles con JSON; clases locales o anidadas no tienen la resolución necesaria de forma general. Las funciones, closures, bytearrays y objetos de usuario no tienen un conversor público configurable en esta API.
+Los tipos y enums se resuelven por módulo y nombre de clase. Usa clases importables y valores de enum admitidos por el serializador, como una tupla o un UUID. Una clase local a una función no se puede importar mediante su nombre cualificado. Las funciones, closures, bytearrays y objetos de usuario no tienen un conversor público configurable en esta API.
 
 <a id="serializer-dumptofile"></a>
 ### dumpToFile(data: Any, file_path: Path) -> None

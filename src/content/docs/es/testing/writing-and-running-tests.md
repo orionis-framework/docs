@@ -51,7 +51,7 @@ class TestPrice(TestCase):
         self.skipTest("Replace this placeholder with assertions.")
 ```
 
-**Todos los casos de prueba de Orionis deben heredar de `TestCase`, importado con `from orionis.test import TestCase`.** La plantilla crea un método asíncrono y una omisión explícita; todavía no comprueba un comportamiento. Sustituye `skipTest(...)` por las operaciones y aserciones de tu aplicación antes de considerar cubierta esa funcionalidad.
+Los casos generados heredan de `orionis.test.TestCase`. La plantilla crea un método asíncrono y una omisión explícita; todavía no comprueba un comportamiento. Sustituye `skipTest(...)` por las operaciones y aserciones de tu aplicación antes de considerar cubierta esa funcionalidad.
 
 Los nombres de archivo coinciden por defecto con `test_*.py`; los métodos deben empezar por `test`. No es obligatorio que el nombre de la clase tenga ese prefijo, aunque el generador lo usa para mantener una convención clara.
 

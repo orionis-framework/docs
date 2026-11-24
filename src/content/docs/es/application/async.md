@@ -53,7 +53,7 @@ print(result)  # JOB-7
 
 En un controlador async, llama directamente con `await`. Tanto `run()` como `runSync()` lanzan `RuntimeError` si ya hay un loop activo en el hilo llamador. No crean otro hilo para resolver esa situación. La corrutina rechazada queda sin consumir: el llamador debe esperarla o cerrarla.
 
-`execute()` acepta una función, no el objeto corrutina ya creado. Los callables síncronos se ejecutan mediante `asyncio.to_thread`, que propaga los valores de `ContextVar` del llamador al worker. Si devuelven un awaitable, incluido uno basado en generadores, ese resultado se espera de vuelta en el loop original.
+`execute()` acepta una función, no el objeto corrutina ya creado. Los callables síncronos se ejecutan en el ejecutor predeterminado del loop con una copia de los valores de `ContextVar` del llamador. Si devuelven un awaitable, incluido uno basado en generadores, ese resultado se espera de vuelta en el loop original.
 
 ### Propiedad de recursos
 
@@ -69,7 +69,7 @@ Usa [colas](/es/queues) cuando el trabajo deba sobrevivir a un reinicio; una tar
 
 ### Puente de callables
 
-`Loop.execute(func, *args, **kwargs)` acepta ambos tipos de callable. Una función corrutina se llama y espera en el loop actual. Un callable síncrono se envía con `asyncio.to_thread` al ejecutor predeterminado de ese loop, preservando el contexto del llamador. Si devuelve un awaitable, el objeto devuelto se espera después en el loop actual.
+`Loop.execute(func, *args, **kwargs)` acepta ambos tipos de callable. Una función corrutina se llama y espera en el loop actual. Un callable síncrono se envía al ejecutor predeterminado de ese loop, preservando el contexto del llamador. Si devuelve un awaitable, el objeto devuelto se espera después en el loop actual.
 
 ### Puente síncrono de corrutinas
 
@@ -222,7 +222,7 @@ La resolución de la factoría de loops y la detección de `uvloop` se almacenan
 
 El registro de `asyncio` determina el loop del hilo. `getEventLoop()` respeta los cambios realizados con `asyncio.set_event_loop()` y reutiliza el loop abierto registrado; un loop actualmente en ejecución tiene prioridad.
 
-`execute` usa el ejecutor predeterminado del loop actual mediante `asyncio.to_thread`; su capacidad y ciclo de vida pertenecen a ese event loop. `runSync` se ejecuta en el hilo llamador y no tiene un pool global que serialice las llamadas realizadas desde hilos distintos.
+`execute` usa el ejecutor predeterminado del loop actual; su capacidad y ciclo de vida pertenecen a ese event loop. `runSync` se ejecuta en el hilo llamador y no tiene un pool global que serialice las llamadas realizadas desde hilos distintos.
 
 `runSync` rechaza los loops anidados. `createTask` solo programa trabajo; la concurrencia depende de que la corrutina ceda el control.
 
@@ -259,10 +259,12 @@ El método acepta un objeto corrutina, no una función corrutina ni un awaitable
 #### `execute(func, /, *args, **kwargs)`
 
 ```text
-await Loop.execute(func, *args, **kwargs) -> Any
+await Loop.execute(func, /, *args, **kwargs) -> R
 ```
 
-Invoca directamente una función corrutina y la espera. Mueve cualquier otro callable al ejecutor predeterminado del loop actual mediante `asyncio.to_thread`, propagando los `ContextVar` del llamador. Los argumentos y valores de retorno pasan sin alteración; si el callable devuelve un awaitable reconocido por `inspect.isawaitable`, este se espera en el loop original antes de devolver el resultado. Las excepciones originales atraviesan sin cambios el límite de `await`.
+Pasa la función como primer argumento posicional. `R` es el tipo del valor obtenido tras la llamada y la espera de su posible resultado asíncrono. Si se cancela al llamador durante la espera de un callback síncrono, el trabajo que siga en cola puede omitirse. Si el callback ya se ejecuta en un hilo, puede terminar después de que el llamador reciba `CancelledError`.
+
+Invoca directamente una función corrutina y la espera. Mueve cualquier otro callable al ejecutor predeterminado del loop actual, propagando los `ContextVar` del llamador. Los argumentos y valores de retorno pasan sin alteración; si el callable devuelve un awaitable reconocido por `inspect.isawaitable`, este se espera en el loop original antes de devolver el resultado. Las excepciones originales atraviesan sin cambios el límite de `await`.
 
 Espera este método desde un event loop activo. No crea un ejecutor privado.
 

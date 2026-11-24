@@ -2135,7 +2135,7 @@ fake.pastDate(start_date: datetime.date | datetime.datetime | datetime.timedelta
 | Parámetro | Propósito |
 | --- | --- |
 | `start_date` | Extremo inicial: fecha/hora, intervalo relativo o formato admitido por el proveedor. |
-| `tzinfo` | Timezone del datetime producido; None usa el comportamiento nativo. |
+| `tzinfo` | Al omitirlo se usa la zona horaria de la aplicación. Un valor explícito, incluido `None`, se pasa al proveedor. |
 
 Disponibilidad verificada: 110 locales. Ejemplos de locales: `en_US`, `es_CO`, `es_ES`, `am_ET`, `ar_AA`, `ar_AE`, `ar_BH`, `ar_DZ`.
 
@@ -2166,7 +2166,7 @@ fake.pastDatetime(start_date: datetime.date | datetime.datetime | datetime.timed
 | Parámetro | Propósito |
 | --- | --- |
 | `start_date` | Extremo inicial: fecha/hora, intervalo relativo o formato admitido por el proveedor. |
-| `tzinfo` | Timezone del datetime producido; None usa el comportamiento nativo. |
+| `tzinfo` | Al omitirlo se usa la zona horaria de la aplicación. Un valor explícito, incluido `None`, se pasa al proveedor. |
 
 Disponibilidad verificada: 110 locales. Ejemplos de locales: `en_US`, `es_CO`, `es_ES`, `am_ET`, `ar_AA`, `ar_AE`, `ar_BH`, `ar_DZ`.
 

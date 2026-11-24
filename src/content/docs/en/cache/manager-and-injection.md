@@ -177,9 +177,9 @@ These methods call the default repository. Their parameters, return values and e
 | `async add(key: str, value: Any, ttl: float \| None = None) -> bool` | [Add if missing](/en/cache/caching-values#repository-add). |
 | `async increment(key: str, amount: int = 1) -> int` | [Increment](/en/cache/caching-values#repository-increment). |
 | `async decrement(key: str, amount: int = 1) -> int` | [Decrement](/en/cache/caching-values#repository-decrement). |
-| `lock(key: str, timeout: float \| None = None) -> Any` | Create a [CacheLock context](/en/cache/locks). Synchronous; actually returns `CacheLock`. |
+| `lock(key: str, timeout: float \| None = None) -> CacheLock` | Synchronously creates a [lock context](/en/cache/locks) for the default store. |
 
-`replace()` belongs to the repository: call `cache.store().replace(...)`. There is no `Cache.replace(...)` proxy. `lock()` exists on the concrete manager and repository implementations, although their current abstract contracts do not declare it; the locks guide accesses it through the resolved facade.
+Use `await cache.store().replace(...)` for a conditional replacement. For a named store, use `async with cache.store(name).lock(key)`.
 
 ## Keeping permanent data coherent
 

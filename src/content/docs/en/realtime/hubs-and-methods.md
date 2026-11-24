@@ -292,9 +292,9 @@ Unannotated parameters, positional-only parameters, `*args`, `**kwargs`, and amb
 |---|---|
 | `self.context.connection_id` | Identifier generated for this connection. It changes after reconnecting. |
 | `self.context.socket` | The connection's `WebSocket` object. |
-| `self.context.user` | Authentication context identity when starting the hub, or `None`. |
-| `self.clients` | Recipient selectors for events or invocations. |
-| `self.groups` | `join` and `leave` operations for the current connection. |
+| `self.context.user` | The `IAuthenticatable` identity when the connection starts, or `None` for a guest. |
+| `self.clients` | `HubClients` selects recipients for events or invocations. |
+| `self.groups` | `HubGroups` provides `join` and `leave` for the current connection. |
 
 A route such as `Route.hub("/realtime/projects/{project_id:int}", ProjectHub)` exposes its parameter as follows:
 

@@ -565,13 +565,13 @@ See [locks and concurrent regeneration](/en/cache/locks) before using this to co
 
 ## Default-store proxies
 
-`CacheManager` delegates the fourteen asynchronous value operations above, excluding `replace`, to `store()`. Their arguments, defaults, results, and errors are unchanged. It also exposes the synchronous factory `lock(key: str, timeout: float | None = None) -> Any`, whose concrete result is `CacheLock`.
+`CacheManager` delegates its fourteen asynchronous value operations to the default store. Its synchronous `lock(key: str, timeout: float | None = None) -> CacheLock` factory returns an asynchronous context manager.
 
 The [complete proxy map](/en/cache/manager-and-injection#manager-proxies) lists every manager signature and links to the corresponding operation here. A proxy does not add retries, fallback, or a transaction.
 
 For the synchronous lock factory through the facade, use `manager = await Cache.resolve()` followed by `manager.lock(...)`. The asynchronous operations can be awaited directly through `Cache`.
 
-`replace` is available on `ICacheRepository` and `CacheRepository`, not on `CacheManager`. The concrete `lock` factories are not declared by `ICacheManager` or `ICacheRepository`; account for that distinction when typing an injected contract. The [API reference](/en/cache/api-reference) lists the contracts and other public components.
+For conditional replacement, call `await cache.store().replace(key, value, ttl)`. Both manager and repository contracts declare `lock()`. See the [contract reference](/en/cache/api-reference).
 
 ## Errors, concurrency, and invalidation
 

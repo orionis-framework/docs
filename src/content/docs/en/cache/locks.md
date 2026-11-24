@@ -15,7 +15,7 @@ See [stores](/en/cache/stores-and-drivers) and [configuration](/en/cache/configu
 Concrete implementations expose these signatures:
 
 ```text
-CacheManager.lock(key: str, timeout: float | None = None) -> Any
+CacheManager.lock(key: str, timeout: float | None = None) -> CacheLock
 CacheRepository.lock(key: str, timeout: float | None = None) -> CacheLock
 CacheLock(backend: Any, key: str, timeout: float | None = None) -> None
 ```
@@ -24,7 +24,7 @@ CacheLock(backend: Any, key: str, timeout: float | None = None) -> None
 
 Resolve the manager before obtaining a synchronous repository: `cache = await Cache.resolve()`, followed by `cache.store("file")`. This also works when the deferred provider has not resolved yet. Do not chain `Cache.store(...).lock(...)` on the assumption that the facade is already pinned. See [manager and injection](/en/cache/manager-and-injection).
 
-`ICacheManager` and `ICacheRepository` do not declare `lock()`, although concrete classes implement it. `CacheLock` has no public `acquire()`, `release()`, `forceRelease()`, lease-renewal, or owner-query API. Acquisition and release use the asynchronous context protocol.
+Acquire and release the lock with `async with`. Both `ICacheManager` and `ICacheRepository` expose this factory.
 
 <a id="lock-context"></a>
 ### Enter and leave the context
@@ -184,7 +184,6 @@ A service can receive the real manager in its constructor and select a repositor
 ```python
 from collections.abc import Awaitable, Callable
 from orionis.cache.contracts.cache_manager import ICacheManager
-from orionis.cache.repository import CacheRepository
 
 
 class CachedSummary:
@@ -192,12 +191,12 @@ class CachedSummary:
         self.cache = cache
 
     async def get(self, resolver: Callable[[], Awaitable[dict]]) -> dict:
-        repository: CacheRepository = self.cache.store("file")
+        repository = self.cache.store("file")
         async with repository.lock("summary:build", timeout=3.0):
             return await repository.remember("summary:value", 60, resolver)
 ```
 
-Inject the service into an action and supply your application resolver. `lock()` is invoked on the verified concrete `CacheRepository`; this does not add a nonexistent method to its contract.
+Inject `CachedSummary` into your action and pass an awaitable resolver to `get()`.
 
 ## Exceptions, cancellation, and release
 

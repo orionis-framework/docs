@@ -196,6 +196,8 @@ class DemoServer(Server):
 
 `GreetInput` can stay next to `GreetTool`. The [Tools](/en/mcp/tools), [Resources](/en/mcp/resources) and [Prompts](/en/mcp/prompts) guides develop those files, hooks and contracts. Do not register duplicate declarations from both the single-file example and the separate component organization.
 
+For application integrations that need the inventory, `Mcp.servers()` synchronously returns a tuple of `(transport, address, server_class)` entries. `Mcp.getWebServer(path)` and `Mcp.getLocalServer(name)` return compiled metadata and raise `KeyError` for unknown registrations. `finalizeRoutes()` indexes the final fluent HTTP paths and rejects duplicates or dynamic paths. The framework invokes `await dispatchHttp(request)` for a registered HTTP endpoint, `await startLocal(name)` from the console, and `await shutdown()` to wake open subscriptions at shutdown. Ordinary handlers only need their tool, resource or prompt declarations.
+
 ## Server and request lifecycle
 
 ```mermaid

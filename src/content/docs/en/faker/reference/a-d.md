@@ -3748,7 +3748,7 @@ fake.dateOfBirth(tzinfo: datetime.tzinfo | None = None, minimum_age: int = 0, ma
 
 | Parameter | Purpose |
 | --- | --- |
-| `tzinfo` | Timezone for generated datetime; None uses native behavior. |
+| `tzinfo` | Omit to use the application timezone. An explicit value, including `None`, is passed to the provider. |
 | `minimum_age` | Minimum age for the birth date. |
 | `maximum_age` | Maximum age for the birth date. |
 
@@ -3904,7 +3904,7 @@ fake.dateTime(tzinfo: datetime.tzinfo | None = None, end_datetime: datetime.date
 
 | Parameter | Purpose |
 | --- | --- |
-| `tzinfo` | Timezone for generated datetime; None uses native behavior. |
+| `tzinfo` | Omit to use the application timezone. An explicit value, including `None`, is passed to the provider. |
 | `end_datetime` | Ending datetime interval boundary. |
 
 Verified availability: 110 locales. Example locales: `en_US`, `es_CO`, `es_ES`, `am_ET`, `ar_AA`, `ar_AE`, `ar_BH`, `ar_DZ`.
@@ -3935,7 +3935,7 @@ fake.dateTimeAd(tzinfo: datetime.tzinfo | None = None, end_datetime: datetime.da
 
 | Parameter | Purpose |
 | --- | --- |
-| `tzinfo` | Timezone for generated datetime; None uses native behavior. |
+| `tzinfo` | Omit to use the application timezone. An explicit value, including `None`, is passed to the provider. |
 | `end_datetime` | Ending datetime interval boundary. |
 | `start_datetime` | Starting datetime interval boundary. |
 
@@ -3969,7 +3969,7 @@ fake.dateTimeBetween(start_date: datetime.date | datetime.datetime | datetime.ti
 | --- | --- |
 | `start_date` | Start boundary: date/time, relative interval or provider-supported format. |
 | `end_date` | End date/time boundary or relative interval. |
-| `tzinfo` | Timezone for generated datetime; None uses native behavior. |
+| `tzinfo` | Omit to use the application timezone. An explicit value, including `None`, is passed to the provider. |
 
 Verified availability: 110 locales. Example locales: `en_US`, `es_CO`, `es_ES`, `am_ET`, `ar_AA`, `ar_AE`, `ar_BH`, `ar_DZ`.
 
@@ -4001,7 +4001,7 @@ fake.dateTimeBetweenDates(datetime_start: datetime.date | datetime.datetime | da
 | --- | --- |
 | `datetime_start` | Starting datetime boundary. |
 | `datetime_end` | Ending datetime boundary. |
-| `tzinfo` | Timezone for generated datetime; None uses native behavior. |
+| `tzinfo` | Omit to use the application timezone. An explicit value, including `None`, is passed to the provider. |
 
 Verified availability: 110 locales. Example locales: `en_US`, `es_CO`, `es_ES`, `am_ET`, `ar_AA`, `ar_AE`, `ar_BH`, `ar_DZ`.
 
@@ -4033,7 +4033,7 @@ fake.dateTimeThisCentury(before_now: bool = True, after_now: bool = False, tzinf
 | --- | --- |
 | `before_now` | Allows datetimes before the current moment within the period. |
 | `after_now` | Allows datetimes after the current moment within the period. |
-| `tzinfo` | Timezone for generated datetime; None uses native behavior. |
+| `tzinfo` | Omit to use the application timezone. An explicit value, including `None`, is passed to the provider. |
 
 Verified availability: 110 locales. Example locales: `en_US`, `es_CO`, `es_ES`, `am_ET`, `ar_AA`, `ar_AE`, `ar_BH`, `ar_DZ`.
 
@@ -4065,7 +4065,7 @@ fake.dateTimeThisDecade(before_now: bool = True, after_now: bool = False, tzinfo
 | --- | --- |
 | `before_now` | Allows datetimes before the current moment within the period. |
 | `after_now` | Allows datetimes after the current moment within the period. |
-| `tzinfo` | Timezone for generated datetime; None uses native behavior. |
+| `tzinfo` | Omit to use the application timezone. An explicit value, including `None`, is passed to the provider. |
 
 Verified availability: 110 locales. Example locales: `en_US`, `es_CO`, `es_ES`, `am_ET`, `ar_AA`, `ar_AE`, `ar_BH`, `ar_DZ`.
 
@@ -4097,7 +4097,7 @@ fake.dateTimeThisMonth(before_now: bool = True, after_now: bool = False, tzinfo:
 | --- | --- |
 | `before_now` | Allows datetimes before the current moment within the period. |
 | `after_now` | Allows datetimes after the current moment within the period. |
-| `tzinfo` | Timezone for generated datetime; None uses native behavior. |
+| `tzinfo` | Omit to use the application timezone. An explicit value, including `None`, is passed to the provider. |
 
 Verified availability: 110 locales. Example locales: `en_US`, `es_CO`, `es_ES`, `am_ET`, `ar_AA`, `ar_AE`, `ar_BH`, `ar_DZ`.
 
@@ -4129,7 +4129,7 @@ fake.dateTimeThisYear(before_now: bool = True, after_now: bool = False, tzinfo: 
 | --- | --- |
 | `before_now` | Allows datetimes before the current moment within the period. |
 | `after_now` | Allows datetimes after the current moment within the period. |
-| `tzinfo` | Timezone for generated datetime; None uses native behavior. |
+| `tzinfo` | Omit to use the application timezone. An explicit value, including `None`, is passed to the provider. |
 
 Verified availability: 110 locales. Example locales: `en_US`, `es_CO`, `es_ES`, `am_ET`, `ar_AA`, `ar_AE`, `ar_BH`, `ar_DZ`.
 

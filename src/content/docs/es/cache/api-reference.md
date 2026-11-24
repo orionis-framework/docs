@@ -17,7 +17,7 @@ Para operaciones de aplicación utiliza la [fachada o ICacheManager](/es/cache/m
 | `ICacheRepository` | Quince operaciones asíncronas: los catorce proxies de valores y `replace()`. |
 | `IFileBasedCache` | `get() -> dict \| None`, `save(data: dict) -> tuple[int, str]` y `clear() -> bool`, todos síncronos. |
 
-`lock()` existe en `CacheManager` y `CacheRepository`, pero no está declarado en estos contratos abstractos. El provider nativo solo registra `ICacheManager`; no proporciona automáticamente un repositorio o artefacto para los otros contratos. Las anotaciones no sustituyen las diferencias reales entre drivers.
+Ambos contratos exponen la fábrica síncrona `lock(key, timeout=None) -> CacheLock`. `ICacheManager.lock()` delega en el almacén predeterminado. Un repositorio personalizado debe implementar `lock()` para admitirlo, pues el método base lanza `NotImplementedError`. El proveedor nativo registra `ICacheManager` para inyección.
 
 <a id="backend-file"></a>
 

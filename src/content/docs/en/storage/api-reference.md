@@ -155,7 +155,7 @@ Application equivalent: `await Storage.disk().file("reports/42.txt").mimeType()`
 async lastModified(path: str) -> datetime
 ```
 
-Returns the timezone-aware UTC modification timestamp.
+Local and memory disks return UTC. S3, Azure and GCS return the modification time supplied by the SDK, falling back to the current UTC time when the metadata omits it.
 
 Application equivalent: `await Storage.disk().file("reports/42.txt").lastModified()`.
 

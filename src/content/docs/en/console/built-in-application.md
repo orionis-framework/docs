@@ -28,15 +28,13 @@ python -B reactor about
 
 ## clear:cache
 
-Clear the default cache store.
+Clear a named cache store, or use the configured default.
 
-Takes no arguments or command-specific options; automatic help remains available.
-
-Call `ICacheManager.clear()`. Its scope depends on the configured driver/namespace; it takes no store name. Return `0` when the service confirms clearing, or `1` for a false result or recognized backend error. Errors outside these families propagate.
+Use `--store NAME` to select `file`, `memcached`, `memory`, `redis`, or `database`. Omitting it clears the configured default. The command returns `0` when the selected store confirms the clear and `1` for a false result or a recognized backend error. Other exceptions propagate. The memory store belongs to the running process, so clearing it from the CLI leaves other workers’ memory stores intact.
 
 ```shell
 orionis clear:cache
-python -B reactor clear:cache
+python -B reactor clear:cache --store=file
 ```
 
 <a id="command-clear-logs"></a>
@@ -124,7 +122,7 @@ Generate and persist the application encryption key.
 |---|---|---|---|
 | `--force` | Flag, optional | `False` | Bypass confirmation (db:wipe) or replace APP_KEY (key:generate). |
 
-Read `app.cipher` (falling back to `AES_256_CBC`), generate a valid key and save it through `Env.set("APP_KEY", ...)`. An existing `APP_KEY` is preserved with status `0`; enable `--force` (default `False`) to replace it. Persistence failures return `1`. Replacement affects data encrypted with the previous key: consult the encryption guide before using `--force` on an existing application.
+Read `app.cipher` (falling back to `AES_256_GCM`), generate a valid key and save it through `Env.set("APP_KEY", ...)`. An existing `APP_KEY` is preserved with status `0`; enable `--force` (default `False`) to replace it. Persistence failures return `1`. Replacement affects data encrypted with the previous key: consult the encryption guide before using `--force` on an existing application.
 
 ```shell
 orionis key:generate
@@ -169,7 +167,7 @@ Remove compiled application artifacts.
 
 Takes no arguments or command-specific options; automatic help remains available.
 
-Remove `__pycache__` directories, `.pyc` / `.pyo` files, top-level `build`, `dist` and `*.egg-info`, and the `config`, `commands` and `routes` cache files beneath `app.compiledPath` (or `storage_framework/cache` when unset). Virtual environments and dependencies are excluded from bytecode traversal. It does not flush every application cache store: use `clear:cache` for the default store. Cleanup groups are reported; return `1` if any removal fails, otherwise `0`. There is no `--dry-run` flag.
+Remove `__pycache__` directories, `.pyc` / `.pyo` files, top-level `build`, `dist` and `*.egg-info`, and the `config`, `commands` and `routes` cache files beneath `app.compiledPath` (or `storage_framework/cache` when unset). Virtual environments and dependencies are excluded from bytecode traversal. To clear an application cache store, use `clear:cache` and optionally select it with `--store`. Cleanup groups are reported; return `1` if any removal fails, otherwise `0`. There is no `--dry-run` flag.
 
 ```shell
 orionis optimize:clear

@@ -64,7 +64,7 @@ from orionis.foundation.config.filesystems import (
 
 All constructor fields are optional; omitted entries use their factories. `Disks(local={...})` converts that dictionary to `Local(...)`, and the same applies to the other entries. Other object types, including `None`, raise `TypeError`. Instances do not share the entities created by their factories.
 
-The standard configuration has five fixed entries. Adding an `archive` dictionary key does not register a disk and raises `TypeError`. `Filesystems(default="archive")` is also rejected. `extend()` expands the **driver** registry rather than the disk catalog. Change an existing entry's `driver` to use another implementation; a wider configuration structure requires consistent extensions to its entities and validation.
+The five declared entries are converted from dictionaries into typed disk configurations. `Disks(archive={"driver": "memory"})` retains the extra value as a plain dictionary. The manager reads the driver as an attribute, so `disk("archive")` on that configuration raises `DriverNotSupportedException`. The typed default rejects `"archive"`. For an in-memory disk, set `driver="memory"` on a declared entry and select its name. Use `extend()` to register a driver factory.
 
 <a id="local"></a>
 
@@ -186,7 +186,7 @@ settings = Filesystems(
 )
 ```
 
-Dictionaries retain validation and do not accept arbitrary keys. Existing entities are retained; dictionaries are reconstructed using the real constructors. In Python, use a boolean for `use_path_style_endpoint`: `True`, rather than `"true"`. In `.env`, `Env.get(...)` reads the value before entity validation.
+Native `Filesystems`, `Disks` and disk entities accept additional public attributes. `toDict()` includes them. For example, a custom driver factory can read an application-defined attribute on a declared disk. A private name, Python keyword, invalid identifier or existing method name raises `TypeError`. The project template’s `BootstrapFilesystems` constructor accepts its declared top-level fields. In Python pass a boolean such as `True` for `use_path_style_endpoint`.
 
 ## Validation and resolution
 

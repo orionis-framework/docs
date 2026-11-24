@@ -110,6 +110,8 @@ class ReportPolicy:
 
 El contenedor debe invocar `limit()` para inyectar `app`. Si ya tienes la aplicación, puedes entregarla explícitamente. Define valores mediante [configuración tipada](/es/application/configuration), leyendo el entorno solo en `config/`.
 
+Después de `create()`, usa `app.config("app.timezone", "America/Bogota")` para cambiar la zona horaria del worker. Orionis valida el nombre IANA antes de guardarlo, actualiza `DateTime` y establece la variable de proceso `TZ`. Llama a `time.tzset()` en las plataformas que lo admiten. Un nombre inválido o una escritura bajo `app.timezone` producen `ValueError`. Al reemplazar toda la sección `app` se aplica su zona, con UTC como valor por defecto si se omite. `resetRuntimeConfig()` restaura la zona del bootstrap. Para mostrar fechas a un usuario concreto, pasa `tz` a la operación sobre la fecha y conserva la configuración del worker.
+
 <a id="application-path"></a>
 ## path() y routingPaths()
 

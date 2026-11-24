@@ -9,6 +9,8 @@ Realtime uses the **Orionis Realtime v1 protocol** over WebSocket. Opening the s
 
 The [JavaScript client](/en/realtime/javascript-client), published on npm as `@orionis-framework/realtime-client`, implements these messages and manages limits, deadlines, and reconnection. This page explains the protocol and provides complete stream and bidirectional-result examples.
 
+For Python integrations, `HubProtocol(name="json", *, max_message_size=1048576)` from `orionis.realtime` provides synchronous `encode(message)` and `decode(message)` methods. `encode` returns a `str` for JSON or `bytes` for MessagePack. `decode` takes a `WebSocketMessage` containing a **client** envelope. A frame of the wrong kind or an oversized payload raises `ProtocolError`. Normal hub handlers receive decoded arguments directly.
+
 ## Protocol messages
 
 With JSON, every envelope is an object sent as text. The `protocol="msgpack"` alternative uses the same fields encoded as binary MessagePack; the browser would need a compatible MessagePack codec. `JSON.parse` cannot decode that route.

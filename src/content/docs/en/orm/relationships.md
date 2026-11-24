@@ -7,6 +7,8 @@ lastUpdated: false
 
 A relationship is a **synchronous instance method returning a specialized builder**. Calling it does not load data; `await` executes the query. Orionis implements exactly four relationship kinds: `hasOne`, `hasMany`, `belongsTo` and `belongsToMany`. Polymorphic, `hasManyThrough` and `hasOneThrough` relationships are not implemented.
 
+For type annotations, `IRelation[Related, Result]` from `orionis.orm.contracts.relation` describes a query for the related model and the result of `await relation.getResults()`. A single-row relation can return `None`. A to-many relation returns a collection. For code that attaches or detaches pivot rows, use `IBelongsToManyRelation[Related]` from `orionis.orm.contracts.belongs_to_many_relation`.
+
 ## Complete example models
 
 ```python

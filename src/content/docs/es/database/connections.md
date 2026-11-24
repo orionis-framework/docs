@@ -7,7 +7,17 @@ lastUpdated: false
 
 Cada nombre identifica una configuración y un objeto `Connection` reutilizable, no una sesión física permanentemente abierta. El gestor conserva los objetos resueltos y el engine adquiere conexiones físicas por operación o transacción.
 
-La configuración tipada admite `sqlite`, `mysql`, `pgsql`, `oracle`, `sqlserver` y `redshift`. Para utilizar dos bases del mismo motor registra nombres adicionales durante el arranque; no añadas `reporting=...` a `Connections`: sus campos son fijos.
+La entidad tipada `Connections` valida las seis entradas incorporadas. Para configurar una segunda base del mismo tipo, añade otra entidad de motor, o un diccionario con un driver explícito, bajo un nombre de atributo público. La entidad de motor valida sus opciones antes de pasarlas al administrador. `toDict()` conserva la entrada y el administrador puede resolverla. El campo tipado `Database.default` sigue aceptando solo los seis nombres incorporados, por lo que debes seleccionar la conexión adicional explícitamente. También puedes registrarla al arrancar mediante un [proveedor](#registrar-una-segunda-conexión).
+
+Para añadir una conexión SQLite de prueba, incluye el argumento `reporting` del ejemplo en la fábrica `Connections(...)` existente en `config/database.py`.
+
+```python
+from orionis.foundation.config.database import Connections, SQLite
+
+connections = Connections(reporting=SQLite(database=":memory:"))
+```
+
+Después del arranque, selecciona la conexión por nombre con `DB.connection("reporting")`.
 
 ## Selección por operación
 

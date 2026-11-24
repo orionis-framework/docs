@@ -138,7 +138,7 @@ Call `/access` using the token described in [Personal access tokens](/en/authent
 | `await Auth.canAny(names)` | Whether it grants at least one. |
 | `await Auth.canAll(names)` | Whether it grants all of them. |
 | `await Auth.hasRole(name)` | Whether the identity belongs to the role. |
-| `await Auth.authorization()` | An immutable snapshot of permissions, roles, and credential limits. |
+| `await Auth.authorization()` | An `IAuthorizationSnapshot` (the built-in implementation is `AuthorizationSnapshot`) with permissions, roles and credential limits. |
 
 Guests receive `False` for permission or role queries. Roles have no inheritance, and permission names do not match by prefix: `articles.*` does not automatically grant `articles.publish`.
 

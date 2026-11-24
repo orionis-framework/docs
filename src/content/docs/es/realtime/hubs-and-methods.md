@@ -292,9 +292,9 @@ Se rechazan parámetros sin anotación, posicionales exclusivos, `*args`, `**kwa
 |---|---|
 | `self.context.connection_id` | Identificador generado para esa conexión. Cambia al reconectar. |
 | `self.context.socket` | Objeto `WebSocket` de la conexión. |
-| `self.context.user` | Identidad del contexto de autenticación al iniciar el hub, o `None`. |
-| `self.clients` | Selección de destinatarios para eventos o invocaciones. |
-| `self.groups` | Operaciones `join` y `leave` de la conexión actual. |
+| `self.context.user` | La identidad `IAuthenticatable` al abrir la conexión, o `None` para un invitado. |
+| `self.clients` | `HubClients` selecciona los destinatarios de eventos o invocaciones. |
+| `self.groups` | `HubGroups` ofrece las operaciones `join` y `leave` de la conexión actual. |
 
 Una ruta `Route.hub("/realtime/projects/{project_id:int}", ProjectHub)` permite consultar el parámetro así:
 

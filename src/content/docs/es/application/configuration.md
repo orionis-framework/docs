@@ -89,7 +89,7 @@ Todas son opcionales al construir `Configuration`: cada una tiene una fábrica p
 
 La clase `orionis.foundation.config.startup.Configuration` es una dataclass congelada con argumentos únicamente por nombre. Acepta, para cada sección de la tabla, **su entidad correspondiente o un `dict`**. No acepta `None` como sustituto de una sección; si omites el argumento, construye su valor predeterminado.
 
-Cuando recibe un diccionario, construye `Entidad(**opciones)` y ejecuta sus validaciones. Cuando recibe una instancia del tipo esperado, la conserva; un tipo distinto produce `TypeError`. Los campos desconocidos del diccionario fallan al construir la entidad. Algunas entidades normalizan sus subestructuras a entidades y otras conservan diccionarios validados: no supongas una misma representación interna para todos los componentes.
+Cuando recibe un diccionario, construye `Entidad(**opciones)` y ejecuta sus validaciones. Cuando recibe una instancia del tipo esperado, la conserva; un tipo distinto produce `TypeError`. Las entidades nativas de sección aceptan atributos públicos adicionales por palabra clave. Los nombres deben ser identificadores válidos y deben evitar palabras reservadas de Python, nombres privados y miembros de la clase. La serialización conserva estos atributos. Cada servicio lee sus propias opciones, por lo que un error de escritura puede almacenarse sin modificar su comportamiento. Algunas entidades normalizan sus subestructuras a entidades y otras conservan diccionarios validados: no supongas una misma representación interna para todos los componentes.
 
 ```python
 from orionis.foundation.config.app import App, Environments
@@ -128,11 +128,11 @@ Importa `App`, `Cipher` y `Environments` desde `orionis.foundation.config.app`. 
 | `locale` | `str`, `"en"` | Locale principal no vacío. |
 | `fallback_locale` | `str`, `"en"` | Locale alternativo no vacío. |
 | `language_path` | `str`, `"resources/lang/"` | Ruta de traducciones no vacía; consulta [Localización](/es/localization). |
-| `cipher` | `str \| Cipher`, `"AES-256-CBC"` | Algoritmo normalizado y utilizado para validar la longitud de la clave; consulta [Cifrado](/es/cryptography/encryption). |
+| `cipher` | `str \| Cipher`, `"AES-256-GCM"` | Algoritmo normalizado y utilizado para validar la longitud de la clave; consulta [Cifrado](/es/cryptography/encryption). |
 | `key` | `str \| bytes \| None`, `None` | Se normaliza a bytes. Admite representación `base64:`; exige la longitud exacta del cipher. Si falta, genera y persiste una clave. |
 | `maintenance` | `bool`, `False` | Ajuste de mantenimiento; su estado efectivo también tiene en cuenta el marcador de mantenimiento de la aplicación. |
 
-`Environments` contiene `DEVELOPMENT`, `TESTING` y `PRODUCTION`. `Cipher` contiene los algoritmos disponibles; sus claves y usos se explican en la guía de cifrado enlazada. La normalización acepta el miembro, su nombre o su valor textual según las reglas de `normalize_enum()`.
+`Environments` contiene `DEVELOPMENT`, `TESTING` y `PRODUCTION`. El cifrado de la aplicación admite `AES-128-GCM` y `AES-256-GCM`. Elegir un miembro CBC aquí produce `ValueError`. La normalización acepta el miembro, su nombre o su valor textual según las reglas de `normalize_enum()`.
 
 <a id="configuration-own"></a>
 
@@ -249,9 +249,14 @@ Ambas funciones rechazan tipos no textuales con `TypeError` y nombres inválidos
 validate_seconds(value: object, name: str, *, positive: bool = False) -> None
 validate_driver(value: object, expected: Drivers) -> None
 validate_http_origin(origin: str) -> None
+validate_store_table(value: object, name: str = "table", *, optional: bool = False) -> None
+validate_store_port(value: object) -> None
+validate_store_db(value: object) -> None
 ```
 
 `validate_seconds()` admite `int` y `float` finitos, rechaza `bool` y números negativos, y rechaza cero con `positive=True`. `validate_driver()` comprueba que un driver textual coincida exactamente con el `Drivers` esperado de **colas**; no es un validador genérico para todos los enums llamados `Drivers`.
+
+En un almacén personalizado, `validate_store_table()` admite nombres no vacíos compuestos por letras ASCII minúsculas y guiones bajos, o `None` con `optional=True`. `validate_store_port()` acepta puertos enteros entre 1 y 65535. `validate_store_db()` acepta un índice entero no negativo. Los tres devuelven `None` si el valor es válido. Un tipo incorrecto, incluido un booleano pasado como entero, produce `TypeError`. Un valor fuera de lo admitido produce `ValueError`.
 
 `validate_http_origin()` acepta un origen HTTP o HTTPS explícito con host y puerto válido cuando se indica. Rechaza comodines, espacios, caracteres no ASCII, credenciales, rutas, query y fragmentos. No modifica su representación; `https://app.example.test/` tiene una ruta y no equivale al origen sin `/` para este validador.
 

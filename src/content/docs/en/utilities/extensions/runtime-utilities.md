@@ -120,7 +120,7 @@ async def completed_import() -> None:
 
 ## Date and time API
 
-`DateTime` is usable without the container. The application configures its timezone and locale during boot; read them with `getTimezone()` and `getLocale()`. An omitted `tz` uses that configured zone, except `local()` (the operating system zone) and `naive()` (no zone). Calendar boundaries preserve an explicit `dt` and use `tz` only when they create the current datetime.
+Before application creation, `DateTime` uses UTC by default. During `create()`, Orionis applies the configured timezone and locale before registering eager providers. Read them with `getTimezone()` and `getLocale()`. Calendar boundaries such as `startOfMonth(dt, tz)` first convert the supplied instant into the selected zone. `parse()` and `fromDatetime()` interpret a naive input as wall time in that zone and convert an offset-aware input to it. `local()` uses the system zone and `naive()` produces a value without a zone.
 
 `formatLocal()` converts the instant before formatting and applies the configured locale. `isToday()` compares local calendar dates. `diffInDays()` and `diffInHours()` return absolute truncated elapsed-time differences, so a calendar day crossing a daylight-saving transition need not be 24 hours. `fromFormat()` and `formatLocal()` use Pendulum tokens; `Stringable.toDate()` uses Python strptime tokens. Invalid dates, units, locales and zones propagate their validation errors.
 
@@ -128,7 +128,7 @@ async def completed_import() -> None:
 from orionis.support.facades import DateTime
 
 instant = DateTime.parse("2026-10-06T12:30:00Z", tz="UTC")
-month_start = DateTime.startOfMonth(instant)
+month_start = DateTime.startOfMonth(instant, tz="UTC")
 deadline = DateTime.add(instant, days=2, hours=3)
 assert month_start.to_iso8601_string() == "2026-10-01T00:00:00Z"
 assert DateTime.diffInHours(instant, deadline) == 51
@@ -189,7 +189,22 @@ assert DateTime.fromFormat("06/10/2026", "DD/MM/YYYY", tz="UTC").day == 6
 | `lastOf(dt: pendulum.DateTime, unit: str, day_of_week: int \| None=None) -> pendulum.DateTime` | Return the last day of the given unit, optionally on a weekday. |
 | `nthOf(dt: pendulum.DateTime, unit: str, nth: int, day_of_week: int) -> pendulum.DateTime` | Return the n-th occurrence of a weekday within the given unit. |
 
+If a report groups events by local calendar day, parse its source timestamps before computing the boundary. An offset-free timestamp belongs to the selected zone. A timestamp ending in `Z` identifies a UTC instant and can fall on the previous local date.
+
+```python
+from orionis.support.facades import DateTime
+
+zone = "America/Bogota"
+wall_time = DateTime.parse("2026-01-15T00:30", tz=zone)
+instant = DateTime.parse("2026-01-15T00:30Z", tz="UTC")
+start = DateTime.startOfDay(instant, tz=zone)
+assert wall_time.to_iso8601_string() == "2026-01-15T00:30:00-05:00"
+assert start.to_iso8601_string() == "2026-01-14T00:00:00-05:00"
+```
+
 ## Console quotes
+
+For a command that can accept different sources of quotations, annotate its dependency as `IInspire` from `orionis.support.inspirational.contracts`. An implementation supplies the synchronous `random() -> dict` method. Register your implementation in your application provider if you resolve it by that contract.
 
 `Inspire(quotes=None)` uses the built-in catalog. A custom nonempty list is retained by reference and its entries must provide `quote` and `author`. `random()` returns a quote mapping; `printQuote(console)` prints it through the supplied `Console` and returns `None`. If the retained list later becomes empty, selection uses the fallback quote.
 
@@ -204,7 +219,7 @@ quotes.printQuote(Console())
 
 ## Configuration
 
-Facade targets are configured by their owning modules and resolved from the current Orionis container. `DateTime` receives the application timezone and locale through its internal configuration loader during boot; explicit `tz` arguments override its default for individual operations.
+A timezone passed as `tz` applies to that operation. To change the application timezone, use the [runtime configuration setter](/en/application/api#application-config).
 
 `Workers` defaults to 0.5 GiB per worker. `setRamPerWorker()` changes a class-level process-wide budget. `Inspire` accepts a custom list of mappings with mandatory `quote` and `author` keys. The other helper types require no global configuration.
 
@@ -255,6 +270,6 @@ These utilities require Python 3.14 or newer. Public names use Orionis's camelCa
 
 ## Reference and next steps
 
-[__init__.py](https://github.com/orionis-framework/framework/blob/1e905f4f103d47c61789d877eba472a5bd97681b/orionis/support/facades/__init__.py) · [datetime.py](https://github.com/orionis-framework/framework/blob/1e905f4f103d47c61789d877eba472a5bd97681b/orionis/support/facades/datetime.py) · [counter.py](https://github.com/orionis-framework/framework/blob/1e905f4f103d47c61789d877eba472a5bd97681b/orionis/support/performance/counter.py) · [workers.py](https://github.com/orionis-framework/framework/blob/1e905f4f103d47c61789d877eba472a5bd97681b/orionis/support/system/workers.py)
+[__init__.py](https://github.com/orionis-framework/framework/blob/v1.9.0/orionis/support/facades/__init__.py) · [datetime.py](https://github.com/orionis-framework/framework/blob/v1.9.0/orionis/support/facades/datetime.py) · [counter.py](https://github.com/orionis-framework/framework/blob/v1.9.0/orionis/support/performance/counter.py) · [workers.py](https://github.com/orionis-framework/framework/blob/v1.9.0/orionis/support/system/workers.py)
 
 [Return to the module index](/en/utilities).

@@ -64,7 +64,7 @@ from orionis.foundation.config.filesystems import (
 
 Todos son opcionales en el constructor; los omitidos se crean mediante su fábrica. `Disks(local={...})` convierte ese diccionario en `Local(...)`, y lo mismo ocurre con las demás entradas. Un objeto de otro tipo, incluso `None`, produce `TypeError`. Las instancias no comparten las entidades generadas por sus fábricas.
 
-La configuración estándar tiene cinco entradas fijas. Añadir una clave `archive` al diccionario no registra un disco y provoca `TypeError`. `Filesystems(default="archive")` también se rechaza. `extend()` amplía el registro de **drivers**, no el catálogo de discos. Para cambiar de implementación utiliza el campo `driver` de una entrada existente; una estructura más amplia exige extender las entidades y su validación de forma coherente.
+Las cinco entradas declaradas se convierten de diccionarios a configuraciones de disco tipadas. `Disks(archive={"driver": "memory"})` conserva el valor adicional como diccionario. El administrador lee el driver como atributo, por lo que `disk("archive")` con esa configuración lanza `DriverNotSupportedException`. El campo de disco predeterminado rechaza `"archive"`. Para un disco en memoria, asigna `driver="memory"` a una entrada declarada y selecciónala por nombre. Usa `extend()` para registrar una fábrica de drivers.
 
 <a id="local"></a>
 
@@ -186,7 +186,7 @@ settings = Filesystems(
 )
 ```
 
-Los diccionarios no evitan la validación ni admiten claves arbitrarias. Una entidad existente se conserva; un diccionario se reconstruye mediante los constructores reales. En Python, utiliza un booleano para `use_path_style_endpoint`: `True`, no `"true"`. En `.env`, `Env.get(...)` lee el valor antes de validar la entidad.
+Las entidades nativas `Filesystems`, `Disks` y las de cada disco aceptan atributos públicos adicionales. `toDict()` los incluye. Por ejemplo, una fábrica de drivers propia puede leer un atributo definido por la aplicación en un disco declarado. Un nombre privado, palabra reservada de Python, identificador inválido o nombre de un método existente produce `TypeError`. El constructor de `BootstrapFilesystems` de la plantilla acepta sus campos declarados en el nivel superior. En Python, pasa un booleano como `True` para `use_path_style_endpoint`.
 
 ## Validación y resolución
 

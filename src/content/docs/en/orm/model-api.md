@@ -256,7 +256,7 @@ async def remove_article(article_id: int) -> bool:
 def freshTimestamp(cls) -> datetime
 ```
 
-Generates UTC. Returns a naive datetime when the first available update, creation or deletion column does not declare `timezone=True`; without any such column it returns aware UTC. May be overridden as a classmethod.
+Returns the current aware datetime in the application timezone via `DateTime.now()`. Override this classmethod to supply the instant used for automatic timestamps. Each managed column applies its own UTC storage rule when written. [Timestamp storage](/en/orm/models-and-attributes#datetime-storage).
 
 ```python
 timestamp = Article.freshTimestamp()
@@ -423,7 +423,7 @@ internal_data = article.exclude("internal_token")
 def getDirty(self) -> dict[str, Any]
 ```
 
-Returns current values differing from the snapshot, including newly assigned keys whose value is `None`. Python equality detects nested dict/list changes because the original was deep-copied. Does not issue SQL.
+Returns changed values, including newly assigned keys whose value is `None`. The original snapshot is a deep copy, so mutations inside lists and dictionaries can be detected. For an attribute holding two timezone-aware datetimes, the comparison uses their UTC instants. The two occurrences of a repeated local time count as distinct.
 
 ```python
 pending = article.getDirty()

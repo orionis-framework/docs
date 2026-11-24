@@ -9,6 +9,8 @@ lastUpdated: false
 
 `Product.query()` crea un `ModelQueryBuilder[Product]`. Las cláusulas se agregan sin I/O; los terminales asíncronos ejecutan el plan, reciben filas de Database y construyen instancias de `Product`. La hidratación aplica el estado original y despacha `retrieved`; la carga anticipada se realiza después.
 
+Para una función que añade filtros antes de ejecutar, anota el parámetro y el retorno con `IModelQueryBuilder[Product]` de `orionis.orm.contracts`. Una relación también implementa este contrato de consulta. El constructor de tablas que devuelve `DB.table()` implementa `IRawQueryBuilder` de `orionis.orm.contracts.raw_builder`. Ambos comparten las cláusulas declaradas en `IQueryBuilderBase` de `orionis.orm.contracts.base_builder`.
+
 ```mermaid
 flowchart LR
   M["Product.query()"] --> B["ModelQueryBuilder"]
@@ -175,7 +177,7 @@ async def archive_out_of_stock() -> int:
     return await Product.where("stock", 0).update({"active": False})
 ```
 
-La primera función utiliza `fillable`, mutadores, estado y eventos de una instancia. Un listener puede vetar la operación y producir `False`. La segunda actualiza un conjunto en SQL y devuelve un recuento: serializa dict/list/UUID para almacenamiento según el tipo de columna y añade el timestamp de actualización cuando corresponde, pero no ejecuta los casts de asignación de `Model.casts`, `fillable`, mutadores ni eventos por instancia.
+La actualización masiva devuelve la cantidad de filas afectadas. Las escrituras mediante el constructor del modelo preparan diccionarios, listas, UUID y columnas de fecha para su almacenamiento. El modelo añade su marca de actualización cuando está configurada. Los métodos de asignación de la instancia, las restricciones de asignación masiva y los eventos individuales se aplican a la primera función. Consulta las [reglas de almacenamiento de fechas](/es/orm/models-and-attributes#datetime-storage).
 
 `insert()` devuelve `InsertResult`, no modelos ni una lista de IDs; no añade automáticamente los timestamps de creación. `update()` y `delete()` ignoran JOIN, orden, límite y offset de lectura: restringe con `where` y claves explícitas. Las operaciones individuales abren su ciclo de ejecución normal; para un conjunto atómico utiliza [transacciones](/es/database/transactions).
 

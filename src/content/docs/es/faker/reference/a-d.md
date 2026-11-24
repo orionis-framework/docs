@@ -3748,7 +3748,7 @@ fake.dateOfBirth(tzinfo: datetime.tzinfo | None = None, minimum_age: int = 0, ma
 
 | Parámetro | Propósito |
 | --- | --- |
-| `tzinfo` | Timezone del datetime producido; None usa el comportamiento nativo. |
+| `tzinfo` | Al omitirlo se usa la zona horaria de la aplicación. Un valor explícito, incluido `None`, se pasa al proveedor. |
 | `minimum_age` | Edad mínima para la fecha de nacimiento. |
 | `maximum_age` | Edad máxima para la fecha de nacimiento. |
 
@@ -3904,7 +3904,7 @@ fake.dateTime(tzinfo: datetime.tzinfo | None = None, end_datetime: datetime.date
 
 | Parámetro | Propósito |
 | --- | --- |
-| `tzinfo` | Timezone del datetime producido; None usa el comportamiento nativo. |
+| `tzinfo` | Al omitirlo se usa la zona horaria de la aplicación. Un valor explícito, incluido `None`, se pasa al proveedor. |
 | `end_datetime` | Límite final datetime del intervalo. |
 
 Disponibilidad verificada: 110 locales. Ejemplos de locales: `en_US`, `es_CO`, `es_ES`, `am_ET`, `ar_AA`, `ar_AE`, `ar_BH`, `ar_DZ`.
@@ -3935,7 +3935,7 @@ fake.dateTimeAd(tzinfo: datetime.tzinfo | None = None, end_datetime: datetime.da
 
 | Parámetro | Propósito |
 | --- | --- |
-| `tzinfo` | Timezone del datetime producido; None usa el comportamiento nativo. |
+| `tzinfo` | Al omitirlo se usa la zona horaria de la aplicación. Un valor explícito, incluido `None`, se pasa al proveedor. |
 | `end_datetime` | Límite final datetime del intervalo. |
 | `start_datetime` | Límite inicial datetime del intervalo. |
 
@@ -3969,7 +3969,7 @@ fake.dateTimeBetween(start_date: datetime.date | datetime.datetime | datetime.ti
 | --- | --- |
 | `start_date` | Extremo inicial: fecha/hora, intervalo relativo o formato admitido por el proveedor. |
 | `end_date` | Extremo final de fecha/hora o intervalo relativo. |
-| `tzinfo` | Timezone del datetime producido; None usa el comportamiento nativo. |
+| `tzinfo` | Al omitirlo se usa la zona horaria de la aplicación. Un valor explícito, incluido `None`, se pasa al proveedor. |
 
 Disponibilidad verificada: 110 locales. Ejemplos de locales: `en_US`, `es_CO`, `es_ES`, `am_ET`, `ar_AA`, `ar_AE`, `ar_BH`, `ar_DZ`.
 
@@ -4001,7 +4001,7 @@ fake.dateTimeBetweenDates(datetime_start: datetime.date | datetime.datetime | da
 | --- | --- |
 | `datetime_start` | Datetime inicial del intervalo. |
 | `datetime_end` | Datetime final del intervalo. |
-| `tzinfo` | Timezone del datetime producido; None usa el comportamiento nativo. |
+| `tzinfo` | Al omitirlo se usa la zona horaria de la aplicación. Un valor explícito, incluido `None`, se pasa al proveedor. |
 
 Disponibilidad verificada: 110 locales. Ejemplos de locales: `en_US`, `es_CO`, `es_ES`, `am_ET`, `ar_AA`, `ar_AE`, `ar_BH`, `ar_DZ`.
 
@@ -4033,7 +4033,7 @@ fake.dateTimeThisCentury(before_now: bool = True, after_now: bool = False, tzinf
 | --- | --- |
 | `before_now` | Permite datetimes anteriores al momento actual dentro del periodo. |
 | `after_now` | Permite datetimes posteriores al momento actual dentro del periodo. |
-| `tzinfo` | Timezone del datetime producido; None usa el comportamiento nativo. |
+| `tzinfo` | Al omitirlo se usa la zona horaria de la aplicación. Un valor explícito, incluido `None`, se pasa al proveedor. |
 
 Disponibilidad verificada: 110 locales. Ejemplos de locales: `en_US`, `es_CO`, `es_ES`, `am_ET`, `ar_AA`, `ar_AE`, `ar_BH`, `ar_DZ`.
 
@@ -4065,7 +4065,7 @@ fake.dateTimeThisDecade(before_now: bool = True, after_now: bool = False, tzinfo
 | --- | --- |
 | `before_now` | Permite datetimes anteriores al momento actual dentro del periodo. |
 | `after_now` | Permite datetimes posteriores al momento actual dentro del periodo. |
-| `tzinfo` | Timezone del datetime producido; None usa el comportamiento nativo. |
+| `tzinfo` | Al omitirlo se usa la zona horaria de la aplicación. Un valor explícito, incluido `None`, se pasa al proveedor. |
 
 Disponibilidad verificada: 110 locales. Ejemplos de locales: `en_US`, `es_CO`, `es_ES`, `am_ET`, `ar_AA`, `ar_AE`, `ar_BH`, `ar_DZ`.
 
@@ -4097,7 +4097,7 @@ fake.dateTimeThisMonth(before_now: bool = True, after_now: bool = False, tzinfo:
 | --- | --- |
 | `before_now` | Permite datetimes anteriores al momento actual dentro del periodo. |
 | `after_now` | Permite datetimes posteriores al momento actual dentro del periodo. |
-| `tzinfo` | Timezone del datetime producido; None usa el comportamiento nativo. |
+| `tzinfo` | Al omitirlo se usa la zona horaria de la aplicación. Un valor explícito, incluido `None`, se pasa al proveedor. |
 
 Disponibilidad verificada: 110 locales. Ejemplos de locales: `en_US`, `es_CO`, `es_ES`, `am_ET`, `ar_AA`, `ar_AE`, `ar_BH`, `ar_DZ`.
 
@@ -4129,7 +4129,7 @@ fake.dateTimeThisYear(before_now: bool = True, after_now: bool = False, tzinfo: 
 | --- | --- |
 | `before_now` | Permite datetimes anteriores al momento actual dentro del periodo. |
 | `after_now` | Permite datetimes posteriores al momento actual dentro del periodo. |
-| `tzinfo` | Timezone del datetime producido; None usa el comportamiento nativo. |
+| `tzinfo` | Al omitirlo se usa la zona horaria de la aplicación. Un valor explícito, incluido `None`, se pasa al proveedor. |
 
 Disponibilidad verificada: 110 locales. Ejemplos de locales: `en_US`, `es_CO`, `es_ES`, `am_ET`, `ar_AA`, `ar_AE`, `ar_BH`, `ar_DZ`.
 

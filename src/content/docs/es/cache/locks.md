@@ -15,7 +15,7 @@ Para elegir y configurar el backend consulta [stores](/es/cache/stores-and-drive
 Las implementaciones concretas exponen estas firmas:
 
 ```text
-CacheManager.lock(key: str, timeout: float | None = None) -> Any
+CacheManager.lock(key: str, timeout: float | None = None) -> CacheLock
 CacheRepository.lock(key: str, timeout: float | None = None) -> CacheLock
 CacheLock(backend: Any, key: str, timeout: float | None = None) -> None
 ```
@@ -24,7 +24,7 @@ CacheLock(backend: Any, key: str, timeout: float | None = None) -> None
 
 Resuelve primero el manager para obtener un repositorio síncrono: `cache = await Cache.resolve()` y después `cache.store("file")`. Esto también funciona cuando el provider diferido aún no se ha resuelto. No encadenes `Cache.store(...).lock(...)` suponiendo que la fachada ya está fijada. Consulta [manager e inyección](/es/cache/manager-and-injection).
 
-Los contratos `ICacheManager` e `ICacheRepository` no declaran `lock()`, aunque las clases concretas lo implementan. No existe una API pública de `CacheLock` con métodos `acquire()`, `release()`, `forceRelease()`, renovación del lease ni consulta del propietario. Su API de adquisición y liberación es el contexto asíncrono.
+Adquiere y libera el bloqueo con `async with`. Tanto `ICacheManager` como `ICacheRepository` exponen esta fábrica.
 
 <a id="lock-context"></a>
 ### Entrar y salir del contexto
@@ -184,7 +184,6 @@ Un servicio puede recibir el manager real en el constructor y seleccionar el rep
 ```python
 from collections.abc import Awaitable, Callable
 from orionis.cache.contracts.cache_manager import ICacheManager
-from orionis.cache.repository import CacheRepository
 
 
 class CachedSummary:
@@ -192,12 +191,12 @@ class CachedSummary:
         self.cache = cache
 
     async def get(self, resolver: Callable[[], Awaitable[dict]]) -> dict:
-        repository: CacheRepository = self.cache.store("file")
+        repository = self.cache.store("file")
         async with repository.lock("summary:build", timeout=3.0):
             return await repository.remember("summary:value", 60, resolver)
 ```
 
-Inyecta el servicio en una acción y suministra el resolver de tu aplicación. `lock()` se invoca sobre `CacheRepository`, cuya implementación concreta se verificó; no se añade un método inexistente al contrato.
+Inyecta `CachedSummary` en la acción y pasa a `get()` una función que devuelva un awaitable.
 
 ## Excepciones, cancelación y liberación
 

@@ -21,6 +21,8 @@ class Scheduler(BaseScheduler):
 
 No pegues todas las alternativas juntas con la misma firma: la agenda usa la firma como clave y la última definición reemplaza la anterior. Todos los horarios usan la zona de `DateTime.getZoneInfo()`, que proviene de la configuración de la aplicación; no existe un setter de zona horaria por tarea en esta API.
 
+En un horario de calendario como `dailyAt(2, 30)`, si el reloj se adelanta y se salta esa hora local, la tarea se omite ese día. Si la hora se repite al atrasar el reloj, la tarea se ejecuta solo en la primera ocurrencia. Un intervalo como `hourly()` mide el tiempo transcurrido entre ejecuciones. Si pasas una fecha explícita a `startDate()`, `endDate()` u `onceAt()`, una hora local inexistente produce `ValueError` al declarar la tarea. Una hora repetida selecciona su primera ocurrencia. La tarea conserva la zona de la aplicación vigente al crearla.
+
 ## Construcción y configuración
 
 <a id="task-construction"></a>

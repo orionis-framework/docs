@@ -46,7 +46,7 @@ Cada enlace lleva a las opciones y ejemplos completos de ese comando.
 | [`bootstrap:web`](/es/console/built-in-bootstrap#command-bootstrap-web) | Habilita el contexto de rutas web. |
 | [`bootstrap:websocket`](/es/console/built-in-bootstrap#command-bootstrap-websocket) | Habilita las rutas WebSocket. |
 | [`cache:migrate`](/es/database/commands#cache-migrate) | Crea las tablas SQL faltantes de cache y locks. |
-| [`clear:cache`](/es/console/built-in-application#command-clear-cache) | Vacía el store de caché predeterminado. |
+| [`clear:cache`](/es/console/built-in-application#command-clear-cache) | Vacía un store de caché concreto o el predeterminado. |
 | [`clear:logs`](/es/console/built-in-application#command-clear-logs) | Elimina los archivos de log del framework. |
 | [`clear:testing`](/es/console/built-in-application#command-clear-testing) | Borra los resultados de pruebas guardados en caché. |
 | [`clear:views`](/es/console/built-in-application#command-clear-views) | Elimina bytecode de las vistas compiladas. |
@@ -113,6 +113,6 @@ Cada enlace lleva a las opciones y ejemplos completos de ese comando.
 
 Reactor devuelve el entero retornado por `handle()`; un retorno que no es entero se convierte en `0`. Una excepción no capturada pasa al manejador de fallos de consola y produce `1`. El parser termina con `0` al pedir ayuda y `2` ante un error de argumentos.
 
-No todos los comandos convierten sus errores internos en una excepción o en un retorno `1`: los generadores comunes imprimen ciertos errores y retornan `None`. Sus páginas explican esta limitación y los códigos específicos de comandos como `packages`, `test`, `db:wipe` y workers. Usa conjuntamente la salida del comando, su código y el resultado esperado.
+Un generador devuelve `1` cuando informa de un error al crear archivos, incluido un destino que ya existe. Las referencias de `packages`, `test`, `db:wipe` y los workers describen sus códigos de salida específicos.
 
 Para encadenar comandos desde código e inyectar servicios consulta la guía de [Reactor y ejecución programática](/es/console/reactor-and-injection).

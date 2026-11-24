@@ -232,6 +232,21 @@ Las opciones se leen al crear la clase. Configúralas en el cuerpo de la clase; 
 
 `DELETED_AT: ClassVar[str] = "deleted_at"`. Nombre de la marca de eliminación lógica; debe poder almacenar `None`.
 
+<a id="datetime-storage"></a>
+
+## Cómo se almacena un instante
+
+Para las columnas declaradas con `DateTime` o `StrictTimestamp`, el modelo distingue dos usos.
+
+| Uso de la columna | Valor que se escribe | Valor que se lee desde el modelo |
+| --- | --- | --- |
+| Marca de creación o actualización administrada, o marca de eliminación lógica | Se convierte a UTC. Una columna declarada con `timezone=False` recibe la hora UTC sin desplazamiento. | Se convierte a la zona de la aplicación. Si el valor almacenado carece de desplazamiento, se interpreta como UTC. |
+| Otra columna con cast `"datetime"` | Se convierte a la zona de la aplicación. Una columna declarada con `timezone=False` recibe la hora local sin desplazamiento. | El cast devuelve una fecha con la zona de la aplicación. Una columna con hora local sin desplazamiento no permite distinguir las dos ocurrencias de una hora repetida. |
+
+Por ejemplo, con la zona de aplicación `America/Bogota`, el instante `2026-11-24T02:00:00+00:00` aparece en el modelo como `2026-11-23T21:00:00-05:00`. La columna administrada sin zona horaria almacena `02:00`. Una columna de cita sin zona horaria con cast de fecha almacena `21:00`.
+
+Los filtros del modelo como `where`, `whereIn` y `whereBetween` preparan los valores temporales con la misma regla de la columna. Esto se aplica a columnas sin calificar o calificadas con la tabla del modelo o su alias. Con SQL directo o `DB.table()`, proporciona los parámetros en la representación que utiliza la base de datos.
+
 ## Casts nativos: los siete nombres admitidos
 
 ```python

@@ -166,6 +166,8 @@ File locks and conditional database/cache updates protect storage operations; th
 
 An expired record is no longer valid even if it still exists physically. Memory, file and database reject expired records on read; file also discards corrupt files. Cache checks expiration and uses the repository's TTL, whose physical cleanup depends on the backend.
 
+The `ISessionStore` contract in `orionis.session.contracts` uses async methods. `read(session_id)` returns a `SessionRecord` or `None`. `write(record)` creates or overwrites an entry, `update(record)` conditionally updates a live entry and returns a boolean, and `delete(session_id)` reports whether an entry was removed. A record carries `id`, `data` and `expires_at`. `SessionManager` constructs the backend selected by its configured driver. Binding an `ISessionStore` in the container does not register an additional driver.
+
 Stores provide `gc()` to collect expired records; in cache it is a no-op because expiration is delegated to the repository. The session manager does not schedule automatic bulk collection. If you need to remove expired files or rows that no longer receive reads, add explicit maintenance for the chosen storage.
 
 Changing the driver, directory, cache repository, prefix or table changes where Orionis looks for sessions. Existing records are not migrated automatically. Plan the change knowing that existing cookies may no longer find their session.

@@ -23,7 +23,7 @@ Todos los argumentos de los métodos siguientes son obligatorios y se usan direc
 
 <a id="reflection-method-instance"></a>
 
-**`instance(instance: Any) -> IReflectionInstance`** crea un [ReflectionInstance](/es/utilities/introspection/instances) sobre un objeto existente. No construye la instancia objetivo. El wrapper rechaza clases e instancias de módulos `builtins`, `abc` y `__main__` según sus reglas.
+**`instance[T](instance: T) -> IReflectionInstance[T]`** crea un [ReflectionInstance](/es/utilities/introspection/instances) sobre un objeto existente. No construye la instancia objetivo. El wrapper rechaza clases e instancias de módulos `builtins`, `abc` y `__main__` según sus reglas.
 
 <a id="reflection-method-abstract"></a>
 

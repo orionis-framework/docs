@@ -16,8 +16,8 @@ These three elements participate in each operation:
 | Element | Responsibility |
 | --- | --- |
 | `APP_KEY` | Key retained by the application and used for both encryption and decryption. |
-| `APP_CIPHER` | Selects a supported AES variant and determines the key and IV length. |
-| Payload returned by `encrypt()` | Represents the random IV, ciphertext, cipher and tag when applicable. Does not contain the key. |
+| `APP_CIPHER` | Selects a supported AES variant and determines the key length. |
+| Payload returned by `encrypt()` | Represents the random IV, ciphertext, cipher and GCM authentication tag. Does not contain the key. |
 
 `config/app.py` configures the key and cipher; `config/hashing.py` configures password hashes. Retain the key and cipher used to produce the values you want to recover.
 
@@ -54,11 +54,9 @@ See [encrypting and decrypting values](/en/cryptography/encryption/encrypting-va
 
 | Cipher | Key | Implemented integrity check |
 | --- | --- | --- |
-| `AES-128-CBC` | 16 bytes | The CBC variant does not add a MAC or authentication tag to the payload. |
-| `AES-256-CBC` | 32 bytes | The CBC variant does not add a MAC or authentication tag to the payload. This is the configuration default. |
 | `AES-128-GCM` | 16 bytes | Generates and verifies the GCM authentication tag. |
-| `AES-256-GCM` | 32 bytes | Generates and verifies the GCM authentication tag. |
+| `AES-256-GCM` (default) | 32 bytes | Generates and verifies the GCM authentication tag. |
 
-The service checks format and that the payload cipher matches configuration. Those checks do not make a CBC payload an authenticated message. GCM tag validation is part of decryption.
+During decryption the service validates the token structure, checks the configured cipher and verifies the authentication tag. Both CBC identifiers are rejected by application configuration.
 
 The [values and keys guide](/en/cryptography/encryption/encrypting-values) details `key:generate` commands, configuration, output format, errors you can handle and the implications of replacing a key. Recovering and replacing existing values requires an explicit application process.

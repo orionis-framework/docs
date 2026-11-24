@@ -111,8 +111,10 @@ Los errores de importación o configuración durante esta consulta pueden propag
 ## info: inspeccionar metadatos
 
 ```text
-async info() -> list[dict]
+async info() -> list[CommandInfo]
 ```
+
+`CommandInfo` es un `TypedDict` de `orionis.console.entities.command`.
 
 Materializa el registro completo, omite firmas que comiencen **y** terminen con `__`, y ordena por firma. Cada diccionario contiene:
 

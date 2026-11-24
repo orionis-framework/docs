@@ -32,7 +32,7 @@ Las rutas relativas se resuelven desde la raíz de la aplicación; las absolutas
 
 ## Rotación por períodos
 
-Cada registro consulta el sufijo actual. Si cambia respecto al del archivo abierto, el handler cierra el anterior, aplica la retención y abre el archivo del nuevo período. Sin registros nuevos no se crean archivos, no se comprueba el cambio de período y no se ejecuta la limpieza.
+En los canales que rotan por período, el instante de creación del registro determina el archivo y la fecha que aparece en la línea. Si un mensaje entra en la cola antes de medianoche y se escribe después, corresponde al día de su creación. Al cambiar el sufijo, el handler cierra el archivo abierto y aplica la retención.
 
 | Canal | Sufijo | Límite efectivo entre archivos |
 |---|---|---|
@@ -41,7 +41,7 @@ Cada registro consulta el sufijo actual. Si cambia respecto al del archivo abier
 | `weekly` | `YYYY-weekWW` | Cambio de semana ISO: lunes, con año ISO. |
 | `monthly` | `YYYY-MM` | Cambio de mes del calendario. |
 
-Por ejemplo, el 29 de diciembre de 2025 pertenece a `2026-week01`. No se calcula la semana dividiendo el año en bloques de siete días. Los resolvers capturan la zona de `DateTime` al construirse; cuando reciben un `datetime` explícito, `getSuffix(dt)` formatea ese valor sin convertirlo a otra zona.
+El 29 de diciembre de 2025 pertenece a la semana ISO `2026-week01`. Cuando se atrasa el reloj, la segunda ocurrencia de una hora añade el desplazamiento UTC al nombre del archivo horario, por ejemplo `2026-11-01_01_-0500` en `America/New_York`. Los resolvers integrados consultan la zona actual de la aplicación en cada operación. Convierten los valores con zona a esa zona e interpretan los valores sin zona como hora local. Asigna un `tzinfo` a `tz` para fijar la zona del resolver o `None` para volver a la de la aplicación.
 
 ```dotenv
 LOG_CHANNEL=daily
@@ -199,13 +199,13 @@ getNextRotationTime(current_time: datetime) -> datetime
 
 | Clase | Constructor | Resultado de `getNextRotationTime()` |
 |---|---|---|
-| `HourlySuffixResolver` | `()` | Comienzo de la hora siguiente, con la zona del resolver. |
-| `DailySuffixResolver` | `(at_time: time | None = None)` | Próxima fecha/hora diaria configurada; si ya pasó, día siguiente. |
+| `HourlySuffixResolver` | `()` | Próximo cambio de hora local o de ocurrencia de una hora repetida. |
+| `DailySuffixResolver` | `(at_time: time \| None = None)` | Próxima fecha/hora diaria configurada; si ya pasó, día siguiente. |
 | `WeeklySuffixResolver` | `(at_time: time \| None = None)` | El próximo lunes a esa hora; hoy si es lunes y la hora aún no llegó, en otro caso la semana siguiente. |
 | `MonthlySuffixResolver` | `(at_time: time \| None = None)` | El próximo día primero a esa hora; hoy si es primero y la hora aún no llegó, en otro caso el mes siguiente. |
-| `ChunkedSuffixResolver` | `()` | `current_time + timedelta(hours=1)`, sin uso como disparador integrado. |
+| `ChunkedSuffixResolver` | `()` | Una hora transcurrida después, en la zona del resolver. La rotación por tamaño usa los bytes del archivo. |
 
-En los tres constructores con `at_time`, `None` equivale a medianoche. Son APIs de extensión: el handler integrado consume `getSuffix()` y no programa la hora calculada por `getNextRotationTime()`.
+En los tres constructores con `at_time`, `None` equivale a medianoche. Si la hora configurada cae en un salto del reloj local, el resolver avanza al siguiente límite diario, semanal o mensual que exista. Son APIs de extensión: el handler integrado consume `getSuffix()` y no programa la hora calculada por `getNextRotationTime()`.
 
 ```python
 from datetime import UTC, datetime, time
@@ -215,8 +215,11 @@ from orionis.logging.handlers.weekly_suffix_resolver import WeeklySuffixResolver
 moment = datetime(2026, 10, 23, 15, 30, tzinfo=UTC)
 daily = DailySuffixResolver(time(2, 30))
 
+daily.tz = UTC
+weekly = WeeklySuffixResolver()
+weekly.tz = UTC
 assert daily.getSuffix(moment) == "2026-10-23"
-assert WeeklySuffixResolver().getSuffix(moment) == "2026-week43"
+assert weekly.getSuffix(moment) == "2026-week43"
 ```
 
 <a id="handler-api"></a>

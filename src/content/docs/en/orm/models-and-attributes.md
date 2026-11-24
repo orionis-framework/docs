@@ -232,6 +232,21 @@ Options are read when the class is created. Set them in the class body; changing
 
 `DELETED_AT: ClassVar[str] = "deleted_at"`. Soft deletion column name; it must support `None`.
 
+<a id="datetime-storage"></a>
+
+## How timestamp columns store an instant
+
+For declared `DateTime` and `StrictTimestamp` columns, the model distinguishes two uses.
+
+| Column use | Value written | Value read through the model |
+| --- | --- | --- |
+| Managed creation or update timestamp, or the soft-deletion timestamp | Converted to UTC. A column declared with `timezone=False` receives UTC wall time without the offset. | Converted to the application timezone. An offset-less value already in storage is interpreted as UTC. |
+| Other column with a `"datetime"` cast | Converted to application time. A column declared with `timezone=False` receives local wall time without the offset. | The cast returns an application-zone datetime. An offset-less local column cannot distinguish both occurrences of a repeated hour. |
+
+For example, with application timezone `America/Bogota`, the instant `2026-11-24T02:00:00+00:00` appears on the model as `2026-11-23T21:00:00-05:00`. A timezone-less managed column stores `02:00`. A timezone-less appointment column with a datetime cast stores `21:00`.
+
+Model filters such as `where`, `whereIn`, and `whereBetween` bind datetime values with the same column policy. This applies to unqualified model columns and columns qualified by the model table or its alias. With raw SQL or `DB.table()`, supply bindings in the representation used by the database.
+
 ## Native casts: all seven supported names
 
 ```python

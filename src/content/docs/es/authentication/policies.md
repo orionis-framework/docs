@@ -97,6 +97,8 @@ app.withProviders(AuthorizationProvider)
 
 Integra estas líneas en el bootstrap existente; `app` es la instancia de `Application` ya configurada. No registres la policy dentro de cada petición.
 
+La implementación predeterminada de `IAuthorizer` expone `registry()`. Su `PolicyRegistry.policyFor(clase_del_recurso)` devuelve la clase de policy seleccionada según el MRO del recurso o `None`. `bindings()` devuelve una copia superficial de los registros explícitos. Los proveedores de la aplicación pueden usar `Auth.registerPolicy()` directamente.
+
 El registro relaciona una clase de recurso con una clase que implemente `IPolicy`; `Policy` ya implementa ese contrato. Al buscar una policy también se recorren las clases base del recurso, por lo que una subclase puede utilizar la policy de su antecesor. Registrar una nueva asociación reemplaza la anterior para ese tipo.
 
 ## Autorizar un recurso en un controlador

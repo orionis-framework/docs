@@ -45,7 +45,9 @@ class TestGreetingServer(TestCase):
 uv run python -B reactor test --start-dir tests/integration --file-pattern "test_greeting_mcp.py"
 ```
 
-El resultado esperado es una prueba aprobada y código de salida 0. `assertOk()` rechaza errores JSON-RPC y resultados de herramienta marcados `isError=True`; `assertTextContains()` comprueba el texto devuelto. La herramienta debe devolver `McpResponse`, no un diccionario ni string de Python sin envolver. Para probar una herramienta de tu aplicación, importa su servidor real en vez de declarar el servidor del ejemplo y llámala con entradas representativas.
+El resultado esperado es una prueba aprobada y código de salida 0. `assertOk()` rechaza errores JSON-RPC y resultados de herramienta marcados `isError=True`; `assertTextContains()` comprueba el texto devuelto. El ejemplo devuelve `McpResponse.text(...)`. Para devolver varios contenidos o continuar tras solicitar datos al cliente, consulta [respuestas MCP](/es/mcp/responses-and-content) y [flujos avanzados](/es/mcp/advanced-workflows). Para probar una herramienta de tu aplicación, importa su servidor real en vez de declarar el servidor del ejemplo y llámala con entradas representativas.
+
+`await client.request(method, params)` recopila un intercambio finito en un `McpTestResponse`. `params` vale `None` por defecto. Los argumentos de palabra clave `meta` (por defecto `None`) y `request_id` (por defecto `1`) permiten personalizar los metadatos y el identificador de la petición. Lee `response.message` para obtener el diccionario JSON-RPC final. Una respuesta correcta tiene `result`, un fallo del protocolo tiene `error` y `{}` indica que el intercambio terminó sin respuesta final. `response.notifications` es una tupla de notificaciones decodificadas en orden de recepción. Para una suscripción abierta, usa `async for message in client.stream(method, params)` y cierra el stream cuando la prueba haya observado el evento esperado.
 
 ## Inspeccionar un servidor HTTP desde el navegador
 
@@ -70,6 +72,6 @@ Un error de red del navegador puede deberse a CORS, DNS, TLS u otro problema de 
 
 ## Referencia y próximos pasos
 
-[mcp.py](https://github.com/orionis-framework/framework/blob/1e905f4f103d47c61789d877eba472a5bd97681b/orionis/test/clients/mcp.py) · [case.py](https://github.com/orionis-framework/framework/blob/1e905f4f103d47c61789d877eba472a5bd97681b/orionis/test/cases/case.py)
+[mcp.py](https://github.com/orionis-framework/framework/blob/v1.9.0/orionis/test/clients/mcp.py) · [case.py](https://github.com/orionis-framework/framework/blob/v1.9.0/orionis/test/cases/case.py)
 
 [Volver al índice del módulo](/es/testing).

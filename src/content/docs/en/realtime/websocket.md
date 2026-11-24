@@ -610,6 +610,8 @@ The [browser WebSocket constructor](https://websockets.spec.whatwg.org/#the-webs
 | `socket.closed` | Whether the connection is terminal. |
 | `socket.supportsCloseDetails` | Whether the transport can send custom close codes and reasons. |
 
+For named close codes, import `WebSocketStatus` from `orionis.http.enums`. For example, `await socket.close(WebSocketStatus.NORMAL_CLOSURE)` sends code `1000` on transports that support close details. Reserved reporting codes such as `1006` cannot be sent as a close code.
+
 `await socket.accept(subprotocol=None, headers=None)` accepts once. Application data cannot be sent or received before acceptance. `await socket.reject(status_code=403)` rejects before acceptance and permits HTTP statuses between `400` and `599`. The visible status depends on the transport.
 
 `await socket.close()` is the portable closing method. Before acceptance it rejects the handshake; after acceptance it requests normal closure. Repeated calls after closure do nothing.

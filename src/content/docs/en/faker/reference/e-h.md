@@ -1763,7 +1763,7 @@ fake.futureDatetime(end_date: datetime.date | datetime.datetime | datetime.timed
 | Parameter | Purpose |
 | --- | --- |
 | `end_date` | End date/time boundary or relative interval. |
-| `tzinfo` | Timezone for generated datetime; None uses native behavior. |
+| `tzinfo` | Omit to use the application timezone. An explicit value, including `None`, is passed to the provider. |
 
 Verified availability: 110 locales. Example locales: `en_US`, `es_CO`, `es_ES`, `am_ET`, `ar_AA`, `ar_AE`, `ar_BH`, `ar_DZ`.
 

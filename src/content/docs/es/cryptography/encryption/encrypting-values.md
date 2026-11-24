@@ -13,19 +13,17 @@ Los ajustes pertenecen a `config/app.py`. `config/hashing.py` configura los hash
 
 | Ajuste | Variable de entorno | Comportamiento |
 | --- | --- | --- |
-| `app.cipher` | `APP_CIPHER` | Identificador del cifrado. Predeterminado: `AES-256-CBC`. |
+| `app.cipher` | `APP_CIPHER` | Identificador del cifrado. Predeterminado: `AES-256-GCM`. |
 | `app.key` | `APP_KEY` | Clave compartida por los procesos que deban descifrar los mismos valores. |
 
 Los identificadores se escriben exactamente así:
 
 | Cifrado | Clave | IV por operación | Autenticación del contenido |
 | --- | --- | --- | --- |
-| `AES-128-CBC` | 16 bytes | 16 bytes | No agrega MAC ni tag; utiliza padding PKCS7. |
-| `AES-256-CBC` | 32 bytes | 16 bytes | No agrega MAC ni tag; utiliza padding PKCS7. |
 | `AES-128-GCM` | 16 bytes | 12 bytes | Genera y verifica un tag de 16 bytes. |
 | `AES-256-GCM` | 32 bytes | 12 bytes | Genera y verifica un tag de 16 bytes. |
 
-Para utilizar GCM en un flujo que necesite comprobar la autenticidad del contenido, configura, por ejemplo:
+Para una clave de aplicación de 32 bytes, usa el valor predeterminado en `.env`.
 
 ```dotenv
 APP_CIPHER=AES-256-GCM
@@ -234,11 +232,9 @@ flowchart TD
     E --> F["Text token for storage or transport"]
 ```
 
-Los campos binarios `iv`, `value` y `tag` se representan también en Base64. En CBC, `tag` es `None`; en GCM contiene el tag de autenticación. Guarda el **token completo**: el texto cifrado aislado no contiene toda la información necesaria para descifrarlo.
+Guarda el token completo. Sus campos en Base64 contienen el IV de 12 bytes, el texto cifrado y la etiqueta de autenticación de 16 bytes. El descifrado verifica la etiqueta antes de devolver el texto original.
 
-El token ocupa más espacio que el texto original por el IV, el tag cuando corresponde, JSON y Base64. No contiene la clave, un identificador de clave, una fecha de caducidad ni una lista de claves anteriores. El campo `cipher` debe coincidir con el de la instancia que lo descifra; no cambia automáticamente su configuración.
-
-GCM comprueba su tag durante el descifrado y rechaza un contenido alterado. CBC verifica el padding, pero esta implementación no agrega un MAC: un descifrado exitoso de CBC no demuestra integridad.
+El token ocupa más espacio que el texto original por el IV, el tag, JSON y Base64. No contiene la clave, un identificador de clave, una fecha de caducidad ni una lista de claves anteriores. El campo `cipher` debe coincidir con el de la instancia que lo descifra; no cambia automáticamente su configuración.
 
 ## Errores de entrada y descifrado
 
@@ -246,9 +242,9 @@ GCM comprueba su tag durante el descifrado y rechaza un contenido alterado. CBC 
 | --- | --- |
 | Entrada que no sea `str`. | `TypeError`. |
 | Texto o token vacío; texto que no se pueda codificar en UTF-8. | `ValueError`. |
-| Sobre Base64/JSON inválido, campos incompatibles, cifrado distinto o tamaño de IV incorrecto. | `ValueError`. |
+| Sobre Base64/JSON inválido, campos ausentes o incompatibles, cifrado distinto o tamaño de IV incorrecto. | `ValueError`. |
 | Fallo durante el cifrado. | `RuntimeError`. |
-| Tag GCM ausente o de longitud incorrecta, fallo de autenticación, padding CBC inválido o fallo al recuperar UTF-8. | `RuntimeError`, con la causa original encadenada. |
+| Tag GCM nulo o de longitud incorrecta, fallo de autenticación o fallo al recuperar UTF-8. | `RuntimeError`, con la causa original encadenada. |
 
 La acción `decrypt` del ejemplo transforma los errores esperados del token en una respuesta HTTP sin devolver el detalle interno de la excepción. El resto de fallos sigue el [flujo de excepciones HTTP](/es/http/exceptions). No se necesita capturar `TypeError` allí porque el esquema ya exige un `str`.
 
@@ -268,4 +264,4 @@ La aplicación debe identificar qué configuración corresponde a cada registro 
 
 ---
 
-[Índice de cifrado](/es/cryptography/encryption) · [Hashing de contraseñas](/es/cryptography/hashing) · [Controladores](/es/deployment/health-and-default-responses)
+[Índice de cifrado](/es/cryptography/encryption) · [Hashing de contraseñas](/es/cryptography/hashing) · [Controladores](/es/http/controllers)

@@ -15,6 +15,12 @@ The installer creates an application from one of seven supported skeletons. Each
 
 The package is `orionis-installer`; its executable is `orionis`. Application commands in this guide use `uv run python -B reactor ...` from the generated project's root, so they run in that application's environment.
 
+To follow this edition, check the resolved version from the generated project. If you are starting a project specifically on 1.9.0, declare `orionis==1.9.0` in its dependencies, retain any selected driver extras (for example, `orionis[pgsql]==1.9.0`), run `uv sync`, and keep `uv.lock` in version control.
+
+```bash
+uv run python -c "from orionis.metadata import VERSION; print(VERSION)"
+```
+
 ## Prerequisites
 
 - Install **[uv](https://docs.astral.sh/uv/getting-started/installation/)** and **[Git](https://git-scm.com/downloads)** and make them available on `PATH`. Git downloads the skeleton even when you skip initializing the new project's repository.

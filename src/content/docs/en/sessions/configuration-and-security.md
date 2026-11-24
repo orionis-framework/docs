@@ -21,7 +21,7 @@ These are the defaults in `config/session.py` when no environment variable overr
 | `lifetime` · `SESSION_LIFETIME` | `120` | Record lifetime in **minutes** since its last persistence. An integer greater than zero. |
 | `expire_on_close` · `SESSION_EXPIRE_ON_CLOSE` | `False` | When `True`, omits `Max-Age` and issues a browser session cookie. The server record remains subject to `lifetime`. |
 | `renewal_interval` · `SESSION_RENEWAL_INTERVAL` | `0` | Interval in **seconds** for renewing unchanged scalar data. `0` renews on every save of an active session. |
-| `track_previous_url` · `SESSION_TRACK_PREVIOUS_URL` | `True` | Remembers the URL of a GET/HEAD navigation with a 200–299 response, excluding AJAX and requests asking for JSON. |
+| `track_previous_url` · `SESSION_TRACK_PREVIOUS_URL` | `True` | `SessionManager.tracksPreviousUrl` exposes this setting as a read-only boolean. The middleware remembers the URL of a GET/HEAD navigation with a 200–299 response, excluding AJAX and requests asking for JSON. |
 | `files` · `SESSION_FILES` | `"storage/framework/sessions"` | Directory for the `file` driver. Relative paths resolve from the project root. Use a nonempty path when selecting that driver. |
 | `connection` · `SESSION_DB_CONNECTION` | `None` | Database connection for the `database` driver; `None` uses the default connection. |
 | `table` · `SESSION_DB_TABLE` | `"sessions"` | Table for the `database` driver. |

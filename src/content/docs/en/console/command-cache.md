@@ -54,7 +54,7 @@ flowchart TD
     H --> I[Reuse in-memory registry throughout the process]
 ```
 
-It monitors application invalidation paths and additionally `orionis/console/core/commands.py` to detect changes to the native catalog. `FileBasedCache` compares a hash; it reuses its calculated hash for half a second to avoid recomputing it on every query of that object.
+The cache tracks the application invalidation paths, the built-in command catalog and the framework version metadata. A release that changes built-in options can therefore invalidate cached command metadata. `FileBasedCache` compares a hash; it reuses its calculated hash for half a second to avoid recomputing it on every query of that object.
 
 A missing cache, invalid format or different hash causes reconstruction. This is not a TTL for results. Once a loader has loaded metadata, it retains its flags and objects in memory: disk changes do not automatically reload that running service.
 

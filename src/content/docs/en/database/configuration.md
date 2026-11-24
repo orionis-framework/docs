@@ -16,11 +16,11 @@ A declared field does not imply runtime automatically applies it. Retained but u
 | `default` | `ConnectionName \| str` | `DB_CONNECTION` | `sqlite` | Default name normalized to lowercase; accepts only the six `ConnectionName` members. |
 | `connections` | `Connections \| dict` | No single variable | `Connections(...)` with six backends | Constructs and validates each entity. A dictionary becomes `Connections(**connections)`. |
 
-An invalid `default` type raises `TypeError`; an unsupported name raises `ValueError`. For names such as `reporting` use [provider registration](/en/database/connections#registering-a-second-connection), rather than `DB_CONNECTION=reporting` in this entity.
+An invalid `default` type raises `TypeError`. A name outside `ConnectionName` raises `ValueError`. To select an additional connection explicitly, see [connection management](/en/database/connections).
 
 ## Connections
 
-Fields are `sqlite: SQLite | dict`, `mysql: MySQL | dict`, `pgsql: PGSQL | dict`, `oracle: Oracle | dict`, `sqlserver: SQLServer | dict` and `redshift: Redshift | dict`. Omitted fields create new backend entities. Dictionaries are converted to their corresponding entity; other types raise `TypeError`. Unknown fields are not constructor arguments.
+Fields are `sqlite: SQLite | dict`, `mysql: MySQL | dict`, `pgsql: PGSQL | dict`, `oracle: Oracle | dict`, `sqlserver: SQLServer | dict` and `redshift: Redshift | dict`. Omitted fields create new backend entities. Dictionaries are converted to their corresponding entity; other types raise `TypeError`. The native entities retain additional public attributes in `toDict()`. Invalid identifiers, private names, keywords and names shadowing methods such as `toDict` raise `TypeError`. The project template generates a separate constructor for `BootstrapDatabase` with its declared top-level fields.
 
 The template constructs all six entities even when only one is used. `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` and `DB_PREFIX` are shared by entries reading them. `DB_CHARSET` applies only to the active MySQL, PostgreSQL or SQL Server driver; other entries retain their default charset. Configure entities explicitly for distinct connections.
 

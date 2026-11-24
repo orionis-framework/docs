@@ -23,7 +23,7 @@ All arguments below are required and used directly. `Any` and `Callable` are sig
 
 <a id="reflection-method-instance"></a>
 
-**`instance(instance: Any) -> IReflectionInstance`** creates a [ReflectionInstance](/en/utilities/introspection/instances) over an existing object. It does not construct the target. The wrapper rejects classes and instances from `builtins`, `abc` and `__main__` according to its rules.
+**`instance[T](instance: T) -> IReflectionInstance[T]`** creates a [ReflectionInstance](/en/utilities/introspection/instances) over an existing object. It does not construct the target. The wrapper rejects classes and instances from `builtins`, `abc` and `__main__` according to its rules.
 
 <a id="reflection-method-abstract"></a>
 

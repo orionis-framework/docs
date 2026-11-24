@@ -155,7 +155,7 @@ Equivalente de aplicación: `await Storage.disk().file("reports/42.txt").mimeTyp
 async lastModified(path: str) -> datetime
 ```
 
-Obtiene la fecha de modificación consciente de zona horaria UTC.
+Los discos local y de memoria devuelven UTC. S3, Azure y GCS devuelven la fecha de modificación que suministra el SDK. Si falta ese dato, usan la hora UTC actual.
 
 Equivalente de aplicación: `await Storage.disk().file("reports/42.txt").lastModified()`.
 

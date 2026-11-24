@@ -260,7 +260,7 @@ curl --request DELETE \
 | `tokens.expiration` / `AUTH_TOKEN_EXPIRATION` | `None` | Duración en minutos; `None` no fija vencimiento automático. |
 | `tokens.secret_bytes` / `AUTH_TOKEN_SECRET_BYTES` | `40` | Bytes aleatorios antes de codificación; admite entre 32 y 128. |
 
-Una fecha `expires_at` explícita prevalece sobre la duración configurada. Pasar `None` aplica esa duración: para emitir credenciales sin vencimiento automático, la configuración debe tener `expiration=None`. Las fechas se normalizan a UTC para persistencia. El token deja de aceptarse al alcanzar su fecha aunque la fila siga almacenada.
+Una fecha `expires_at` explícita prevalece sobre la duración configurada. Pasar `None` aplica esa duración: para emitir credenciales sin vencimiento automático, la configuración debe tener `expiration=None`. Una fecha con desplazamiento UTC identifica un instante preciso. Una fecha sin desplazamiento usa `app.timezone`. El repositorio compara instantes en UTC e interpreta como UTC las marcas de tiempo existentes sin desplazamiento en la base de datos. El `AccessToken` devuelto presenta `created_at`, `expires_at` y `last_used_at` en la zona de la aplicación cuando esos valores existen. El token deja de aceptarse al alcanzar su fecha aunque la fila siga almacenada.
 
 `IAccessTokenRepository` expone estas operaciones asíncronas:
 
@@ -292,12 +292,14 @@ class TokenMaintenance:
 
 La limpieza física requiere que tu aplicación invoque ese servicio desde su tarea de mantenimiento; el guard ya rechaza tokens vencidos o revocados sin esperar a esa limpieza.
 
-Al desactivar una cuenta o cambiar sus credenciales fuera del flujo de recuperación, decide explícitamente qué tokens revocar. El guard de tokens comprueba la identidad y la credencial almacenada; no aplica por sí mismo una condición sobre la columna `active`. La [recuperación de contraseña](/es/authentication/account-recovery) sí revoca los tokens del propietario durante su transacción.
+Al desactivar una cuenta o cambiar sus credenciales fuera del flujo de recuperación, decide explícitamente qué tokens revocar. El guard de tokens rechaza al propietario ausente y al propietario cuyo atributo `active` exista y tenga un valor distinto de `True`. Aplica esta condición antes de actualizar `last_used_at`. Si el atributo está ausente, el propietario supera esta comprobación de estado. Desactivar la cuenta conserva la fila del token. La [recuperación de contraseña](/es/authentication/account-recovery) sí revoca los tokens del propietario durante su transacción.
 
 <a id="token-lookup-performance"></a>
 
 ## Consulta nativa de tokens
 
 El repositorio nativo de tokens y el provider de identidad basado en modelos pueden recuperar token y propietario mediante un SELECT con JOIN cuando comparten una conexión nativa, usan claves enteras o de texto admitidas y mantienen una consulta de scopes sencilla. El guard conserva la actualización condicional final de `last_used_at` después de resolver la identidad, comprobando de nuevo revocación y expiración. Esa ruta de token/propietario utiliza dos sentencias en lugar de tres; las relaciones anticipadas pueden ejecutar consultas adicionales.
+
+Al extender la búsqueda de tokens, el guard reconoce el hook asíncrono opcional `findWithIdentity(plain_text, identities)`. Devuelve `(access_token, identity)` para una coincidencia, `None` para rechazar esa credencial o `NotImplemented` para usar `findByPlainText()` y después `retrieveById()`. El guard comprueba la identidad devuelta y confirma la validez del token antes de establecer el contexto de la petición.
 
 Los metadatos del token se validan antes de los eventos de identidad. Se mantienen filtros globales, hidratación, eventos `retrieved` y relaciones anticipadas; no se cachean decisiones de autenticación. Providers o repositorios personalizados, conexiones separadas, claves UUID y consultas complejas utilizan consultas separadas para el token y la identidad.

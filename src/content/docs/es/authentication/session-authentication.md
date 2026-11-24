@@ -237,7 +237,7 @@ flowchart TD
 
 En el login se rota el identificador de sesión, se guarda la clave del usuario y una huella del hash de su contraseña, y se genera un nuevo token CSRF. En la siguiente petición el guard vuelve a consultar la identidad y compara esa huella; si el usuario ya no existe o cambió su hash, elimina los datos de autenticación e intenta restaurar un recuerdo válido, si existe.
 
-El estado `active` se comprueba al validar credenciales y al restaurar un recuerdo. La resolución de una sesión ya autenticada comprueba la identidad y la huella; no añade otra comprobación de `active`. Si tu aplicación requiere bloquear de inmediato sesiones existentes por un estado de negocio, aplica también esa condición mediante un [middleware de acceso](/es/authentication/middleware).
+El acceso con contraseña y la restauración mediante cookie persistente requieren que el atributo `active` de la identidad sea exactamente `True`. En las peticiones siguientes, el guard de sesión vuelve a cargar la identidad y comprueba la huella de la contraseña. Si `active` existe y tiene un valor distinto de `True`, descarta el acceso almacenado en la sesión. Una identidad sin ese atributo supera esta comprobación de estado al restaurar una sesión existente.
 
 ## Inicio persistente: remember me
 
@@ -274,7 +274,7 @@ La fachada se importa siempre desde `orionis.support.facades`. Estas lecturas so
 | `Auth.identifier()` | Clave primaria de la identidad o `None`. |
 | `Auth.check()` | `True` si la petición está autenticada. |
 | `Auth.guest()` | `True` si es una petición invitada. |
-| `Auth.context()` | Contexto de autenticación actual. |
+| `Auth.context()` | `IAuthenticationContext` actual, implementado por `AuthenticationContext`. Lee `isAuthenticated`, `isGuest`, `identity`, `guard`, `abilities` y `credentialId` como propiedades. `identifier()` devuelve la clave de la identidad o `None`. |
 
 El nombre de la API es `identifier()`; no existe un alias `Auth.id()`. La identidad puede leerse desde cualquier componente ejecutado en el scope de la petición. No conserves el usuario de una petición en una variable global o en un servicio compartido.
 

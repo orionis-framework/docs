@@ -538,7 +538,7 @@ assert [(name, argument.resolved) for name, argument in signature.arguments()] =
 ### getFields heredado
 
 ```text
-getFields(self) -> list[dict[str, Any]]
+getFields(self, *, include_dynamic: bool = False) -> list[dict[str, Any]]
 ```
 
 Proviene de `BaseEntity`. Describe **los campos de la dataclass `Signature`**, no los parámetros del callable. Cada elemento contiene `name`, `types`, `default` y `metadata`. Para recorrer parámetros utiliza `arguments()`.

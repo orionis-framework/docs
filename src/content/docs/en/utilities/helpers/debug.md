@@ -116,4 +116,4 @@ Dumper.dump({"phase": "bootstrap"})
 
 The template global [`dump(*values)`](/en/views/globals#dumpvalues) returns HTML to insert into a view; it is a different API from `Debug.dump()`, which writes to the console.
 
-Implementation: [Debug](https://github.com/orionis-framework/framework/blob/64fd20a92/orionis/support/facades/debug.py), [Dumper](https://github.com/orionis-framework/framework/blob/64fd20a92/orionis/console/debug/dumper.py) and [DumperProvider](https://github.com/orionis-framework/framework/blob/64fd20a92/orionis/console/debug/provider.py).
+Implementation: [Debug](https://github.com/orionis-framework/framework/blob/v1.9.0/orionis/support/facades/debug.py), [Dumper](https://github.com/orionis-framework/framework/blob/v1.9.0/orionis/console/debug/dumper.py) and [DumperProvider](https://github.com/orionis-framework/framework/blob/v1.9.0/orionis/console/debug/provider.py).

@@ -51,7 +51,7 @@ class TestPrice(TestCase):
         self.skipTest("Replace this placeholder with assertions.")
 ```
 
-**All Orionis test cases must inherit from `TestCase`, imported with `from orionis.test import TestCase`.** The template creates an asynchronous method with an explicit skip; it does not yet check behavior. Replace `skipTest(...)` with application operations and assertions before treating that functionality as covered.
+Generated cases inherit from `orionis.test.TestCase`. The template creates an asynchronous method with an explicit skip; it does not yet check behavior. Replace `skipTest(...)` with application operations and assertions before treating that functionality as covered.
 
 Filenames match `test_*.py` by default; method names must start with `test`. Class names do not have to use that prefix, although the generator uses it for a clear convention.
 

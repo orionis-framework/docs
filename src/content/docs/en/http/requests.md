@@ -47,7 +47,7 @@ It responds with `{"name":"Ada"}`. In PowerShell, use `curl.exe` if `curl` is an
 | `await request.data()` | Dictionary for a JSON object, URL encoded form, multipart form, or MessagePack map. Preserves repeated form fields as lists. |
 | `await request.payload()` | Selects a parser using `Content-Type`; returns bytes if none exists. The result depends on the format. |
 | `await request.json()` | Any JSON value: object, list, string, number, boolean, or `None`. |
-| `await request.formUrlEncoded()` | Dictionary of URL encoded text values; keeps the last value for each name. |
+| `await request.formUrlEncoded()` | `dict[str, str]` of URL encoded fields. Keeps the last value for each name. |
 | `await request.form()` | Multipart `FormData`, including repeated fields and files. |
 | `await request.xml()` | Root element of an XML document. |
 | `await request.msgpack()` | Decoded MessagePack value. |

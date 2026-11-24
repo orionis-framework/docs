@@ -269,7 +269,11 @@ Control methods operate locally and return `True` on completion. They represent 
 
 <a id="schedule-info"></a>
 
-### `async info() -> list[dict]`
+<a id="async-info---listdict"></a>
+
+### `async info() -> list[ScheduledTaskInfo]`
+
+`ScheduledTaskInfo` is a `TypedDict` defined in `orionis.console.entities.task`.
 
 Loads Reactor signatures, validates tasks, and constructs entities using configuration defaults. It starts no scheduler and executes no command. Unknown command signatures and tasks without triggers raise `ValueError`.
 

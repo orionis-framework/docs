@@ -89,7 +89,7 @@ Every section is optional when constructing `Configuration`: each has a default 
 
 `orionis.foundation.config.startup.Configuration` is a frozen dataclass with keyword-only arguments. For each section in the table, it accepts **the corresponding entity or a `dict`**. It does not accept `None` as a replacement section; omitting the argument constructs its default.
 
-Given a dictionary, it constructs `Entity(**options)` and runs that entity's validation. Given an instance of the expected type, it retains it; a different type produces `TypeError`. Unknown dictionary fields fail during entity construction. Some entities normalize their substructures into entities while others retain validated dictionaries: do not assume every component has the same internal representation.
+Given a dictionary, it constructs `Entity(**options)` and runs that entity's validation. Given an instance of the expected type, it retains it; a different type produces `TypeError`. The built-in section entities accept extra public keyword attributes. Their names must be valid identifiers and must avoid Python keywords, private names and class members. Extras survive serialization. Each subsystem still reads its own supported settings, so a misspelled option can be stored without changing service behavior. Some entities normalize their substructures into entities while others retain validated dictionaries: do not assume every component has the same internal representation.
 
 ```python
 from orionis.foundation.config.app import App, Environments
@@ -128,11 +128,11 @@ Import `App`, `Cipher` and `Environments` from `orionis.foundation.config.app`. 
 | `locale` | `str`, `"en"` | Non-empty primary locale. |
 | `fallback_locale` | `str`, `"en"` | Non-empty fallback locale. |
 | `language_path` | `str`, `"resources/lang/"` | Non-empty translation path; see [Localization](/en/localization). |
-| `cipher` | `str \| Cipher`, `"AES-256-CBC"` | Normalized algorithm used to validate key length; see [Encryption](/en/cryptography/encryption). |
+| `cipher` | `str \| Cipher`, `"AES-256-GCM"` | Normalized algorithm used to validate key length; see [Encryption](/en/cryptography/encryption). |
 | `key` | `str \| bytes \| None`, `None` | Normalized to bytes. Accepts `base64:` representation; requires the cipher's exact key length. Generates and persists a key when missing. |
 | `maintenance` | `bool`, `False` | Maintenance setting; effective state also considers the application's maintenance marker. |
 
-`Environments` contains `DEVELOPMENT`, `TESTING` and `PRODUCTION`. `Cipher` contains the available algorithms; the linked encryption guide explains their keys and uses. Normalization accepts a member, its name or its textual value according to `normalize_enum()`.
+`Environments` contains `DEVELOPMENT`, `TESTING` and `PRODUCTION`. Application encryption accepts `AES-128-GCM` and `AES-256-GCM`. Choosing a CBC enum member here raises `ValueError`. Normalization accepts a member, its name or its textual value according to `normalize_enum()`.
 
 <a id="configuration-own"></a>
 
@@ -249,9 +249,14 @@ Both reject non-string types with `TypeError` and invalid names with `ValueError
 validate_seconds(value: object, name: str, *, positive: bool = False) -> None
 validate_driver(value: object, expected: Drivers) -> None
 validate_http_origin(origin: str) -> None
+validate_store_table(value: object, name: str = "table", *, optional: bool = False) -> None
+validate_store_port(value: object) -> None
+validate_store_db(value: object) -> None
 ```
 
 `validate_seconds()` accepts finite `int` and `float` values, rejects `bool` and negative numbers, and rejects zero with `positive=True`. `validate_driver()` checks a string driver against the exact expected **queue** `Drivers` member; it is not a universal validator for every enum named `Drivers`.
+
+For a custom store, `validate_store_table()` accepts a nonempty name made of lowercase ASCII letters and underscores, or `None` with `optional=True`. `validate_store_port()` accepts integers from 1 through 65535. `validate_store_db()` accepts a nonnegative integer database index. Each returns `None` on success. A wrong type, including a boolean passed as an integer, raises `TypeError`. An invalid value raises `ValueError`.
 
 `validate_http_origin()` accepts an explicit HTTP or HTTPS origin with a host and a valid port when supplied. It rejects wildcards, whitespace, non-ASCII characters, credentials, paths, queries and fragments. It does not change the representation; `https://app.example.test/` has a path and is not equivalent to the origin without `/` for this validator.
 

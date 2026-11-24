@@ -21,7 +21,7 @@ Los valores siguientes son los predeterminados de `config/session.py` cuando no 
 | `lifetime` · `SESSION_LIFETIME` | `120` | Duración en **minutos** de un registro desde su última persistencia. Entero mayor que cero. |
 | `expire_on_close` · `SESSION_EXPIRE_ON_CLOSE` | `False` | Si es `True`, omite `Max-Age` y emite una cookie de sesión del navegador. El registro del servidor sigue sujeto a `lifetime`. |
 | `renewal_interval` · `SESSION_RENEWAL_INTERVAL` | `0` | Intervalo en **segundos** para renovar datos escalares sin cambios. `0` renueva en cada guardado de una sesión activa. |
-| `track_previous_url` · `SESSION_TRACK_PREVIOUS_URL` | `True` | Recuerda la URL de una navegación GET/HEAD con respuesta 200–299, excluyendo AJAX y peticiones que solicitan JSON. |
+| `track_previous_url` · `SESSION_TRACK_PREVIOUS_URL` | `True` | `SessionManager.tracksPreviousUrl` expone esta opción como booleano de solo lectura. El middleware recuerda la URL de una navegación GET/HEAD con respuesta 200–299, excluyendo AJAX y peticiones que solicitan JSON. |
 | `files` · `SESSION_FILES` | `"storage/framework/sessions"` | Directorio del driver `file`. Una ruta relativa se resuelve desde la raíz del proyecto. Usa una ruta no vacía cuando selecciones ese driver. |
 | `connection` · `SESSION_DB_CONNECTION` | `None` | Conexión de base de datos del driver `database`; `None` usa la predeterminada. |
 | `table` · `SESSION_DB_TABLE` | `"sessions"` | Tabla del driver `database`. |

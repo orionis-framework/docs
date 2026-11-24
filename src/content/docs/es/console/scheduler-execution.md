@@ -269,7 +269,11 @@ Los métodos de control son locales al proceso y devuelven `True` al completar l
 
 <a id="schedule-info"></a>
 
-### `async info() -> list[dict]`
+<a id="async-info---listdict"></a>
+
+### `async info() -> list[ScheduledTaskInfo]`
+
+`ScheduledTaskInfo` es un `TypedDict` de `orionis.console.entities.task`.
 
 Carga las firmas de Reactor, valida las tareas y construye sus entidades con los defaults configurados. No inicia el scheduler ni ejecuta comandos. Una firma no registrada o una tarea sin trigger produce `ValueError`.
 

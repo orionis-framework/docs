@@ -17,7 +17,7 @@ For application operations, use the [facade or ICacheManager](/en/cache/manager-
 | `ICacheRepository` | Fifteen asynchronous operations: the fourteen value proxies plus `replace()`. |
 | `IFileBasedCache` | Synchronous `get() -> dict \| None`, `save(data: dict) -> tuple[int, str]` and `clear() -> bool`. |
 
-`lock()` exists on `CacheManager` and `CacheRepository`, but their abstract contracts do not declare it. The native provider only binds `ICacheManager`; it does not automatically supply a repository or artifact instance for the other contracts. Annotations do not replace real driver differences.
+Both contracts expose the synchronous `lock(key, timeout=None) -> CacheLock` factory. `ICacheManager.lock()` delegates to the default store. A custom repository must implement `lock()` to support it, because the base method raises `NotImplementedError`. The native provider registers `ICacheManager` for injection.
 
 <a id="backend-file"></a>
 

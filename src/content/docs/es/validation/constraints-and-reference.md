@@ -1006,7 +1006,7 @@ Cuerpo inválido (422):
 
 `After`, `AfterOrEqual`, `Before` y `BeforeOrEqual` aceptan valores `date`, `datetime` o texto interpretable por `DateTime`. El parámetro `reference` puede ser uno de esos valores o un nombre de campo hermano. Si el atributo existe y no es `None`, se utiliza antes de intentar interpretar el texto como fecha. `None` compara con el momento actual. También se reconocen los textos `now`, `today`, `tomorrow` y `yesterday`; los tres últimos representan el inicio del día correspondiente.
 
-Si el valor del campo no puede interpretarse como fecha, estas cuatro reglas no añaden error; una referencia que no puede resolverse sí falla. Por eso conviene declarar `date` o `datetime`, o agregar `DateFormat` si se conserva texto. Los formatos de `DateFormat` usan tokens de `DateTime`, como `YYYY-MM-DD`, **no** directivas de `strptime` como `%Y-%m-%d`.
+Estas cuatro reglas rechazan el texto que no se puede interpretar y las referencias que no se pueden resolver. Otros valores que no representan fechas quedan sujetos a la validación de tipos. Una fecha de calendario representa la medianoche en `app.timezone`. Un datetime sin desplazamiento usa la misma zona. La comparación se hace entre instantes UTC. Por ejemplo, `01:30-05:00` ocurre una hora después de `01:30-04:00` en la misma fecha. Por eso conviene declarar `date` o `datetime`, o agregar `DateFormat` si se conserva texto. Los formatos de `DateFormat` usan tokens de `DateTime`, como `YYYY-MM-DD`, **no** directivas de `strptime` como `%Y-%m-%d`.
 
 ```python
 from datetime import date

@@ -442,7 +442,7 @@ python -B reactor test --start-dir tests/database --file-pattern test_migration_
 
 ## Selección de pruebas y configuración
 
---start-dir/-s selecciona el directorio, --file-pattern el patrón de archivos y --method-pattern el patrón de métodos. --verbosity/-v admite 0/1/2; --fail-fast/-f recibe 0/1, no es un flag sin valor. --no-panel desactiva paneles. Los valores omitidos usan config/testing.py; sus variables son TESTING_START_DIR, TESTING_FILE_PATTERN, TESTING_METHOD_PATTERN, TESTING_VERBOSITY, TESTING_FAIL_FAST y TESTING_CACHE_RESULTS. El comando devuelve 1 si algún resultado es failed/errored y 0 en otro caso. Una selección vacía puede terminar sin fallos: confirma que se descubrieron los tests esperados.
+--start-dir/-s selecciona el directorio, --file-pattern el patrón de archivos y --method-pattern el patrón de métodos. --verbosity/-v admite 0/1/2; --fail-fast/-f recibe 0/1, no es un flag sin valor. --no-panel desactiva paneles. Los valores omitidos usan config/testing.py; sus variables son TESTING_START_DIR, TESTING_FILE_PATTERN, TESTING_METHOD_PATTERN, TESTING_VERBOSITY, TESTING_FAIL_FAST y TESTING_CACHE_RESULTS. El comando termina con código `1` si la selección está vacía o alguna prueba falla o produce un error. Una ejecución con resultados y sin esos estados termina con `0`.
 
 ```shell
 orionis test --start-dir tests/database --file-pattern "test_*reference.py" --method-pattern "test*" --verbosity 1 --fail-fast 1 --no-panel
@@ -484,6 +484,8 @@ class TestDatabase(BaseCommand):
         engine.setMethodPattern("test*").setVerbosity(1).setFailFast(fail_fast=True)
         engine.withoutPanel()
         results = await engine.run()
+        if not results:
+            return 1
         failed = {TestStatus.FAILED, TestStatus.ERRORED}
         return 1 if any(result.status in failed for result in results) else 0
 ```

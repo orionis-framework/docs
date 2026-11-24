@@ -111,8 +111,10 @@ Import or configuration errors during this query can propagate. Unlike `call()`,
 ## info: inspect metadata
 
 ```text
-async info() -> list[dict]
+async info() -> list[CommandInfo]
 ```
+
+`CommandInfo` is a `TypedDict` defined in `orionis.console.entities.command`.
 
 Materializes the complete registry, excludes signatures that both **start and end** with `__`, and sorts by signature. Each dictionary contains:
 

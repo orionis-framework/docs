@@ -7,7 +7,7 @@ lastUpdated: false
 
 Orionis testing integrates case discovery, the application container and asynchronous execution with `unittest` assertions. It checks rules, services and integrations using the same application that registers providers and configuration.
 
-**Every case must inherit from `TestCase`, imported with `from orionis.test import TestCase`.** It supports `def` and `async def` methods; the selected method runs with automatic dependency resolution. Each case has an isolated event loop, while the container and external data may remain shared.
+Extend `orionis.test.TestCase` when a test method needs a service from the application container. It supports synchronous and asynchronous methods and provides an isolated event loop for each case. The runner also discovers standard `unittest.TestCase` subclasses. Those use their own unittest lifecycle, without Orionis method injection.
 
 ## Recommended path
 

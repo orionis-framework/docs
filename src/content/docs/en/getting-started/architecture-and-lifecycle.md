@@ -316,7 +316,7 @@ A stack does not need to include all sixteen files. A section without a local fi
 
 ### `app.py`: identity and environment
 
-Defines the application name, environment, debugging, localization and encryption. `APP_NAME` defaults to `Orionis Application`; `APP_ENV` to `development`; `APP_DEBUG` to `True`; `APP_TIMEZONE` to `UTC`; and `APP_LOCALE`/`APP_FALLBACK_LOCALE` to `en`. It also configures the translation directory and the `AES-256-CBC` cipher. A missing `APP_KEY`, or one parsed as `None`, causes a key to be generated and persisted; an existing key must be valid for the cipher.
+Defines the application name, environment, debugging, localization and encryption. `APP_NAME` defaults to `Orionis Application`; `APP_ENV` to `development`; `APP_DEBUG` to `True`; `APP_TIMEZONE` to `UTC`; and `APP_LOCALE`/`APP_FALLBACK_LOCALE` to `en`. It also configures the translation directory and the `AES-256-GCM` cipher. A missing `APP_KEY`, or one parsed as `None`, causes a key to be generated and persisted; an existing key must be valid for the cipher.
 
 ### `auth.py`: identity and authentication
 
@@ -344,7 +344,7 @@ Groups body and multipart limits, WebSockets, proxies, hosts, CORS, CSRF and rat
 
 ### `logging.py`: files and rotation
 
-`LOG_CHANNEL=stack` and `LOG_LEVEL=info` select the channel and severity. Here, `stack` writes a single plain file, `storage/logs/stack.log`; it does not aggregate other channels. Alternatives include `hourly`, `daily`, `weekly`, `monthly` and `chunked`. `LOG_PATH` changes the active channel's path; `LOG_RETENTION` changes its time retention. For size rotation, `LOG_MB_SIZE=10` and `LOG_FILES=5` define size and count. Files are generated according to the channel used.
+`LOG_CHANNEL=stack` and `LOG_LEVEL=info` select the channel and severity. Here, `stack` writes a single plain file, `storage/logs/stack.log`; it does not aggregate other channels. Alternatives include `hourly`, `daily`, `weekly`, `monthly` and `chunked`. `LOG_PATH` changes the active channel's path; `LOG_RETENTION` sets how many rotated files a time-based channel keeps. Older copies are removed on rotation once that count is exceeded. For size rotation, `LOG_MB_SIZE=10` and `LOG_FILES=5` define size and count. Files are generated according to the channel used.
 
 ### `mail.py`: transport and sender
 
@@ -354,7 +354,7 @@ Groups body and multipart limits, WebSockets, proxies, hosts, CORS, CSRF and rat
 
 `MCP_DEFAULT_PAGE_SIZE=50` and `MCP_MAX_PAGE_SIZE=100` control pagination. `MCP_MAX_REQUEST_SIZE` falls back to `HTTP_MAX_BODY_SIZE`, then to 1 MiB; concurrency falls back to `HTTP_MAX_CONCURRENT_REQUESTS`, then to 32. These are environment variables, rather than effective `http.py` values. The configuration also limits subscriptions, tool search and responses. Servers are registered through AI routes.
 
-`McpConfig.allowed_origins` stores an independent `list[str]` and defaults to `[]`. Configure exact HTTP(S) origins explicitly for browser clients; wildcards, paths and trailing slashes are invalid. An empty list rejects any present `Origin`, while requests without that header pass the origin check. HTTP CORS and MCP origin validation are separate policies. See [MCP configuration](/en/mcp/stdio-and-configuration#allowed-http-origins).
+Both HTTP and MCP read `CORS_ALLOW_ORIGINS`. If it is unset, the release’s `config/mcp.py` permits `https://inspector.orionis-framework.com`, while the built-in `McpConfig` used without that file starts with an empty list. Configure exact HTTP(S) origins explicitly for browser clients; wildcards, paths and trailing slashes are invalid. An empty list rejects any present `Origin`, while requests without that header pass the origin check. HTTP CORS and MCP origin validation are separate policies. See [MCP configuration](/en/mcp/stdio-and-configuration#allowed-http-origins).
 
 ### `queue.py`: job execution
 

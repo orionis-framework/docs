@@ -166,6 +166,8 @@ Los locks de archivo y las actualizaciones condicionales de database/cache prote
 
 Un registro vencido deja de ser válido aunque todavía exista físicamente. Memory, file y database rechazan los registros expirados al leerlos; file también descarta archivos corruptos. Cache comprueba la expiración y utiliza el TTL del repositorio, cuya eliminación física depende del backend.
 
+El contrato `ISessionStore` de `orionis.session.contracts` utiliza métodos asíncronos. `read(session_id)` devuelve un `SessionRecord` o `None`. `write(record)` crea o sobrescribe una entrada, `update(record)` actualiza condicionalmente una entrada vigente y devuelve un booleano, y `delete(session_id)` indica si se eliminó una entrada. Cada registro contiene `id`, `data` y `expires_at`. `SessionManager` construye el backend seleccionado por la configuración del driver. Registrar `ISessionStore` en el contenedor no añade un driver.
+
 Los stores proporcionan `gc()` para recolectar registros expirados; en cache es una operación vacía porque la expiración se delega al repositorio. El manager de sesiones no programa una recolección masiva automática. Si necesitas retirar archivos o filas expirados que ya no reciben lecturas, incorpora mantenimiento explícito del almacenamiento elegido.
 
 Cambiar de driver, directorio, repositorio de caché, prefijo o tabla cambia el lugar donde Orionis busca las sesiones. No hay una migración automática de los registros anteriores. Planifica ese cambio teniendo en cuenta que las cookies existentes pueden dejar de encontrar su sesión.

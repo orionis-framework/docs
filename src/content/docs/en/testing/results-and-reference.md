@@ -5,7 +5,7 @@ editUrl: true
 lastUpdated: false
 ---
 
-Run tests from the application root, where `reactor` lives. All cases must extend `TestCase`, imported with `from orionis.test import TestCase`; see [creation and dependency injection](/en/testing/writing-and-running-tests) to prepare the first one.
+Run tests from the application root, where `reactor` lives. For a test that receives services from the container, see [creation and dependency injection](/en/testing/writing-and-running-tests) to prepare the first one.
 
 ## Run the suite
 
@@ -256,7 +256,7 @@ The provider registers `ITestingEngine → TestingEngine` as a deferred singleto
 | `discover() -> unittest.TestSuite` | New suite, without execution or JSON. |
 | `async run() -> list[TestResult]` | Discovers, executes, saves JSON when enabled, and returns outcomes. |
 
-`TestingEngine(app: IApplication)` reads configuration and paths at construction. Setters return the same instance and retain changes: subsequent in-process runs inherit them. `run()` moves the runner to a thread to avoid blocking the caller's loop; it does not run cases in parallel. Each `TestCase` has an isolated loop; databases and services need their own isolation strategy.
+`TestingEngine(app: IApplication)` reads configuration and paths at construction. Setters return the same instance and retain changes: subsequent in-process runs inherit them. `run()` moves the runner to a thread to avoid blocking the caller's loop; it does not run cases in parallel. Each `orionis.test.TestCase` has an isolated loop; databases and services need their own isolation strategy.
 
 ## Runner and result processing
 

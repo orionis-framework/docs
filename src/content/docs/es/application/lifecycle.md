@@ -26,9 +26,9 @@ flowchart TD
     D -- "Sí" --> F["Reutilizar metadatos recuperados por compile"]
     E --> G["Instantánea de bootstrap congelada"]
     F --> G
-    G --> H["Publicar servicios deferred y registrar providers eager"]
-    H --> I["Ejecutar boot síncronos; dejar boot async pendientes"]
-    I --> J["Aplicar zona horaria, locale y políticas del worker"]
+    G --> H["Aplicar zona horaria e idioma"]
+    H --> I["Publicar servicios diferidos y registrar providers eager"]
+    I --> J["Ejecutar boot síncrono y dejar pendiente el asíncrono"]
     J --> K["isCreated e isBooted = True"]
 ```
 

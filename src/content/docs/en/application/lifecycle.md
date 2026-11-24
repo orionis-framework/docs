@@ -26,9 +26,9 @@ flowchart TD
     D -- "Yes" --> F["Reuse metadata restored by compile"]
     E --> G["Frozen bootstrap snapshot"]
     F --> G
-    G --> H["Publish deferred services and register eager providers"]
-    H --> I["Run synchronous boot; leave async boot pending"]
-    I --> J["Apply timezone, locale and worker policies"]
+    G --> H["Apply timezone and locale"]
+    H --> I["Publish deferred services and register eager providers"]
+    I --> J["Run synchronous boot and leave async boot pending"]
     J --> K["isCreated and isBooted = True"]
 ```
 

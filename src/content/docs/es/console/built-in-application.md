@@ -28,15 +28,13 @@ python -B reactor about
 
 ## clear:cache
 
-Vacía el store de caché predeterminado.
+Vacía un store de caché concreto o el predeterminado.
 
-No recibe argumentos ni opciones específicas; solo la ayuda automática.
-
-Llama a `ICacheManager.clear()`. Su alcance depende del driver y namespace configurados; no acepta nombre de store. Devuelve `0` si el servicio confirma la limpieza y `1` si devuelve falso o produce un error de backend reconocido. Errores ajenos a esas familias se propagan.
+Usa `--store NOMBRE` para elegir `file`, `memcached`, `memory`, `redis` o `database`. Si omites la opción, el comando vacía el store predeterminado. Devuelve `0` cuando el store confirma la limpieza y `1` si devuelve falso o produce un error de backend reconocido. Las demás excepciones se propagan. El store en memoria pertenece al proceso que lo ejecuta, así que vaciarlo desde la consola conserva los datos en memoria de los demás workers.
 
 ```shell
 orionis clear:cache
-python -B reactor clear:cache
+python -B reactor clear:cache --store=file
 ```
 
 <a id="command-clear-logs"></a>
@@ -124,7 +122,7 @@ Genera y guarda la clave de cifrado de la aplicación.
 |---|---|---|---|
 | `--force` | Bandera, opcional | `False` | Omitir confirmación (db:wipe) o reemplazar APP_KEY (key:generate). |
 
-Lee `app.cipher` (fallback `AES_256_CBC`), genera una clave válida y la guarda mediante `Env.set("APP_KEY", ...)`. Si ya hay `APP_KEY`, la conserva y devuelve `0`; `--force` (`False` por defecto) permite reemplazarla al activarlo. Un fallo al guardar devuelve `1`. Reemplazar una clave afecta a los datos cifrados con la anterior: revisa la guía de cifrado antes de usar `--force` en una aplicación existente.
+Lee `app.cipher` (fallback `AES_256_GCM`), genera una clave válida y la guarda mediante `Env.set("APP_KEY", ...)`. Si ya hay `APP_KEY`, la conserva y devuelve `0`; `--force` (`False` por defecto) permite reemplazarla al activarlo. Un fallo al guardar devuelve `1`. Reemplazar una clave afecta a los datos cifrados con la anterior: revisa la guía de cifrado antes de usar `--force` en una aplicación existente.
 
 ```shell
 orionis key:generate
@@ -169,7 +167,7 @@ Elimina los artefactos compilados de la aplicación.
 
 No recibe argumentos ni opciones específicas; solo la ayuda automática.
 
-Borra directorios `__pycache__`, archivos `.pyc` / `.pyo`, los directorios raíz `build`, `dist` y `*.egg-info`, y los archivos de caché `config`, `commands` y `routes` bajo `app.compiledPath` (o `storage_framework/cache` si no está configurado). Excluye entornos virtuales y dependencias del recorrido de bytecode. No limpia el contenido de todos los stores de caché: para el store predeterminado existe `clear:cache`. Informa cada grupo de limpieza; devuelve `1` si alguna eliminación falla, `0` en caso contrario. No ofrece `--dry-run`.
+Borra directorios `__pycache__`, archivos `.pyc` / `.pyo`, los directorios raíz `build`, `dist` y `*.egg-info`, y los archivos de caché `config`, `commands` y `routes` bajo `app.compiledPath` (o `storage_framework/cache` si no está configurado). Excluye entornos virtuales y dependencias del recorrido de bytecode. Para vaciar un store de la aplicación usa `clear:cache` y selecciónalo con `--store` si corresponde. Informa cada grupo de limpieza; devuelve `1` si alguna eliminación falla, `0` en caso contrario. No ofrece `--dry-run`.
 
 ```shell
 orionis optimize:clear

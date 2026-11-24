@@ -7,6 +7,8 @@ lastUpdated: false
 
 Una relación es un **método de instancia síncrono que devuelve un builder especializado**. Invocarlo no carga datos; `await` ejecuta la consulta. Orionis ofrece exactamente cuatro relaciones: `hasOne`, `hasMany`, `belongsTo` y `belongsToMany`. No hay relaciones polimórficas ni `hasManyThrough`/`hasOneThrough` implementadas.
 
+Al anotar tipos, `IRelation[ModeloRelacionado, Resultado]` de `orionis.orm.contracts.relation` describe la consulta del modelo relacionado y el resultado de `await relation.getResults()`. Una relación de una fila puede devolver `None`. Una relación múltiple devuelve una colección. Para código que asocia o desasocia filas de la tabla intermedia, usa `IBelongsToManyRelation[ModeloRelacionado]` de `orionis.orm.contracts.belongs_to_many_relation`.
+
 ## Modelos completos del ejemplo
 
 ```python

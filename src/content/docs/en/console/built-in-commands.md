@@ -46,7 +46,7 @@ Each link opens the complete options and examples for that command.
 | [`bootstrap:web`](/en/console/built-in-bootstrap#command-bootstrap-web) | Enable web routing. |
 | [`bootstrap:websocket`](/en/console/built-in-bootstrap#command-bootstrap-websocket) | Enable WebSocket routing. |
 | [`cache:migrate`](/en/database/commands#cache-migrate) | Create missing SQL cache and lock tables. |
-| [`clear:cache`](/en/console/built-in-application#command-clear-cache) | Clear the default cache store. |
+| [`clear:cache`](/en/console/built-in-application#command-clear-cache) | Clear a named cache store, or use the configured default. |
 | [`clear:logs`](/en/console/built-in-application#command-clear-logs) | Remove framework log files. |
 | [`clear:testing`](/en/console/built-in-application#command-clear-testing) | Remove cached test results. |
 | [`clear:views`](/en/console/built-in-application#command-clear-views) | Remove compiled view bytecode. |
@@ -113,6 +113,6 @@ Each link opens the complete options and examples for that command.
 
 Reactor returns the integer returned by `handle()`; a non-integer return is converted to `0`. An uncaught exception reaches the console failure handler and produces `1`. The parser exits with `0` for help or `2` for invalid arguments.
 
-Not every command converts internal failures into an exception or status `1`: common generators print certain errors and return `None`. Their pages explain this limitation and command-specific statuses for `packages`, `test`, `db:wipe` and workers. Consider command output, exit status and the expected result together.
+A code generator returns `1` when it reports a file creation error, including a destination that already exists. The references for `packages`, `test`, `db:wipe` and workers describe their command-specific exit statuses.
 
 For calling commands from code and injecting services, see [Reactor and programmatic execution](/en/console/reactor-and-injection).

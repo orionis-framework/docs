@@ -16,8 +16,8 @@ Estos tres elementos intervienen en cada operación:
 | Elemento | Responsabilidad |
 | --- | --- |
 | `APP_KEY` | Clave que mantiene la aplicación y que se utiliza tanto para cifrar como para descifrar. |
-| `APP_CIPHER` | Selecciona la variante AES admitida y determina la longitud de la clave y del IV. |
-| Payload devuelto por `encrypt()` | Representa el IV aleatorio, el valor cifrado, el cipher y el tag cuando corresponde. No contiene la clave. |
+| `APP_CIPHER` | Selecciona la variante AES admitida y determina la longitud de la clave. |
+| Payload devuelto por `encrypt()` | Representa el IV aleatorio, el valor cifrado, el cipher y la etiqueta de autenticación GCM. No contiene la clave. |
 
 `config/app.py` configura la clave y el cipher; `config/hashing.py` configura los hashes de contraseñas. Mantén la clave y el cipher con los que se generaron los valores que quieras recuperar.
 
@@ -54,11 +54,9 @@ Consulta [cifrar y descifrar valores](/es/cryptography/encryption/encrypting-val
 
 | Cipher | Clave | Comprobación de integridad implementada |
 | --- | --- | --- |
-| `AES-128-CBC` | 16 bytes | La variante CBC no añade MAC ni tag de autenticación al payload. |
-| `AES-256-CBC` | 32 bytes | La variante CBC no añade MAC ni tag de autenticación al payload. Es el valor predeterminado de la configuración. |
 | `AES-128-GCM` | 16 bytes | Genera y verifica el tag de autenticación GCM. |
-| `AES-256-GCM` | 32 bytes | Genera y verifica el tag de autenticación GCM. |
+| `AES-256-GCM` (predeterminado) | 32 bytes | Genera y verifica el tag de autenticación GCM. |
 
-El servicio comprueba el formato y que el cipher del payload coincida con el configurado. Esas comprobaciones no convierten un payload CBC en un mensaje autenticado. El tag de GCM forma parte de la operación de descifrado.
+Al descifrar, el servicio valida la estructura del token, comprueba el cifrado configurado y verifica la etiqueta de autenticación. La configuración de la aplicación rechaza ambos identificadores CBC.
 
 La [guía de valores y claves](/es/cryptography/encryption/encrypting-values) detalla los comandos `key:generate`, la configuración, el formato de salida, los errores que puedes manejar y las implicaciones de cambiar la clave. La recuperación y sustitución de valores existentes requiere un proceso explícito de tu aplicación.

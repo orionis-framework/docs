@@ -51,7 +51,7 @@ Esta definición usa los mismos valores de entorno y defaults de las entidades n
 | `failed` | `Failed` o `dict`. | `Failed()`. | Selecciona la conexión SQL y la tabla compartidas para guardar fallos terminales. |
 | `worker` | `Worker` o `dict`. | `Worker()`. | Define concurrencia, espera de sondeo y valores de ejecución heredados por los jobs. |
 
-Las entidades son dataclasses inmutables con argumentos de construcción por nombre. Los diccionarios anidados se convierten en entidades y se validan; los campos desconocidos producen `TypeError`. `toDict()` devuelve una copia recursiva y serializa los miembros de `Drivers` como sus valores de texto; `getFields()` permite inspeccionar sus campos y metadatos.
+La entidad nativa `Queue` convierte los diccionarios anidados de conexiones, workers y trabajos fallidos en entidades validadas. Estas conservan los atributos públicos adicionales válidos en `toDict()`, que también convierte los miembros de `Drivers` a texto. Usa `getFields(include_dynamic=True)` para incluir los atributos adicionales en los metadatos. Los nombres privados, palabras reservadas, identificadores inválidos y nombres ya usados por la clase producen `TypeError`. El constructor de `BootstrapQueue` de la plantilla acepta únicamente sus argumentos declarados de nivel superior.
 
 <a id="config-connections"></a>
 

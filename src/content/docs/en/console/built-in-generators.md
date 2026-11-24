@@ -11,7 +11,7 @@ Every generator takes a required positional string `name` and supports `-h` / `-
 
 The common stub accepts `/` and `\` separators, creates subdirectories and lowercases directory/filename components. Underscore-separated words form the class name, with each generator's prefix/suffix applied when needed. For example, `sales/report_export` with `make:console-command` creates `app/console/commands/sales/report_export_command.py` containing `ReportExportCommand`. **CamelCase is not split into snake_case**: `ReportExport` produces `reportexport_command.py`. Factory generation uses its own normalization, described below.
 
-Absolute names, empty components, `.` / `..`, hyphens and components outside the accepted module-name pattern are rejected. Filesystem/name errors are printed. The common generator and `make:console-command` catch these errors and return `None` from `handle()`, so the exit code may be `0` even when generation failed. Check the message and generated file before continuing.
+Absolute names, empty path segments, `.`, `..`, hyphens and invalid module names are rejected. The generators report name, type and filesystem errors and return exit code `1`. Successful generation returns `0`.
 
 <a id="command-make-console-command"></a>
 
@@ -139,14 +139,17 @@ Generate a facade and its typing interface.
 |---|---|---|---|
 | `name` | str, required | — | File/class name; generators support nested directories. |
 | `--accessor` / `-a` | str, required | — | Container service identifier. |
+| `--contract` | str, optional | `None` | Qualified service class used to generate the typing interface. |
 
-`--accessor` / `-a` is a required string identifying the container service. Two files sharing a stem are written: `.py` and `.pyi`. The generator does not register the service. Writes are sequential: if the second file fails, the first may already exist.
+The `.py` facade resolves the service identified by `--accessor`. Bind that identifier in your provider. Supplying `--contract module.Class` or `--contract module:Class` reads the Python source and generates method signatures in a matching `.pyi` file, including inherited methods and overloads. Without it the interface contains an empty class body. If writing the interface raises a file, type or value error, the generator removes the implementation file it just created.
 
 **Default destination:** `app/facades`. Class/file suffix: none.
 
+The second example assumes a `Catalog` class defined in `app/services/catalog.py`.
+
 ```shell
 orionis make:facade reporting --accessor app.reporting
-python -B reactor make:facade reporting --accessor app.reporting
+python -B reactor make:facade catalog --accessor app.catalog --contract app.services.catalog.Catalog
 ```
 
 <a id="command-make-factory"></a>
@@ -238,7 +241,7 @@ Generate a custom validation rule.
 |---|---|---|---|
 | `name` | str, required | — | File/class name; generators support nested directories. |
 
-Use `http_schema_rule.stub` and the `Rule` suffix. Implement `enforce(field, value, instance)`; the stub uses a synchronous method and only produces the rule scaffold.
+Use `http_schema_rule.stub` and the `Rule` suffix. Implement `async def enforce(self, field, value, instance) -> bool`. The generated method raises `NotImplementedError` until you supply the validation logic.
 
 **Default destination:** `app/http/schemas/rules`. Class/file suffix: `Rule`.
 

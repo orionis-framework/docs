@@ -165,6 +165,21 @@ AUTH_REMEMBER_SECURE=bool:true
 
 Para limitar los nuevos tokens a una hora, cambia únicamente `AUTH_TOKEN_EXPIRATION=int:60`. Para desactivar la redirección de login, utiliza `AUTH_REDIRECT_TO=null`. Los prefijos `int:` y `bool:` y el literal `null` proporcionan los tipos requeridos; no escribas `"None"` como nombre de tabla o duración.
 
+`Auth.guard(name=None)` devuelve un `IGuard` de `orionis.auth.contracts`. El guard seleccionado expone la propiedad `name`. `await guard.resolve(request)` devuelve `None` para un invitado o un `GuardResult` con `identity`, `guard` y los valores opcionales `abilities` y `credential_id`. El gestor construye su registro a partir del guard de sesión inyectado y `TokenGuard`. Añadir un nombre a la configuración no registra otro guard.
+
+## Usar otro proveedor de identidades
+
+Los guards de sesión y token resuelven `IIdentityProvider` desde el contenedor. El framework registra `ModelIdentityProvider` de manera predeterminada. Para usar otra implementación, registra el contrato `IIdentityProvider` en un proveedor de servicios de tu aplicación antes de resolver los guards. Implementa estos métodos asíncronos:
+
+| Método | Resultado esperado |
+| --- | --- |
+| `retrieveById(identifier)` | Una identidad `IAuthenticatable` o `None` si no se encuentra. |
+| `retrieveByCredentials(credentials)` | Busca la identidad por sus campos públicos de acceso y devuelve la identidad o `None`. |
+| `validateCredentials(identity, credentials)` | Comprueba las credenciales recibidas y devuelve un `bool`. |
+| `updateRememberToken(identity, expected, token)` | Para el acceso persistente, reemplaza el token almacenado de forma condicional e indica si se aplicó el cambio. `None` como reemplazo lo revoca. La implementación heredada devuelve `False`. |
+
+En el proveedor predeterminado, un `auth.identity.model` incompatible o que no puede importarse produce `IdentityProviderException`. Pedir un nombre sin registrar a `Auth.guard(name)` produce `GuardNotFoundException`. Un nombre de token, capacidades o fechas no válidos pueden producir `TokenException`. Estas excepciones se exportan desde `orionis.auth`.
+
 ## Elegir el flujo de tu aplicación
 
 - **Navegador:** registra rutas WEB, configura el modelo y su almacenamiento y utiliza [login de sesión](/es/authentication/session-authentication), con CSRF en los formularios.

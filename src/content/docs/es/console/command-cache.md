@@ -54,7 +54,7 @@ flowchart TD
     H --> I[Reutilizar registro en memoria durante el proceso]
 ```
 
-Se monitorizan las rutas de invalidación de la aplicación y, adicionalmente, `orionis/console/core/commands.py`, para detectar cambios en el catálogo nativo. `FileBasedCache` compara un hash; reutiliza durante medio segundo su hash calculado para evitar recalcularlo en cada consulta de ese objeto.
+La caché supervisa las rutas de invalidación de la aplicación, el catálogo de comandos integrados y los metadatos de versión del framework. Un cambio de versión que modifique las opciones de un comando puede invalidar los metadatos almacenados. `FileBasedCache` compara un hash; reutiliza durante medio segundo su hash calculado para evitar recalcularlo en cada consulta de ese objeto.
 
 Una caché inexistente, de formato inválido o con hash diferente provoca reconstrucción. No es un TTL de resultados. Una vez que un loader cargó metadatos, mantiene sus indicadores y objetos en memoria: cambiar archivos en disco no recarga automáticamente ese servicio ya iniciado.
 

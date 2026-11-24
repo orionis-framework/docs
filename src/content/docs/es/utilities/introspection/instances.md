@@ -7,6 +7,8 @@ lastUpdated: false
 
 `ReflectionInstance` inspecciona un objeto ya construido: sus datos actuales, la clase que lo define, métodos, propiedades y firmas. Es útil para herramientas de diagnóstico, adaptadores y extensiones que necesitan examinar un servicio sin crear otra instancia. No ejecuta los métodos descubiertos ni resuelve sus dependencias.
 
+En `ReflectionInstance[T]`, `T` representa el tipo del objeto pasado a `Reflection.instance()`. Así se conserva el tipo al recuperar la instancia o su clase.
+
 ## Inicio rápido
 
 Para examinar datos de una clase importada basta con construir el wrapper alrededor del objeto.
@@ -166,7 +168,7 @@ Estos métodos no requieren argumentos. Devuelven referencias o metadatos de la 
 ### `getInstance`
 
 ```python
-def getInstance(self) -> Any: ...
+def getInstance(self) -> T: ...
 ```
 
 Devuelve el mismo objeto reflejado (`Any`).
@@ -180,7 +182,7 @@ assert reflected.getInstance() is service
 ### `getClass`
 
 ```python
-def getClass(self) -> type: ...
+def getClass(self) -> type[T]: ...
 ```
 
 Devuelve su clase (`type`).

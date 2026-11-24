@@ -328,6 +328,8 @@ Both show the registered HTTP routes sorted by URI, along with their total. The 
 The `Middleware` column shows explicit application, group and route middleware. The automatic API and WEB layers shown in the diagrams do not appear in this column.
 :::
 
+To inspect declarations from Python while loading a route file, call `Route.export()` after registering its routes. The result is a `RouterExport` dictionary. Its `routes` list contains the declarations in registration order, including `method`, `path`, `name`, `protocol`, handlers and middleware classes. Its `fallback` is a `(controller, handler)` pair, initially `(None, None)`. An unfinished route without an action or view raises `ValueError`. The entries can contain Python classes and functions, so select individual fields before serializing them.
+
 ## Resolution and conflicts
 
 Static routes are checked before dynamic routes. Dynamic routes are sorted by segment specificity; ties retain registration order. Do not assume `{id:int}` automatically takes precedence over `{name:str}` when both can match: avoid overlaps or declare the more specific route first.

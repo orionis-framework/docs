@@ -15,6 +15,12 @@ Specifically, `SQLite.url` does not override `database`; `MySQL.engine` and `pre
 
 Connections do not indiscriminately forward every configuration key as an SQLAlchemy option. The template has no native `DB_POOL_*` variables or generic isolation/retry settings.
 
+### Temporal columns
+
+The MySQL connection initializer sets the session time zone to `+00:00`. The compiler emits `DATETIME(6)` and `TIMESTAMP(6)` for the corresponding column types. An existing table keeps its declared precision until its schema changes.
+
+On Oracle, `StrictTimestamp(timezone=True)` uses a typed bind that normalizes datetimes to UTC, interpreting naive inputs in the application timezone. A typed projection returns an aware UTC datetime. Handwritten SQL bypasses this column adapter. Model hydration additionally applies the [model’s timestamp policy](/en/orm/models-and-attributes#datetime-storage).
+
 ## Amazon Redshift
 
 Uses `redshift-connector` and `sqlalchemy-redshift` through a Core engine and reserved checkout worker. It is not PostgreSQL through `asyncpg`. Each physical connection retains its thread during a transaction; independent connections can use distinct workers. Rows are buffered on that worker before returning Python results.

@@ -191,8 +191,8 @@ Estas cuatro operaciones se esperan con `await`, incluso cuando el constructor o
 ### `make()` — resolver por contrato o alias
 
 ```text
-async make(key: type[Any] | str, *args: tuple[Any, ...],
-           **kwargs: dict[str, Any]) -> Any
+async make[T](key: type[T], *args: object, **kwargs: object) -> T
+async make(key: str, *args: object, **kwargs: object) -> Any
 ```
 
 Respeta el lifetime del binding. Sin registro, intenta activar un proveedor diferido y, para una clase concreta, autoconstruirla. Una cadena representa un alias; no importa arbitrariamente una clase por su ruta de módulo. Un alias desconocido produce `ValueError`.
@@ -218,11 +218,10 @@ El resultado es el objeto del servicio. Resolver una instancia callable no ejecu
 ### `build()` — construir una clase concreta
 
 ```text
-async build(type_: Callable[..., Any], *args: tuple[Any, ...],
-            **kwargs: dict[str, Any]) -> Any
+async build[T](type_: type[T], *args: object, **kwargs: object) -> T
 ```
 
-Aunque la anotación utiliza `Callable`, la implementación exige una clase y rechaza funciones u objetos con `TypeError`. Construye esa clase directamente, con inyección recursiva en `__init__`; no sustituye el target por el binding de su contrato ni recupera su instancia singleton. Sus dependencias sí se resuelven mediante `make()`.
+Pasa una clase concreta. Una función o una instancia que no sea una clase produce `TypeError`. Construye esa clase directamente, con inyección recursiva en `__init__`; no sustituye el target por el binding de su contrato ni recupera su instancia singleton. Sus dependencias sí se resuelven mediante `make()`.
 
 ```python
 from app.services.catalog import CatalogPresenter
@@ -243,8 +242,8 @@ Las clases abstractas o no construibles son rechazadas por la reflexión. Una ex
 ### `invoke()` — ejecutar una función
 
 ```text
-async invoke(fn: Callable[..., Any], *args: tuple[Any, ...],
-             **kwargs: dict[str, Any]) -> Any
+async invoke(fn: Callable[..., Any], *args: object,
+             **kwargs: object) -> Any
 ```
 
 Admite funciones Python, funciones asíncronas, lambdas y métodos enlazados que puedan inspeccionarse. Rechaza clases y valores no callable con `TypeError`. La reflexión no acepta cualquier objeto únicamente por implementar `__call__`; utiliza `call(objeto, "__call__", ...)` en ese caso.

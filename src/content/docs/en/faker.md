@@ -82,6 +82,8 @@ sample = {
 
 `dateBetween()` returns a date and `pydecimal()` a Decimal: retain their types or explicitly convert them for the target column/response. `fileName()` and `filePath()` generate fictional names/paths without creating files. Identity/payment methods produce examples in localized formats rather than valid real-world documents or payment instruments.
 
+For built-in temporal providers that accept `tzinfo`, omitting the argument uses the application timezone. This also applies to `unique` and `optional`. To generate a naive datetime explicitly, call `fake.dateTime(tzinfo=None)`. To use UTC, pass `tzinfo=UTC` after importing `UTC` from `datetime`.
+
 The [A–D provider catalog](/en/faker/reference/a-d) and continuations map every name declared in Orionis typing to signatures, locale availability and examples. The catalog distinguishes declarations from availability in a particular locale; custom providers can extend the runtime set.
 
 ## Instance-local uniqueness

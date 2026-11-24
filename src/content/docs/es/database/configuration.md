@@ -16,11 +16,11 @@ Un campo existente no implica que el runtime aplique automáticamente todas sus 
 | `default` | `ConnectionName \| str` | `DB_CONNECTION` | `sqlite` | Nombre predeterminado normalizado a minúsculas; sólo acepta los seis miembros de `ConnectionName`. |
 | `connections` | `Connections \| dict` | Sin variable única | `Connections(...)` con seis motores | Construye y valida cada entidad. Un diccionario se convierte con `Connections(**connections)`. |
 
-Un `default` de tipo incorrecto produce `TypeError` y un nombre no admitido `ValueError`. Para nombres adicionales como `reporting` utiliza [registro mediante provider](/es/database/connections#registrar-una-segunda-conexión), no `DB_CONNECTION=reporting` en esta entidad.
+Un tipo incorrecto en `default` produce `TypeError`. Un nombre ajeno a `ConnectionName` produce `ValueError`. Para seleccionar una conexión adicional explícitamente, consulta la [gestión de conexiones](/es/database/connections).
 
 ## Connections
 
-Los campos son `sqlite: SQLite | dict`, `mysql: MySQL | dict`, `pgsql: PGSQL | dict`, `oracle: Oracle | dict`, `sqlserver: SQLServer | dict` y `redshift: Redshift | dict`. Cada uno usa una entidad nueva del motor si se omite. Un diccionario se convierte a la entidad correspondiente y un tipo distinto produce `TypeError`. Campos desconocidos no forman parte del constructor.
+Los campos son `sqlite: SQLite | dict`, `mysql: MySQL | dict`, `pgsql: PGSQL | dict`, `oracle: Oracle | dict`, `sqlserver: SQLServer | dict` y `redshift: Redshift | dict`. Cada uno usa una entidad nueva del motor si se omite. Un diccionario se convierte a la entidad correspondiente y un tipo distinto produce `TypeError`. Las entidades nativas conservan los atributos públicos adicionales en `toDict()`. Los identificadores inválidos, los nombres privados, las palabras reservadas y los que ocultan métodos como `toDict` producen `TypeError`. La plantilla del proyecto genera para `BootstrapDatabase` un constructor propio con sus campos declarados en el nivel superior.
 
 La plantilla construye las seis entidades, incluso cuando sólo utilizas una. `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` y `DB_PREFIX` se comparten entre las entradas que los leen. `DB_CHARSET` se aplica sólo al driver activo entre MySQL, PostgreSQL y SQL Server; las otras entradas conservan su charset predeterminado. Para conexiones distintas configura cada entidad explícitamente.
 

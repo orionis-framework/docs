@@ -45,7 +45,9 @@ class TestGreetingServer(TestCase):
 uv run python -B reactor test --start-dir tests/integration --file-pattern "test_greeting_mcp.py"
 ```
 
-Expect one passing test and exit code 0. `assertOk()` rejects JSON-RPC errors and tool results marked `isError=True`; `assertTextContains()` checks the returned text content. The tool must return `McpResponse`, not a raw Python dictionary or string. To test an existing application tool, import its real server class instead of declaring the example server and call the tool with representative input.
+Expect one passing test and exit code 0. `assertOk()` rejects JSON-RPC errors and tool results marked `isError=True`; `assertTextContains()` checks the returned text content. The example returns `McpResponse.text(...)`. For several content items or a continuation requiring client input, see [MCP responses](/en/mcp/responses-and-content) and [advanced workflows](/en/mcp/advanced-workflows). To test an existing application tool, import its real server class instead of declaring the example server and call the tool with representative input.
+
+`await client.request(method, params)` collects a finite exchange into `McpTestResponse`. `params` defaults to `None`. Use the keyword arguments `meta` (default `None`) and `request_id` (default `1`) to override request metadata and the correlation ID. Read `response.message` for the final JSON-RPC mapping. A successful envelope has `result`, a protocol failure has `error`, and `{}` means the exchange ended without a final response. `response.notifications` is a tuple of decoded notification mappings in wire order. For an ongoing subscription, use `async for message in client.stream(method, params)` and close the stream when your test has observed the expected event.
 
 ## Inspect an HTTP server in the browser
 
@@ -70,6 +72,6 @@ A browser network error can indicate CORS, DNS, TLS, or another connectivity pro
 
 ## Reference and next steps
 
-[mcp.py](https://github.com/orionis-framework/framework/blob/1e905f4f103d47c61789d877eba472a5bd97681b/orionis/test/clients/mcp.py) · [case.py](https://github.com/orionis-framework/framework/blob/1e905f4f103d47c61789d877eba472a5bd97681b/orionis/test/cases/case.py)
+[mcp.py](https://github.com/orionis-framework/framework/blob/v1.9.0/orionis/test/clients/mcp.py) · [case.py](https://github.com/orionis-framework/framework/blob/v1.9.0/orionis/test/cases/case.py)
 
 [Return to the module index](/en/testing).

@@ -5,7 +5,7 @@ editUrl: true
 lastUpdated: false
 ---
 
-Ejecuta las pruebas desde la raíz de la aplicación, donde se encuentra `reactor`. Todos los casos deben extender `TestCase`, importado con `from orionis.test import TestCase`; consulta [creación e inyección de dependencias](/es/testing/writing-and-running-tests) para preparar el primero.
+Ejecuta las pruebas desde la raíz de la aplicación, donde se encuentra `reactor`. Si el caso recibe servicios del contenedor, consulta [creación e inyección de dependencias](/es/testing/writing-and-running-tests) para preparar el primero.
 
 ## Ejecutar la suite
 

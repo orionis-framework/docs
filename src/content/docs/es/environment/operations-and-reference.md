@@ -195,7 +195,7 @@ Para convertir el contenido utiliza [EnvironmentCaster](/es/environment/typed-co
 ## Generación de APP_KEY
 
 ```text
-SecureKeyGenerator.generate(cipher: str | Cipher = Cipher.AES_256_CBC) -> str
+SecureKeyGenerator.generate(cipher: str | Cipher = Cipher.AES_256_GCM) -> str
 ```
 
 `SecureKeyGenerator`, en `orionis.environment.key.key_generator`, genera bytes aleatorios con `os.urandom` y devuelve texto con prefijo `base64:`. `KEY_SIZES` relaciona las cuatro opciones con su tamaño:
@@ -206,6 +206,8 @@ SecureKeyGenerator.generate(cipher: str | Cipher = Cipher.AES_256_CBC) -> str
 | `Cipher.AES_256_CBC` / `"AES-256-CBC"` | 32 |
 | `Cipher.AES_128_GCM` / `"AES-128-GCM"` | 16 |
 | `Cipher.AES_256_GCM` / `"AES-256-GCM"` | 32 |
+
+La tabla describe el generador de claves independiente. Para cifrar datos de la aplicación, `APP_CIPHER` solo admite las dos variantes GCM. El valor predeterminado es `AES-256-GCM`.
 
 Una cadena de algoritmo desconocida produce `ValueError`; no se normalizan sus mayúsculas. Generar una clave no la persiste por sí solo. La entidad nativa de configuración `App` utiliza este generador si falta la clave y escribe `APP_KEY` durante su validación.
 

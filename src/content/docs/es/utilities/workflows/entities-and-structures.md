@@ -37,6 +37,28 @@ assert account.toDict() == {
 assert [item["name"] for item in account.getFields()] == ["name", "status", "tags"]
 ```
 
+### Conservar atributos propios de la aplicación
+
+Usa `@dataclass(init=False)` para heredar el constructor de `BaseEntity`, que recibe argumentos por nombre. Inicializa los campos declarados con sus valores o fábricas, guarda los atributos públicos adicionales y llama a `__post_init__()`. Una dataclass con constructor generado acepta los campos de ese constructor.
+
+```python
+from dataclasses import dataclass
+from orionis.support.entities import BaseEntity
+
+@dataclass(init=False, frozen=True)
+class Report(BaseEntity):
+    name: str
+
+report = Report(name="inventory", region="north")
+assert report.toDict() == {"name": "inventory", "region": "north"}
+assert [f["name"] for f in report.getFields()] == ["name"]
+assert report.getFields(include_dynamic=True)[-1] == {
+    "name": "region", "types": ["str"], "default": None, "metadata": {"dynamic": True}
+}
+```
+
+Omitir un campo obligatorio, pasar un campo declarado con `init=False`, usar un nombre reservado o añadir un atributo a una instancia sin `__dict__` produce `TypeError`. Valida los tipos en tu subclase. `toDict()` copia recursivamente entidades, dataclasses y contenedores, y convierte los miembros de enum en sus valores. Usa datos sin ciclos.
+
 ### Usar datos orientados a atributos
 
 ```python
@@ -69,6 +91,6 @@ assert FreezeThaw.thaw(frozen) == source
 
 ## Referencia y próximos pasos
 
-[base.py](https://github.com/orionis-framework/framework/blob/1e905f4f103d47c61789d877eba472a5bd97681b/orionis/support/entities/base.py) · [dot_dict.py](https://github.com/orionis-framework/framework/blob/1e905f4f103d47c61789d877eba472a5bd97681b/orionis/support/types/dot_dict.py) · [std.py](https://github.com/orionis-framework/framework/blob/1e905f4f103d47c61789d877eba472a5bd97681b/orionis/support/types/std.py) · [freezer.py](https://github.com/orionis-framework/framework/blob/1e905f4f103d47c61789d877eba472a5bd97681b/orionis/support/structures/freezer.py)
+[base.py](https://github.com/orionis-framework/framework/blob/v1.9.0/orionis/support/entities/base.py) · [dot_dict.py](https://github.com/orionis-framework/framework/blob/v1.9.0/orionis/support/types/dot_dict.py) · [std.py](https://github.com/orionis-framework/framework/blob/v1.9.0/orionis/support/types/std.py) · [freezer.py](https://github.com/orionis-framework/framework/blob/v1.9.0/orionis/support/structures/freezer.py)
 
 [Volver al índice del módulo](/es/utilities).

@@ -7,6 +7,12 @@ lastUpdated: false
 
 Construye tu aplicación a partir del esqueleto oficial y añade las funciones que necesite tu proyecto. Para empezar a desarrollar, no necesitas implementar `Application`, un kernel ni un contenedor: el archivo generado `bootstrap/app.py` conecta esos componentes.
 
+Este manual cubre **Orionis Framework 1.9.0** y requiere Python 3.14 o posterior. Desde la raíz de la aplicación puedes comprobar qué versión ejecuta tu proyecto.
+
+```bash
+uv run python -c "from orionis.metadata import VERSION; print(VERSION)"
+```
+
 ## Tu primera sesión de desarrollo
 
 1. [Instala y crea un proyecto](/es/getting-started/installation): prepara uv y Git, elige un stack y crea el entorno de la aplicación.

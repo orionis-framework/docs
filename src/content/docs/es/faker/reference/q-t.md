@@ -3721,7 +3721,7 @@ fake.timeSeries(start_date: datetime.date | datetime.datetime | datetime.timedel
 | `end_date` | Extremo final de fecha/hora o intervalo relativo. |
 | `precision` | Intervalo de puntos de la serie temporal en segundos. |
 | `distrib` | Callable que calcula el valor para cada datetime. |
-| `tzinfo` | Timezone del datetime producido; None usa el comportamiento nativo. |
+| `tzinfo` | Al omitirlo se usa la zona horaria de la aplicación. Un valor explícito, incluido `None`, se pasa al proveedor. |
 
 Disponibilidad verificada: 110 locales. Ejemplos de locales: `en_US`, `es_CO`, `es_ES`, `am_ET`, `ar_AA`, `ar_AE`, `ar_BH`, `ar_DZ`.
 

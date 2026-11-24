@@ -42,7 +42,7 @@ All strings are `str`; `PYTHON_REQUIRES` is a tuple of integers. They take no pa
 | `AUTHOR_EMAIL` | `str` | Contact email published by the package. |
 | `PYTHON_REQUIRES` | `tuple[int, int]` | Minimum Python version as `(major, minor)`, currently `(3, 14)`. |
 | `API` | `str` | URL of the distribution's JSON metadata on PyPI. |
-| `DOCS` | `str` | Documentation root URL. |
+| `DOCS` | `str` | Project home page (`https://orionis-framework.com/`). |
 | `FRAMEWORK` | `str` | Framework repository URL. |
 | `SKELETON` | `str` | Application skeleton repository URL. |
 

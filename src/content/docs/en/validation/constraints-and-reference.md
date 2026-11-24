@@ -1006,7 +1006,7 @@ Invalid body (422):
 
 `After`, `AfterOrEqual`, `Before` and `BeforeOrEqual` accept `date`, `datetime` or text parseable by `DateTime`. Their `reference` may be one of those values or a sibling field name. An existing non-`None` sibling attribute takes precedence over parsing the text as a date. `None` compares against the current moment. The strings `now`, `today`, `tomorrow` and `yesterday` are recognized; the last three mean the start of the corresponding day.
 
-These four rules add no error when the field value cannot be interpreted as a date; an unresolvable reference does fail. Prefer a `date`/`datetime` annotation, or add `DateFormat` when retaining text. `DateFormat` uses `DateTime` tokens such as `YYYY-MM-DD`, **not** `strptime` directives such as `%Y-%m-%d`.
+These four rules reject unparseable text and unresolvable references. Other values that cannot represent a date are left to type validation. A calendar date means midnight in `app.timezone`. A datetime without an offset uses the same zone. Comparisons use UTC instants. For example, `01:30-05:00` occurs an hour after `01:30-04:00` on the same date. Prefer a `date`/`datetime` annotation, or add `DateFormat` when retaining text. `DateFormat` uses `DateTime` tokens such as `YYYY-MM-DD`, **not** `strptime` directives such as `%Y-%m-%d`.
 
 ```python
 from datetime import date
