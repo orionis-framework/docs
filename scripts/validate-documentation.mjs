@@ -155,7 +155,7 @@ if (process.argv.includes('--built')) {
     let html;
     try { html = await htmlAt(slug); }
     catch (error) { errors.push(error.message); continue; }
-    let orinWelcomes = 0;
+    let cosmoWelcomes = 0;
     const data = { ids: new Set(), links: [], alternates: [], languages: [], canonicals: [], descriptions: [], sidebarSections: [], sidebarBands: [], capabilities: [], sidebarPersistence: false, apiLink: false, h1: 0, searchable: false };
     elements(parse(html), (node, attrs) => {
       if (attrs.id) data.ids.add(attrs.id);
@@ -177,17 +177,17 @@ if (process.argv.includes('--built')) {
       if (node.tagName === 'a' && attrs.href === 'https://api.orionis-framework.com/' && attrs.target === '_blank') data.apiLink = true;
       if (node.tagName === 'p' && (attrs.class || '').split(/\s+/).includes('sidebar-band')) data.sidebarBands.push({ id: attrs['data-band-id'], title: textContent(node) });
       if (node.tagName === 'a' && (attrs.class || '').split(/\s+/).includes('capability-card')) data.capabilities.push(attrs.href);
-      if (hasClass(attrs, 'orin-welcome')) {
-        orinWelcomes++;
+      if (hasClass(attrs, 'cosmo-welcome')) {
+        cosmoWelcomes++;
         const greeting = textContent(node);
-        check(/\bOrin\b/.test(greeting) && greeting.includes(locale === 'es' ? 'lince' : 'lynx'), `Missing localized introduction to Orin: ${slug}`);
+        check(/\bCosmo\b/.test(greeting) && greeting.includes(locale === 'es' ? 'lince' : 'lynx'), `Missing localized introduction to Cosmo: ${slug}`);
         const links = new Set();
         elements(node, (child, childAttrs) => {
           if (child.tagName === 'a') links.add(childAttrs.href);
         });
         for (const id of ['foundation-installation', 'foundation-getting-started']) {
           const destination = pages.find((entry) => entry.id === id).slug[locale];
-          check(links.has(destination), `Orin's welcome is missing its localized link to ${destination}: ${slug}`);
+          check(links.has(destination), `Cosmo's welcome is missing its localized link to ${destination}: ${slug}`);
         }
       }
       if (node.tagName === 'details' && (attrs.class || '').split(/\s+/).includes('sidebar-section')) {
@@ -213,7 +213,7 @@ if (process.argv.includes('--built')) {
         data.sidebarSections.push(section);
       }
     });
-    check(orinWelcomes === (page.id === 'foundation-overview' ? 1 : 0), `Orin's welcome must appear once on each getting-started introduction only: ${slug}`);
+    check(cosmoWelcomes === (page.id === 'foundation-overview' ? 1 : 0), `Cosmo's welcome must appear once on each getting-started introduction only: ${slug}`);
     check(data.h1 === 1, `Expected one H1: ${slug}, found ${data.h1}`);
     check(data.descriptions.length === 1, `Expected one meta description: ${slug}`);
     check(data.canonicals.length === 1 && normalize(new URL(data.canonicals[0] || site).pathname) === slug, `Invalid/duplicate canonical: ${slug}`);

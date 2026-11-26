@@ -6,7 +6,7 @@ const spanish = Astro.locals.starlightRoute.lang === 'es';
 const locale = spanish ? 'es' : 'en';
 const copy = spanish ? {
   label: 'Capacidades de Orionis',
-  greeting: '¡Hola! Soy Orin, el lince estelar de Orionis.',
+  greeting: '¡Hola! Soy Cosmo, el lince estelar de Orionis.',
   firstStep: '¿Creamos tu primera aplicación? Empieza por la ',
   install: 'instalación',
   nextStep: ' o, si ya tienes un proyecto, ',
@@ -15,7 +15,7 @@ const copy = spanish ? {
   more: 'También incluye',
 } : {
   label: 'Orionis capabilities',
-  greeting: 'Hi! I’m Orin, the stellar lynx of Orionis.',
+  greeting: 'Hi! I’m Cosmo, the stellar lynx of Orionis.',
   firstStep: 'Ready to build your first app? Start with ',
   install: 'installation',
   nextStep: ', or ',
@@ -82,10 +82,10 @@ function href(pageId: string): string {
 ---
 
 <section class="framework-capabilities" aria-label={copy.label}>
-  <div class="orin-welcome">
-    <img src="/images/orin-avatar.webp" width="80" height="80" alt="" />
+  <div class="cosmo-welcome">
+    <img src="/images/cosmo-avatar.webp" width="80" height="80" alt="" />
     <div>
-      <p class="orin-greeting">{copy.greeting}</p>
+      <p class="cosmo-greeting">{copy.greeting}</p>
       <p>{copy.firstStep}<a href={href('foundation-installation')}>{copy.install}</a>{copy.nextStep}<a href={href('foundation-getting-started')}>{copy.start}</a>.</p>
     </div>
   </div>
@@ -122,7 +122,7 @@ function href(pageId: string): string {
     color: var(--orionis-muted);
   }
 
-  .orin-welcome {
+  .cosmo-welcome {
     display: flex;
     align-items: center;
     gap: clamp(0.65rem, 2vw, 1rem);
@@ -132,17 +132,17 @@ function href(pageId: string): string {
     line-height: 1.5;
   }
 
-  .orin-welcome img {
+  .cosmo-welcome img {
     flex: none;
     inline-size: clamp(3.75rem, 12vw, 5rem);
     block-size: auto;
   }
 
-  .orin-welcome p {
+  .cosmo-welcome p {
     margin: 0;
   }
 
-  .orin-greeting {
+  .cosmo-greeting {
     font-weight: 600;
   }
 
@@ -231,7 +231,7 @@ function href(pageId: string): string {
   }
 
   .additional-capabilities a,
-  .orin-welcome a {
+  .cosmo-welcome a {
     color: var(--orionis-primary);
     text-underline-offset: 0.2em;
   }
